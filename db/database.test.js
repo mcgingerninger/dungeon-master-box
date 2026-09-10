@@ -6,6 +6,7 @@ import {
   upsertCharacter, getCharacter, getCharacterById, listCharacters,
   saveSubsystemState, loadSubsystemState, loadAllSubsystemState,
   savePlayerState, loadPlayerState, loadAllPlayerStates,
+  createLootClaim, getLootClaim,
 } from './database.js';
 import { SUBSYSTEMS } from './schema.js';
 
@@ -225,5 +226,49 @@ describe('player_states (Phase 5a — per-player full state blobs)', () => {
     savePlayerState(db, campaign.id, 'uid-1', { characterCurrentHp: 10 }, 1);
     db.prepare('DELETE FROM campaigns WHERE id = ?').run(campaign.id);
     assert.equal(loadAllPlayerStates(db, campaign.id).length, 0);
+  });
+});
+
+describe('loot_claims (Phase 5b — first-write-wins arbitration)', () => {
+  test('the first claim on a given id wins', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    const result = createLootClaim(db, campaign.id, 'monster1_item1', 'uid-alice', 'Alice');
+    assert.equal(result.won, true);
+    assert.equal(result.claimedByUid, 'uid-alice');
+  });
+
+  test('a second claim on the SAME id loses, and reports who actually won', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    createLootClaim(db, campaign.id, 'monster1_item1', 'uid-alice', 'Alice');
+    const second = createLootClaim(db, campaign.id, 'monster1_item1', 'uid-bob', 'Bob');
+    assert.equal(second.won, false);
+    assert.equal(second.claimedByUid, 'uid-alice');
+    assert.equal(second.claimedByUsername, 'Alice');
+  });
+
+  test('getLootClaim returns null for a claim id never created', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    assert.equal(getLootClaim(db, campaign.id, 'never_claimed'), null);
+  });
+
+  test('the same claim id in two different campaigns never collides', () => {
+    const db = openDatabase(':memory:');
+    const c1 = createCampaign(db, 'Campaign 1');
+    const c2 = createCampaign(db, 'Campaign 2');
+    const r1 = createLootClaim(db, c1.id, 'monster1_item1', 'uid-alice', 'Alice');
+    const r2 = createLootClaim(db, c2.id, 'monster1_item1', 'uid-bob', 'Bob');
+    assert.equal(r1.won, true);
+    assert.equal(r2.won, true); // same claim_id string, but a different campaign — not a collision
+  });
+
+  test('deleting a campaign cascades to loot_claims too', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Doomed Campaign');
+    createLootClaim(db, campaign.id, 'monster1_item1', 'uid-alice', 'Alice');
+    db.prepare('DELETE FROM campaigns WHERE id = ?').run(campaign.id);
+    assert.equal(getLootClaim(db, campaign.id, 'monster1_item1'), null);
   });
 });

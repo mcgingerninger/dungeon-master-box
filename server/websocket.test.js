@@ -221,3 +221,70 @@ describe('cross-player writes (DM -> player)', () => {
     assert.equal(identified.state.characterCurrentHp, 0);
   });
 });
+
+describe('loot claims (Phase 5b — first-write-wins arbitration)', () => {
+  async function connectAs(accountUid, role) {
+    const ws = await connect();
+    send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
+    await nextMessage(ws);
+    return ws;
+  }
+
+  test('a self-loot claim on an unclaimed id wins', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-alice', claimedByUsername: 'Alice' });
+    const result = await nextMessage(player);
+    assert.equal(result.type, 'loot_claim_result');
+    assert.equal(result.won, true);
+    assert.equal(result.claimedByUid, 'uid-alice');
+  });
+
+  test('two players racing for the SAME claim: exactly one wins, the loser learns who actually won', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    const bob = await connectAs('uid-bob', 'player');
+    // Fired without awaiting between them — the point is to not control ordering, since the real
+    // arbitration guarantee (the UNIQUE constraint in db/schema.js) has to hold regardless of
+    // which one the server happens to process first.
+    send(alice, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-alice', claimedByUsername: 'Alice' });
+    send(bob, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-bob', claimedByUsername: 'Bob' });
+    const [aliceResult, bobResult] = await Promise.all([nextMessage(alice), nextMessage(bob)]);
+
+    const winners = [aliceResult, bobResult].filter(r => r.won);
+    const losers = [aliceResult, bobResult].filter(r => !r.won);
+    assert.equal(winners.length, 1, 'exactly one side should win the race');
+    assert.equal(losers.length, 1);
+    // The loser must be told who ACTUALLY won, not just that they lost — matching the original's
+    // own claim doc, which is always readable regardless of who created it.
+    assert.equal(losers[0].claimedByUid, winners[0].claimedByUid);
+  });
+
+  test('the DM\'s live connection is notified when a player wins a claim (for their roster)', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-alice', claimedByUsername: 'Alice' });
+    await nextMessage(player); // consume the player's own loot_claim_result
+    const dmUpdate = await nextMessage(dm);
+    assert.equal(dmUpdate.type, 'loot_claim_update');
+    assert.equal(dmUpdate.claimedByUid, 'uid-alice');
+  });
+
+  test('the DM claiming on a player\'s behalf (a gift) does not send itself a duplicate notification', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-alice', claimedByUsername: 'Alice' });
+    const result = await nextMessage(dm);
+    assert.equal(result.type, 'loot_claim_result');
+    assert.equal(result.won, true);
+    // No second message should follow — the DM already knows via loot_claim_result above, and
+    // this file's server code explicitly skips the separate DM notification when the DM was the
+    // one who sent the claim in the first place.
+    await assertNoMessage(dm);
+  });
+
+  test('a non-DM cannot create a claim on someone else\'s behalf', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    send(alice, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-bob', claimedByUsername: 'Bob' });
+    const msg = await nextMessage(alice);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+});
