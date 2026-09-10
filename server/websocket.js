@@ -20,9 +20,19 @@
 //     { type: 'gift_item', targetUid, item }                          -- DM only
 //     { type: 'set_inventory_fields', targetUid, fields }             -- DM only
 //   server -> client:
-//     { type: 'identified', state, rev }         -- ack, plus whatever was already persisted for this account
-//     { type: 'state_update', state, rev }       -- this account's state changed (a DM cross-write landed)
+//     { type: 'identified', state, rev }             -- ack, plus whatever was already persisted for this account
+//     { type: 'push_ack', rev }                       -- confirms a push_state was actually persisted
+//     { type: 'push_rejected', reason, rev }          -- a push_state was dropped as stale (see the rev check below)
+//     { type: 'cross_write_ack', targetUid, rev }     -- confirms hp_delta/gift_item/set_inventory_fields landed (sent to the DM)
+//     { type: 'state_update', state, rev }            -- this account's state changed (a DM cross-write landed) (sent to the target)
 //     { type: 'error', message }
+//
+// The two ack types matter for more than bookkeeping: the original Firestore design lets a
+// caller await pushOwnState's/applyHpDelta's own promise to know a write actually landed.
+// Without an equivalent signal here, any caller (including this file's own tests) has no way to
+// know a write has actually been persisted except guessing a fixed delay — which is genuinely
+// unsafe under variable load, and was confirmed to cause real, if infrequent, test flakiness
+// before these acks were added.
 //
 // Self-echo (Firestore's onSnapshot always echoing a client's own writes back to it, which
 // multiplayer-sync.js's rev/extRev counters exist specifically to filter back out) simply isn't
@@ -82,8 +92,13 @@ export function createWebSocketServer(db, httpServer) {
         // even-newer push's does not get to clobber the newer one. This is the one piece of the
         // original's rev logic that's still needed — the self-echo half is gone by construction
         // (see the module comment above).
-        if (existing && rev <= existing.rev) return;
+        if (existing && rev <= existing.rev) return send(ws, { type: 'push_rejected', reason: 'stale rev', rev });
         savePlayerState(db, identity.campaignId, identity.accountUid, msg.state, rev);
+        // The original Firestore design lets a caller know a push actually landed — pushOwnState
+        // returns the promise from `await setDoc(...)`. This ack is that same guarantee over
+        // WebSocket: a caller (or a test) can wait for confirmation instead of assuming a fixed
+        // delay was long enough, which is genuinely unsafe under variable system load.
+        send(ws, { type: 'push_ack', rev });
         return;
       }
 
@@ -111,6 +126,11 @@ export function createWebSocketServer(db, httpServer) {
         savePlayerState(db, identity.campaignId, targetUid, nextState, nextRev);
         const targetWs = roomFor(identity.campaignId).get(targetUid);
         if (targetWs) send(targetWs, { type: 'state_update', state: nextState, rev: nextRev });
+        // Acks the DM's OWN connection, separately from the target's state_update above — lets
+        // the DM's client (or a test) know the write actually landed, the same guarantee
+        // push_ack gives a player pushing their own state. Same reasoning: a client shouldn't
+        // have to guess how long "probably done by now" is.
+        send(ws, { type: 'cross_write_ack', targetUid, rev: nextRev });
         return;
       }
 

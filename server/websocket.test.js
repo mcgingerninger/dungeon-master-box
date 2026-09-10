@@ -52,6 +52,19 @@ function assertNoMessage(ws, timeoutMs = 300) {
     ws.once('message', (raw) => { clearTimeout(timer); reject(new Error('Expected no message, got: ' + raw.toString())); });
   });
 }
+// Sends push_state and waits for the server's push_ack before returning — replaces an earlier
+// version of this file that used a fixed setTimeout("give the server a moment to process")
+// instead. That produced real, if infrequent, flaky failures under variable system load: a
+// fixed delay is never actually guaranteed to be long enough. Waiting for the real
+// confirmation the server now sends (see server/websocket.js's push_ack) is what the original
+// Firestore-based pushOwnState() could already do by awaiting its own setDoc() promise — this
+// closes the same gap over WebSocket.
+async function pushState(ws, rev, state) {
+  send(ws, { type: 'push_state', rev, state });
+  const ack = await nextMessage(ws);
+  assert.equal(ack.type, 'push_ack');
+  return ack;
+}
 
 describe('identify', () => {
   test('identifying with a real campaign acks with null state the first time', async () => {
@@ -92,10 +105,10 @@ describe('push_state and reconnect', () => {
     const ws1 = await connect();
     send(ws1, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player', username: 'Alice' });
     await nextMessage(ws1);
-    send(ws1, { type: 'push_state', rev: 1, state: { characterCurrentHp: 25 } });
+    await pushState(ws1, 1, { characterCurrentHp: 25 });
 
-    // Give the server a moment to process, then simulate a reconnect with a fresh connection.
-    await new Promise(r => setTimeout(r, 100));
+    // Now simulate a reconnect with a fresh connection — the push above is confirmed persisted
+    // (pushState awaited its ack) before this happens, not just assumed to have had "enough time."
     const ws2 = await connect();
     send(ws2, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player', username: 'Alice' });
     const msg = await nextMessage(ws2);
@@ -109,6 +122,11 @@ describe('push_state and reconnect', () => {
     send(ws, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player' });
     await nextMessage(ws);
     send(ws, { type: 'push_state', rev: 1, state: { characterCurrentHp: 25 } });
+    // Deliberately NOT using pushState here — the whole point is to prove the ONLY message this
+    // connection receives is its own push_ack, never a state_update. Consume the ack explicitly,
+    // then confirm nothing else follows.
+    const ack = await nextMessage(ws);
+    assert.equal(ack.type, 'push_ack');
     await assertNoMessage(ws);
   });
 
@@ -116,15 +134,15 @@ describe('push_state and reconnect', () => {
     const ws = await connect();
     send(ws, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player' });
     await nextMessage(ws);
-    send(ws, { type: 'push_state', rev: 5, state: { characterCurrentHp: 40 } });
-    await new Promise(r => setTimeout(r, 50));
+    await pushState(ws, 5, { characterCurrentHp: 40 });
     send(ws, { type: 'push_state', rev: 3, state: { characterCurrentHp: 1 } }); // arrives "late" with an older rev
-    await new Promise(r => setTimeout(r, 50));
+    const rejection = await nextMessage(ws);
+    assert.equal(rejection.type, 'push_rejected');
 
     const ws2 = await connect();
     send(ws2, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player' });
     const msg = await nextMessage(ws2);
-    assert.equal(msg.state.characterCurrentHp, 40); // the newer push wins, the stale one was ignored
+    assert.equal(msg.state.characterCurrentHp, 40); // the newer push wins, the stale one was rejected
   });
 });
 
@@ -138,8 +156,7 @@ describe('cross-player writes (DM -> player)', () => {
 
   test('hp_delta reaches the target player live, clamped to their max HP', async () => {
     const player = await connectAs('uid-player', 'player');
-    send(player, { type: 'push_state', rev: 1, state: { characterCurrentHp: 20, characterMaxHpEffective: 30 } });
-    await new Promise(r => setTimeout(r, 50));
+    await pushState(player, 1, { characterCurrentHp: 20, characterMaxHpEffective: 30 });
 
     const dm = await connectAs('uid-dm', 'dm');
     send(dm, { type: 'hp_delta', targetUid: 'uid-player', delta: -5 });
@@ -166,8 +183,7 @@ describe('cross-player writes (DM -> player)', () => {
 
   test('set_inventory_fields overwrites only the fields provided', async () => {
     const player = await connectAs('uid-player', 'player');
-    send(player, { type: 'push_state', rev: 1, state: { characterCurrentHp: 20, characterClass: 'Ranger' } });
-    await new Promise(r => setTimeout(r, 50));
+    await pushState(player, 1, { characterCurrentHp: 20, characterClass: 'Ranger' });
 
     const dm = await connectAs('uid-dm', 'dm');
     send(dm, { type: 'set_inventory_fields', targetUid: 'uid-player', fields: { playerSlots: { weapon1: 'itemKey1' } } });
@@ -191,12 +207,17 @@ describe('cross-player writes (DM -> player)', () => {
     // No prior state exists for this uid, so current HP defaults to 0 and the write floor-clamps
     // to 0 even without a known max — this is the correct, if slightly non-obvious, behavior of
     // the same clamp logic exercised elsewhere, not a special case for the offline path.
+    //
+    // The target isn't connected, so there's no state_update to wait on — but the DM's OWN
+    // connection still gets cross_write_ack once the write actually lands, which is exactly the
+    // confirmation needed here instead of assuming the write is "probably done by now."
     send(dm, { type: 'hp_delta', targetUid: 'uid-offline-player', delta: -5 });
-    await new Promise(r => setTimeout(r, 50));
+    const ack = await nextMessage(dm);
+    assert.equal(ack.type, 'cross_write_ack');
 
     const ws2 = await connect();
     send(ws2, { type: 'identify', campaignId, accountUid: 'uid-offline-player', role: 'player' });
-    const ack = await nextMessage(ws2);
-    assert.equal(ack.state.characterCurrentHp, 0);
+    const identified = await nextMessage(ws2);
+    assert.equal(identified.state.characterCurrentHp, 0);
   });
 });
