@@ -5,6 +5,7 @@ import {
   openDatabase, createCampaign, getCampaign, listCampaigns, touchCampaign,
   upsertCharacter, getCharacter, getCharacterById, listCharacters,
   saveSubsystemState, loadSubsystemState, loadAllSubsystemState,
+  savePlayerState, loadPlayerState, loadAllPlayerStates,
 } from './database.js';
 import { SUBSYSTEMS } from './schema.js';
 
@@ -168,5 +169,61 @@ describe('foreign key integrity', () => {
     db.prepare('DELETE FROM campaigns WHERE id = ?').run(campaign.id);
     assert.equal(listCharacters(db, campaign.id).length, 0);
     assert.equal(loadSubsystemState(db, campaign.id, 'journey'), null);
+  });
+});
+
+describe('player_states (Phase 5a — per-player full state blobs)', () => {
+  test('save and load round-trips a player\'s full state blob with its rev', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    const blob = { inventoryGrid: [[null, 'itemKey1']], playerSlots: { weapon1: 'itemKey1' }, characterCurrentHp: 30 };
+    savePlayerState(db, campaign.id, 'uid-1', blob, 3);
+    const loaded = loadPlayerState(db, campaign.id, 'uid-1');
+    assert.deepEqual(loaded.state, blob);
+    assert.equal(loaded.rev, 3);
+  });
+
+  test('saving again for the same player overwrites rather than duplicating', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    savePlayerState(db, campaign.id, 'uid-1', { characterCurrentHp: 30 }, 1);
+    savePlayerState(db, campaign.id, 'uid-1', { characterCurrentHp: 25 }, 2);
+    const loaded = loadPlayerState(db, campaign.id, 'uid-1');
+    assert.equal(loaded.state.characterCurrentHp, 25);
+    assert.equal(loaded.rev, 2);
+  });
+
+  test('loadPlayerState returns null for a player who never pushed anything', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    assert.equal(loadPlayerState(db, campaign.id, 'nobody'), null);
+  });
+
+  test('player state is scoped per campaign, same account_uid in two campaigns never collides', () => {
+    const db = openDatabase(':memory:');
+    const c1 = createCampaign(db, 'Campaign 1');
+    const c2 = createCampaign(db, 'Campaign 2');
+    savePlayerState(db, c1.id, 'uid-1', { characterCurrentHp: 10 }, 1);
+    savePlayerState(db, c2.id, 'uid-1', { characterCurrentHp: 99 }, 1);
+    assert.equal(loadPlayerState(db, c1.id, 'uid-1').state.characterCurrentHp, 10);
+    assert.equal(loadPlayerState(db, c2.id, 'uid-1').state.characterCurrentHp, 99);
+  });
+
+  test('loadAllPlayerStates returns every player in a campaign', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    savePlayerState(db, campaign.id, 'uid-1', { characterCurrentHp: 10 }, 1);
+    savePlayerState(db, campaign.id, 'uid-2', { characterCurrentHp: 20 }, 1);
+    const all = loadAllPlayerStates(db, campaign.id);
+    assert.equal(all.length, 2);
+    assert.deepEqual(all.map(p => p.accountUid).sort(), ['uid-1', 'uid-2']);
+  });
+
+  test('deleting a campaign cascades to player_states too', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Doomed Campaign');
+    savePlayerState(db, campaign.id, 'uid-1', { characterCurrentHp: 10 }, 1);
+    db.prepare('DELETE FROM campaigns WHERE id = ?').run(campaign.id);
+    assert.equal(loadAllPlayerStates(db, campaign.id).length, 0);
   });
 });

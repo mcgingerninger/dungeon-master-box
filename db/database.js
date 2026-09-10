@@ -162,3 +162,24 @@ export function loadAllSubsystemState(db, campaignId) {
   rows.forEach(r => { out[r.subsystem] = JSON.parse(r.data); });
   return out;
 }
+
+// ---------- Player states (Phase 5a — see db/schema.js's comment on player_states) ----------
+
+export function savePlayerState(db, campaignId, accountUid, state, rev) {
+  const json = JSON.stringify(state);
+  db.prepare(`
+    INSERT INTO player_states (campaign_id, account_uid, state, rev)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(campaign_id, account_uid) DO UPDATE SET state = excluded.state, rev = excluded.rev, updated_at = datetime('now')
+  `).run(campaignId, accountUid, json, rev || 0);
+}
+
+export function loadPlayerState(db, campaignId, accountUid) {
+  const row = db.prepare('SELECT state, rev FROM player_states WHERE campaign_id = ? AND account_uid = ?').get(campaignId, accountUid);
+  return row ? { state: JSON.parse(row.state), rev: row.rev } : null;
+}
+
+export function loadAllPlayerStates(db, campaignId) {
+  const rows = db.prepare('SELECT account_uid, state, rev FROM player_states WHERE campaign_id = ?').all(campaignId);
+  return rows.map(r => ({ accountUid: r.account_uid, state: JSON.parse(r.state), rev: r.rev }));
+}

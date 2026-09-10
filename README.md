@@ -57,15 +57,21 @@ See `docs/MIGRATION_PLAN.md` for the full phase-by-phase plan as originally scop
 
 ## Status
 
-**Phases 0 through 4 complete** (Phase 4 as a first, narrow slice — see below). Repository
-separated with history preserved (Phase 0); item classification, character sheet math, battle
-parsing/damage, and all four gambling games extracted into `game-engine.js`, bridged into the
-monolith (Phase 1); a SQLite schema and Node-side data-access layer built in `db/` (Phase 2); a
-real Node.js server (`server/`, plain `http`, no framework) exposing that persistence layer as a
-REST API (Phase 3); gambling resolution made genuinely server-authoritative — the server's own
-randomness decides outcomes, never a client-supplied value — as a first, well-bounded proof of
-"server-authoritative game state" rather than attempting the full scope at once (Phase 4).
-**None of this is wired into the live browser app yet** — it still uses `localStorage` and
-resolves gambling locally, completely unchanged — that starts in Phase 5. See
-`docs/ARCHITECTURE.md` for the full account of each phase, including real mistakes made and
-fixed along the way and a documented, deliberate gap (no authorization/auth system yet).
+**Phases 0 through 4 complete, Phase 5 in progress** (Phases 4 and 5 both as first, narrow
+slices — see below). Repository separated with history preserved (Phase 0); item classification,
+character sheet math, battle parsing/damage, and all four gambling games extracted into
+`game-engine.js`, bridged into the monolith (Phase 1); a SQLite schema and Node-side data-access
+layer built in `db/` (Phase 2); a real Node.js server (`server/`, plain `http`, no framework)
+exposing that persistence layer as a REST API (Phase 3); gambling resolution made genuinely
+server-authoritative — the server's own randomness decides outcomes, never a client-supplied
+value — as a first, well-bounded proof of "server-authoritative game state" (Phase 4). Phase 5
+("WebSocket multiplayer") turned out to bundle four largely separate systems once audited
+(auth, real-time sync, loot-claim race arbitration, and a whole account UI) — broken into
+sub-phases as a result; **Phase 5a** (the core state sync loop and cross-player writes only,
+Firebase Auth untouched) is done, with loot claims, battlefield/puzzle broadcast, and the
+roster listener still ahead.
+
+**None of this is wired into the live browser app yet** — it still uses `localStorage`/Firebase
+and resolves everything locally, completely unchanged. See `docs/ARCHITECTURE.md` for the full
+account of each phase, including real mistakes made and fixed along the way and documented,
+deliberate gaps (no authorization/auth system, no identity verification on the WebSocket layer).
