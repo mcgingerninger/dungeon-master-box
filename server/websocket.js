@@ -1,11 +1,12 @@
-// Phases 5a-5b of the architecture migration (see docs/MIGRATION_PLAN.md, docs/ARCHITECTURE.md):
+// Phases 5a-5c of the architecture migration (see docs/MIGRATION_PLAN.md, docs/ARCHITECTURE.md):
 // WebSocket replacement for multiplayer-sync.js's core state push/listen loop
 // (pushOwnState/startPlayerListener), its three cross-player writes (applyHpDelta,
-// giftItemToPlayer, setPlayerInventoryFields), and real-time loot-claim arbitration
-// (createLootClaim/startLootClaimListener). Firebase Auth, battlefield/puzzle-log broadcast, the
-// DM roster listener, and the login/account UI are all still explicitly OUT of scope — see
-// docs/ARCHITECTURE.md for why the full replacement was broken into sub-phases and what each
-// remaining piece needs.
+// giftItemToPlayer, setPlayerInventoryFields), real-time loot-claim arbitration
+// (createLootClaim/startLootClaimListener), and DM-to-players battlefield/puzzle-log broadcast
+// (pushBattlefieldState/startBattlefieldListener, pushPuzzleLogState/startPuzzleLogListener).
+// Firebase Auth, the DM roster listener, and the login/account UI are all still explicitly OUT
+// of scope — see docs/ARCHITECTURE.md for why the full replacement was broken into sub-phases
+// and what each remaining piece needs.
 //
 // Loot claims deliberately do NOT carry the actual item data over this layer, matching the
 // original design exactly: a claim only records who won the race for a given claim id (see
@@ -31,6 +32,8 @@
 //       -- claimedByUid must equal the sender's own accountUid (self-loot), UNLESS the sender is
 //       -- the DM claiming on someone else's behalf (a gift) — matching dmGiveLootItem's own
 //       -- permission check in the original.
+//     { type: 'push_battlefield', battleRoster, battleLog }        -- DM only
+//     { type: 'push_puzzle_log', puzzleLog }                       -- DM only
 //   server -> client:
 //     { type: 'identified', state, rev }             -- ack, plus whatever was already persisted for this account
 //     { type: 'push_ack', rev }                       -- confirms a push_state was actually persisted
@@ -43,6 +46,13 @@
 //     { type: 'loot_claim_update', claimId, claimedByUid, claimedByUsername }
 //       -- sent to the DM's live connection (if they weren't the one claiming) so their roster
 //       -- can mark the item claimed, matching markLootClaimOnRoster's role in the original
+//     { type: 'push_battlefield_ack' } / { type: 'push_puzzle_log_ack' } -- confirms the DM's push landed
+//     { type: 'battlefield_update', battleRoster, battleLog }     -- broadcast to every connected
+//       -- PLAYER (never the DM) on a push, AND sent once on identify if something was already
+//       -- published, so a reconnecting/late-joining player catches up immediately rather than
+//       -- waiting for the next DM action — matching what Firestore's onSnapshot already did by
+//       -- firing immediately with whatever the doc already held on subscribe.
+//     { type: 'puzzle_log_update', puzzleLog }                    -- same broadcast/catch-up shape
 //     { type: 'error', message }
 //
 // The two ack types matter for more than bookkeeping: the original Firestore design lets a
@@ -58,12 +68,39 @@
 // never sends that connection a state_update for its own push. What's left is a much smaller
 // problem — genuinely out-of-order delivery of rapid successive pushes from the SAME client —
 // handled by the `rev` staleness check below.
+//
+// Battlefield loot-visibility filtering (push_battlefield) replicates the original's
+// pushBattlefieldState exactly: an ALLOWLIST of safe fields (never a blacklist of sensitive
+// ones — "there is nothing for a player to find via devtools that the DM hasn't chosen to
+// share," per the original's own comment), loot entirely absent until lootRevealed is set, and
+// even after reveal, reserved/already-claimed items stripped individually. See
+// filterBattleRosterForPlayers below.
+//
+// Deliberate simplification: the original debounced both pushes client-side by 400ms, purely to
+// limit Firestore WRITE FREQUENCY (a real cost/quota concern for a cloud database billed per
+// write). That reasoning doesn't transfer to a local SQLite file the DM's own server process
+// writes to — there's no per-write cost to amortize — so this phase does not replicate the
+// debounce. Noted here explicitly as a considered omission, not a missed detail.
 
 import { WebSocketServer } from 'ws';
-import { getCampaign, savePlayerState, loadPlayerState, createLootClaim } from '../db/database.js';
+import {
+  getCampaign, savePlayerState, loadPlayerState, createLootClaim,
+  saveSubsystemState, loadSubsystemState,
+} from '../db/database.js';
 
 function send(ws, msg) {
   if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
+}
+
+// Mirrors pushBattlefieldState's own destructuring exactly — same allowlisted field set, same
+// loot-reveal/reservation/claim filtering.
+function filterBattleRosterForPlayers(battleRoster) {
+  return (battleRoster || []).map((entry) => {
+    const { uid, monster, displayName, variant, traits, chaosGearList, hp, maxHp, hpRoll, ac, statLines, lastResult, defeated, loot, lootRevealed, isCorpse } = entry;
+    const out = { uid, monster, displayName, variant, traits, chaosGearList, hp, maxHp, hpRoll, ac, statLines, lastResult, defeated, isCorpse };
+    if (loot && lootRevealed) out.loot = { tier: loot.tier, gold: loot.gold, items: (loot.items || []).filter(it => !it.reserved && !it.claimedBy) };
+    return out;
+  });
 }
 
 export function createWebSocketServer(db, httpServer) {
@@ -83,6 +120,13 @@ export function createWebSocketServer(db, httpServer) {
       if (entry.role === 'dm') return entry.ws;
     }
     return null;
+  }
+  // Phase 5c: every connected PLAYER (never the DM — matching startBattlefieldListener/
+  // startPuzzleLogListener only ever being started for role !== 'dm' in the original).
+  function broadcastToPlayers(campaignId, msg) {
+    for (const entry of roomFor(campaignId).values()) {
+      if (entry.role !== 'dm') send(entry.ws, msg);
+    }
   }
 
   wss.on('connection', (ws) => {
@@ -105,6 +149,15 @@ export function createWebSocketServer(db, httpServer) {
         roomFor(campaignId).set(msg.accountUid, { ws, role: msg.role, username: msg.username });
         const existing = loadPlayerState(db, campaignId, msg.accountUid);
         send(ws, { type: 'identified', state: existing ? existing.state : null, rev: existing ? existing.rev : 0 });
+        // Phase 5c: a player who just (re)connected should see whatever the DM already
+        // published, not wait for the next push — matching Firestore's onSnapshot firing
+        // immediately with the doc's current contents the moment a listener subscribes.
+        if (msg.role !== 'dm') {
+          const battlefield = loadSubsystemState(db, campaignId, 'battlefield_broadcast');
+          if (battlefield) send(ws, { type: 'battlefield_update', battleRoster: battlefield.battleRoster, battleLog: battlefield.battleLog });
+          const puzzleLog = loadSubsystemState(db, campaignId, 'puzzle_log_broadcast');
+          if (puzzleLog) send(ws, { type: 'puzzle_log_update', puzzleLog: puzzleLog.puzzleLog });
+        }
         return;
       }
 
@@ -176,6 +229,25 @@ export function createWebSocketServer(db, httpServer) {
           const dmWs = findDmConnection(identity.campaignId);
           if (dmWs) send(dmWs, { type: 'loot_claim_update', claimId: msg.claimId, claimedByUid: result.claimedByUid, claimedByUsername: result.claimedByUsername });
         }
+        return;
+      }
+
+      if (msg.type === 'push_battlefield') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can push battlefield state' });
+        const battleRoster = filterBattleRosterForPlayers(msg.battleRoster);
+        const battleLog = (msg.battleLog || []).slice(-50);
+        saveSubsystemState(db, identity.campaignId, 'battlefield_broadcast', { battleRoster, battleLog });
+        broadcastToPlayers(identity.campaignId, { type: 'battlefield_update', battleRoster, battleLog });
+        send(ws, { type: 'push_battlefield_ack' });
+        return;
+      }
+
+      if (msg.type === 'push_puzzle_log') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can push the puzzle log' });
+        const puzzleLog = msg.puzzleLog || [];
+        saveSubsystemState(db, identity.campaignId, 'puzzle_log_broadcast', { puzzleLog });
+        broadcastToPlayers(identity.campaignId, { type: 'puzzle_log_update', puzzleLog });
+        send(ws, { type: 'push_puzzle_log_ack' });
         return;
       }
 

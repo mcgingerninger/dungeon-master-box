@@ -70,8 +70,9 @@ value — as a first, well-bounded proof of "server-authoritative game state" (P
 sub-phases as a result; **Phase 5a** (the core state sync loop and cross-player writes,
 Firebase Auth untouched) and **Phase 5b** (real-time loot-claim arbitration, using a SQL
 `UNIQUE` constraint as the direct equivalent of the original's Firestore-security-rule-based
-first-write-wins guarantee) are both done, with battlefield/puzzle broadcast and the roster
-listener still ahead.
+first-write-wins guarantee), and **Phase 5c** (DM-to-players battlefield/puzzle-log broadcast,
+including the original's exact loot-visibility filtering) are all done, with the DM roster
+listener and the attack-request review queue still ahead.
 
 **None of this is wired into the live browser app yet** — it still uses `localStorage`/Firebase
 and resolves everything locally, completely unchanged. See `docs/ARCHITECTURE.md` for the full

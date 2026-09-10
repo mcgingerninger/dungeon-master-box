@@ -140,9 +140,17 @@ Firestore's create-vs-update security rules — same no-race-window guarantee. D
 doesn't carry the actual item data, matching the original's own split between claim arbitration
 and item delivery. Confirmed with a real two-connection race test, not just single-claim checks.
 
-**Not yet started** (future sub-phases): battlefield/puzzle-log broadcast with loot-visibility
-filtering, the DM roster listener, the attack-request review queue, and a decision on whether
-Firebase Auth stays permanently or is ever replaced.
+**Phase 5c ✅ complete** — replaces `pushBattlefieldState`/`startBattlefieldListener` and
+`pushPuzzleLogState`/`startPuzzleLogListener`, including the original's exact loot-visibility
+filtering (allowlisted fields, loot hidden until revealed, reserved/claimed items stripped). Two
+new `campaign_state` subsystem buckets (`battlefield_broadcast`, `puzzle_log_broadcast`), no new
+table. A late-joining player catches up immediately on identify rather than waiting for the next
+push. Surfaced a real, 100%-reproducible test bug (not flakiness) — see
+`docs/ARCHITECTURE.md` for the full account, including why it's a structurally different bug
+class than the two flaky-test fixes before it.
+
+**Not yet started** (future sub-phases): the DM roster listener, the attack-request review
+queue, and a decision on whether Firebase Auth stays permanently or is ever replaced.
 
 ## Phase 6+ — Dungeon Master Box deployment (not started, not yet scoped in detail)
 

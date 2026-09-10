@@ -155,8 +155,12 @@ describe('campaign_state (subsystem blobs)', () => {
   test('every subsystem named in the old saveAppState() blob has a home here', () => {
     // This is the actual coverage check against the field-by-field mapping documented in
     // db/schema.js and docs/ARCHITECTURE.md — not just "does the code run," but "does every
-    // field the current app persists have somewhere to go."
-    const expectedSubsystems = ['inventory', 'battle', 'merchant', 'bounties', 'mangler', 'loot_settings', 'effects', 'claims', 'journey', 'puzzle_log', 'gambling'];
+    // field the current app persists have somewhere to go." battlefield_broadcast and
+    // puzzle_log_broadcast (Phase 5c) aren't fields from the old blob at all — they're the
+    // DM-published, player-facing broadcast versions of battle/puzzle_log, deliberately kept
+    // separate (see db/schema.js's comment) — included here since this is the source-of-truth
+    // list check for SUBSYSTEMS as a whole, not just the original blob's coverage.
+    const expectedSubsystems = ['inventory', 'battle', 'merchant', 'bounties', 'mangler', 'loot_settings', 'effects', 'claims', 'journey', 'puzzle_log', 'gambling', 'battlefield_broadcast', 'puzzle_log_broadcast'];
     assert.deepEqual(Object.keys(SUBSYSTEMS).sort(), expectedSubsystems.sort());
   });
 });
