@@ -149,8 +149,22 @@ push. Surfaced a real, 100%-reproducible test bug (not flakiness) — see
 `docs/ARCHITECTURE.md` for the full account, including why it's a structurally different bug
 class than the two flaky-test fixes before it.
 
-**Not yet started** (future sub-phases): the DM roster listener, the attack-request review
-queue, and a decision on whether Firebase Auth stays permanently or is ever replaced.
+**Phase 5d ✅ complete** — replaces `startRosterListener` (the DM's live view of connected
+players' HP/AC, derived on the fly from the in-memory connection map plus `player_states`, not a
+new table) and `submitBattlefieldAttack`/`startAttackRequestListener`/`resolveAttackRequest` (a
+new `attack_requests` table, deliberately unconstrained unlike `loot_claims` since multiple
+pending requests are the normal case, not a race). Surfaced a wider-scope recurrence of Phase 5c's
+message-loss test bug — adding roster broadcasts to several existing handlers meant a DM's own
+connection could now receive an unsolicited `roster_update` at points existing tests didn't
+anticipate — fixed by consolidating the file's duplicated `connectAs` test helper into one
+version that drains exactly what the protocol now guarantees. See `docs/ARCHITECTURE.md`'s
+Phase 5d section for the full account.
+
+**Phase 5 is now complete** in its originally-scoped sense (real-time state sync, loot-claim
+arbitration, battlefield/puzzle-log broadcast, roster listener, attack-request queue — every
+system the original audit found in `multiplayer-sync.js` other than authentication itself). The
+one deliberately-deferred, explicitly open question: whether Firebase Auth stays permanently or is
+ever replaced is not yet decided and not scoped as any particular future phase.
 
 ## Phase 6+ — Dungeon Master Box deployment (not started, not yet scoped in detail)
 

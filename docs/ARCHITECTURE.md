@@ -790,3 +790,129 @@ action's ack), where this race doesn't apply.
   different kind of test bug on top: 70 consecutive clean runs (40 full-suite, 30 targeted at
   just this file) before treating it as validated.
 - Not wired into the live browser app, per the confirmed scope.
+
+## Phase 5d: WebSocket Sync — DM Roster Listener & Attack-Request Review Queue
+
+The fourth and final planned Phase 5 sub-phase. Replaces `startRosterListener` (the DM's live view
+of connected players' HP/AC) and `submitBattlefieldAttack`/`startAttackRequestListener`/
+`resolveAttackRequest` (the DM-review queue a player's attack sits in until the DM applies or
+dismisses it). With this sub-phase, every piece of Phase 5's original scope is done except
+Firebase Auth itself — see "Open question" below.
+
+### New table: `attack_requests`
+
+Unlike `loot_claims`, deliberately has **no uniqueness constraint** (`db/schema.js`) — several
+players each having an attack pending review at once is the normal, expected case, not a race to
+arbitrate. `attack_data` stores the attack payload verbatim as JSON, matching the original's own
+`{...attack, playerUid, playerUsername}` spread: this table doesn't need to understand the
+payload's shape, only store and list it in submission order (`database.js`'s `listAttackRequests`
+orders by `id ASC`, i.e. oldest first, matching the original's queue semantics).
+
+### The roster is derived, not stored
+
+There's no `roster` table. `buildRoster` (`server/websocket.js`) reads directly from the
+in-memory `rooms` map (which connections are live right now, in which role) joined with each
+connected player's already-persisted `player_states` row for their HP/AC — the same data
+`push_state`/`hp_delta` already write for Phase 5a's sync loop. Recomputed fresh on every trigger
+rather than cached anywhere, which is cheap at the scale a single DM's table game runs at and
+avoids a second source of truth that could drift from `player_states`.
+
+### Deliberate simplification: connected players only
+
+The original tracked every player who had ever joined the campaign — Firestore's collection
+listener sees every doc regardless of whether that browser is currently open, including a
+last-known username/role for someone who's since gone offline. `buildRoster` only sees whoever is
+currently in the in-memory `rooms` map. Replicating the original fully would mean persisting
+username/role alongside `player_states` (today that table only stores the state blob + `rev`) — a
+real, if small, schema change judged not worth it here, given the roster's main practical use
+(targeting a live player in combat) only matters for players who are actually connected right now.
+Noted as a genuine, deliberate scope reduction, not an oversight.
+
+### When the roster refreshes
+
+`broadcastRoster` fires to the DM's live connection only, on: the DM's own `identify` (immediate
+initial view); a player's `identify` (join) and disconnect (leave); a player's own `push_state`;
+and a DM cross-write (`hp_delta`/`gift_item`/`set_inventory_fields`) landing on a target, since
+that can change the stats being displayed. HP is clamped to max HP in the roster payload itself,
+matching `startRosterListener`'s own clamp in the original — a display-time correction distinct
+from `hp_delta`'s own separate clamp on the stored value.
+
+### Attack-request queue: full list, not a diff
+
+Matching `startAttackRequestListener`'s own "hands the main file the full current list of pending
+requests on every change" behavior exactly: both `submit_attack_request` and
+`resolve_attack_request` re-send the DM's live connection the complete current list afterward,
+never an incremental patch. A DM who connects after requests already exist catches up immediately
+via the same `attack_request_list` sent on `identify`, the same catch-up spirit as Phase 5c's
+battlefield/puzzle-log push.
+
+### A second, larger instance of the Phase 5c test-message-loss bug
+
+Adding `broadcastRoster` calls to `identify`, `push_state`, and the cross-write handlers meant the
+DM's own connection could now receive an unsolicited `roster_update` at points several
+already-passing Phase 5a/5b/5c tests didn't anticipate — not just the two tests that broke
+outright (the battlefield/puzzle-log "never the DM" tests, both failing with
+`actual: 'roster_update'` where a specific push ack was expected).
+
+The deeper issue, found while investigating those two failures: a DM's own `identify` now
+unconditionally sends two extra messages after `identified` (`roster_update` and
+`attack_request_list`, for the DM's own catch-up) — messages every existing `connectAs` test
+helper across the file only ever drained one of (`identified` alone). Any test that later
+inspected the DM's own message stream (`nextMessage(dm)`/`assertNoMessage(dm)`) was at risk of
+picking up a stale leftover instead of the message actually being tested for; two tests did so
+outright, several others were passing only because they happened not to assert on message
+`.type`. This is the same root cause as Phase 5c's bug (a listener that isn't there yet, or isn't
+looking for the right thing, loses or misattributes a message) showing up at a wider scope, not a
+new bug class.
+
+Fixed by consolidating every describe block's separately-duplicated `connectAs` helper into one
+shared version that uses `messageQueue` internally and, for a DM identify specifically, drains
+exactly the three messages the protocol now guarantees (`identified`, `roster_update`,
+`attack_request_list`) before returning — so a connection handed back by `connectAs` always starts
+with an empty queue, matching what every caller already assumed. The returned connection also
+exposes its queue's `next()` (as `ws.next`) for later, robust reads. A `nextNonRosterMessage`
+helper skips past legitimate-but-irrelevant `roster_update` noise when a test is waiting for some
+other specific message on the DM's connection (e.g. a push ack), without pinning down an exact
+interleaving order that's an implementation detail, not something these tests should assert on.
+
+### New tests for this sub-phase's actual features
+
+Prior sub-phases largely fixed regressions in existing tests; this one also needed coverage for
+what Phase 5d actually adds, since none existed yet: the DM's initial empty roster/request-list on
+identify, a joining player appearing on the roster and their pushed stats reflecting a moment
+later, the HP-clamp-to-max display behavior, a DM cross-write refreshing the roster, a
+disconnecting player dropping off it, confirmation players never receive `roster_update` at all,
+submitting an attack (ack to the submitter plus full list to the DM), multiple pending requests
+staying in submission order, resolving a request (DM-only, removes it, re-sends the updated full
+list), and a DM catching up on pending requests that existed before they connected.
+
+### Open question carried forward: Firebase Auth
+
+Every other piece of `multiplayer-sync.js` identified in the original Phase 5 audit has now been
+replaced. What remains, out of scope for all of Phase 5: Firebase Auth itself (account
+creation/login) and the account UI built on it. This server still trusts whatever `identify`
+claims about `accountUid`/`role`, unchanged since Phase 5a — real verification would mean pulling
+in a way to check identity server-side, a distinct concern from sync-loop correctness. Whether and
+how to replace Firebase Auth is an explicit open decision for a future phase, not a gap discovered
+late.
+
+### Validation performed
+
+- 11 new tests (5 roster listener, 5 attack-request queue, plus one bug found and fixed while
+  writing them — see below), full suite now 126 tests, all passing.
+- One test-writing bug of its own, distinct from the message-loss fix above: an early draft of the
+  cross-write/roster test expected an extra `roster_update` after `connectAs('uid-dm', 'dm')`
+  returned, not realizing `connectAs` itself now already drains the DM's own initial one. Fixed in
+  the test, not the server — a reminder that `connectAs`'s new draining behavior changes what
+  every subsequent `dm.next()` call in a test should expect to see first.
+- 50 consecutive clean runs of `server/websocket.test.js` alone, plus 30 consecutive clean
+  full-suite runs, before treating this sub-phase — and all of Phase 5 — as validated.
+
+### Phase 5, complete
+
+With 5a (core state sync and cross-player writes), 5b (loot-claim arbitration), 5c
+(battlefield/puzzle-log broadcast), and 5d (roster listener and attack-request queue) all done,
+every real-time multiplayer system identified in the original `multiplayer-sync.js` audit has a
+WebSocket-based replacement, backed by SQLite instead of Firestore, none of it wired into the live
+browser app yet. Firebase Auth's replacement (or retention) remains the one explicitly open
+question for a future phase.

@@ -111,10 +111,28 @@ CREATE TABLE IF NOT EXISTS loot_claims (
   UNIQUE(campaign_id, claim_id)
 );
 
+-- Added in Phase 5d (see docs/ARCHITECTURE.md) for the DM-review attack-request queue
+-- (submitBattlefieldAttack/startAttackRequestListener/resolveAttackRequest in the original).
+-- Unlike loot_claims, deliberately has NO uniqueness constraint — multiple pending requests
+-- coexisting normally is the whole point (several players can each have an attack awaiting
+-- review at once), so there's nothing to arbitrate here, just a queue. attack_data holds the
+-- attack payload verbatim as JSON (to-hit, damage, target, etc.) exactly as the original passed
+-- it through unopinionated (see submitBattlefieldAttack's own "...attack" spread) — this table
+-- doesn't need to understand its shape, only store and list it.
+CREATE TABLE IF NOT EXISTS attack_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  campaign_id INTEGER NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+  player_uid TEXT NOT NULL,
+  player_username TEXT,
+  attack_data TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_characters_campaign ON characters(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_campaign_state_campaign ON campaign_state(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_player_states_campaign ON player_states(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_loot_claims_campaign ON loot_claims(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_attack_requests_campaign ON attack_requests(campaign_id);
 `;
 
 // Every valid subsystem name, and the exact top-level saveAppState() field(s) each one replaces

@@ -57,7 +57,7 @@ See `docs/MIGRATION_PLAN.md` for the full phase-by-phase plan as originally scop
 
 ## Status
 
-**Phases 0 through 4 complete, Phase 5 in progress** (Phases 4 and 5 both as first, narrow
+**Phases 0 through 4 complete, Phase 5 complete** (Phases 4 and 5 both as first, narrow
 slices — see below). Repository separated with history preserved (Phase 0); item classification,
 character sheet math, battle parsing/damage, and all four gambling games extracted into
 `game-engine.js`, bridged into the monolith (Phase 1); a SQLite schema and Node-side data-access
@@ -68,11 +68,15 @@ value — as a first, well-bounded proof of "server-authoritative game state" (P
 ("WebSocket multiplayer") turned out to bundle four largely separate systems once audited
 (auth, real-time sync, loot-claim race arbitration, and a whole account UI) — broken into
 sub-phases as a result; **Phase 5a** (the core state sync loop and cross-player writes,
-Firebase Auth untouched) and **Phase 5b** (real-time loot-claim arbitration, using a SQL
+Firebase Auth untouched), **Phase 5b** (real-time loot-claim arbitration, using a SQL
 `UNIQUE` constraint as the direct equivalent of the original's Firestore-security-rule-based
-first-write-wins guarantee), and **Phase 5c** (DM-to-players battlefield/puzzle-log broadcast,
-including the original's exact loot-visibility filtering) are all done, with the DM roster
-listener and the attack-request review queue still ahead.
+first-write-wins guarantee), **Phase 5c** (DM-to-players battlefield/puzzle-log broadcast,
+including the original's exact loot-visibility filtering), and **Phase 5d** (the DM roster
+listener, derived live from connected players' state rather than a new table, and the
+attack-request review queue, backed by a new unconstrained `attack_requests` table) are all done.
+Every real-time multiplayer system the original `multiplayer-sync.js` audit found is now
+replaced except Firebase Auth itself, whose replacement (or retention) remains an explicitly
+open question for a future phase.
 
 **None of this is wired into the live browser app yet** — it still uses `localStorage`/Firebase
 and resolves everything locally, completely unchanged. See `docs/ARCHITECTURE.md` for the full

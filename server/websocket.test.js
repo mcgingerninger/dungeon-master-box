@@ -78,6 +78,20 @@ function messageQueue(ws) {
     });
   };
 }
+// Phase 5d added automatic roster_update broadcasts to the DM's connection any time a player
+// connects, pushes state, or is affected by a cross-write — real, correct behavior, but it means
+// any test with both a dm and a player connection can now see a roster_update interleaved with
+// whatever else the DM's connection receives, in an order this file has no reason to pin down
+// (and shouldn't need to, since these tests aren't testing roster behavior). Rather than
+// asserting an exact message order that would make every such test fragile against an
+// implementation detail, this skips past any roster_update noise to find the message actually
+// being tested for — the same "don't lose messages to timing" discipline as messageQueue, just
+// also permissive about a message type known to be expected-but-irrelevant here.
+async function nextNonRosterMessage(queueNext) {
+  let msg = await queueNext();
+  while (msg.type === 'roster_update') msg = await queueNext();
+  return msg;
+}
 // Sends push_state and waits for the server's push_ack before returning — replaces an earlier
 // version of this file that used a fixed setTimeout("give the server a moment to process")
 // instead. That produced real, if infrequent, flaky failures under variable system load: a
@@ -90,6 +104,31 @@ async function pushState(ws, rev, state) {
   const ack = await nextMessage(ws);
   assert.equal(ack.type, 'push_ack');
   return ack;
+}
+
+// Shared by every describe block below that needs a connected+identified socket. Uses
+// messageQueue internally (not the fragile nextMessage) so nothing arriving during identify can
+// be lost, and attaches the resulting next() as ws.next so callers can keep reading this
+// connection's later messages just as robustly. A DM's own identify unconditionally sends an
+// initial roster_update and attack_request_list (Phase 5d catch-up) right after 'identified' —
+// drained here so a connection returned by connectAs always starts with an empty queue, matching
+// what every existing caller already assumes.
+async function connectAs(accountUid, role) {
+  const ws = await connect();
+  const next = messageQueue(ws);
+  send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
+  const identified = await next();
+  assert.equal(identified.type, 'identified');
+  if (role === 'dm') {
+    await next(); // roster_update
+    await next(); // attack_request_list
+  }
+  ws.next = next;
+  return ws;
+}
+// Counterpart to assertNoMessage, for connections using the messageQueue/connectAs pattern.
+function assertNoQueuedMessage(next, timeoutMs = 300) {
+  return assert.rejects(next(timeoutMs), /Timed out waiting for a queued message/);
 }
 
 describe('identify', () => {
@@ -173,13 +212,6 @@ describe('push_state and reconnect', () => {
 });
 
 describe('cross-player writes (DM -> player)', () => {
-  async function connectAs(accountUid, role) {
-    const ws = await connect();
-    send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
-    await nextMessage(ws); // consume the 'identified' ack
-    return ws;
-  }
-
   test('hp_delta reaches the target player live, clamped to their max HP', async () => {
     const player = await connectAs('uid-player', 'player');
     await pushState(player, 1, { characterCurrentHp: 20, characterMaxHpEffective: 30 });
@@ -238,7 +270,7 @@ describe('cross-player writes (DM -> player)', () => {
     // connection still gets cross_write_ack once the write actually lands, which is exactly the
     // confirmation needed here instead of assuming the write is "probably done by now."
     send(dm, { type: 'hp_delta', targetUid: 'uid-offline-player', delta: -5 });
-    const ack = await nextMessage(dm);
+    const ack = await dm.next();
     assert.equal(ack.type, 'cross_write_ack');
 
     const ws2 = await connect();
@@ -249,13 +281,6 @@ describe('cross-player writes (DM -> player)', () => {
 });
 
 describe('loot claims (Phase 5b — first-write-wins arbitration)', () => {
-  async function connectAs(accountUid, role) {
-    const ws = await connect();
-    send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
-    await nextMessage(ws);
-    return ws;
-  }
-
   test('a self-loot claim on an unclaimed id wins', async () => {
     const player = await connectAs('uid-alice', 'player');
     send(player, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-alice', claimedByUsername: 'Alice' });
@@ -289,7 +314,9 @@ describe('loot claims (Phase 5b — first-write-wins arbitration)', () => {
     const player = await connectAs('uid-alice', 'player');
     send(player, { type: 'create_loot_claim', claimId: 'monster1_item1', claimedByUid: 'uid-alice', claimedByUsername: 'Alice' });
     await nextMessage(player); // consume the player's own loot_claim_result
-    const dmUpdate = await nextMessage(dm);
+    // Alice's own connectAs() just triggered a roster_update to the DM (Phase 5d) — skip past
+    // that noise to find the loot_claim_update actually being tested for here.
+    const dmUpdate = await nextNonRosterMessage(dm.next);
     assert.equal(dmUpdate.type, 'loot_claim_update');
     assert.equal(dmUpdate.claimedByUid, 'uid-alice');
   });
@@ -316,13 +343,6 @@ describe('loot claims (Phase 5b — first-write-wins arbitration)', () => {
 });
 
 describe('battlefield broadcast (Phase 5c)', () => {
-  async function connectAs(accountUid, role) {
-    const ws = await connect();
-    send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
-    await nextMessage(ws);
-    return ws;
-  }
-
   const sampleEntry = {
     uid: 'monster-1', monster: 'Goblin', displayName: 'Goblin', variant: null, traits: [], chaosGearList: [],
     hp: 5, maxHp: 7, hpRoll: '2d6', ac: 13, statLines: [], lastResult: null, defeated: true, isCorpse: false,
@@ -337,9 +357,11 @@ describe('battlefield broadcast (Phase 5c)', () => {
     const player = await connectAs('uid-alice', 'player');
     const playerNext = messageQueue(player); // capture from here, before the DM's push can arrive
     send(dm, { type: 'push_battlefield', battleRoster: [sampleEntry], battleLog: ['Goblin defeated.'] });
-    const ack = await nextMessage(dm);
+    // Alice's connectAs() above triggered a roster_update to the DM (Phase 5d) — skip past it to
+    // find the actual push ack being tested for here.
+    const ack = await nextNonRosterMessage(dm.next);
     assert.equal(ack.type, 'push_battlefield_ack');
-    await assertNoMessage(dm); // no battlefield_update for the DM itself
+    await assertNoQueuedMessage(dm.next); // no battlefield_update for the DM itself
 
     const update = await playerNext();
     assert.equal(update.type, 'battlefield_update');
@@ -352,7 +374,7 @@ describe('battlefield broadcast (Phase 5c)', () => {
     const playerNext = messageQueue(player);
     const hidden = { ...sampleEntry, lootRevealed: false };
     send(dm, { type: 'push_battlefield', battleRoster: [hidden], battleLog: [] });
-    await nextMessage(dm);
+    await nextNonRosterMessage(dm.next);
     const update = await playerNext();
     assert.equal(update.battleRoster[0].loot, undefined);
   });
@@ -362,7 +384,7 @@ describe('battlefield broadcast (Phase 5c)', () => {
     const player = await connectAs('uid-alice', 'player');
     const playerNext = messageQueue(player);
     send(dm, { type: 'push_battlefield', battleRoster: [sampleEntry], battleLog: [] });
-    await nextMessage(dm);
+    await nextNonRosterMessage(dm.next);
     const update = await playerNext();
     const loot = update.battleRoster[0].loot;
     assert.equal(loot.tier, 'common');
@@ -375,7 +397,7 @@ describe('battlefield broadcast (Phase 5c)', () => {
     const player = await connectAs('uid-alice', 'player');
     const playerNext = messageQueue(player);
     send(dm, { type: 'push_battlefield', battleRoster: [sampleEntry], battleLog: [] });
-    await nextMessage(dm);
+    await nextNonRosterMessage(dm.next);
     const update = await playerNext();
     assert.equal(update.battleRoster[0].dmOnlySecretNotes, undefined);
     assert.equal(update.battleRoster[0].monster, 'Goblin'); // a real allowlisted field does survive
@@ -387,7 +409,7 @@ describe('battlefield broadcast (Phase 5c)', () => {
     const playerNext = messageQueue(player);
     const longLog = Array.from({ length: 60 }, (_, i) => `Event ${i}`);
     send(dm, { type: 'push_battlefield', battleRoster: [], battleLog: longLog });
-    await nextMessage(dm);
+    await nextNonRosterMessage(dm.next);
     const update = await playerNext();
     assert.equal(update.battleLog.length, 50);
     assert.equal(update.battleLog[0], 'Event 10'); // the oldest 10 were dropped, not the newest
@@ -418,21 +440,16 @@ describe('battlefield broadcast (Phase 5c)', () => {
 });
 
 describe('puzzle log broadcast (Phase 5c)', () => {
-  async function connectAs(accountUid, role) {
-    const ws = await connect();
-    send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
-    await nextMessage(ws);
-    return ws;
-  }
-
   test('a puzzle log push reaches every connected player, never the DM', async () => {
     const dm = await connectAs('uid-dm', 'dm');
     const player = await connectAs('uid-alice', 'player');
     const playerNext = messageQueue(player);
     send(dm, { type: 'push_puzzle_log', puzzleLog: [{ riddle: 'What has keys but no locks?', answer: 'A piano' }] });
-    const ack = await nextMessage(dm);
+    // Alice's connectAs() above triggered a roster_update to the DM (Phase 5d) — skip past it to
+    // find the actual push ack being tested for here.
+    const ack = await nextNonRosterMessage(dm.next);
     assert.equal(ack.type, 'push_puzzle_log_ack');
-    await assertNoMessage(dm);
+    await assertNoQueuedMessage(dm.next);
 
     const update = await playerNext();
     assert.equal(update.type, 'puzzle_log_update');
@@ -461,5 +478,168 @@ describe('puzzle log broadcast (Phase 5c)', () => {
     const msg = await nextMessage(player);
     assert.equal(msg.type, 'error');
     assert.match(msg.message, /DM/);
+  });
+});
+
+describe('DM roster listener (Phase 5d)', () => {
+  test('the DM gets an empty roster and empty attack list immediately on identify', async () => {
+    const ws = await connect();
+    const next = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-dm', role: 'dm', username: 'DM' });
+    const identified = await next();
+    assert.equal(identified.type, 'identified');
+    const roster = await next();
+    assert.equal(roster.type, 'roster_update');
+    assert.deepEqual(roster.roster, []);
+    const requests = await next();
+    assert.equal(requests.type, 'attack_request_list');
+    assert.deepEqual(requests.requests, []);
+  });
+
+  test('a player connecting adds them to the DM\'s roster; pushing state updates their stats', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-player', 'player');
+    const joinRoster = await dm.next();
+    assert.equal(joinRoster.type, 'roster_update');
+    assert.equal(joinRoster.roster.length, 1);
+    assert.equal(joinRoster.roster[0].uid, 'uid-player');
+
+    await pushState(player, 1, { characterCurrentHp: 18, characterMaxHpEffective: 25, characterAc: 16 });
+    const statsRoster = await dm.next();
+    assert.equal(statsRoster.type, 'roster_update');
+    assert.equal(statsRoster.roster[0].currentHp, 18);
+    assert.equal(statsRoster.roster[0].maxHp, 25);
+    assert.equal(statsRoster.roster[0].ac, 16);
+  });
+
+  test('roster current HP is clamped to max HP, matching startRosterListener\'s own clamp', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-player', 'player');
+    await dm.next(); // join roster_update
+
+    await pushState(player, 1, { characterCurrentHp: 999, characterMaxHpEffective: 30 });
+    const roster = await dm.next();
+    assert.equal(roster.roster[0].currentHp, 30); // clamped, not 999
+  });
+
+  test('a DM cross-write (hp_delta) landing also refreshes the roster', async () => {
+    const player = await connectAs('uid-player', 'player');
+    await pushState(player, 1, { characterCurrentHp: 20, characterMaxHpEffective: 30 });
+    // connectAs already drains the DM's own initial roster_update (which reflects the player
+    // connected above, since it's built fresh on every identify) as part of identify catch-up —
+    // nothing extra to consume here before the cross-write itself.
+    const dm = await connectAs('uid-dm', 'dm');
+
+    send(dm, { type: 'hp_delta', targetUid: 'uid-player', delta: -5 });
+    await nextMessage(player); // consume the target's state_update
+    // Order on the DM's own connection: cross_write_ack first, then the roster refresh.
+    const ack = await dm.next();
+    assert.equal(ack.type, 'cross_write_ack');
+    const roster = await dm.next();
+    assert.equal(roster.type, 'roster_update');
+    assert.equal(roster.roster[0].currentHp, 15);
+  });
+
+  test('a disconnecting player drops off the DM\'s roster', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-player', 'player');
+    await dm.next(); // join roster_update, player present
+
+    player.close();
+    const roster = await dm.next();
+    assert.equal(roster.type, 'roster_update');
+    assert.deepEqual(roster.roster, []);
+  });
+
+  test('players never receive roster_update — it is DM-only', async () => {
+    const player = await connectAs('uid-player', 'player');
+    const playerNext = messageQueue(player);
+    await connectAs('uid-dm', 'dm');
+    await connectAs('uid-other-player', 'player'); // triggers a roster_update, but only to the DM
+    await assertNoQueuedMessage(playerNext, 300);
+  });
+});
+
+describe('attack-request review queue (Phase 5d)', () => {
+  test('submitting an attack acks the player and sends the DM the full list', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    await dm.next(); // Alice's connect-triggered roster_update
+
+    send(player, { type: 'submit_attack_request', attack: { toHit: 15, damage: 8, targetUid: 'monster-1' } });
+    const ack = await nextMessage(player);
+    assert.equal(ack.type, 'attack_request_submitted');
+    assert.equal(typeof ack.requestId, 'number');
+
+    const list = await dm.next();
+    assert.equal(list.type, 'attack_request_list');
+    assert.equal(list.requests.length, 1);
+    assert.equal(list.requests[0].playerUid, 'uid-alice');
+    assert.equal(list.requests[0].playerUsername, 'uid-alice'); // connectAs uses accountUid as username
+    assert.deepEqual(list.requests[0].attackData, { toHit: 15, damage: 8, targetUid: 'monster-1' });
+  });
+
+  test('multiple pending requests all appear, oldest first', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const alice = await connectAs('uid-alice', 'player');
+    const bob = await connectAs('uid-bob', 'player');
+    await dm.next(); // alice's join roster_update
+    await dm.next(); // bob's join roster_update
+
+    send(alice, { type: 'submit_attack_request', attack: { move: 'first' } });
+    await nextMessage(alice);
+    await dm.next(); // list with 1 entry
+
+    send(bob, { type: 'submit_attack_request', attack: { move: 'second' } });
+    await nextMessage(bob);
+    const list = await dm.next(); // list with 2 entries
+    assert.equal(list.requests.length, 2);
+    assert.equal(list.requests[0].attackData.move, 'first');
+    assert.equal(list.requests[1].attackData.move, 'second');
+  });
+
+  test('resolving a request (DM only) removes it and re-sends the updated full list', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    await dm.next(); // join roster_update
+
+    send(player, { type: 'submit_attack_request', attack: { move: 'x' } });
+    await nextMessage(player);
+    const list1 = await dm.next();
+    const requestId = list1.requests[0].id;
+
+    send(dm, { type: 'resolve_attack_request', requestId });
+    const resolved = await dm.next();
+    assert.equal(resolved.type, 'attack_request_resolved');
+    assert.equal(resolved.requestId, requestId);
+    const list2 = await dm.next();
+    assert.equal(list2.type, 'attack_request_list');
+    assert.deepEqual(list2.requests, []);
+  });
+
+  test('a non-DM cannot resolve an attack request', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'resolve_attack_request', requestId: 1 });
+    const msg = await nextMessage(player);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
+  test('a DM connecting after requests already exist catches up via attack_request_list on identify', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'submit_attack_request', attack: { move: 'already pending' } });
+    await nextMessage(player); // ack — no DM connected yet to receive the list broadcast
+
+    const ws = await connect();
+    const wsNext = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-dm', role: 'dm', username: 'DM' });
+    const identified = await wsNext();
+    assert.equal(identified.type, 'identified');
+    const roster = await wsNext();
+    assert.equal(roster.type, 'roster_update');
+    const list = await wsNext();
+    assert.equal(list.type, 'attack_request_list');
+    assert.equal(list.requests.length, 1);
+    assert.equal(list.requests[0].attackData.move, 'already pending');
   });
 });

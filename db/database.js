@@ -212,3 +212,30 @@ export function getLootClaim(db, campaignId, claimId) {
   const row = db.prepare('SELECT claimed_by_uid, claimed_by_username FROM loot_claims WHERE campaign_id = ? AND claim_id = ?').get(campaignId, claimId);
   return row ? { claimedByUid: row.claimed_by_uid, claimedByUsername: row.claimed_by_username } : null;
 }
+
+// ---------- Attack requests (Phase 5d — see db/schema.js's comment on attack_requests) ----------
+
+function rowToAttackRequest(row) {
+  return { id: row.id, playerUid: row.player_uid, playerUsername: row.player_username, attackData: JSON.parse(row.attack_data), createdAt: row.created_at };
+}
+
+export function createAttackRequest(db, campaignId, playerUid, playerUsername, attackData) {
+  const info = db.prepare(`
+    INSERT INTO attack_requests (campaign_id, player_uid, player_username, attack_data)
+    VALUES (?, ?, ?, ?)
+  `).run(campaignId, playerUid, playerUsername || null, JSON.stringify(attackData));
+  return rowToAttackRequest(db.prepare('SELECT * FROM attack_requests WHERE id = ?').get(Number(info.lastInsertRowid)));
+}
+
+// Ordered oldest-first — a real, if simple, FIFO review queue for the DM rather than an
+// unspecified order that could make requests appear to jump around between renders.
+export function listAttackRequests(db, campaignId) {
+  return db.prepare('SELECT * FROM attack_requests WHERE campaign_id = ? ORDER BY id ASC').all(campaignId).map(rowToAttackRequest);
+}
+
+// Returns whether a row actually existed to delete, so a caller (or test) can tell "resolved
+// successfully" apart from "that request was already gone" rather than both looking identical.
+export function deleteAttackRequest(db, campaignId, requestId) {
+  const info = db.prepare('DELETE FROM attack_requests WHERE campaign_id = ? AND id = ?').run(campaignId, requestId);
+  return info.changes > 0;
+}

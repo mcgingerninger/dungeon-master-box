@@ -7,6 +7,7 @@ import {
   saveSubsystemState, loadSubsystemState, loadAllSubsystemState,
   savePlayerState, loadPlayerState, loadAllPlayerStates,
   createLootClaim, getLootClaim,
+  createAttackRequest, listAttackRequests, deleteAttackRequest,
 } from './database.js';
 import { SUBSYSTEMS } from './schema.js';
 
@@ -274,5 +275,49 @@ describe('loot_claims (Phase 5b — first-write-wins arbitration)', () => {
     createLootClaim(db, campaign.id, 'monster1_item1', 'uid-alice', 'Alice');
     db.prepare('DELETE FROM campaigns WHERE id = ?').run(campaign.id);
     assert.equal(getLootClaim(db, campaign.id, 'monster1_item1'), null);
+  });
+});
+
+describe('attack_requests (Phase 5d — DM review queue)', () => {
+  test('creating a request returns it with a real id and the attack data intact', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    const req = createAttackRequest(db, campaign.id, 'uid-1', 'Alice', { toHit: 15, damage: '2d6+3', targetUid: 'monster-1' });
+    assert.ok(req.id > 0);
+    assert.equal(req.playerUid, 'uid-1');
+    assert.deepEqual(req.attackData, { toHit: 15, damage: '2d6+3', targetUid: 'monster-1' });
+  });
+
+  test('listAttackRequests returns every pending request, oldest first', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    createAttackRequest(db, campaign.id, 'uid-1', 'Alice', { toHit: 10 });
+    createAttackRequest(db, campaign.id, 'uid-2', 'Bob', { toHit: 12 });
+    const list = listAttackRequests(db, campaign.id);
+    assert.equal(list.length, 2);
+    assert.equal(list[0].playerUid, 'uid-1'); // created first, listed first
+  });
+
+  test('deleteAttackRequest removes it and reports success', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    const req = createAttackRequest(db, campaign.id, 'uid-1', 'Alice', { toHit: 10 });
+    const deleted = deleteAttackRequest(db, campaign.id, req.id);
+    assert.equal(deleted, true);
+    assert.equal(listAttackRequests(db, campaign.id).length, 0);
+  });
+
+  test('deleting a request that no longer exists reports false, not an error', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Test');
+    assert.equal(deleteAttackRequest(db, campaign.id, 999999), false);
+  });
+
+  test('deleting a campaign cascades to attack_requests too', () => {
+    const db = openDatabase(':memory:');
+    const campaign = createCampaign(db, 'Doomed Campaign');
+    createAttackRequest(db, campaign.id, 'uid-1', 'Alice', { toHit: 10 });
+    db.prepare('DELETE FROM campaigns WHERE id = ?').run(campaign.id);
+    assert.equal(listAttackRequests(db, campaign.id).length, 0);
   });
 });
