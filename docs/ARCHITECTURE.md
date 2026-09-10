@@ -650,3 +650,71 @@ non-zero failure count as worth chasing down, not dismissing as a fluke.
 
 Confirmed fixed, not just quieted: 80 consecutive clean runs (`node --test`, 0 failures) after
 both fixes, versus a roughly 5-10% failure rate per run beforehand.
+
+## Phase 5b: WebSocket Sync — Loot-Claim Arbitration
+
+The second Phase 5 sub-phase (see Phase 5a above for why Phase 5 was broken up in the first
+place). Replaces `createLootClaim`/`startLootClaimListener` — the original's real-time,
+first-write-wins loot claiming.
+
+### What the original relied on, and its direct SQL equivalent
+
+The original design never wrote any arbitration logic at all: a claim doc write at a
+deterministic id (`monsterUid_itemId`) either succeeds as Firestore's own "create" (first writer)
+or fails as a denied "update" (everyone after), enforced entirely by the security rules quoted at
+the top of `multiplayer-sync.js`. This phase's equivalent is a `UNIQUE(campaign_id, claim_id)`
+constraint on the new `loot_claims` table (`db/schema.js`) — an `INSERT` for a pair that already
+exists fails outright with a constraint error rather than silently overwriting, which
+`db/database.js`'s `createLootClaim` catches and translates into a plain `{ won: false, ... }`
+return value naming the actual winner, rather than an exception callers have to unwrap. Same
+no-read-then-write-race-window guarantee, different engine.
+
+### Deliberately does not carry item data
+
+Matching the original exactly: a claim only ever records *who won the race for a given claim id*
+— never the item itself. In the original, delivering the actual item to the winner was always a
+separate step (a reactive listener on the winning client, using item data it already had
+locally). This phase preserves that split rather than collapsing it, since actually delivering
+loot is tangled up with battlefield state (which items are even visible/claimable in the first
+place) — a separate, not-yet-built sub-phase.
+
+### Message protocol addition (`server/websocket.js`)
+
+```
+client -> server:
+  { type: 'create_loot_claim', claimId, claimedByUid, claimedByUsername }
+    -- claimedByUid must equal the sender's own accountUid, UNLESS the sender is the DM
+    -- claiming on someone else's behalf (a gift) -- matches dmGiveLootItem's own permission
+    -- check in the original.
+server -> client:
+  { type: 'loot_claim_result', claimId, won, claimedByUid, claimedByUsername }
+    -- sent back to whoever sent create_loot_claim, win or lose, always naming the real winner
+  { type: 'loot_claim_update', claimId, claimedByUid, claimedByUsername }
+    -- sent to the DM's live connection (only if the DM wasn't the one claiming), so their
+    -- roster can mark the item claimed -- matches markLootClaimOnRoster's role in the original
+```
+
+No one else is notified of a claim — matching the original precisely: a losing *other* player's
+own listener in `multiplayer-sync.js` (`claim.claimedBy !== mp.uid`) was always a silent no-op
+for them, so there was never any real behavior to replicate there.
+
+### Finding the DM's connection
+
+Reaching the DM's live connection (for `loot_claim_update`) needed something Phase 5a's room
+tracking didn't have — Phase 5a's `rooms` map was keyed `accountUid -> ws` for direct
+target-uid lookups only, with no way to ask "who is the DM here" without also knowing their uid.
+Widened to store `{ ws, role, username }` per entry instead of a bare `ws`, so `findDmConnection`
+can scan a room's connections for `role === 'dm'`. A small, backward-compatible widening — every
+existing lookup by uid still works unchanged, just reads `.ws` off the stored object now.
+
+### Validation performed
+
+- 10 new tests (5 in `server/websocket.test.js`, 5 in `db/database.test.js`), and the full suite
+  (100 tests total) still passes, including a real race test: two client connections fire
+  `create_loot_claim` for the *same* claim id without awaiting between them (deliberately not
+  controlling which one the server happens to process first), and the test asserts exactly one
+  side reports `won: true` and the other's `loot_claim_result` correctly names the actual winner.
+- Given the fixed-test-flakiness lesson immediately above, this wasn't trusted after one clean
+  run: 70 consecutive clean runs (40 full-suite, 30 targeted at just this file) before treating
+  it as validated.
+- Not wired into the live browser app, per the confirmed scope.

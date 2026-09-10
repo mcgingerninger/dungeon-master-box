@@ -183,3 +183,32 @@ export function loadAllPlayerStates(db, campaignId) {
   const rows = db.prepare('SELECT account_uid, state, rev FROM player_states WHERE campaign_id = ?').all(campaignId);
   return rows.map(r => ({ accountUid: r.account_uid, state: JSON.parse(r.state), rev: r.rev }));
 }
+
+// ---------- Loot claims (Phase 5b — see db/schema.js's comment on loot_claims) ----------
+
+// Attempts to create a claim; the UNIQUE(campaign_id, claim_id) constraint is what actually
+// arbitrates the race — this function's job is just to translate "the INSERT itself failed
+// because the row already exists" into a normal, non-exceptional return value rather than an
+// error a caller has to unwrap. A constraint failure for any OTHER reason (there isn't one on
+// this table today, but this file shouldn't assume that forever) still propagates as a real
+// exception rather than being silently treated as "someone else claimed it."
+export function createLootClaim(db, campaignId, claimId, claimedByUid, claimedByUsername) {
+  try {
+    db.prepare(`
+      INSERT INTO loot_claims (campaign_id, claim_id, claimed_by_uid, claimed_by_username)
+      VALUES (?, ?, ?, ?)
+    `).run(campaignId, claimId, claimedByUid, claimedByUsername || null);
+    return { won: true, claimedByUid, claimedByUsername: claimedByUsername || null };
+  } catch (err) {
+    if (err.code === 'ERR_SQLITE_ERROR' && /UNIQUE constraint failed/.test(err.message)) {
+      const existing = getLootClaim(db, campaignId, claimId);
+      return { won: false, claimedByUid: existing.claimedByUid, claimedByUsername: existing.claimedByUsername };
+    }
+    throw err;
+  }
+}
+
+export function getLootClaim(db, campaignId, claimId) {
+  const row = db.prepare('SELECT claimed_by_uid, claimed_by_username FROM loot_claims WHERE campaign_id = ? AND claim_id = ?').get(campaignId, claimId);
+  return row ? { claimedByUid: row.claimed_by_uid, claimedByUsername: row.claimed_by_username } : null;
+}

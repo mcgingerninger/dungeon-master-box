@@ -90,9 +90,31 @@ CREATE TABLE IF NOT EXISTS player_states (
   UNIQUE(campaign_id, account_uid)
 );
 
+-- Added in Phase 5b (see docs/ARCHITECTURE.md) for real-time loot-claim arbitration. The
+-- original design relied on Firestore's create-vs-update security rules: a claim doc write at a
+-- deterministic id (monsterUid_itemId) either succeeds as a "create" (first writer) or fails as
+-- a denied "update" (everyone after) — true first-write-wins with zero custom arbitration code.
+-- The UNIQUE constraint below is the direct SQL equivalent of that same guarantee: an INSERT for
+-- a (campaign_id, claim_id) pair that already exists fails outright rather than overwriting, so
+-- database.js's createLootClaim can distinguish "you won" from "someone already claimed this"
+-- by whether the INSERT itself succeeded — no read-then-write race window, same as the original.
+-- Deliberately does NOT store the actual item data (see the module comment in
+-- server/websocket.js) — only who won the race for a given claim id, matching the original's own
+-- separation between claim arbitration and item delivery.
+CREATE TABLE IF NOT EXISTS loot_claims (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  campaign_id INTEGER NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+  claim_id TEXT NOT NULL,
+  claimed_by_uid TEXT NOT NULL,
+  claimed_by_username TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(campaign_id, claim_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_characters_campaign ON characters(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_campaign_state_campaign ON campaign_state(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_player_states_campaign ON player_states(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_loot_claims_campaign ON loot_claims(campaign_id);
 `;
 
 // Every valid subsystem name, and the exact top-level saveAppState() field(s) each one replaces

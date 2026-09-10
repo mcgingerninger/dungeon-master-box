@@ -133,10 +133,16 @@ backed by a new `player_states` table (`db/schema.js`). Firebase Auth and the ac
 untouched. First real npm dependency (`ws`) added, per confirmed choice over hand-rolling the
 WebSocket protocol.
 
-**Not yet started** (future sub-phases): loot-claim first-write-wins arbitration,
-battlefield/puzzle-log broadcast with loot-visibility filtering, the DM roster listener, the
-attack-request review queue, and a decision on whether Firebase Auth stays permanently or is
-ever replaced.
+**Phase 5b ✅ complete** — replaces `createLootClaim`/`startLootClaimListener`'s real-time,
+first-write-wins loot claiming. A `UNIQUE(campaign_id, claim_id)` constraint on a new
+`loot_claims` table (`db/schema.js`) is the direct SQL equivalent of the original's reliance on
+Firestore's create-vs-update security rules — same no-race-window guarantee. Deliberately still
+doesn't carry the actual item data, matching the original's own split between claim arbitration
+and item delivery. Confirmed with a real two-connection race test, not just single-claim checks.
+
+**Not yet started** (future sub-phases): battlefield/puzzle-log broadcast with loot-visibility
+filtering, the DM roster listener, the attack-request review queue, and a decision on whether
+Firebase Auth stays permanently or is ever replaced.
 
 ## Phase 6+ — Dungeon Master Box deployment (not started, not yet scoped in detail)
 

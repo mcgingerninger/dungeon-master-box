@@ -67,9 +67,11 @@ server-authoritative — the server's own randomness decides outcomes, never a c
 value — as a first, well-bounded proof of "server-authoritative game state" (Phase 4). Phase 5
 ("WebSocket multiplayer") turned out to bundle four largely separate systems once audited
 (auth, real-time sync, loot-claim race arbitration, and a whole account UI) — broken into
-sub-phases as a result; **Phase 5a** (the core state sync loop and cross-player writes only,
-Firebase Auth untouched) is done, with loot claims, battlefield/puzzle broadcast, and the
-roster listener still ahead.
+sub-phases as a result; **Phase 5a** (the core state sync loop and cross-player writes,
+Firebase Auth untouched) and **Phase 5b** (real-time loot-claim arbitration, using a SQL
+`UNIQUE` constraint as the direct equivalent of the original's Firestore-security-rule-based
+first-write-wins guarantee) are both done, with battlefield/puzzle broadcast and the roster
+listener still ahead.
 
 **None of this is wired into the live browser app yet** — it still uses `localStorage`/Firebase
 and resolves everything locally, completely unchanged. See `docs/ARCHITECTURE.md` for the full
