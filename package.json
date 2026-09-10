@@ -1,0 +1,14 @@
+{
+  "name": "dungeon-master-box",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Local-first Dungeon Master Box - architectural migration of dungeon-loot-tool.",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server/start.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

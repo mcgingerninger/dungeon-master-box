@@ -69,8 +69,30 @@ CREATE TABLE IF NOT EXISTS campaign_state (
   UNIQUE(campaign_id, subsystem)
 );
 
+-- Added in Phase 5a (see docs/ARCHITECTURE.md) for the WebSocket sync layer. Unlike
+-- campaign_state (one row per campaign+subsystem, meant for campaign-wide DM settings), a
+-- player's full save-state blob (inventory, equipped gear, generated items, etc.) is inherently
+-- per-PLAYER, not per-campaign — this mirrors exactly what the original Firestore model already
+-- did (rooms/{code}/players/{uid} held one player's entire state), which campaign_state alone
+-- had no way to represent since Phase 2 only ever needed to model a single DM's own data.
+-- rev is a client-supplied monotonic counter, same purpose as the original's ordering guard,
+-- but WebSocket's server-mediated broadcast means the SELF-echo half of the original problem
+-- (Firestore's onSnapshot always echoing a client's own writes back to it) doesn't exist here —
+-- the server simply never sends a state_update back to the connection that sent the push. This
+-- column still guards against genuinely out-of-order delivery of rapid successive pushes.
+CREATE TABLE IF NOT EXISTS player_states (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  campaign_id INTEGER NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+  account_uid TEXT NOT NULL,
+  state TEXT NOT NULL,
+  rev INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(campaign_id, account_uid)
+);
+
 CREATE INDEX IF NOT EXISTS idx_characters_campaign ON characters(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_campaign_state_campaign ON campaign_state(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_player_states_campaign ON player_states(campaign_id);
 `;
 
 // Every valid subsystem name, and the exact top-level saveAppState() field(s) each one replaces

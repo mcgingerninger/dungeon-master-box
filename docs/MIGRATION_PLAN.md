@@ -118,10 +118,25 @@ NOT add any authorization/auth system — that gap is real and explicitly docume
 over. Not wired into the live app yet. See `docs/ARCHITECTURE.md`'s Phase 4 section for the full
 route list and the authorization gap in detail.
 
-## Phase 5 — WebSocket multiplayer (not started, not yet scoped in detail)
+## Phase 5 — WebSocket multiplayer (in progress, broken into sub-phases)
 
-Replaces the current Firebase/Firestore-based multiplayer sync layer (`multiplayer-sync.js`) with
-a WebSocket connection to the local server from Phase 3/4.
+A full audit of `multiplayer-sync.js` (1,538 lines) found it bundles four largely separate
+systems — authentication, real-time state sync, Firestore-security-rule-dependent race
+arbitration for loot claims, and a whole login/account UI — plus several more broadcast/listener
+subsystems on top. Attempting all of it as one phase was rejected as too large; see
+`docs/ARCHITECTURE.md`'s Phase 5a section for the full breakdown.
+
+**Phase 5a ✅ complete** — replaces only the core state push/listen loop
+(`pushOwnState`/`startPlayerListener`) and the three cross-player writes (`applyHpDelta`,
+`giftItemToPlayer`, `setPlayerInventoryFields`) with a WebSocket layer (`server/websocket.js`),
+backed by a new `player_states` table (`db/schema.js`). Firebase Auth and the account UI are
+untouched. First real npm dependency (`ws`) added, per confirmed choice over hand-rolling the
+WebSocket protocol.
+
+**Not yet started** (future sub-phases): loot-claim first-write-wins arbitration,
+battlefield/puzzle-log broadcast with loot-visibility filtering, the DM roster listener, the
+attack-request review queue, and a decision on whether Firebase Auth stays permanently or is
+ever replaced.
 
 ## Phase 6+ — Dungeon Master Box deployment (not started, not yet scoped in detail)
 

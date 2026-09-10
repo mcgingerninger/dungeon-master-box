@@ -1,0 +1,202 @@
+// Regression tests for the Phase 5a WebSocket sync layer. Run with: node --test
+// Uses the 'ws' package as a real client connecting to a real WebSocket server (attached to a
+// real http.Server on an OS-assigned port), same "real requests, not mocks" philosophy as
+// server.test.js and gambling.test.js.
+import { test, describe, beforeEach, afterEach } from 'node:test';
+import assert from 'node:assert/strict';
+import { createServer as createHttpServer } from 'node:http';
+import { WebSocket } from 'ws';
+import { openDatabase, createCampaign } from '../db/database.js';
+import { createWebSocketServer } from './websocket.js';
+
+let db, httpServer, port, campaignId;
+const sockets = []; // opened during a test, force-closed in afterEach even if a test fails early
+
+beforeEach(async () => {
+  db = openDatabase(':memory:');
+  httpServer = createHttpServer();
+  createWebSocketServer(db, httpServer);
+  await new Promise(resolve => httpServer.listen(0, resolve));
+  port = httpServer.address().port;
+  campaignId = createCampaign(db, 'Test').id;
+});
+
+afterEach(async () => {
+  sockets.forEach(ws => ws.close());
+  sockets.length = 0;
+  await new Promise(resolve => httpServer.close(resolve));
+});
+
+function connect() {
+  const ws = new WebSocket(`ws://localhost:${port}`);
+  sockets.push(ws);
+  return new Promise((resolve, reject) => {
+    ws.on('open', () => resolve(ws));
+    ws.on('error', reject);
+  });
+}
+function send(ws, msg) { ws.send(JSON.stringify(msg)); }
+// Waits for the next message, with a short timeout so a test that wrongly expects a message
+// (e.g. checking self-echo never arrives) fails fast rather than hanging.
+function nextMessage(ws, timeoutMs = 500) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Timed out waiting for a message')), timeoutMs);
+    ws.once('message', (raw) => { clearTimeout(timer); resolve(JSON.parse(raw.toString())); });
+  });
+}
+// Confirms NO message arrives within the window — used specifically to prove self-echo doesn't
+// happen, which is the main behavioral difference from the original Firestore-based design.
+function assertNoMessage(ws, timeoutMs = 300) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(resolve, timeoutMs);
+    ws.once('message', (raw) => { clearTimeout(timer); reject(new Error('Expected no message, got: ' + raw.toString())); });
+  });
+}
+
+describe('identify', () => {
+  test('identifying with a real campaign acks with null state the first time', async () => {
+    const ws = await connect();
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player', username: 'Alice' });
+    const msg = await nextMessage(ws);
+    assert.equal(msg.type, 'identified');
+    assert.equal(msg.state, null);
+    assert.equal(msg.rev, 0);
+  });
+
+  test('identifying with an unknown campaign returns an error', async () => {
+    const ws = await connect();
+    send(ws, { type: 'identify', campaignId: 999999, accountUid: 'uid-1', role: 'player' });
+    const msg = await nextMessage(ws);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /999999/);
+  });
+
+  test('any message before identify is rejected', async () => {
+    const ws = await connect();
+    send(ws, { type: 'push_state', rev: 1, state: { characterCurrentHp: 10 } });
+    const msg = await nextMessage(ws);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /identify/);
+  });
+
+  test('malformed JSON does not crash the connection', async () => {
+    const ws = await connect();
+    ws.send('{not valid json');
+    const msg = await nextMessage(ws);
+    assert.equal(msg.type, 'error');
+  });
+});
+
+describe('push_state and reconnect', () => {
+  test('a pushed state is persisted and visible to a fresh identify (reconnect)', async () => {
+    const ws1 = await connect();
+    send(ws1, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player', username: 'Alice' });
+    await nextMessage(ws1);
+    send(ws1, { type: 'push_state', rev: 1, state: { characterCurrentHp: 25 } });
+
+    // Give the server a moment to process, then simulate a reconnect with a fresh connection.
+    await new Promise(r => setTimeout(r, 100));
+    const ws2 = await connect();
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player', username: 'Alice' });
+    const msg = await nextMessage(ws2);
+    assert.equal(msg.type, 'identified');
+    assert.equal(msg.state.characterCurrentHp, 25);
+    assert.equal(msg.rev, 1);
+  });
+
+  test('the pushing connection never receives its own push back (no self-echo)', async () => {
+    const ws = await connect();
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player' });
+    await nextMessage(ws);
+    send(ws, { type: 'push_state', rev: 1, state: { characterCurrentHp: 25 } });
+    await assertNoMessage(ws);
+  });
+
+  test('a stale (out-of-order) push is dropped, newer state is not clobbered', async () => {
+    const ws = await connect();
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player' });
+    await nextMessage(ws);
+    send(ws, { type: 'push_state', rev: 5, state: { characterCurrentHp: 40 } });
+    await new Promise(r => setTimeout(r, 50));
+    send(ws, { type: 'push_state', rev: 3, state: { characterCurrentHp: 1 } }); // arrives "late" with an older rev
+    await new Promise(r => setTimeout(r, 50));
+
+    const ws2 = await connect();
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-1', role: 'player' });
+    const msg = await nextMessage(ws2);
+    assert.equal(msg.state.characterCurrentHp, 40); // the newer push wins, the stale one was ignored
+  });
+});
+
+describe('cross-player writes (DM -> player)', () => {
+  async function connectAs(accountUid, role) {
+    const ws = await connect();
+    send(ws, { type: 'identify', campaignId, accountUid, role, username: accountUid });
+    await nextMessage(ws); // consume the 'identified' ack
+    return ws;
+  }
+
+  test('hp_delta reaches the target player live, clamped to their max HP', async () => {
+    const player = await connectAs('uid-player', 'player');
+    send(player, { type: 'push_state', rev: 1, state: { characterCurrentHp: 20, characterMaxHpEffective: 30 } });
+    await new Promise(r => setTimeout(r, 50));
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'hp_delta', targetUid: 'uid-player', delta: -5 });
+    const update = await nextMessage(player);
+    assert.equal(update.type, 'state_update');
+    assert.equal(update.state.characterCurrentHp, 15);
+
+    // Now push past the max and confirm it clamps rather than exceeding it.
+    send(dm, { type: 'hp_delta', targetUid: 'uid-player', delta: 100 });
+    const clamped = await nextMessage(player);
+    assert.equal(clamped.state.characterCurrentHp, 30);
+  });
+
+  test('gift_item adds the item to the target\'s savedGeneratedItems and recentlyLooted', async () => {
+    const player = await connectAs('uid-player', 'player');
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'gift_item', targetUid: 'uid-player', item: { name: 'Flametongue Sword', type: 'weapon' } });
+    const update = await nextMessage(player);
+    assert.equal(update.state.savedGeneratedItems.length, 1);
+    assert.equal(update.state.savedGeneratedItems[0].name, 'Flametongue Sword');
+    assert.equal(update.state.recentlyLooted.length, 1);
+    assert.match(update.state.recentlyLooted[0], /^gen:/);
+  });
+
+  test('set_inventory_fields overwrites only the fields provided', async () => {
+    const player = await connectAs('uid-player', 'player');
+    send(player, { type: 'push_state', rev: 1, state: { characterCurrentHp: 20, characterClass: 'Ranger' } });
+    await new Promise(r => setTimeout(r, 50));
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'set_inventory_fields', targetUid: 'uid-player', fields: { playerSlots: { weapon1: 'itemKey1' } } });
+    const update = await nextMessage(player);
+    assert.deepEqual(update.state.playerSlots, { weapon1: 'itemKey1' });
+    assert.equal(update.state.characterCurrentHp, 20); // untouched
+    assert.equal(update.state.characterClass, 'Ranger'); // untouched
+  });
+
+  test('a non-DM cannot perform cross-player writes', async () => {
+    const player1 = await connectAs('uid-player-1', 'player');
+    await connectAs('uid-player-2', 'player');
+    send(player1, { type: 'hp_delta', targetUid: 'uid-player-2', delta: -5 });
+    const msg = await nextMessage(player1);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
+  test('a cross-player write to a target with no live connection still persists (delivered on next identify)', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    // No prior state exists for this uid, so current HP defaults to 0 and the write floor-clamps
+    // to 0 even without a known max — this is the correct, if slightly non-obvious, behavior of
+    // the same clamp logic exercised elsewhere, not a special case for the offline path.
+    send(dm, { type: 'hp_delta', targetUid: 'uid-offline-player', delta: -5 });
+    await new Promise(r => setTimeout(r, 50));
+
+    const ws2 = await connect();
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-offline-player', role: 'player' });
+    const ack = await nextMessage(ws2);
+    assert.equal(ack.state.characterCurrentHp, 0);
+  });
+});

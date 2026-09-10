@@ -476,3 +476,147 @@ at the same time.
   than trusting a single green run given real RNG is involved.
 - Not wired into the live browser app, per the confirmed scope.
 - No unrelated files modified.
+
+## Phase 5a: WebSocket Sync — Core State Loop (first sub-phase of Phase 5)
+
+"Phase 5: WebSocket multiplayer, replaces the current Firebase-based sync layer" turned out to
+be a much bigger phase than its name suggests once actually audited (see below) — large enough
+that attempting it as one phase was explicitly rejected in favor of breaking it into sub-phases.
+This is the first one: replacing only `multiplayer-sync.js`'s core state push/listen loop
+(`pushOwnState`/`startPlayerListener`) and its three cross-player writes (`applyHpDelta`,
+`giftItemToPlayer`, `setPlayerInventoryFields`). Everything else `multiplayer-sync.js` does —
+listed in full below — is explicitly out of scope for this sub-phase.
+
+### Why this got broken into sub-phases
+
+A full audit of `multiplayer-sync.js` (1,538 lines) found it's not one system but four bundled
+together:
+
+1. **Authentication** — real Firebase accounts, username/password disguised as fake emails,
+   session persistence, signup rollback-on-failure logic. Has nothing to do with WebSocket vs.
+   Firestore as a transport — it's a full login system.
+2. **Real-time state sync** — the core push/listen loop, with real hard-won correctness logic: a
+   `rev` counter to detect and drop stale/out-of-order writes, and a separate `extRev` counter so
+   a DM's write to a player's doc is never mistaken for that player's own echo.
+3. **Race-condition arbitration** — real-time loot claims rely specifically on Firestore's
+   create-vs-update security rule semantics to get true first-write-wins with zero server-side
+   code. Replacing the transport doesn't replace this arbitration; something else has to do that
+   job.
+4. **A whole login/account UI** — the gate screen, signup/login forms, account panel, roster
+   display, guest mode. Injected DOM/CSS, tightly coupled to the auth flow.
+
+Plus, underneath those: room/campaign membership, a DM-review queue for player attacks
+(`submitBattlefieldAttack`/`startAttackRequestListener`), battlefield/puzzle-log broadcast with
+loot-visibility filtering, and a DM-only roster listener across every player in a room.
+
+Given Phase 1 already demonstrated that real bugs surface even at a much smaller scope than
+this, attempting all four systems (plus the six-plus remaining subsystems) in one phase was
+rejected. **Confirmed scope for this sub-phase**: keep Firebase Auth completely untouched
+(system #1 above, and the account UI, #4, stay exactly as they are); build only the core sync
+loop and cross-player writes (system #2); explicitly defer loot-claim arbitration, battlefield/
+puzzle-log broadcast, and the roster listener to their own future sub-phases.
+
+### What changed vs. the original design, and why it's simpler
+
+The original's `rev`/`extRev` two-counter scheme exists entirely to solve a problem specific to
+Firestore's `onSnapshot`: it always echoes a client's own writes back to that same client, so the
+app needs its own logic to tell "this is just my own write bouncing back, ignore it" apart from
+"the DM actually changed something." A WebSocket server is stateful and knows exactly which
+connection sent which message — so it can simply never send a `state_update` back to the
+connection that sent the `push_state` that caused it. This eliminates the self-echo problem by
+construction rather than by counter-comparison logic; confirmed by a dedicated regression test
+(`the pushing connection never receives its own push back`) that would fail loudly if this
+invariant were ever broken.
+
+What's still needed and still present: a single `rev` field, guarding against a narrower problem
+that doesn't go away — two rapid pushes from the *same* client arriving out of order over the
+network, where an older one's round-trip happens to finish after a newer one's. `push_state`
+compares the incoming `rev` against what's already persisted and drops anything not strictly
+newer.
+
+### Schema addition: `player_states` (see `db/schema.js`)
+
+Phase 2's `campaign_state` table is scoped per `(campaign_id, subsystem)` — built for
+campaign-wide DM settings (loot rarity weights, journey log, etc.), all owned by one account.
+A player's full save-state blob (inventory, equipped gear, character sheet) is inherently
+per-*player*, mirroring exactly what Firestore's `rooms/{code}/players/{uid}` document already
+was — a shape Phase 2 never needed to model since it only ever handled a DM's own data. Rather
+than force per-player blobs into the campaign-wide table (which the code doesn't even allow —
+`saveSubsystemState` validates the subsystem name against a fixed list) or invent something more
+elaborate, this phase added one small, directly-analogous table: `(campaign_id, account_uid,
+state, rev)`, one row per player per campaign. `db/database.js` gained `savePlayerState`,
+`loadPlayerState`, `loadAllPlayerStates` to match, with their own regression tests.
+
+### Message protocol (`server/websocket.js`)
+
+JSON messages over a `ws` WebSocket connection, sharing the same TCP port as the REST API (the
+`ws` package upgrades HTTP connections on the existing `http.Server` instance — no second port
+needed):
+
+```
+client -> server:
+  { type: 'identify', campaignId, accountUid, role, username }   -- must be sent first
+  { type: 'push_state', rev, state }                              -- persists the sender's own state
+  { type: 'hp_delta', targetUid, delta }                          -- DM only
+  { type: 'gift_item', targetUid, item }                          -- DM only
+  { type: 'set_inventory_fields', targetUid, fields }             -- DM only
+server -> client:
+  { type: 'identified', state, rev }    -- ack, plus whatever was already persisted for this account
+  { type: 'state_update', state, rev }  -- this account's state changed (a DM cross-write landed)
+  { type: 'error', message }
+```
+
+`hp_delta` clamps the same way the original did (floors at 0, ceilings at
+`characterMaxHpEffective`/`characterMaxHp` if known) — including the same behavior for a target
+with no prior state at all (current HP treated as 0, so any negative delta floors straight to 0,
+not a negative number). A cross-player write to a target with no live connection still persists
+correctly and is delivered the next time that account identifies — confirmed by a dedicated test,
+not just assumed.
+
+### `ws` package — first real npm dependency
+
+Node has no built-in WebSocket *server* (only an experimental client, for connecting outward).
+Per the user's confirmed choice, this uses the `ws` package — the de facto standard, rather than
+hand-rolling the handshake/framing protocol from raw `http`/`net`. This is the project's first
+real dependency; `package.json` and `.gitignore` (for `node_modules/`, plus `*.db`/`*.db-journal`
+so a locally-running server's database file is never accidentally committed) were added this
+phase.
+
+### Deliberate, documented gap: no identity verification
+
+The server trusts whatever `accountUid`/`role` a client's `identify` message claims — it does not
+cryptographically verify this against a real Firebase session. Real verification would mean
+pulling in Firebase Admin SDK to check ID tokens server-side on every connection, which is a
+separate integration effort from what this sub-phase is actually about (sync-loop correctness).
+Same trust model Phase 4 already established for gambling ("no authorization" gap) — noted here
+explicitly rather than silently inherited.
+
+### What's still needed for "Phase 5" as originally named (future sub-phases)
+
+- **Loot-claim first-write-wins arbitration** — needs the WebSocket server itself to do what
+  Firestore's create-vs-update security rules did implicitly: reject a second claim on the same
+  drop once the first has landed.
+- **Battlefield/puzzle-log broadcast** — DM-authored state pushed to every connected player in a
+  room, including the loot-visibility filtering (`pushBattlefieldState` strips unrevealed/
+  reserved/claimed items before it ever reaches a player).
+- **DM roster listener** — a live, thin (username/HP/AC) summary across every player in a room,
+  for the Combat tab's targeting UI.
+- **Attack-request review queue** — a player submits a weapon-attack roll, the DM applies/
+  dismisses it.
+- **Authentication and the account/login UI** — deliberately untouched in this sub-phase;
+  whether Firebase Auth stays permanently (only ever replacing the real-time sync/game-state
+  parts) or eventually gets replaced too is an open question for a future conversation, not
+  decided here.
+
+### Validation performed
+
+- All 90 Node regression tests pass (`node --test` — 78 from Phases 1–4 plus the `player_states`
+  schema additions, 12 new in `server/websocket.test.js`), covering identify (including unknown
+  campaign and pre-identify-message rejection), push/reconnect round-tripping, the no-self-echo
+  guarantee, stale-push rejection, all three cross-player writes (including HP clamping at both
+  floor and ceiling), non-DM rejection, and delivery-on-reconnect for an offline target.
+- A real end-to-end smoke test: started the actual server process (`server/start.js`) against a
+  real file-backed SQLite database, created a campaign via the REST API, then connected a real
+  `ws` client to the *same port* and successfully identified — confirming the shared-port HTTP/
+  WebSocket upgrade actually works outside the in-process test harness, not just inside it.
+- Not wired into the live browser app, per the confirmed scope.
