@@ -24,7 +24,15 @@ architectural migration's development home, starting from dungeon-loot-tool's ex
 working state with full commit history preserved (not squashed, not reset to an unrelated repo).
 No application architecture changed in this phase.
 
-## Phase 1 — Game-engine extraction (not started)
+## Phase 1 — Game-engine extraction ✅ complete
+
+Extracted item classification, character sheet math, battle parsing/damage, and all four
+gambling games into `game-engine.js`, bridged into the monolith via `window.X`. Two real
+ordering/audit mistakes were made and fixed — see `docs/ARCHITECTURE.md`'s Phase 1 section for
+the full account, including the lesson for future phases about auditing bulk line-range edits
+and top-level script-ordering hazards more thoroughly than "just" the target function names.
+
+Original scope description, preserved for reference:
 
 Extract dependency-light game logic into a `game-engine.js` module, without changing any
 user-visible behavior or beginning the SQLite/server/multiplayer migration.
@@ -79,19 +87,36 @@ Ends with a concise report (files changed, functions extracted, functions intent
 extracted and why, tests added/results, dependencies discovered, compatibility bridges, risks,
 recommended next phase) and a stop for review before Phase 2.
 
-## Phase 2 — SQLite / database foundation (not started, not yet scoped in detail)
+## Phase 2 — SQLite / database foundation ✅ complete
 
-Durable local persistence to replace the current ad-hoc state-blob approach. Detailed scope to be
-written when this phase is approved to begin.
+Built the schema (`db/schema.js`) and a Node-side data-access layer (`db/database.js`) using
+Node's built-in `node:sqlite`, with 16 regression tests. Deliberately **not** wired into the live
+browser app yet — the app still uses `localStorage` unchanged. Partial normalization: a real
+`characters` table (matches `game-engine.js`'s character-sheet shape), everything else scoped
+into a generic per-subsystem `campaign_state` bucket rather than a speculative full redesign. See
+`docs/ARCHITECTURE.md`'s Phase 2 section for the full schema reasoning and the `node:sqlite`
+experimental-API risk this introduces.
 
-## Phase 3 — Node.js server (not started, not yet scoped in detail)
+## Phase 3 — Node.js server ✅ complete
 
-A real local server process a DM runs, as the foundation for server-authoritative state.
+Built a real Node.js server (`server/server.js`, plain `http` module, no framework — the
+project's first point where adding a dependency like Express was a live option, deliberately
+declined to stay dependency-free) exposing Phase 2's persistence layer as a REST API, with 18
+regression tests plus a manual end-to-end smoke test against a real file-backed database.
+Deliberately **not** wired into the live browser app yet — that's Phase 4. See
+`docs/ARCHITECTURE.md`'s Phase 3 section for the full route list and error-handling design.
 
-## Phase 4 — Server-authoritative game state (not started, not yet scoped in detail)
+## Phase 4 — Server-authoritative game state ✅ complete (first slice: gambling)
 
-The server becomes the single source of truth for game state, rather than state being split
-across clients and Firestore the way it is today.
+Confirmed before starting that the literal full scope ("every state mutation, server-owned") was
+too large and risky for one phase. Built a narrower, well-bounded first slice instead: gambling
+resolution (`server/gambling.js`) is now genuinely decided server-side — every resolve step uses
+the server's own randomness, never a client-supplied value, provable by inspection and covered
+by a regression test that confirms extra client-supplied fields are ignored. Everything else
+(combat, inventory, character state, the rest of multiplayer) is untouched. Deliberately does
+NOT add any authorization/auth system — that gap is real and explicitly documented, not papered
+over. Not wired into the live app yet. See `docs/ARCHITECTURE.md`'s Phase 4 section for the full
+route list and the authorization gap in detail.
 
 ## Phase 5 — WebSocket multiplayer (not started, not yet scoped in detail)
 

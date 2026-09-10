@@ -3554,6 +3554,24 @@
   </div>
 </div>
 
+<!-- Phase 1 of the architecture migration (see docs/ARCHITECTURE.md): item classification,
+     character sheet math, battle parsing/damage, and all four gambling games' resolution logic
+     now live in game-engine.js, a dependency-light ES module with no DOM/window/localStorage
+     access of its own. This bridge script is the temporary compatibility shim that lets the
+     rest of this still-monolithic file keep calling those functions as plain globals
+     (classifyItemFull(...), battleParseAttack(...), etc.) — same spirit as multiplayer-sync.js's
+     explicit window.X bridge below, just running in the other direction (this module needs to
+     expose things TO the classic script below it, not consume from it).
+     Module scripts execute after the document finishes parsing but BEFORE DOMContentLoaded,
+     regardless of where the <script type="module"> tag sits in the document — so the one piece
+     of this file that needs game-engine.js ready before it runs (the initial lootData
+     classification pass, see the bottom of the main script block) is deferred to
+     DOMContentLoaded rather than left at the top level, which is the only ordering change this
+     migration phase required. -->
+<script type="module">
+  import * as GameEngine from './game-engine.js';
+  Object.assign(window, GameEngine);
+</script>
 <script>
 // Bump this whenever the file is saved as a new version (filename should match, e.g. v96).
 const APP_VERSION = 'v96';
@@ -4003,584 +4021,12 @@ function closePowerPicker() {
 }
 
 // ===================== ITEM CLASSIFICATION SYSTEM =====================
-// Three independent axes, layered on top of the existing type/subcategory fields rather
-// than replacing them (everything built earlier this project — equip slots, icons, weight,
-// weapons/armor detection — keeps working unchanged):
-//   • classification — an array of path segments from root to the most specific leaf that
-//     applies (e.g. ['Weapon','Melee','One-Handed','Sword']): "what physically/functionally
-//     is this thing." Derived automatically from the item's existing type/subcategory/name/
-//     description — every item in the project gets one, not just new ones.
-//   • properties — a flat array of descriptive traits from a fixed vocabulary (Magical,
-//     Cursed, Rare, Unique, Heavy, Soulbound, elemental flavors, etc.): "what characteristics
-//     does it have."
-//   • tags — a flat array of lowercase hashtag-style strings (the '#' is only added back for
-//     display) that other systems can gate on: "what systems can interact with this." The
-//     Monster Mangler's weapon/armor check (see manglerItemDrop) now reads these tags
-//     instead of a hardcoded type check, as a working example of that gating.
-// Coverage note: several branches from the full classification chart (Document, Treasure,
-// Key/Quest Object, and most of Miscellaneous) don't have any real mechanical item type in
-// this project yet — nothing currently *is* a readable book or a quest key. The classifier
-// below still recognizes the handful of existing items that read that way by name (maps,
-// keys, ledgers, coin pouches, etc.) and routes them into the right branch, but populating
-// every empty leaf with brand-new hand-authored items is a separate, much larger follow-up
-// (a hundred-plus new items across entirely new item types) that hasn't been done here.
-
-// Body-slot label used for the Armor tree's material branches (2.1–2.3), independent of the
-// "which doll slot does this equip to" mapping SUBCATEGORY_TO_SLOT_CATEGORY already handles.
-const ARMOR_BODY_SLOT_LABEL = { head:'Head', chest:'Chest', handwear:'Hands', leggings:'Legs', boots:'Feet', facewear:'Head' };
-function classifyItemHierarchy(item, rarity) {
-  const n = (item.name || '').toLowerCase();
-  const text = n + ' ' + ((item.desc || '') + ' ' + (item.effect || '')).toLowerCase();
-  const type = item.type;
-  const sub = item.subcategory;
-
-  // ---- 1. WEAPON ---- (four real top-level classes: Melee, Ranged, Natural, Misc — no
-  // class is allowed to be a dumping ground for another; Two-Handed is a Melee subclass,
-  // not a sibling of it, and the old per-subclass "Miscellaneous" leaves are gone in favor
-  // of one true last-resort class, reached only if nothing below matches at all.)
-  if (type === 'weapon') {
-    const twoHanded = sub === 'twohanded';
-    // Natural weapons (claws, fangs, stingers, horns/tails used as weapons, etc.) are
-    // checked first since they're their own class — but skipped if the name also contains
-    // a real manufactured-weapon noun, so a themed weapon like "Wolf Fang Dagger" still
-    // classifies as a Dagger rather than a natural attack.
-    const manufacturedNoun = /sword|blade|rapier|saber|scimitar|falchion|dagger|\bknife\b|dirk|stiletto|\baxe\b|hatchet|\bmace\b|hammer|\bflail\b|\bclub\b|spear|trident|\bpike\b|\bbow\b|crossbow|\bsling\b|blowgun|\bwhip\b|\bchain\b|morningstar|javelin|sickle|\bpick\b|kusarigama|\bnet\b|shuriken|\bstaff\b|glaive|halberd|polearm|\blance\b/;
-    if (!manufacturedNoun.test(n)) {
-      if (/\bclaw/.test(n)) return ['Weapon','Natural','Claw'];
-      if (/\bbite\b|\bfang|\btooth\b|\btusk/.test(n)) return ['Weapon','Natural','Bite'];
-      if (/\btalon/.test(n)) return ['Weapon','Natural','Talon'];
-      if (/\bhorn\b/.test(n)) return ['Weapon','Natural','Horn'];
-      if (/\btail\b/.test(n)) return ['Weapon','Natural','Tail'];
-      if (/\bsting/.test(n)) return ['Weapon','Natural','Sting'];
-      if (/\bslam\b|\bmaw\b|\bram\b/.test(text)) return ['Weapon','Natural','Slam'];
-    }
-    // Ranged
-    if (/\bsling\b/.test(n)) return ['Weapon','Ranged','Exotic','Sling'];
-    if (/blowgun/.test(n)) return ['Weapon','Ranged','Exotic','Blowgun'];
-    if (/\bnet\b/.test(n)) return ['Weapon','Ranged','Exotic','Net'];
-    if (/hand crossbow/.test(n)) return ['Weapon','Ranged','Crossbow','Hand Crossbow'];
-    if (/heavy crossbow/.test(n)) return ['Weapon','Ranged','Crossbow','Heavy Crossbow'];
-    if (/crossbow/.test(n)) return ['Weapon','Ranged','Crossbow','Light Crossbow'];
-    if (/throwing knife|throwing dagger/.test(n)) return ['Weapon','Ranged','Thrown','Throwing Knife'];
-    if (/throwing axe/.test(n)) return ['Weapon','Ranged','Thrown','Throwing Axe'];
-    if (/javelin/.test(n)) return ['Weapon','Ranged','Thrown','Javelin'];
-    if (/shuriken/.test(n)) return ['Weapon','Ranged','Thrown','Shuriken'];
-    if (/greatbow/.test(n)) return ['Weapon','Ranged','Bow','Greatbow'];
-    if (/longbow/.test(n)) return ['Weapon','Ranged','Bow','Longbow'];
-    if (/shortbow|\bbow\b/.test(n)) return ['Weapon','Ranged','Bow','Shortbow'];
-    // Melee: Flexible
-    if (/\bwhip\b/.test(n)) return ['Weapon','Melee','Flexible','Whip'];
-    if (/\bchain\b(?!\s*mail)/.test(n)) return ['Weapon','Melee','Flexible','Chain'];
-    if (/morningstar/.test(n)) return ['Weapon','Melee','Flexible','Morningstar'];
-    if (/kusarigama/.test(n)) return ['Weapon','Melee','Flexible','Kusarigama'];
-    // Melee: Two-Handed (a Melee subclass, same level as One-Handed/Flexible)
-    if (/great.?sword|zweihander/.test(n)) return ['Weapon','Melee','Two-Handed','Greatsword'];
-    if (/great.?axe/.test(n)) return ['Weapon','Melee','Two-Handed','Greataxe'];
-    if (/great.?club|great.?hammer|\bmaul\b/.test(n)) return ['Weapon','Melee','Two-Handed','Great Hammer'];
-    if (/halberd|glaive|\bpike\b|\blance\b|polearm/.test(n)) return ['Weapon','Melee','Two-Handed','Polearm'];
-    if (twoHanded && /spear|trident/.test(n)) return ['Weapon','Melee','Two-Handed','Two-Handed Spear'];
-    if (/\bstaff\b/.test(n)) return ['Weapon','Melee','Two-Handed','Staff'];
-    // Melee: One-Handed
-    if (/dagger|\bknife\b|dirk|stiletto/.test(n)) return ['Weapon','Melee','One-Handed','Dagger'];
-    if (/\baxe\b|hatchet/.test(n)) return ['Weapon','Melee','One-Handed','Axe'];
-    if (/\bmace\b/.test(n)) return ['Weapon','Melee','One-Handed','Mace'];
-    if (/\bpick\b/.test(n)) return ['Weapon','Melee','One-Handed','Pick'];
-    if (/hammer/.test(n)) return ['Weapon','Melee','One-Handed','Hammer'];
-    if (/\bflail\b/.test(n)) return ['Weapon','Melee','One-Handed','Flail'];
-    if (/\bclub\b/.test(n)) return ['Weapon','Melee','One-Handed','Club'];
-    if (/\bsickle\b/.test(n)) return ['Weapon','Melee','One-Handed','Sickle'];
-    if (/spear|trident|\bpike\b/.test(n)) return ['Weapon','Melee','One-Handed','Spear'];
-    if (/sword|\bblade\b|rapier|saber|scimitar|falchion/.test(n)) return ['Weapon','Melee','One-Handed','Sword'];
-    // Misc — top-level class, true last resort. Should now be rare given the added
-    // Sickle/Pick/Kusarigama/Net/Shuriken/Natural coverage above.
-    return ['Weapon','Misc','Unclassified Weapon'];
-  }
-
-  // ---- Grafted limbs — routed to Accessory > Augmentation, split by the actual body part
-  // (already known from item.subcategory, set at graft time — see FLESH_LIMB_DEFS) instead
-  // of one flat "Magical Augmentation" leaf for every limb regardless of type.
-  if (type === 'limb') {
-    const augLeaf = { arm:'Arm', hand:'Hand', finger:'Hand', leg:'Leg', foot:'Leg', eye:'Eye', ear:'Organ', heart:'Organ', tongue:'Organ' };
-    return ['Accessory','Augmentation', augLeaf[sub] || 'Other'];
-  }
-
-  // ---- 2. ARMOR ---- (cloak/belt/facewear/ring/amulet-flavored "armor" items are really
-  // accessories that happen to grant AC — routed to the Accessory branch instead of the
-  // material/weight-class tree, which is for actual body armor. Material keyword list
-  // expanded so the exotic-material fallback is reached less often.)
-  if (type === 'armor') {
-    if (sub === 'cloak') return ['Accessory','Back','Cloak'];
-    if (sub === 'belt') return ['Accessory','Waist','Belt'];
-    if (sub === 'facewear') {
-      if (/mask/.test(n)) return ['Accessory','Face','Mask'];
-      if (/goggles|lens|spectacles|monocle/.test(n)) return ['Accessory','Face','Goggles'];
-      if (/veil|blindfold/.test(n)) return ['Accessory','Face','Veil'];
-    }
-    if (sub === 'offhand') {
-      if (/tower/.test(n)) return ['Armor','Shield','Tower Shield'];
-      if (/kite/.test(n)) return ['Armor','Shield','Kite Shield'];
-      if (/buckler/.test(n)) return ['Armor','Shield','Buckler'];
-      return ['Armor','Shield','Round Shield'];
-    }
-    const slotLabel = ARMOR_BODY_SLOT_LABEL[sub] || 'Full Set';
-    if (/full plate/.test(n)) return ['Armor','Heavy Armor','Full Plate', slotLabel];
-    if (/half.?plate/.test(n)) return ['Armor','Heavy Armor','Half Plate', slotLabel];
-    if (/\bplate\b|cuirass|breastplate/.test(n)) return ['Armor','Heavy Armor','Plate', slotLabel];
-    if (/splint/.test(n)) return ['Armor','Heavy Armor','Splint', slotLabel];
-    if (/banded/.test(n)) return ['Armor','Heavy Armor','Banded', slotLabel];
-    if (/ring mail/.test(n)) return ['Armor','Heavy Armor','Ring Mail', slotLabel];
-    if (/chain\s*mail|\bchain\b/.test(n)) return ['Armor','Medium Armor','Chain', slotLabel];
-    if (/\bscale\b/.test(n)) return ['Armor','Medium Armor','Scale', slotLabel];
-    if (/studded/.test(n)) return ['Armor','Medium Armor','Studded', slotLabel];
-    if (/brigandine/.test(n)) return ['Armor','Medium Armor','Brigandine', slotLabel];
-    if (/lamellar/.test(n)) return ['Armor','Medium Armor','Lamellar', slotLabel];
-    if (/\bhide\b/.test(n)) return ['Armor','Light Armor','Hide', slotLabel];
-    if (/leather/.test(n)) return ['Armor','Light Armor','Leather', slotLabel];
-    if (/\brobe\b|vestment|\bcloth\b/.test(n)) return ['Armor','Light Armor','Cloth', slotLabel];
-    if (/padded/.test(n)) return ['Armor','Light Armor','Padded', slotLabel];
-    if (/\bsilk\b/.test(n)) return ['Armor','Light Armor','Silk', slotLabel];
-    if (/dragon|elemental|obsidian|celestial/.test(text)) return ['Armor','Exotic Material','Dragonscale / Elemental'];
-    if (/mithral/.test(text)) return ['Armor','Exotic Material','Mithral'];
-    if (/adamantine/.test(text)) return ['Armor','Exotic Material','Adamantine'];
-    if (/\bbone\b|chitin|carapace/.test(text)) return ['Armor','Exotic Material','Bone / Chitin'];
-    if (/\bbark\b|\bwood\b/.test(text)) return ['Armor','Exotic Material','Bark / Wood'];
-    return ['Armor','Exotic Material','Unclassified Material'];
-  }
-
-  // ---- 3. ACCESSORY ----
-  if (sub === 'ring') return ['Accessory','Ring', /signet/.test(n) ? 'Signet Ring' : 'Magical Ring'];
-  if (sub === 'amulet') {
-    if (/talisman/.test(n)) return ['Accessory','Neck','Talisman'];
-    if (/locket/.test(n)) return ['Accessory','Neck','Locket'];
-    if (/brooch/.test(n)) return ['Accessory','Neck','Brooch'];
-    if (/medallion/.test(n)) return ['Accessory','Neck','Medallion'];
-    if (/pendant/.test(n)) return ['Accessory','Neck','Pendant'];
-    if (/necklace/.test(n)) return ['Accessory','Neck','Necklace'];
-    return ['Accessory','Neck','Amulet'];
-  }
-  // Wearable "of Elvenkind"-style magic items authored as type:'misc' rather than
-  // type:'armor' (e.g. "Boots of Speed", "Cloak of Invisibility", "Belt of Hill Giant
-  // Strength") used to have no Accessory route at all and fell all the way through the
-  // Tool/Material/Document/Treasure legacy-sniffing gauntlet into the Miscellaneous
-  // fallback — usually landing in the "Unidentified Object" catch-all, or worse, getting
-  // hijacked by an unrelated keyword partway through (e.g. "Cloak of the Hundred Faces"
-  // matching the Tool > Disguise Kit check on "disguise" in its effect text). Name-only
-  // matches (not desc/effect) so flavor text like a bottle's "lead cap" can't trigger these.
-  if (/\bboots\b|\bslippers\b|\bsandals\b|\bsocks?\b/.test(n)) return ['Accessory','Feet','Boots'];
-  if (/\bgauntlets\b/.test(n)) return ['Accessory','Hands','Gauntlets'];
-  if (/\bbracers\b/.test(n)) return ['Accessory','Hands','Bracers'];
-  if (/\bgloves\b/.test(n)) return ['Accessory','Hands','Gloves'];
-  if (/\bcape\b/.test(n)) return ['Accessory','Back','Cape'];
-  if (/\bmantle\b/.test(n)) return ['Accessory','Back','Mantle'];
-  if (/\bcloak\b/.test(n)) return ['Accessory','Back','Cloak'];
-  if (/\bbelt\b(?!\s*pouch)|\bgirdle\b|\bsash\b/.test(n)) return ['Accessory','Waist','Belt'];
-  if (/\bcirclet\b|\btiara\b|\bcoronet\b/.test(n)) return ['Accessory','Head','Circlet'];
-  if (/\bdiadem\b/.test(n)) return ['Accessory','Head','Diadem'];
-  if (/\bheadband\b/.test(n)) return ['Accessory','Head','Headband'];
-  if (/\bhat\b/.test(n)) return ['Accessory','Head','Hat'];
-  if (/\bgoggles\b|\bspectacles\b|\bmonocle\b/.test(n)) return ['Accessory','Face','Goggles'];
-  if (/\bears?\b/.test(n)) return ['Accessory','Face','Ear'];
-  if (/\beyes?\b/.test(n)) return ['Accessory','Face','Ocular Item'];
-
-  // ---- Companions — a creature, not really an "item" in this taxonomy, but given real
-  // depth (Mount/Pet) matching the rest of the tree instead of one bare flat leaf.
-  if (type === 'companion') return ['Miscellaneous','Companion', sub === 'pet' ? 'Pet' : 'Mount'];
-
-  // ---- Document / Treasure / Key-Quest-Object — explicit type takes precedence over the
-  // name-keyword sniffing further down (which exists only to catch older items authored
-  // before these types existed, e.g. lootData's "Crude Map"/"Rusty Key").
-  if (type === 'document') {
-    if (sub === 'journal') return ['Document','Journal','Personal'];
-    if (sub === 'letter') return ['Document','Letter', /official|decree|noble|contract/.test(text) ? 'Official' : (/threat/.test(text) ? 'Threat' : 'Personal')];
-    if (sub === 'map') return ['Document','Map', /treasure/.test(text) ? 'Treasure Map' : (/dungeon/.test(text) ? 'Dungeon' : 'Region')];
-    if (sub === 'formula') return ['Document','Formula', /recipe/.test(text) ? 'Recipe' : (/blueprint/.test(text) ? 'Blueprint' : (/contract|deed/.test(text) ? 'Contract / Deed' : 'Spell Formula'))];
-    return ['Document','Book', /history|king|chronicle/.test(text) ? 'History' : (/magic|arcane|spell/.test(text) ? 'Magic' : (/beast|bestiary|creature/.test(text) ? 'Bestiary' : 'Other'))];
-  }
-  if (type === 'treasure') {
-    if (sub === 'gem') return ['Treasure','Gem', /flawless|precious|rare/.test(text) ? 'Precious Gem' : 'Semi-Precious Gem'];
-    if (sub === 'regalia') return ['Treasure','Regalia', /crown/.test(n) ? 'Crown' : (/scepter/.test(n) ? 'Scepter' : 'Circlet')];
-    if (sub === 'jewelry') return ['Treasure','Jewelry', /necklace/.test(n) ? 'Necklace' : (/bracelet/.test(n) ? 'Bracelet' : (/earring/.test(n) ? 'Earring' : 'Ring'))];
-    if (sub === 'art') return ['Treasure','Art', /statue|sculpture/.test(n) ? 'Statue' : (/tapestry/.test(n) ? 'Tapestry' : 'Painting')];
-    if (sub === 'currencybar') return ['Treasure','Currency','Bar'];
-    return ['Treasure','Currency','Coin'];
-  }
-  if (type === 'questitem') {
-    if (sub === 'key') return ['Key / Quest Object','Key', /magical|enchant/.test(text) ? 'Magical Key' : 'Physical Key'];
-    if (sub === 'accesstoken') return ['Key / Quest Object','Access Token', /sigil/.test(n) ? 'Sigil' : (/pass/.test(n) ? 'Pass' : 'Seal')];
-    if (sub === 'puzzleobject') return ['Key / Quest Object','Puzzle Object', /rune/.test(n) ? 'Rune' : (/symbol/.test(n) ? 'Symbol' : (/mechanism/.test(n) ? 'Mechanism' : 'Puzzle Piece'))];
-    return ['Key / Quest Object','Quest Object', /evidence/.test(text) ? 'Evidence' : (/relic/.test(n) ? 'Relic' : (/deliver/.test(text) ? 'Delivery Object' : 'Artifact'))];
-  }
-
-  // ---- Monster parts always land in Material > Monster Material, by part type.
-  if (type === 'craftable' && sub === 'monsterpart') {
-    const leafByPart = {
-      eye:'Organ', heart:'Organ', tongue:'Organ', venomsac:'Venom', shell:'Carapace',
-      hide:'Hide', pelt:'Fur', fang:'Fang', claw:'Claw', talon:'Talon', horn:'Horn',
-      tail:'Tail', wing:'Wing', bone:'Bone',
-    };
-    return ['Material','Monster Material', leafByPart[item.partType] || 'Other'];
-  }
-
-  // ---- 4. CONSUMABLE ---- (Throwable is a real class name, matching its subcategory,
-  // instead of the old "Other" placeholder.)
-  if (type === 'consumable') {
-    if (sub === 'scroll') return ['Consumable','Scroll', /ritual/.test(text) ? 'Ritual Scroll' : 'Spell Scroll'];
-    if (sub === 'potion') {
-      if (item.hp) return ['Consumable','Potion','Healing'];
-      if (/poison|venom|toxic/.test(text)) return ['Consumable','Potion','Poison'];
-      if (/resist/.test(text)) return ['Consumable','Potion','Resistance'];
-      if (/transform|shape/.test(text)) return ['Consumable','Potion','Transformation'];
-      if (item.mods && item.mods.length) return ['Consumable','Potion','Buff'];
-      return ['Consumable','Potion','Utility'];
-    }
-    if (sub === 'food') {
-      if (/magical|enchant/.test(text)) return ['Consumable','Food','Magical Food'];
-      if (/meat|beetle|monster/.test(text)) return ['Consumable','Food','Monster Meat'];
-      if (/ration/.test(n)) return ['Consumable','Food','Ration'];
-      return ['Consumable','Food','Prepared Food'];
-    }
-    if (sub === 'throwable') {
-      if (/dust|powder/.test(n)) return ['Consumable','Throwable', /explosive|blast/.test(text) ? 'Explosive Powder' : 'Alchemical Powder'];
-      if (/bomb|grenade/.test(n)) return ['Consumable','Throwable','Bomb'];
-      return ['Consumable','Throwable','Utility Throwable'];
-    }
-    return ['Consumable','Throwable','Utility Throwable'];
-  }
-
-  // ---- 5. TOOL ---- (wands/rods/foci that aren't classified as full weapons, plus
-  // adventuring gear that's clearly a tool rather than a trinket. Crafting keywords now
-  // route to their real discipline instead of all collapsing into one "Alchemy Tools"
-  // leaf. Ends with a "General Tools" catch-all reached only if the item clearly reads as
-  // some kind of tool/kit/supplies but doesn't match a specific discipline, so unrecognized
-  // tools don't silently fall all the way through to Material/Misc.)
-  if (/\bwand\b/.test(n)) return ['Tool','Magical','Wand'];
-  if (/\brod\b/.test(n)) return ['Tool','Magical','Rod'];
-  if (/spellbook|grimoire|component pouch|focus\b/.test(text)) return ['Tool','Magical','Magical Focus'];
-  if (/diviner|divination/.test(text)) return ['Tool','Magical','Divination Tool'];
-  if (/ritual (tool|kit|dagger|candle)/.test(text)) return ['Tool','Magical','Ritual Tool'];
-  // Musical instruments checked by name before Magical Focus, so an instrument that
-  // also doubles as a spellcasting focus (e.g. a bard's lute) still classifies primarily
-  // as the instrument it visibly is, rather than being swallowed by the Focus check above.
-  if (/\blute\b|\bmusical\b|minstrel|\bdrum\b|\bhorn\b instrument|\bflute\b/.test(n)) return ['Tool','Professional','Musical'];
-  // A physical lock/padlock (something you pick) is not the same as lockpicking tools
-  // (something you pick WITH) — checked first so "Lock of Eternal Binding" or "Small Iron
-  // Padlock" don't get mistaken for a thieves'-tools kit just for mentioning DC-to-pick.
-  if (/padlock|\block\b(?!pick)/.test(n)) return ['Tool','Adventuring','Padlock'];
-  if (/lockpick|thieves.? tools/.test(text)) return ['Tool',"Thieves' Tools",'Lockpicks'];
-  // Requires "disguise kit" specifically — bare "disguise" also matches worn magic items
-  // whose effect just mentions disguising the wearer (a hat, a tattoo, a cloak), which
-  // aren't disguise KITS at all.
-  if (/disguise kit/.test(text)) return ['Tool',"Thieves' Tools",'Disguise Kit'];
-  if (/manacles|shackles|restraints?/.test(text)) return ['Tool',"Thieves' Tools",'Manacles / Restraints'];
-  if (/grappling hook/.test(n)) return ['Tool','Adventuring','Grappling Hook'];
-  if (/\brope\b/.test(n)) return ['Tool','Adventuring','Rope'];
-  if (/\btorch\b/.test(n)) return ['Tool','Adventuring','Torch'];
-  if (/lantern/.test(n)) return ['Tool','Adventuring','Lantern'];
-  if (/crowbar/.test(n)) return ['Tool','Adventuring','Crowbar'];
-  if (/climbing (gear|kit)|pitons?/.test(text)) return ['Tool','Adventuring','Climbing Gear'];
-  if (/shovel|pickaxe|digging/.test(text)) return ['Tool','Adventuring','Digging Tool'];
-  if (/\bbandage/.test(n)) return ['Tool','Medical','Bandage'];
-  if (/surgical|surgeon/.test(text)) return ['Tool','Medical','Surgical Tools'];
-  if (/medical|healer'?s? kit|diagnos/.test(text)) return ['Tool','Medical', /diagnos/.test(text) ? 'Diagnostic Tools' : 'Medical Kit'];
-  if (/herbalis(m|t)/.test(text) && /kit|supplies|satchel|pouch/.test(text)) return ['Tool','Medical','Herbalism Kit'];
-  if (/cartograph/.test(text)) return ['Tool','Professional','Cartography'];
-  if (/navigat/.test(text)) return ['Tool','Professional','Navigation'];
-  if (/\bquill\b|\bwriting\b|calligraphy/.test(text)) return ['Tool','Professional','Writing'];
-  if (/cook'?s? (utensils|kit)|culinary/.test(text)) return ['Tool','Professional','Culinary'];
-  if (/fishing/.test(text)) return ['Tool','Professional','Fishing'];
-  if (/\bthimble\b/.test(n)) return ['Tool','Crafting','Tailoring Tools'];
-  if (/enchant(er|ing)/.test(text)) return ['Tool','Crafting','Enchanting Tools'];
-  if (/smithing/.test(text)) return ['Tool','Crafting','Smithing Tools'];
-  if (/leatherworking/.test(text)) return ['Tool','Crafting','Leatherworking Tools'];
-  if (/woodworking/.test(text)) return ['Tool','Crafting','Woodworking Tools'];
-  if (/alchemist'?s? (kit|supplies)/.test(text)) return ['Tool','Crafting',"Alchemist's Supplies"];
-  if (/tailoring/.test(text)) return ['Tool','Crafting','Tailoring Tools'];
-  if (/brewer|brewing/.test(text)) return ['Tool','Crafting','Brewing Supplies'];
-  if (/poisoner/.test(text)) return ['Tool','Crafting',"Poisoner's Kit"];
-  if (/jewel/.test(text)) return ['Tool','Crafting',"Jeweler's Tools"];
-  if (/\btool(s)?\b|\bkit\b|supplies\b/.test(text)) return ['Tool','General Tools','Miscellaneous Tool'];
-
-  // ---- 6. MATERIAL ---- (reagents, alchemical ingredients, raw crafting stock that isn't
-  // a monster part — Organic added for generic wood/cloth/leather/plant stock, which used
-  // to have no home but Miscellaneous.)
-  // Word-boundaried now — bare "dust" was matching inside "Dusty" (e.g. "Dusty Porcelain
-  // Figurine"), misrouting decorative items into raw alchemical reagent stock.
-  if (/\bdust\b|\bpowder\b|\breagent\b|\bsolvent\b|\bcatalyst\b/.test(n) && type === 'misc') {
-    if (/\bcatalyst\b/.test(n)) return ['Material','Alchemical','Catalyst'];
-    if (/\bsolvent\b/.test(n)) return ['Material','Alchemical','Solvent'];
-    return ['Material','Alchemical','Reagent'];
-  }
-  if (/\bore\b/.test(n)) return ['Material','Mineral','Ore'];
-  if (/\bingot\b/.test(n)) return ['Material','Mineral','Ingot'];
-  if (/\bgem\b|\bcrystal\b/.test(n) && !item.gp) return ['Material','Mineral','Gem'];
-  if (type === 'misc') {
-    // Excludes finished garments (a cloak, socks, clothes) so raw-material checks below
-    // only catch actual bolts/scraps of stock — "Common Clothes" contains "cloth" as a
-    // substring and "Wool Cloak"/"Pair of Wool Socks" contain "wool" as a real word, but
-    // none of these are crafting material.
-    const finishedGarment = /cloak|sock|shirt|dress|\brobe\b|tunic|\bvest\b|glove|\bhat\b|scarf|trousers|pants|clothes|clothing|bandage/;
-    if (!finishedGarment.test(n)) {
-      if (/\btimber\b|\blumber\b|\bwood\b/.test(n)) return ['Material','Organic','Wood'];
-      if (/\bcloth\b|fabric|\bsilk\b|\blinen\b|\bwool\b/.test(n)) return ['Material','Organic','Cloth / Fabric'];
-      if (/leather scrap|hide scrap/.test(n)) return ['Material','Organic','Leather'];
-      if (/plant fiber|\bvine\b|\breed\b/.test(n)) return ['Material','Organic','Plant Fiber'];
-    }
-  }
-
-  // ---- 7. KEY / QUEST OBJECT ---- (legacy keyword sniffing for old untyped items —
-  // mirrors the explicit type==='questitem' branch above so the two paths don't drift.)
-  if (/\bkey\b/.test(n)) return ['Key / Quest Object','Key', /magical|enchant/.test(text) ? 'Magical Key' : 'Physical Key'];
-  if (/\bseal\b|\bsigil\b/.test(n)) return ['Key / Quest Object','Access Token', /seal/.test(n) ? 'Seal' : 'Sigil'];
-  if (/relic|artifact/.test(n) && (item.rarity === 'legendary' || item.rarity === 'celestial')) return ['Key / Quest Object','Quest Object','Relic'];
-
-  // ---- 8. DOCUMENT ---- (legacy keyword sniffing — mirrors the explicit
-  // type==='document' branch above, including the Formula class, so an old untyped
-  // "Blueprint" item lands the same place a new document-type one would.)
-  if (/\bmap\b/.test(n)) return ['Document','Map', /treasure/.test(text) ? 'Treasure Map' : (/dungeon/.test(text) ? 'Dungeon' : 'Region')];
-  if (/ledger|journal|diary/.test(n)) return ['Document','Journal','Personal'];
-  if (/\bletter\b/.test(n)) return ['Document','Letter', /official|decree|noble|contract/.test(text) ? 'Official' : (/threat/.test(text) ? 'Threat' : 'Personal')];
-  if (/recipe|blueprint|formula|contract\b|\bdeed\b/.test(n)) return ['Document','Formula', /recipe/.test(n) ? 'Recipe' : (/blueprint/.test(n) ? 'Blueprint' : (/contract|deed/.test(n) ? 'Contract / Deed' : 'Spell Formula'))];
-  if (/tome|grimoire|spellbook|\bbook\b|\bmanual\b/.test(n)) return ['Document','Book', /history|king|chronicle/.test(text) ? 'History' : (/magic|arcane|spell/.test(text) ? 'Magic' : (/beast|bestiary|creature/.test(text) ? 'Bestiary' : 'Other'))];
-
-  // ---- 9. TREASURE ---- (flat currency/valuables with no other mechanical purpose —
-  // legacy sniffing, mirrors the explicit type==='treasure' branch including Regalia.)
-  if (/crown|scepter|circlet|tiara|regalia/.test(n)) return ['Treasure','Regalia', /crown/.test(n) ? 'Crown' : (/scepter/.test(n) ? 'Scepter' : 'Circlet')];
-  if (/pouch of .*(coins|gold|silver|copper)|\bgold\b|\bcoins?\b/.test(n) && !item.effect) return ['Treasure','Currency','Coin'];
-  if (/\bgem\b|\bjewel\b/.test(n) && item.gp && !item.effect) return ['Treasure','Gem','Precious Gem'];
-  if (/painting|statue|sculpture|tapestry/.test(n)) return ['Treasure','Art', /statue|sculpture/.test(n) ? 'Statue' : (/tapestry/.test(n) ? 'Tapestry' : 'Painting')];
-
-  // ---- 10. MISCELLANEOUS fallback ---- (Clothing added for mundane hats/gloves/garments
-  // that grant no AC and aren't real Armor.)
-  if (/idol|icon|holy symbol|shrine/.test(text)) return ['Miscellaneous','Religious', /icon/.test(n) ? 'Icon' : (/holy symbol/.test(text) ? 'Religious Object' : 'Idol')];
-  if (/trophy|mounted head|taxidermy|stuffed head/.test(text)) return ['Miscellaneous','Trophy', /battle/.test(text) ? 'Battle Trophy' : 'Monster Trophy'];
-  if (/figurine/.test(n)) return ['Miscellaneous','Decoration','Figurine'];
-  if (/tapestry/.test(n)) return ['Miscellaneous','Decoration','Tapestry'];
-  if (/ornament/.test(n)) return ['Miscellaneous','Decoration','Ornament'];
-  if (/\bmug\b|\bcup\b|utensil|cutlery|\bplate\b|\bbowl\b/.test(n)) return ['Miscellaneous','Household','Utensil'];
-  if (/\bcrate\b|\bchest\b|\bbarrel\b|\bcontainer\b/.test(n)) return ['Miscellaneous','Household','Container'];
-  // Excludes "roll on a table"/"DMG table"/"reference table" style rules-text phrasing —
-  // bare "table" was catching items like Robe of Useful Items and Deck of Many Things
-  // purely because their effect says to consult a table, not because they're furniture.
-  if (/\bchair\b|furniture/.test(text) || (/\btable\b/.test(text) && !/roll (on|a)|\bdmg\b|reference table|\bchart\b/.test(text))) return ['Miscellaneous','Household','Furniture'];
-  if (/toy\b|game piece|board game/.test(text)) return ['Miscellaneous','Entertainment','Toy'];
-  if (/\bgame\b|\bdice\b|playing cards/.test(text)) return ['Miscellaneous','Entertainment','Game'];
-  if (/instrument|\blute\b|\bdrum\b|\bflute\b/.test(text)) return ['Miscellaneous','Entertainment','Instrument'];
-  // Name-only now (not desc/effect) — "hat" is handled earlier under Accessory > Head for
-  // actual magic headwear; this Clothing fallback is only for mundane cap/bonnet items and
-  // no longer risks a false hit like a bottle's "lead cap" stopper mentioned in flavor text.
-  if (type !== 'armor' && /\bcap\b|bonnet|headscarf/.test(n)) return ['Miscellaneous','Clothing','Headwear'];
-  if (type !== 'armor' && /mittens/.test(n)) return ['Miscellaneous','Clothing','Handwear'];
-  if (type !== 'armor' && /\bscarf\b|\bshirt\b|\btunic\b|\btrousers\b|garment|\bvest\b|\bdress\b|\bclothes\b|\bclothing\b/.test(n)) return ['Miscellaneous','Clothing','Garment'];
-  if (/strange|humming|unidentif|inexplicable/.test(text)) return ['Miscellaneous','Unknown','Strange Object'];
-
-  // ---- Wondrous Item — the real D&D "Wondrous Item" classification: genuinely one-of-a-
-  // kind MAGIC items (Bag of Holding, Efreeti Bottle, Ioun Stones, Eye of Vecna, Decanter
-  // of Endless Water, etc.) that don't fit any body slot, tool discipline, material, or
-  // document/treasure/quest-object category above. Gated on actually reading as magical —
-  // an explicit magic keyword in the text, OR any effect at uncommon rarity or above — not
-  // merely "has an effect string," which used to catch completely mundane common gear
-  // (Tinderbox, Bedroll, Sack, Whetstone, Belt Pouch, Iron Pot...) and mislabel it as a
-  // wondrous magic item just because it does something. Mundane gear with a real effect
-  // falls to the Adventuring Gear branch below instead; a true unknown curiosity with no
-  // mechanical effect still falls through to Unidentified Object at the very end.
-  const wcText = n + ' ' + ((item.desc || '') + ' ' + (item.effect || '')).toLowerCase();
-  const wcMagicKeyword = /magical|magic\b|enchant|arcane|spell\b|rune|glowing|shimmer|ench\.|attunement|curse|blessed|\bholy\b(?!\s*days?)|\bdivine\b(?!\s*service)|conjure|summon/.test(wcText);
-  const wcRarity = rarity || item.rarity;
-  const wcIsMagical = wcMagicKeyword || (wcRarity && wcRarity !== 'common' && item.effect);
-  if (item.effect && wcIsMagical) {
-    if (/\bbag\b|\bhole\b|\bbottle\b|\bflask\b|\bvessel\b|\bwell\b|\bapparatus\b/.test(n)) return ['Miscellaneous','Wondrous Item','Storage / Container'];
-    if (/\bchime\b|\bdecanter\b|\bdriftglobe\b|\bram\b|\bfan\b|\bpipes?\b|\bhorn\b|\bcandle\b/.test(n)) return ['Miscellaneous','Wondrous Item','Environmental / Utility'];
-    if (/\beye of\b|\bhand of\b|\bsphere\b|\bcube\b|\bscarab\b|\bgem\b|\bcrystal ball\b|\bioun stone\b|\bshard\b|\borb\b/.test(n)) return ['Miscellaneous','Wondrous Item','Relic / Artifact'];
-    return ['Miscellaneous','Wondrous Item','Unique Wondrous Item'];
-  }
-  // ---- Adventuring Gear — mundane, non-magical misc equipment with a real (but ordinary)
-  // effect: the stuff that fills out a common-rarity loot table without being "wondrous."
-  if (item.effect) {
-    if (/\bsack\b|\bpouch\b|\bbackpack\b|\bsatchel\b/.test(n)) return ['Miscellaneous','Adventuring Gear','Container'];
-    if (/tinderbox|\bflint\b/.test(n)) return ['Miscellaneous','Adventuring Gear','Fire-Starting'];
-    if (/bedroll|\bblanket\b/.test(n)) return ['Miscellaneous','Adventuring Gear','Bedding'];
-    if (/whetstone/.test(n)) return ['Miscellaneous','Adventuring Gear','Maintenance'];
-    if (/\bmirror\b/.test(n)) return ['Miscellaneous','Adventuring Gear','Mirror'];
-    if (/parchment|\bpaper\b/.test(n)) return ['Miscellaneous','Adventuring Gear','Writing Material'];
-    if (/\bpot\b|\bpan\b|\bkettle\b/.test(n)) return ['Miscellaneous','Adventuring Gear','Cookware'];
-    return ['Miscellaneous','Adventuring Gear','General Gear'];
-  }
-  return ['Miscellaneous','Unknown','Unidentified Object'];
-}
-
-// Fixed vocabulary of descriptive traits — a small, curated set rather than open-ended free
-// text, so other systems can reliably check "does this item have property X."
-function deriveItemProperties(item, rarity) {
-  const props = [];
-  const text = ((item.name || '') + ' ' + (item.desc || '') + ' ' + (item.effect || '')).toLowerCase();
-  const r = rarity || item.rarity || 'common';
-  if (r === 'rare' || r === 'superrare') props.push('Rare');
-  if (r === 'legendary' || r === 'celestial') { props.push('Rare'); props.push('Unique'); }
-  // Real magic signals only: explicit magic keywords in the text, a spellcasting-flavored
-  // effect (mods/hp-altering/charge-based magical effect), or an equippable magic item at
-  // uncommon+ rarity — NOT just "isn't literally type:misc" (that caught every mundane
-  // weapon/armor/document/treasure) and NOT just "has any effect text" (that caught flavor
-  // text like a mug's "holds a drink").
-  // \bholy\b(?!\s*days?) / \bdivine\b(?!\s*service) — "holy days"/"divine service" are
-  // calendar/flavor phrasing (e.g. an almanac's "tide tables, holy days"), not a magic signal.
-  const magicKeyword = /magical|magic\b|enchant|arcane|spell\b|rune|glowing|shimmer|ench\.|attunement|curse|blessed|\bholy\b(?!\s*days?)|\bdivine\b(?!\s*service)|conjure|summon/.test(text);
-  const magicByRarity = ['weapon', 'armor', 'consumable'].includes(item.type) && r !== 'common' && item.effect;
-  if (magicKeyword || magicByRarity) props.push('Magical');
-  if (/curse|cursed/.test(text)) props.push('Cursed');
-  if (/attunement/.test(text)) props.push('Soulbound');
-  if ((item.weight || 0) >= 15) props.push('Heavy');
-  if (item.charges === undefined && item.type === 'weapon') props.push('Durable');
-  if (/quest|bounty/.test(text)) props.push('Quest Item');
-  if (/\bfire\b|flame|burn|ember/.test(text)) props.push('Fire');
-  if (/\bcold\b|frost|ice\b/.test(text)) props.push('Cold');
-  if (/lightning|thunder|shock/.test(text)) props.push('Lightning');
-  if (/poison|venom|toxic/.test(text)) props.push('Poison');
-  if (/necrotic|undead|death\b/.test(text)) props.push('Necrotic');
-  if (/radiant|\bholy\b(?!\s*days?)|\bdivine\b(?!\s*service)/.test(text)) props.push('Radiant');
-  return [...new Set(props)];
-}
-
-// Hashtag-style, lowercase, no '#' stored (added back only when displayed) — the classifier
-// leaf plus a handful of thematic keyword tags, so a future system (like the "alchemy items
-// only usable in alchemy" example) has something concrete to gate on. The Monster Mangler's
-// weapon/armor compatibility check already reads these (see manglerItemDrop).
-function deriveItemTags(item, classification, properties) {
-  const tags = new Set();
-  const leaf = classification[classification.length - 1];
-  if (leaf) tags.add(leaf.toLowerCase().replace(/[^a-z0-9]+/g, ''));
-  classification.forEach(seg => tags.add(seg.toLowerCase().replace(/[^a-z0-9]+/g, '')));
-  if (item.type === 'weapon' || classification[0] === 'Weapon') tags.add('weapon');
-  if (item.type === 'armor' || classification[0] === 'Armor') tags.add('armor');
-  if (classification[0] === 'Material') tags.add('crafting');
-  if (item.subcategory === 'potion' || item.subcategory === 'throwable') tags.add('alchemy');
-  if (item.type === 'craftable') tags.add('crafting');
-  properties.forEach(p => { if (['Fire','Cold','Lightning','Poison','Necrotic','Radiant'].includes(p)) tags.add(p.toLowerCase()); });
-  const text = ((item.name || '') + ' ' + (item.desc || '')).toLowerCase();
-  if (/undead|zombie|skeleton|lich|ghoul|wraith/.test(text)) tags.add('undead');
-  if (/king|queen|royal|noble|crown|throne/.test(text)) tags.add('royal');
-  if (/ancient|primordial|elder/.test(text)) tags.add('ancient');
-  if (/dragon|wyrm/.test(text)) tags.add('dragon');
-  if (item.sourceMonster) tags.add(item.sourceMonster.toLowerCase().replace(/[^a-z0-9]+/g, ''));
-  return [...tags].filter(Boolean);
-}
-
-// Runs all three axes and stores them on the item — idempotent (skips items that already
-// have a classification, same "don't clobber existing data" rule every other auto-derived
-// field in this project follows) so it's safe to call repeatedly across every code path that
-// constructs an item (lootData at load, generated items when saved, monster parts, etc).
-function classifyItemFull(item, rarity) {
-  if (item.classification) return item;
-  item.classification = classifyItemHierarchy(item, rarity);
-  item.properties = deriveItemProperties(item, rarity);
-  item.tags = deriveItemTags(item, item.classification, item.properties);
-  item.interactions = computeItemInteractions(item);
-  return item;
-}
-
-// ===================== INTERACTION SYSTEM =====================
-// A centralized "what can this item be used FOR" layer, kept deliberately separate from
-// classification (what an item IS — type/subcategory, above) and from properties/tags (what
-// an item HAS — Magical/Cursed/Fire/etc., above). Every place in the app that needs to know
-// whether an item can be equipped, sold, salvaged, fed to a crafting/monster/ritual system,
-// etc. should call canInteract(item, 'action_id') instead of re-deriving that answer with its
-// own ad-hoc type/name check — this is the one place those rules live, so adding a new
-// crafting system, equipment slot, or recipe type later never requires touching the item
-// database itself.
-//
-// Each action's `default` rule reads only type/subcategory/partType/classification/
-// properties/effect-text — never the item's specific name — so it applies correctly to any
-// of the hand-authored lootData items and to anything generated later (monster parts, store
-// staples, Fleshmancer limbs, future recipes) with zero per-item bookkeeping. A handful of
-// items can still carry an explicit `extraInteractions` / `blockedInteractions` array (see
-// computeItemInteractions below) for the rare case a default rule gets a specific item wrong
-// — that's the escape hatch, not the primary mechanism.
-function itemRequiresAttunement(item) {
-  return /requires attunement/i.test((item && item.effect) || '') || /requires attunement/i.test((item && item.desc) || '');
-}
-// Monster-part crafting affinities, keyed by MONSTER_PART_TYPES' `key` (see buildMonsterPartItem)
-// — this is what lets a Gargoyle's Hide default to {armor_material, trophy} while a Kraken's
-// Claw (themed as a "Tentacle" on aquatic monsters) defaults to {weapon_material} instead,
-// entirely from the part's TYPE rather than which monster it came from.
-const WEAPON_MATERIAL_PARTS = new Set(['fang', 'claw', 'horn', 'tail', 'bone', 'talon']);
-const ARMOR_MATERIAL_PARTS  = new Set(['hide', 'horn', 'wing', 'bone', 'shell', 'pelt']);
-const REAGENT_PARTS         = new Set(['eye', 'fang', 'claw', 'venomsac', 'heart', 'tongue']);
-const RITUAL_PARTS          = new Set(['eye', 'horn', 'venomsac', 'heart', 'bone', 'tongue']);
-const SUMMON_PARTS          = new Set(['heart', 'bone']);
-// Was scoped to just eye/heart/tongue/venomsac — a leftover stub from before the Fleshmancer
-// actually had a way to consume a monster part at all. Expanded to every part type now that
-// PART_TO_LIMB_CATEGORY (below) gives each of the 14 a sensible graft target, so "drag in a
-// monster part" means any monster part, not just a thematic handful of them.
-const FLESHMANCER_PARTS     = new Set(['eye', 'heart', 'tongue', 'venomsac', 'claw', 'talon', 'fang', 'horn', 'wing', 'shell', 'bone', 'hide', 'pelt', 'tail']);
-const TROPHY_PARTS          = new Set(['eye', 'hide', 'horn', 'wing', 'tail', 'heart', 'shell', 'pelt', 'talon']);
-const INTERACTIONS = {
-  // ---- Equipment ----
-  equip:            { cat: 'Equipment',   label: 'Equip',              default: it => ['armor', 'weapon', 'limb', 'companion', 'misc'].includes(it.type) },
-  attune:           { cat: 'Equipment',   label: 'Attune',             default: it => itemRequiresAttunement(it) },
-  // ---- Economy ---- (sell/trade/gift/appraise were removed — they applied to nearly every
-  // item in the game and carried no real information; "can this be sold" isn't a useful
-  // question when the answer is "yes" for 95% of the database. Whether an item is quest-
-  // locked from the economy is now just the absence of the `quest_item` tag below, checked
-  // directly at the one place that needs it (traderSellDrop).)
-  // ---- Crafting ----
-  craft_material:   { cat: 'Crafting',    label: 'Crafting Material',  default: it => it.type === 'craftable' || (it.classification || [])[0] === 'Material' },
-  weapon_material:  { cat: 'Crafting',    label: 'Weapon Material',    default: it => it.type === 'craftable' && WEAPON_MATERIAL_PARTS.has(it.partType) },
-  armor_material:   { cat: 'Crafting',    label: 'Armor Material',     default: it => it.type === 'craftable' && ARMOR_MATERIAL_PARTS.has(it.partType) },
-  reagent:          { cat: 'Crafting',    label: 'Reagent',            default: it => (it.type === 'craftable' && REAGENT_PARTS.has(it.partType)) || (it.classification || []).includes('Alchemical') },
-  component:        { cat: 'Crafting',    label: 'Component',          default: it => (it.classification || [])[0] === 'Material' && (it.classification || []).includes('Mineral') },
-  // ---- Modification ----
-  enchant:          { cat: 'Modification', label: 'Enchant',           default: it => ['weapon', 'armor'].includes(it.type) || (it.type === 'misc' && ['ring', 'amulet'].includes(it.subcategory)) },
-  socket:           { cat: 'Modification', label: 'Socket',            default: it => ['weapon', 'armor'].includes(it.type) },
-  repair:           { cat: 'Modification', label: 'Repair',            default: it => ['weapon', 'armor'].includes(it.type) },
-  // ---- Magic ----
-  spell_focus:      { cat: 'Magic',       label: 'Spell Focus',        default: it => /spellcasting focus|holy symbol|arcane focus|druidic focus/i.test(it.effect || '') },
-  ritual_component: { cat: 'Magic',       label: 'Ritual Component',   default: it => it.type === 'craftable' && RITUAL_PARTS.has(it.partType) },
-  summon_component: { cat: 'Magic',       label: 'Summoning Component', default: it => it.type === 'craftable' && SUMMON_PARTS.has(it.partType) },
-  // ---- Monster ----
-  monster_material: { cat: 'Monster',     label: 'Monster Material',   default: it => it.type === 'craftable' && it.subcategory === 'monsterpart' },
-  fleshmancer_input:{ cat: 'Monster',     label: 'Fleshmancer Input',  default: it => it.type === 'craftable' && FLESHMANCER_PARTS.has(it.partType) },
-  trophy:           { cat: 'Monster',     label: 'Trophy',             default: it => it.type === 'craftable' && TROPHY_PARTS.has(it.partType) },
-  // ---- Processing ----
-  salvage:          { cat: 'Processing',  label: 'Salvage',            default: it => ['weapon', 'armor'].includes(it.type) },
-  harvest:          { cat: 'Processing',  label: 'Harvest',            default: it => it.type !== 'craftable' && (it.classification || [])[0] === 'Material' },
-  // ---- Consumable ----
-  consume:          { cat: 'Consumable',  label: 'Consume',            default: it => it.type === 'consumable' && ['potion', 'food'].includes(it.subcategory) },
-  apply:            { cat: 'Consumable',  label: 'Apply',              default: it => it.type === 'consumable' && /\boil\b|ointment|salve|balm/i.test(it.name || '') },
-  // Gated on type alone (not subcategory) — every consumable (potions, food, scrolls, oils,
-  // poisons, smoke bombs...) is meant to be used up and gone, unlike a charge-based weapon
-  // ability, a wearable charm, or a torch, none of which are type:'consumable' in the first
-  // place. See itemShouldCrumble/expendItemCharge below for the actual disappear-at-0 behavior.
-  crumble:          { cat: 'Consumable',  label: 'Crumbles When Spent', default: it => it.type === 'consumable' && !!it.charges },
-  // ---- Combat ----
-  throw:            { cat: 'Combat',      label: 'Throw',              default: it => it.subcategory === 'throwable' },
-  weapon_coating:   { cat: 'Combat',      label: 'Weapon Coating',     default: it => it.type === 'consumable' && /poison/i.test(it.name || '') },
-  // ---- World ----
-  place:            { cat: 'World',       label: 'Place',              default: it => /\btrap\b|\btotem\b|\bward\b|\bbanner\b|\bbeacon\b/i.test(it.name || '') },
-  unlock:           { cat: 'World',       label: 'Unlock',             default: it => it.type === 'questitem' && it.subcategory === 'key' },
-  // ---- Quest ----
-  quest_item:       { cat: 'Quest',       label: 'Quest Item',         default: it => it.type === 'questitem' },
-  turn_in:          { cat: 'Quest',       label: 'Turn-In',            default: it => it.type === 'questitem' },
-};
-// Runs every default rule once and folds in any hand-authored exceptions — `extraInteractions`
-// grants an action the default rule wouldn't infer on its own, `blockedInteractions` removes
-// one the default rule would otherwise grant. Both are optional escape hatches; most items
-// need neither.
-function computeItemInteractions(item) {
-  const set = new Set();
-  for (const action in INTERACTIONS) {
-    if (INTERACTIONS[action].default(item)) set.add(action);
-  }
-  (item.extraInteractions || []).forEach(a => set.add(a));
-  (item.blockedInteractions || []).forEach(a => set.delete(a));
-  return [...set];
-}
-// The single query point every part of the app should use: canInteract(item, 'equip'),
-// canInteract(item, 'weapon_material'), canInteract(item, 'attune'), etc. Computes on demand
-// for items that haven't run through classifyItemFull yet, otherwise reads the cached list.
-function canInteract(item, action) {
-  if (!item || !INTERACTIONS[action]) return false;
-  const list = item.interactions || computeItemInteractions(item);
-  return list.includes(action);
-}
+// Extracted to game-engine.js in Phase 1 of the architecture migration (see
+// docs/ARCHITECTURE.md): classifyItemFull, classifyItemHierarchy, deriveItemProperties,
+// deriveItemTags, computeItemInteractions, canInteract, itemRequiresAttunement, INTERACTIONS,
+// ARMOR_BODY_SLOT_LABEL, and the *_PARTS Sets all now live there and reach this file only
+// through the window.X bridge script near the top of this file (window.classifyItemFull(...),
+// window.canInteract(...), etc. — called here as plain globals, same as before extraction).
 
 // Rarity-tiered fallback mechanics — same shape/spirit as the wheel/generator's existing
 // per-rarity tables (see rollItemStats, qualityForWheel) but applied here so every
@@ -4608,7 +4054,16 @@ function inferItemMetadata(item, rarity){
   classifyItemFull(item, rarity);
   return item;
 }
-Object.entries(lootData).forEach(([r, arr]) => arr.forEach(item => inferItemMetadata(item, r)));
+// Deferred to DOMContentLoaded (rather than run immediately here, as it did before the Phase 1
+// extraction) since inferItemMetadata's last step, classifyItemFull, now lives in
+// game-engine.js and reaches this file through the window.X bridge module near the top of this
+// file. Module scripts are guaranteed by spec to finish executing before DOMContentLoaded fires,
+// regardless of where in the document the <script type="module"> tag sits, so the bridge is
+// always ready by the time this runs. Nothing else in this file reads lootData at the top level
+// (verified before making this change), so this is the only ordering change Phase 1 required.
+document.addEventListener('DOMContentLoaded', () => {
+  Object.entries(lootData).forEach(([r, arr]) => arr.forEach(item => inferItemMetadata(item, r)));
+});
 
 const rarityNames  = { common:'Common', uncommon:'Uncommon', rare:'Rare', superrare:'Super Rare',legendary:'Legendary',celestial:'Celestial' };
 
@@ -12352,124 +11807,16 @@ let characterAc = 10;
 let characterMaxHpEffective = 10;
 let characterClass = '';
 
-const ABILITY_NAMES = { str: 'Strength', dex: 'Dexterity', con: 'Constitution', int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma' };
-const SKILL_ABILITY_MAP = {
-  'Athletics': 'str',
-  'Acrobatics': 'dex', 'Sleight of Hand': 'dex', 'Stealth': 'dex',
-  'Arcana': 'int', 'History': 'int', 'Investigation': 'int', 'Nature': 'int', 'Religion': 'int',
-  'Animal Handling': 'wis', 'Insight': 'wis', 'Medicine': 'wis', 'Perception': 'wis', 'Survival': 'wis',
-  'Deception': 'cha', 'Intimidation': 'cha', 'Performance': 'cha', 'Persuasion': 'cha',
-};
-function proficiencyBonusForLevel(level) {
-  if (level >= 17) return 6;
-  if (level >= 13) return 5;
-  if (level >= 9) return 4;
-  if (level >= 5) return 3;
-  return 2;
-}
-function abilityModifier(score) { return Math.floor((score - 10) / 2); }
-function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
-
-// A handful of hand-authored items abbreviate what the generator's own buff/debuff pools
-// always spell out in full (see pickBuffEffect/pickDebuffEffect/pickNamedTrait) — e.g. "+3 AC"
-// instead of "+3 Armor Class". Mapped to the canonical name so both phrasings land on the
-// same sheet field. Deliberately does NOT include "Armor Class"/"AC" itself — see the note
-// on collectEquippedAcBreakdown below for why AC is sourced only from the item's own
-// dedicated `ac` field, never from this text scan.
-const SHEET_STAT_ALIASES = { 'Max HP': 'Maximum Hit Points', 'Max Hit Points': 'Maximum Hit Points' };
-let _sheetStatVocabRegex = null;
-// Scans an item's effect text for "+N <stat>" / "-N <stat>" patterns anywhere it appears —
-// this is the ONLY numeric bonus data that exists for equipped items today (there's no
-// separate structured {stat, amount} field on regular loot items OR Fleshmancer limbs; every
-// generator-produced buff/debuff bakes its number directly into descriptive text). Matching
-// against the exact known vocabulary (ability names, skill names, "Maximum Hit Points",
-// "Saving Throws", plus the aliases above) keeps this from false-matching unrelated numbers in
-// flavor text — anything not phrased as "+N <exact known name>" is simply not picked up, which
-// is a real, acknowledged limitation rather than a bug.
-function extractStatDeltasFromText(text) {
-  if (!text) return [];
-  if (!_sheetStatVocabRegex) {
-    const names = new Set([...Object.values(ABILITY_NAMES), 'Maximum Hit Points', 'Saving Throws', ...Object.keys(SKILL_ABILITY_MAP), ...Object.keys(SHEET_STAT_ALIASES)]);
-    const alt = [...names].sort((a, b) => b.length - a.length).map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-    _sheetStatVocabRegex = new RegExp(`([+-]\\d+)\\s+(${alt})\\b`, 'g');
-  }
-  const plain = String(text).replace(/<[^>]+>/g, ' ');
-  const out = [];
-  let m;
-  _sheetStatVocabRegex.lastIndex = 0;
-  while ((m = _sheetStatVocabRegex.exec(plain))) {
-    out.push({ stat: SHEET_STAT_ALIASES[m[2]] || m[2], amount: parseInt(m[1], 10) });
-  }
-  return out;
-}
-// Same text scan as before, but now keeps track of WHICH equipped item each delta came from
-// (not just the running total) — every buffed/debuffed stat on the sheet needs to name its
-// source for the hover tooltip, not just show a net number. Returns { [statName]: [{itemName,
-// amount}] }. slots/resolveItem are parameters (not hard-coded to this account's own
-// playerSlots/TOKEN_INDEX) so the Players tab can compute the exact same sheet math for a
-// VIEWED player's own data — see computeCharacterSheetFor below and resolveForeignItem.
-// weapon1/weapon2 are the only pair of slots that can share the same key at once — a two-
-// handed weapon occupies both simultaneously (see pairedWeaponSlot). Every function below
-// that derives stats/AC/attacks from equipped gear needs to count that item exactly once, not
-// once per slot it happens to fill twice over. Returns [slotId, key] pairs with duplicate
-// keys collapsed down to their first-seen slot.
-function uniqueEquippedSlotEntries(slots) {
-  const seen = new Set();
-  const out = [];
-  Object.keys(slots).forEach(slotId => {
-    const key = slots[slotId];
-    if (!key || seen.has(key)) return;
-    seen.add(key);
-    out.push([slotId, key]);
-  });
-  return out;
-}
-function collectEquippedStatBreakdown(slots, resolveItem) {
-  const breakdown = {};
-  uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
-    const entry = resolveItem(key);
-    if (!entry) return;
-    extractStatDeltasFromText(entry.item.effect).forEach(({ stat, amount }) => {
-      (breakdown[stat] = breakdown[stat] || []).push({ itemName: entry.item.name, amount });
-    });
-  });
-  return breakdown;
-}
-function sumBreakdown(sources) { return (sources || []).reduce((a, s) => a + s.amount, 0); }
-// 'buff' / 'debuff' / '' (neutral — no color, no tooltip) based on the net numeric effect of
-// whatever equipped gear affects this particular stat.
-function statusFor(net) { return net > 0 ? 'buff' : net < 0 ? 'debuff' : ''; }
-// Turns a list of {itemName, amount[, viaAbility][, isBaseOverride]} into the hover-tooltip
-// text — e.g. "Ring of Protection (+1), Gauntlets of Ogre Power (+2 Strength)". viaAbility
-// marks an entry that's affecting THIS stat only indirectly, by having already bumped the
-// ability score this stat derives from (see the modDelta plumbing in computeCharacterSheetFor).
-function describeStatSources(sources) {
-  return (sources || []).map(s => s.isBaseOverride
-    ? `${s.itemName} (base ${s.amount + 10})`
-    : `${s.itemName} (${fmtMod(s.amount)}${s.viaAbility ? ' ' + s.viaAbility : ''})`
-  ).join(', ');
-}
-// AC is deliberately sourced ONLY from items' own dedicated `ac` field, never from the
-// effect-text scan above — several items (e.g. a shield with ac:"+2" AND effect text reading
-// "+2 AC. ...") carry the exact same bonus in both places, and summing both would double it.
-// An item's own `ac` field can independently be either an absolute base AC ("13" — replaces
-// the sheet's default base of 10, armor slot only) or, on any slot, a flat bonus ("+1", "+2") —
-// a dedicated field several item types (armor, rings, shields) already carry. Also breakdown-
-// aware, same reasoning as collectEquippedStatBreakdown above.
-function collectEquippedAcBreakdown(slots, resolveItem) {
-  let base = 10, baseSource = null;
-  const flatSources = [];
-  uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
-    const entry = resolveItem(key);
-    if (!entry) return;
-    const raw = String(entry.item.ac || '').trim();
-    if (!raw) return;
-    if (slotId === 'armor' && /^\d+$/.test(raw)) { base = parseInt(raw, 10); baseSource = entry.item.name; return; }
-    const m = /^([+-]\d+)$/.exec(raw);
-    if (m) flatSources.push({ itemName: entry.item.name, amount: parseInt(m[1], 10) });
-  });
-  return { base, baseSource, flatSources };
-}
+// Extracted to game-engine.js in Phase 1 of the architecture migration (see
+// docs/ARCHITECTURE.md): ABILITY_NAMES, SKILL_ABILITY_MAP, SHEET_STAT_ALIASES,
+// proficiencyBonusForLevel, abilityModifier, fmtMod, extractStatDeltasFromText,
+// uniqueEquippedSlotEntries, collectEquippedStatBreakdown, sumBreakdown, statusFor,
+// describeStatSources, collectEquippedAcBreakdown, and computeCharacterSheetFor (further below,
+// right before computeCharacterSheet()) all now live there, reached through the window.X bridge
+// near the top of this file. Everything from here down to computeCharacterSheetFor —
+// collectEquippedWeaponInfo, parseWeaponEffectBonuses, computeWeaponAttackRoll,
+// weaponAttackRollHtml, rollEquippedWeaponAttack, closeWeaponAttackPopup, and the entire Dice
+// Roller feature — is NOT part of Phase 1 and stays exactly where it was.
 // Both weapon slots' name/damage-dice, read straight off the item's own `dmg` field (the same
 // field the Combat tab's monster stat blocks use) — parameterized the same way as everything
 // else here so the Players tab can show a VIEWED player's actual equipped weapons, and so the
@@ -12721,76 +12068,10 @@ function openDiceRoller() {
 function closeDiceRoller() {
   document.getElementById('diceRollerModal')?.classList.remove('open');
 }
-// The single computation function everything else reads from — ability totals/modifiers,
-// proficiency bonus, every skill and saving throw total, and AC — folding in equipped-item
-// bonuses at read time so there's nothing to keep in sync when gear changes. Every stat also
-// carries a `status` ('buff'/'debuff'/'') and `tooltip` (readable "which item did this" text)
-// for the sheet's hover/color treatment. Parameterized (not hard-coded to this account's own
-// state) so the Players tab can show a VIEWED player's real sheet using their own synced data —
-// see computeCharacterSheet below for the local-account convenience wrapper every other caller
-// in this file already used.
-function computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, resolveItem, baseMaxHp) {
-  const breakdown = collectEquippedStatBreakdown(slots, resolveItem);
-  const abilities = {};
-  Object.keys(ABILITY_NAMES).forEach(abbr => {
-    const full = ABILITY_NAMES[abbr];
-    const base = abilityScores[abbr] != null ? abilityScores[abbr] : 10;
-    const sources = breakdown[full] || [];
-    const bonus = sumBreakdown(sources);
-    const total = base + bonus;
-    const mod = abilityModifier(total);
-    // How much this bonus actually moved the modifier — a +1 that doesn't cross an even/odd
-    // boundary changes the raw score but not the modifier, so it shouldn't paint every skill
-    // and save riding on this ability as buffed when nothing about their total actually moved.
-    const modDelta = mod - abilityModifier(base);
-    abilities[abbr] = { base, bonus, total, mod, modDelta, sources, status: statusFor(bonus), tooltip: describeStatSources(sources) };
-  });
-  const profBonus = proficiencyBonusForLevel(level || 1);
-  const saveFlatSources = breakdown['Saving Throws'] || [];
-  const saveFlatTotal = sumBreakdown(saveFlatSources);
-  const saves = {};
-  Object.keys(ABILITY_NAMES).forEach(abbr => {
-    const a = abilities[abbr];
-    const full = ABILITY_NAMES[abbr];
-    const proficient = (saveProfs || []).includes(full);
-    const total = a.mod + (proficient ? profBonus : 0) + saveFlatTotal;
-    const viaAbility = a.modDelta ? a.sources.map(s => ({ itemName: s.itemName, amount: s.amount, viaAbility: full })) : [];
-    const sources = [...viaAbility, ...saveFlatSources];
-    saves[abbr] = { total, sources, status: statusFor(a.modDelta + saveFlatTotal), tooltip: describeStatSources(sources) };
-  });
-  const skills = {};
-  Object.keys(SKILL_ABILITY_MAP).forEach(skill => {
-    const abbr = SKILL_ABILITY_MAP[skill];
-    const a = abilities[abbr];
-    const proficient = (skillProfs || []).includes(skill);
-    const directSources = breakdown[skill] || [];
-    const directTotal = sumBreakdown(directSources);
-    const total = a.mod + (proficient ? profBonus : 0) + directTotal;
-    const viaAbility = a.modDelta ? a.sources.map(s => ({ itemName: s.itemName, amount: s.amount, viaAbility: ABILITY_NAMES[abbr] })) : [];
-    const sources = [...viaAbility, ...directSources];
-    skills[skill] = { total, sources, status: statusFor(a.modDelta + directTotal), tooltip: describeStatSources(sources) };
-  });
-  const acField = collectEquippedAcBreakdown(slots, resolveItem);
-  const dex = abilities.dex;
-  const baseSourceEntry = acField.baseSource ? [{ itemName: acField.baseSource, amount: acField.base - 10, isBaseOverride: true }] : [];
-  const viaDex = dex.modDelta ? dex.sources.map(s => ({ itemName: s.itemName, amount: s.amount, viaAbility: 'Dexterity' })) : [];
-  const acFlatTotal = sumBreakdown(acField.flatSources);
-  const acSources = [...baseSourceEntry, ...acField.flatSources, ...viaDex];
-  const acTotal = acField.base + dex.mod + acFlatTotal;
-  const acNet = (acField.base - 10) + acFlatTotal + dex.modDelta;
-  const ac = { total: acTotal, sources: acSources, status: statusFor(acNet), tooltip: describeStatSources(acSources) };
-  const maxHpSources = breakdown['Maximum Hit Points'] || [];
-  const maxHpBonus = sumBreakdown(maxHpSources);
-  // `.total` used to not exist here at all — the gear bonus was computed but only ever shown as
-  // a cosmetic "(+N from gear)" note next to the manually-typed base, never actually added to
-  // the number the game uses for HP clamping/death-save thresholds/DM roster display. AC gets
-  // this right (fully live-computed, no separate base); Max HP has a genuine independent base
-  // (class/level/CON — this app doesn't track hit dice math), so `.total` is that base plus the
-  // live gear bonus, not a full replacement of the base the way `.total` works for AC.
-  const base = baseMaxHp != null ? baseMaxHp : 0;
-  const maxHp = { base, bonus: maxHpBonus, total: base + maxHpBonus, sources: maxHpSources, status: statusFor(maxHpBonus), tooltip: describeStatSources(maxHpSources) };
-  return { abilities, profBonus, saves, skills, ac, maxHp };
-}
+// computeCharacterSheetFor — the single computation function everything else reads from
+// (ability totals/modifiers, proficiency bonus, every skill/save total, AC, max HP) — now lives
+// in game-engine.js, reached through the window.X bridge; see the note further up this file
+// where the rest of its dependency chain was removed for the full explanation.
 function computeCharacterSheet() {
   buildTokenIndex();
   return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp);
@@ -15196,51 +14477,12 @@ function clearBattleLog() {
   renderCombatLog();
 }
 
-// Pulls "+N to hit", the first damage-dice expression, and a save DC (if present) out of an
-// already-cleaned action/trait text block so the roll mechanic has real numbers to work with.
-function battleParseAttack(text) {
-  const t = text || '';
-  const hitMatch = t.match(/([+-]\d+)\s*to hit/i);
-  const toHit = hitMatch ? parseInt(hitMatch[1], 10) : null;
-  // A single action can deal more than one damage type in the same "Hit:" clause — e.g.
-  // "19 (2d10+8) piercing damage plus 11 (2d10) psychic damage." String.match without the /g/
-  // flag only ever returns the FIRST match, so this used to silently drop every damage
-  // component after the first on any multi-damage attack — a real bug caught from a live
-  // combat log where a Brain Dragon's Bite only ever applied its piercing damage and never
-  // its psychic damage. Now captures every "(NdM+/-X)" clause in the text, each paired with
-  // whatever damage-type word immediately follows it (piercing/psychic/fire/etc.), if any.
-  const damageClauses = [];
-  const dmgRe = /\((\d+d\d+(?:\s*[+-]\s*\d+)?)\)\s*([a-z]+)?/gi;
-  let dm;
-  while ((dm = dmgRe.exec(t)) !== null) {
-    damageClauses.push({ dice: dm[1].replace(/\s+/g, ''), type: (dm[2] || '').toLowerCase() });
-  }
-  const dcMatch = t.match(/DC\s*(\d+)/i);
-  const saveDC = dcMatch ? parseInt(dcMatch[1], 10) : null;
-  return { toHit, damageClauses, saveDC };
-}
-
-// Standard 5e crit rule: double the dice, add the flat modifier once.
-function battleRollDamage(diceExpr, crit) {
-  const m = diceExpr.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
-  if (!m) return null;
-  const n = parseInt(m[1], 10), sides = parseInt(m[2], 10);
-  const mod = m[3] ? parseInt(m[3], 10) : 0;
-  const count = crit ? n * 2 : n;
-  const rolls = [];
-  for (let i = 0; i < count; i++) rolls.push(rn(1, sides));
-  return { rolls, mod, total: rolls.reduce((a, b) => a + b, 0) + mod };
-}
-
-// Used when an attack has no parseable "to hit" (utility / save-based / breath-weapon
-// actions) — grades how effective it was straight off the raw d20 instead.
-function battleEffectivenessLabel(roll) {
-  if (roll === 20) return { label: 'Devastating', cls: 'crit' };
-  if (roll >= 15) return { label: 'Strong', cls: 'hit' };
-  if (roll >= 10) return { label: 'Moderate', cls: 'hit' };
-  if (roll >= 2) return { label: 'Weak', cls: 'miss' };
-  return { label: 'Critical Failure', cls: 'miss' };
-}
+// Extracted to game-engine.js in Phase 1 of the architecture migration (see
+// docs/ARCHITECTURE.md): battleParseAttack, battleRollDamage, battleEffectivenessLabel. All
+// three were already dependency-free apart from battleRollDamage's use of rn() for randomness —
+// the extracted version takes an optional injectable `rand` parameter (defaulting to
+// Math.random, so this call site's behavior is unchanged) rather than reaching for the global
+// rn() helper, which doesn't exist inside game-engine.js. Reached here via the window.X bridge.
 
 // Picks one attack for the creature to use: real actions AND legendary actions together first
 // (mixed in with a chaos-gear spell action, if it has one, so it's sometimes chosen alongside
@@ -18084,65 +17326,22 @@ function renderGamblingTab() {
 }
 
 // ===================== GAMBLING: ROULETTE =====================
-// Standard European single-zero wheel (37 pockets, not the American double-zero layout) —
-// simpler payout math for the exact same "real roulette" experience. ROULETTE_WHEEL_ORDER is
-// the actual physical pocket sequence (not numeric order) used only for the spin visual and to
-// draw the winning pocket uniformly at random; payout math itself never depends on wheel order.
-const ROULETTE_WHEEL_ORDER = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-const ROULETTE_RED_NUMBERS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
-function rouletteColor(n) { return n === 0 ? 'green' : (ROULETTE_RED_NUMBERS.has(n) ? 'red' : 'black'); }
-// TOTAL-return multipliers (stake included), not "X to 1" profit odds — a win is one
-// addPlayerGold(amount * multiplier) call with no separate "and give the stake back" step.
-function rouletteMultiplier(bet, number) {
-  const color = rouletteColor(number);
-  switch (bet.betType) {
-    case 'straight': return Number(bet.betValue) === number ? 36 : 0;
-    case 'red': case 'black': return color === bet.betType ? 2 : 0;
-    case 'even': return number !== 0 && number % 2 === 0 ? 2 : 0;
-    case 'odd': return number % 2 === 1 ? 2 : 0;
-    case 'low': return number >= 1 && number <= 18 ? 2 : 0;
-    case 'high': return number >= 19 && number <= 36 ? 2 : 0;
-    case 'dozen1': return number >= 1 && number <= 12 ? 3 : 0;
-    case 'dozen2': return number >= 13 && number <= 24 ? 3 : 0;
-    case 'dozen3': return number >= 25 && number <= 36 ? 3 : 0;
-    default: return 0;
-  }
-}
-const ROULETTE_OUTSIDE_BETS = [
-  { type:'red', label:'Red' }, { type:'black', label:'Black' },
-  { type:'even', label:'Even' }, { type:'odd', label:'Odd' },
-  { type:'low', label:'1–18' }, { type:'high', label:'19–36' },
-  { type:'dozen1', label:'1st 12' }, { type:'dozen2', label:'2nd 12' }, { type:'dozen3', label:'3rd 12' },
-];
-function newRouletteTable() { return { phase: 'betting', bets: {}, lastResult: null, roundCounter: 0 }; }
-// One live bet per player per round, and bets are final once placed (matching a real table:
-// chips down means committed) — deliberately no clear/cancel here, which sidesteps a whole class
-// of "whose client is responsible for refunding this" timing questions for a fictional-stakes
-// feature where the cost of getting that edge case wrong outweighs the convenience.
-function applyRouletteAction(table, action) {
-  if (action.type === 'place_bet') {
-    if (table.phase !== 'betting' || table.bets[action.playerUid]) return;
-    table.bets[action.playerUid] = { username: action.playerUsername, amount: action.amount, betType: action.betType, betValue: action.betValue };
-  }
-}
+// ROULETTE_WHEEL_ORDER, ROULETTE_RED_NUMBERS, ROULETTE_OUTSIDE_BETS, rouletteColor,
+// rouletteMultiplier, newRouletteTable, and applyRouletteAction (bet placement) were extracted
+// to game-engine.js in Phase 1 (see docs/ARCHITECTURE.md) — reached here via the window.X
+// bridge, used as before by the render functions below (rouletteWheelSvg, renderRouletteHtml,
+// etc.) and by GAMBLING_HANDLERS.roulette. The actual spin resolution (drawing a number,
+// computing payouts) was NOT already a pure function — it lived inline in spinRouletteWheel
+// below, mixed with DM-permission checks, global gamblingState reads, and render/push calls.
+// That pure core is now game-engine.js's resolveRouletteSpin(table, rand); spinRouletteWheel
+// stays here as the thin DOM/global-state wrapper around it.
 // DM-only, called directly by the Spin button — never routed through the player-action queue
 // since only the dealer ever triggers a spin.
 function spinRouletteWheel() {
   if (isRealPlayerAccount() || gamblingState.game !== 'roulette') return;
   const table = gamblingState.table;
   if (!table || table.phase !== 'betting' || !Object.keys(table.bets).length) return;
-  const number = ri(ROULETTE_WHEEL_ORDER); // drawn the way a physical wheel actually lands, not numerically — same uniform odds either way
-  const color = rouletteColor(number);
-  const betsSnapshot = table.bets;
-  const payouts = {};
-  Object.entries(betsSnapshot).forEach(([uid, bet]) => {
-    const mult = rouletteMultiplier(bet, number);
-    if (mult > 0) payouts[uid] = Math.round(bet.amount * mult * 100) / 100;
-  });
-  table.roundCounter = (table.roundCounter || 0) + 1;
-  table.lastResult = { roundId: table.roundCounter, number, color, bets: betsSnapshot, payouts };
-  table.bets = {};
-  table.phase = 'result';
+  resolveRouletteSpin(table);
   renderGamblingTab();
   pushGamblingState();
 }
@@ -18242,107 +17441,41 @@ function renderRouletteHtml(table) {
     </div>
   `;
 }
-GAMBLING_HANDLERS.roulette = { newTable: newRouletteTable, applyAction: applyRouletteAction, renderHtml: renderRouletteHtml };
+// Deferred to DOMContentLoaded, same reasoning as the lootData classification pass above:
+// newRouletteTable/applyRouletteAction now live in game-engine.js and reach this file through
+// the window.X bridge module, which (being a module script) is guaranteed to finish executing
+// before DOMContentLoaded fires — but this assignment itself runs at top level during parse,
+// before that point, so it can't reference them directly anymore. Caught by an actual browser
+// console error during Phase 1 validation (this file's own top-level-call audit only checked
+// for bare function CALLS, not bare identifier references like this one — noted in
+// docs/ARCHITECTURE.md as a real gap the audit missed the first time).
+document.addEventListener('DOMContentLoaded', () => {
+  GAMBLING_HANDLERS.roulette = { newTable: newRouletteTable, applyAction: applyRouletteAction, renderHtml: renderRouletteHtml };
+});
 
 // ===================== GAMBLING: BLACKJACK =====================
-const CARD_SUITS = ['♠','♥','♦','♣'];
-const CARD_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-function freshShuffledDeck() {
-  const deck = [];
-  CARD_SUITS.forEach(s => CARD_RANKS.forEach(r => deck.push({ r, s })));
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
-  return deck;
-}
-function cardValue(card) {
-  if (card.r === 'A') return 11;
-  if (card.r === 'J' || card.r === 'Q' || card.r === 'K') return 10;
-  return parseInt(card.r, 10);
-}
-// Every ace counts as 11 first, then downgrades to 1 (-10) one at a time for as long as the
-// hand is still bust and still holds an ace left to downgrade — the standard soft/hard-hand rule.
-function blackjackHandValue(cards) {
-  let total = cards.reduce((sum, c) => sum + cardValue(c), 0);
-  let aces = cards.filter(c => c.r === 'A').length;
-  while (total > 21 && aces > 0) { total -= 10; aces--; }
-  return total;
-}
-function isBlackjackHand(cards) { return cards.length === 2 && blackjackHandValue(cards) === 21; }
-function newBlackjackTable() {
-  return { phase: 'betting', deck: [], dealerHand: [], players: {}, lastResult: null, roundCounter: 0 };
-}
-// hit/stand only apply to a hand actually in play; a request arriving after that player's hand
-// is already resolved (bust/stand/blackjack) or after the round moved on is silently dropped,
-// same "just no-op on a stale request" spirit as the rest of this app's request queues.
-function applyBlackjackAction(table, action) {
-  const uid = action.playerUid;
-  if (action.type === 'place_bet') {
-    if (table.phase !== 'betting' || table.players[uid]) return;
-    table.players[uid] = { username: action.playerUsername, bet: action.amount, hand: [], status: 'betting' };
-    return;
-  }
-  if (action.type === 'hit') {
-    const p = table.players[uid];
-    if (!p || table.phase !== 'playing' || p.status !== 'playing') return;
-    p.hand.push(table.deck.pop());
-    if (blackjackHandValue(p.hand) > 21) p.status = 'bust';
-    return;
-  }
-  if (action.type === 'stand') {
-    const p = table.players[uid];
-    if (!p || table.phase !== 'playing' || p.status !== 'playing') return;
-    p.status = 'stand';
-  }
-}
+// CARD_SUITS, CARD_RANKS, freshShuffledDeck, cardValue, blackjackHandValue, isBlackjackHand,
+// newBlackjackTable, applyBlackjackAction (bet/hit/stand), and blackjackAllDone were extracted
+// to game-engine.js in Phase 1 (see docs/ARCHITECTURE.md) — reached here via the window.X
+// bridge. As with Roulette's spin, the actual dealing and dealer-AI resolution were NOT already
+// pure — blackjackDeal/blackjackDealerPlay mixed the real logic with DM-permission checks and
+// render/push calls. Those pure cores are now game-engine.js's resolveBlackjackDeal(table, rand)
+// and resolveBlackjackDealerPlay(table); the two functions below stay as thin wrappers.
 // DM-only, direct actions (not routed through the player-action queue) — dealing and playing
 // the dealer's own hand are dealer decisions, not something any player proposes.
 function blackjackDeal() {
   if (isRealPlayerAccount() || gamblingState.game !== 'blackjack') return;
   const table = gamblingState.table;
   if (!table || table.phase !== 'betting' || !Object.keys(table.players).length) return;
-  table.deck = freshShuffledDeck();
-  table.dealerHand = [table.deck.pop(), table.deck.pop()];
-  Object.values(table.players).forEach(p => {
-    p.hand = [table.deck.pop(), table.deck.pop()];
-    p.status = isBlackjackHand(p.hand) ? 'blackjack' : 'playing';
-  });
-  table.phase = 'playing';
+  resolveBlackjackDeal(table);
   renderGamblingTab();
   pushGamblingState();
 }
-function blackjackAllDone(table) { return Object.values(table.players).every(p => p.status !== 'playing'); }
 function blackjackDealerPlay() {
   if (isRealPlayerAccount() || gamblingState.game !== 'blackjack') return;
   const table = gamblingState.table;
   if (!table || table.phase !== 'playing' || !blackjackAllDone(table)) return;
-  // A dealer whose whole table busted or already holds blackjack still reveals, but only
-  // actually draws if at least one hand is still live to play against — same real-table
-  // etiquette of not bothering to draw out a hand nobody can still beat by a worse total.
-  const anyLive = Object.values(table.players).some(p => p.status === 'stand' || p.status === 'blackjack');
-  if (anyLive) { while (blackjackHandValue(table.dealerHand) < 17) table.dealerHand.push(table.deck.pop()); }
-  const dealerTotal = blackjackHandValue(table.dealerHand);
-  const dealerBJ = isBlackjackHand(table.dealerHand);
-  const dealerBust = dealerTotal > 21;
-  const outcomes = {}, payouts = {};
-  Object.entries(table.players).forEach(([uid, p]) => {
-    const total = blackjackHandValue(p.hand);
-    let result, mult;
-    if (p.status === 'bust') { result = 'lose'; mult = 0; }
-    else if (p.status === 'blackjack' && dealerBJ) { result = 'push'; mult = 1; }
-    else if (p.status === 'blackjack') { result = 'blackjack'; mult = 2.5; }
-    else if (dealerBJ) { result = 'lose'; mult = 0; }
-    else if (dealerBust) { result = 'win'; mult = 2; }
-    else if (total > dealerTotal) { result = 'win'; mult = 2; }
-    else if (total === dealerTotal) { result = 'push'; mult = 1; }
-    else { result = 'lose'; mult = 0; }
-    outcomes[uid] = { result, total };
-    if (mult > 0) payouts[uid] = Math.round(p.bet * mult * 100) / 100;
-  });
-  table.roundCounter = (table.roundCounter || 0) + 1;
-  table.lastResult = { roundId: table.roundCounter, dealerHand: table.dealerHand.slice(), dealerTotal, outcomes, payouts };
-  table.phase = 'result';
+  resolveBlackjackDealerPlay(table);
   renderGamblingTab();
   pushGamblingState();
 }
@@ -18427,45 +17560,22 @@ function renderBlackjackHtml(table) {
     ${playersHtml}
   </div>`;
 }
-GAMBLING_HANDLERS.blackjack = { newTable: newBlackjackTable, applyAction: applyBlackjackAction, renderHtml: renderBlackjackHtml };
+// Deferred to DOMContentLoaded — see the matching comment on GAMBLING_HANDLERS.roulette above.
+document.addEventListener('DOMContentLoaded', () => {
+  GAMBLING_HANDLERS.blackjack = { newTable: newBlackjackTable, applyAction: applyBlackjackAction, renderHtml: renderBlackjackHtml };
+});
 
 // ===================== GAMBLING: SLOTS =====================
 // Dungeon-themed reel symbols, weighted rarer-symbol-pays-more the same way the rest of this
 // app's loot already scales (see BAL.rarityOrder) — a common Potion barely pays, a Monster
 // triple is the jackpot. "triple" is a TOTAL-return multiplier (stake included), matching
 // Roulette/Blackjack's own convention.
-const SLOTS_SYMBOLS = [
-  { key:'potion',  icon:'🧪', weight:30, triple:3 },
-  { key:'gold',    icon:'💰', weight:25, triple:5 },
-  { key:'weapon',  icon:'⚔️', weight:20, triple:10 },
-  { key:'gem',     icon:'💎', weight:15, triple:20 },
-  { key:'monster', icon:'👹', weight:10, triple:50 },
-];
+// SLOTS_SYMBOLS, newSlotsTable, and applySlotsAction were extracted to game-engine.js in
+// Phase 1 (see docs/ARCHITECTURE.md) — reached here via the window.X bridge. Unlike
+// Roulette/Blackjack, Slots' resolution logic was already fully self-contained (no DM
+// phase, no dealer decision — a spin resolves completely inside applyAction), so this one
+// needed no pure/impure split, just a straight move.
 function slotsSymbolIcon(key) { return (SLOTS_SYMBOLS.find(s => s.key === key) || {}).icon || '❔'; }
-function newSlotsTable() { return { results: [], roundCounter: 0 }; }
-// Unlike Roulette/Blackjack, every spin is a single player acting entirely on their own — there
-// is no "wait for the table" phase and no dealer decision to make, so this is the only one of
-// the four games where the DM has nothing to actually operate; applyAction resolves a spin
-// completely in one step the instant the request arrives.
-function applySlotsAction(table, action) {
-  if (action.type !== 'spin') return;
-  const weights = {}; SLOTS_SYMBOLS.forEach(s => { weights[s.key] = s.weight; });
-  const reels = [weightedPickFromObject(weights), weightedPickFromObject(weights), weightedPickFromObject(weights)];
-  const counts = {};
-  reels.forEach(r => { counts[r] = (counts[r] || 0) + 1; });
-  const maxCount = Math.max(...Object.values(counts));
-  let mult = 0;
-  if (maxCount === 3) mult = (SLOTS_SYMBOLS.find(s => s.key === reels[0]) || {}).triple || 0;
-  else if (maxCount === 2) mult = 1; // any matching pair: consolation stake-back, not a real win
-  const payout = mult > 0 ? Math.round(action.amount * mult * 100) / 100 : 0;
-  table.roundCounter = (table.roundCounter || 0) + 1;
-  table.results = table.results || [];
-  table.results.unshift({
-    roundId: table.roundCounter, uid: action.playerUid, username: action.playerUsername,
-    reels, amount: action.amount, mult, payouts: payout ? { [action.playerUid]: payout } : {},
-  });
-  if (table.results.length > 20) table.results.length = 20;
-}
 function slotsPullLever() {
   const msgEl = document.getElementById('gamblingMsg');
   const amount = parseFloat(document.getElementById('slotsBetAmount')?.value) || 0;
@@ -18503,7 +17613,10 @@ function renderSlotsHtml(table) {
     ${feedHtml}
   </div>`;
 }
-GAMBLING_HANDLERS.slots = { newTable: newSlotsTable, applyAction: applySlotsAction, renderHtml: renderSlotsHtml };
+// Deferred to DOMContentLoaded — see the matching comment on GAMBLING_HANDLERS.roulette above.
+document.addEventListener('DOMContentLoaded', () => {
+  GAMBLING_HANDLERS.slots = { newTable: newSlotsTable, applyAction: applySlotsAction, renderHtml: renderSlotsHtml };
+});
 
 // ===================== GAMBLING: FIVE-CARD POKER =====================
 // Video-poker-style five-card draw, not a shared-pot showdown against other players — same
@@ -18514,63 +17627,10 @@ GAMBLING_HANDLERS.slots = { newTable: newSlotsTable, applyAction: applySlotsActi
 // entirely separate pot/side-pot/showdown system just for this one game) is the safer, smaller
 // build. Reuses freshShuffledDeck/CARD_SUITS/CARD_RANKS from Blackjack above rather than a
 // second deck implementation.
-const POKER_RANK_ORDER = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-function pokerRankValue(r) { return POKER_RANK_ORDER.indexOf(r); }
-const POKER_PAYOUTS = {
-  royalFlush: 250, straightFlush: 50, fourKind: 25, fullHouse: 9, flush: 6,
-  straight: 4, threeKind: 3, twoPair: 2, jacksOrBetter: 1, lowPair: 0, highCard: 0,
-};
-// Standard Jacks-or-Better video poker rules: a pair below Jacks pays nothing (same as high
-// card) — the pair itself is real, just not a rewarded one.
-function evaluatePokerHand(cards) {
-  const values = cards.map(c => pokerRankValue(c.r)).sort((a, b) => a - b);
-  const isFlush = cards.every(c => c.s === cards[0].s);
-  let isStraight = values.every((v, i) => i === 0 || v === values[i - 1] + 1);
-  if (!isStraight && values.join(',') === '0,1,2,3,12') isStraight = true; // wheel: A-2-3-4-5
-  const counts = {};
-  cards.forEach(c => { counts[c.r] = (counts[c.r] || 0) + 1; });
-  const countValues = Object.values(counts).sort((a, b) => b - a);
-  if (isStraight && isFlush && values[0] === pokerRankValue('10')) return { rank: 'royalFlush', label: 'Royal Flush' };
-  if (isStraight && isFlush) return { rank: 'straightFlush', label: 'Straight Flush' };
-  if (countValues[0] === 4) return { rank: 'fourKind', label: 'Four of a Kind' };
-  if (countValues[0] === 3 && countValues[1] === 2) return { rank: 'fullHouse', label: 'Full House' };
-  if (isFlush) return { rank: 'flush', label: 'Flush' };
-  if (isStraight) return { rank: 'straight', label: 'Straight' };
-  if (countValues[0] === 3) return { rank: 'threeKind', label: 'Three of a Kind' };
-  if (countValues[0] === 2 && countValues[1] === 2) return { rank: 'twoPair', label: 'Two Pair' };
-  if (countValues[0] === 2) {
-    const pairRank = Object.keys(counts).find(r => counts[r] === 2);
-    return ['J','Q','K','A'].includes(pairRank) ? { rank: 'jacksOrBetter', label: 'Jacks or Better' } : { rank: 'lowPair', label: `Pair of ${pairRank}s` };
-  }
-  return { rank: 'highCard', label: 'High Card' };
-}
-function newPokerTable() { return { hands: {}, results: [], roundCounter: 0 }; }
-function applyPokerAction(table, action) {
-  const uid = action.playerUid;
-  if (action.type === 'deal') {
-    if (table.hands[uid]) return; // already mid-hand
-    const deck = freshShuffledDeck();
-    table.hands[uid] = { username: action.playerUsername, bet: action.amount, hand: [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()], deck };
-    return;
-  }
-  if (action.type === 'draw') {
-    const h = table.hands[uid];
-    if (!h) return;
-    const held = new Set(action.heldIndexes || []);
-    for (let i = 0; i < 5; i++) { if (!held.has(i)) h.hand[i] = h.deck.pop(); }
-    const evalResult = evaluatePokerHand(h.hand);
-    const mult = POKER_PAYOUTS[evalResult.rank] || 0;
-    const payout = mult > 0 ? Math.round(h.bet * mult * 100) / 100 : 0;
-    table.roundCounter = (table.roundCounter || 0) + 1;
-    table.results = table.results || [];
-    table.results.unshift({
-      roundId: table.roundCounter, uid, username: h.username, hand: h.hand.slice(),
-      handLabel: evalResult.label, amount: h.bet, mult, payouts: payout ? { [uid]: payout } : {},
-    });
-    if (table.results.length > 20) table.results.length = 20;
-    delete table.hands[uid];
-  }
-}
+// POKER_RANK_ORDER, pokerRankValue, POKER_PAYOUTS, evaluatePokerHand, newPokerTable, and
+// applyPokerAction were extracted to game-engine.js in Phase 1 (see docs/ARCHITECTURE.md) —
+// reached here via the window.X bridge. Like Slots, Poker's resolution logic (deal + draw) was
+// already fully self-contained inside applyAction, so this needed no pure/impure split either.
 let pokerHeldSelection = [false, false, false, false, false];
 function pokerToggleHold(i) { pokerHeldSelection[i] = !pokerHeldSelection[i]; renderGamblingTab(); }
 function pokerDeal() {
@@ -18621,7 +17681,10 @@ function renderPokerHtml(table) {
     ${feedHtml}
   </div>`;
 }
-GAMBLING_HANDLERS.poker = { newTable: newPokerTable, applyAction: applyPokerAction, renderHtml: renderPokerHtml };
+// Deferred to DOMContentLoaded — see the matching comment on GAMBLING_HANDLERS.roulette above.
+document.addEventListener('DOMContentLoaded', () => {
+  GAMBLING_HANDLERS.poker = { newTable: newPokerTable, applyAction: applyPokerAction, renderHtml: renderPokerHtml };
+});
 
 // ---------- Journey pixel-art scenes ----------
 // Same technique as the existing battle-stage sprites (hand-placed SVG <rect>s + CSS keyframe
@@ -19519,8 +18582,18 @@ window.onConnectedPlayersChanged = function (players) {
   if (typeof renderCombatRosterDisplay === 'function' && document.getElementById('combatRoster')) renderCombatRosterDisplay();
   if (typeof renderPlayersTab === 'function' && document.getElementById('playersListEl')) renderPlayersTab();
 };
-loadAppState();
-refreshAllViewsAfterStateApply();
+// Deferred to DOMContentLoaded — refreshAllViewsAfterStateApply() transitively reaches
+// computeCharacterSheetFor (via renderPlayerSlots -> renderCharacterSheet ->
+// computeCharacterSheet), which now lives in game-engine.js and reaches this file through the
+// window.X bridge module. Caught by an actual browser console error during Phase 1 validation:
+// this file's original top-level-call audit only checked for DIRECT top-level calls to the
+// six extracted target functions/areas by name, not transitive calls reached through several
+// layers of other functions — this is the second, broader instance of that same audit gap (the
+// first being the four GAMBLING_HANDLERS.* registrations above), noted in docs/ARCHITECTURE.md.
+document.addEventListener('DOMContentLoaded', () => {
+  loadAppState();
+  refreshAllViewsAfterStateApply();
+});
 // Belt-and-braces autosave: a periodic tick catches anything a crashed/killed tab would
 // otherwise lose, beforeunload catches refreshes/closes/navigations, and visibilitychange
 // catches the moment the user switches away to another browser tab — exactly the "moved
