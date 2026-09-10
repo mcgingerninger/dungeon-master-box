@@ -620,3 +620,33 @@ explicitly rather than silently inherited.
   `ws` client to the *same port* and successfully identified — confirming the shared-port HTTP/
   WebSocket upgrade actually works outside the in-process test harness, not just inside it.
 - Not wired into the live browser app, per the confirmed scope.
+
+### Two real bugs found by running the suite dozens of times, not just once
+
+After merging, running the full suite a single time isn't enough to trust it — both of these
+were caught only by deliberately running `node --test` 40–50 times in a row and treating any
+non-zero failure count as worth chasing down, not dismissing as a fluke.
+
+1. **`websocket.test.js` used fixed `setTimeout` delays** ("give the server a moment to
+   process") instead of waiting for real confirmation, which is a classic source of rare,
+   load-dependent flakiness — a delay that's "usually enough" isn't the same as actually knowing
+   an operation finished. The real fix wasn't a longer delay: `server/websocket.js` gained two
+   new server→client acks it was missing — `push_ack` (confirms a `push_state` was actually
+   persisted) and `cross_write_ack` (confirms `hp_delta`/`gift_item`/`set_inventory_fields`
+   landed, sent back to the DM's own connection). This closes a real gap, not just a test
+   convenience: the original Firestore design already let a caller `await` `pushOwnState`'s own
+   promise to know a write landed; this WebSocket version had no equivalent until now. Tests were
+   rewritten to await these acks instead of guessing a delay — incidentally also making the suite
+   noticeably faster (several hundred milliseconds of artificial sleeps removed).
+2. **A pre-existing Phase 4 test in `server/gambling.test.js`** ("dealerPlay is rejected while a
+   hand is still mid-play") implicitly assumed a dealt blackjack hand would never happen to be a
+   natural 21 — but with real, non-seeded randomness (the HTTP layer exposes no way to inject a
+   deterministic `rand`), that happens roughly 1 deal in 20, which sets the player's status to
+   `'blackjack'` instead of `'playing'` and makes `dealerPlay` legitimately succeed instead of
+   being rejected — not an application bug, but a test whose stated precondition ("p1 never
+   stands/busts — still 'playing'") wasn't actually being enforced. Fixed with a bounded retry
+   (re-deal until the real precondition holds, capped at 20 attempts with a clear failure message
+   if it somehow never does) rather than papering over it.
+
+Confirmed fixed, not just quieted: 80 consecutive clean runs (`node --test`, 0 failures) after
+both fixes, versus a roughly 5-10% failure rate per run beforehand.

@@ -122,10 +122,24 @@ describe('blackjack — full round through the server', () => {
   });
 
   test('dealerPlay is rejected while a hand is still mid-play', async () => {
-    await gambling('/host', 'POST', { game: 'blackjack' });
-    await gambling('/action', 'POST', { type: 'place_bet', playerUid: 'p1', playerUsername: 'Alice', amount: 50 });
-    await gambling('/resolve', 'POST', { step: 'deal' });
-    // p1 never stands/busts — still 'playing'.
+    // This test needs a hand that's genuinely still 'playing' (not stood/busted/blackjack) —
+    // resolveBlackjackDeal uses real, non-seeded randomness at this HTTP layer (the server
+    // exposes no way to inject a deterministic rand over the API), so roughly 1 deal in ~20 is
+    // a natural blackjack, which immediately sets status to 'blackjack' instead of 'playing' and
+    // would make dealerPlay legitimately succeed instead of being rejected — not a bug in the
+    // app, but a precondition this test needs to actually hold rather than just hope for. Retries
+    // a fresh deal (closing and re-hosting) until the real precondition is confirmed true; this
+    // was caught as genuine, if infrequent, flakiness (~5% failure rate) across repeated runs,
+    // not a hypothetical.
+    let dealt;
+    for (let attempt = 0; attempt < 20; attempt++) {
+      await gambling('/host', 'POST', { game: 'blackjack' });
+      await gambling('/action', 'POST', { type: 'place_bet', playerUid: 'p1', playerUsername: 'Alice', amount: 50 });
+      dealt = await gambling('/resolve', 'POST', { step: 'deal' });
+      if (dealt.body.table.players['p1'].status === 'playing') break;
+    }
+    assert.equal(dealt.body.table.players['p1'].status, 'playing', 'Could not get a non-blackjack deal in 20 attempts — something other than bad luck is likely wrong');
+
     const { status, body } = await gambling('/resolve', 'POST', { step: 'dealerPlay' });
     assert.equal(status, 400);
     assert.match(body.error, /done playing/);
