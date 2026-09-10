@@ -132,4 +132,13 @@ export const SUBSYSTEMS = {
   journey:       ['journeySetting', 'journeyLog', 'journeyLogCounter', 'journeySettingWeights'],
   puzzle_log:    ['puzzleLog'],
   gambling:      ['gamblingState'],
+  // Added in Phase 5c (see docs/ARCHITECTURE.md) for the DM-published, player-facing broadcast
+  // of combat/puzzle state — deliberately separate from the 'battle'/'puzzle_log' subsystems
+  // above, which hold the DM's own PRIVATE full save-state blob (matching saveAppState's raw
+  // battleRoster/puzzleLog fields verbatim). battlefield_broadcast specifically holds the
+  // loot-visibility-FILTERED version players are actually allowed to see (see
+  // server/websocket.js's push_battlefield handler) — conflating the two under one name would
+  // either leak DM-only data to players or silently drop the DM's own unfiltered save data.
+  battlefield_broadcast: ['battleRoster', 'battleLog'],
+  puzzle_log_broadcast:  ['puzzleLog'],
 };

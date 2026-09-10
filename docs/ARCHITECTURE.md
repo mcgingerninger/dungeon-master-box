@@ -718,3 +718,75 @@ existing lookup by uid still works unchanged, just reads `.ws` off the stored ob
   run: 70 consecutive clean runs (40 full-suite, 30 targeted at just this file) before treating
   it as validated.
 - Not wired into the live browser app, per the confirmed scope.
+
+## Phase 5c: WebSocket Sync — Battlefield/Puzzle-Log Broadcast
+
+The third Phase 5 sub-phase. Replaces `pushBattlefieldState`/`startBattlefieldListener` and
+`pushPuzzleLogState`/`startPuzzleLogListener` — the DM-to-all-players broadcast of combat and
+puzzle state, including the original's loot-visibility filtering.
+
+### New subsystem buckets, not a new table
+
+`battlefield_broadcast` and `puzzle_log_broadcast` were added to the existing `SUBSYSTEMS` map
+(`db/schema.js`), reusing Phase 2's `campaign_state` table rather than adding a new one.
+Deliberately kept separate from the pre-existing `battle`/`puzzle_log` subsystems, which hold the
+DM's own *private* full save-state (matching `saveAppState`'s raw fields verbatim) — the
+broadcast versions hold the loot-*filtered*, player-facing publication of that data. Conflating
+the two under one name would either leak DM-only data to players or silently drop the DM's own
+unfiltered save data.
+
+### Loot-visibility filtering, replicated exactly
+
+`filterBattleRosterForPlayers` mirrors the original's own destructuring line-for-line: an
+**allowlist** of safe fields (never a blacklist of sensitive ones — "there is nothing for a
+player to find via devtools that the DM hasn't chosen to share," per the original's own comment),
+loot entirely absent until `lootRevealed`, and even after reveal, individually stripping
+`reserved`/already-`claimedBy` items. Confirmed with dedicated tests for each condition
+separately (unrevealed loot never sent at all; revealed loot strips reserved/claimed items but
+keeps the rest; a field deliberately not on the allowlist never reaches a player), not just one
+combined happy-path check.
+
+### Deliberate simplification: no debounce
+
+The original debounced both pushes client-side by 400ms, purely to limit Firestore *write
+frequency* — a real cost/quota concern for a cloud database billed per write. That reasoning
+doesn't transfer to a local SQLite file the DM's own server process writes to directly; there's
+no per-write cost to amortize. Not replicated, noted here as a considered omission rather than a
+missed detail.
+
+### Catch-up on identify
+
+A player who connects (or reconnects) after the DM already published a battlefield/puzzle-log
+state doesn't have to wait for the *next* push — `identify` now also sends whatever's currently
+in `battlefield_broadcast`/`puzzle_log_broadcast`, if anything, right after the `identified` ack.
+This matches what Firestore's `onSnapshot` already did by firing immediately with the document's
+current contents the moment a listener subscribes, rather than only on the next write.
+
+### A real, structural test bug found while writing these tests — not just flakiness
+
+Every new test in this sub-phase initially failed with a hard timeout, 100% reproducible (not
+intermittent like the previous two sub-phases' bugs). The cause: this file's `nextMessage` helper
+attaches a `.once('message', ...)` listener only at the moment it's *called*. If a message can
+arrive on a connection before the test gets around to calling `nextMessage` on it — e.g. a
+broadcast triggered by a *different* connection's action, while the test is still busy `await`ing
+something else on that other connection first — Node's `EventEmitter` does not buffer the message
+for a listener that attaches later. It fires into the void and is gone; the later `nextMessage`
+call then waits forever for a message that already arrived and was already lost.
+
+This is a different class of bug than the earlier fixed-delay flakiness: not "how long should I
+wait," but "did I start listening before the message could possibly arrive at all." The fix is a
+`messageQueue(ws)` helper that attaches a *persistent* `.on('message', ...)` listener the instant
+it's called, queuing anything that arrives before the test asks for it — so a message genuinely
+cannot be lost to this race regardless of how much other work happens in between. Used for every
+connection in this sub-phase's tests that receives a broadcast it didn't itself trigger (the
+receiving player, a late-joining player), while the original `nextMessage`/`assertNoMessage`
+helpers were left in place for direct request→response exchanges (a connection awaiting its own
+action's ack), where this race doesn't apply.
+
+### Validation performed
+
+- 10 new tests (`server/websocket.test.js`), full suite now 110 tests, all passing.
+- Given both prior sub-phases' test-quality lessons, and this sub-phase surfacing a third,
+  different kind of test bug on top: 70 consecutive clean runs (40 full-suite, 30 targeted at
+  just this file) before treating it as validated.
+- Not wired into the live browser app, per the confirmed scope.
