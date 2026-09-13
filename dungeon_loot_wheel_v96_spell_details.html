@@ -2048,6 +2048,11 @@
   .players-list-row.active{border-color:var(--gold);background:var(--surface2)}
   .players-list-name{color:var(--text);font-weight:600}
   .players-list-stats{color:var(--text-dim);font-size:.78rem;font-family:'Share Tech Mono',monospace}
+  .players-list-main{cursor:pointer}
+  .players-hp-adjust{display:flex;align-items:center;gap:.35rem;margin-top:.4rem}
+  .players-hp-input{width:4.2rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.78rem;padding:.15rem .3rem}
+  .players-hp-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-family:'Crimson Text',serif;font-size:.78rem;padding:.15rem .5rem;cursor:pointer}
+  .players-hp-btn:hover{border-color:var(--gold);color:var(--gold)}
   .players-detail{background:var(--surface);border:1px solid var(--border);padding:1rem;min-height:200px}
   .players-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem}
   .players-detail-header h3{margin:0;color:var(--gold);letter-spacing:.03em}
@@ -15270,6 +15275,16 @@ window.applyIncomingAttackRequests = function (list) {
   pendingAttackRequests = list || [];
   renderPendingAttacksPanel();
 };
+// Two real bugs found here via live testing, not hypothetical: (1) the server stores/sends each
+// request's actual attack fields nested under req.attackData (db/database.js's row mapping,
+// confirmed by server/websocket.test.js's own assertions), but this rendering code was reading
+// req.monsterUid/req.toHitTotal/etc. directly off req — every field read undefined, so the panel
+// showed "undefined" everywhere and "Apply" always found no matching monster. (2) req.id is a
+// plain number (SQLite's own autoincrement), but the onclick attributes below used to wrap it in
+// quotes ('${req.id}'), passing a STRING into applyPendingAttackRequest/dismissPendingAttackRequest
+// — whose lookups used strict === against the numeric r.id, so neither button could ever find its
+// own request either, even once bug (1) was fixed. Together these meant a player's submitted
+// attack was completely inert from the DM's side no matter what they clicked.
 function renderPendingAttacksPanel() {
   const wrap = document.getElementById('pendingAttacksPanel');
   if (!wrap) return;
@@ -15277,20 +15292,21 @@ function renderPendingAttacksPanel() {
   wrap.innerHTML = `
     <div class="players-section-title">⚔ Pending Player Attacks</div>
     ${pendingAttackRequests.map(req => {
-      const entry = battleRoster.find(e => e.uid === req.monsterUid);
+      const a = req.attackData || {};
+      const entry = battleRoster.find(e => e.uid === a.monsterUid);
       const targetAc = entry ? (entry.ac !== null && entry.ac !== undefined ? entry.ac : entry.monster.ac) : null;
       // A natural 1 always misses and a natural 20 always hits, same 5e rule
       // resolveBattleAttack already applies to a monster's own attacks — this preview used to
       // ignore isFumble/isCrit entirely and judge purely off the total vs AC.
-      const wouldHit = targetAc != null && !req.isFumble && (req.isCrit || req.toHitTotal >= targetAc);
+      const wouldHit = targetAc != null && !a.isFumble && (a.isCrit || a.toHitTotal >= targetAc);
       return `<div class="pending-attack-row">
         <div class="pending-attack-info">
-          <strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(req.monsterName)}</strong> with ${escapeHtml(req.weaponName)}${req.isCrit ? ' <span class="weapon-attack-crit">(CRIT)</span>' : req.isFumble ? ' <span class="weapon-attack-fumble">(FUMBLE)</span>' : ''}
-          <div class="pending-attack-detail">To Hit: ${req.toHitTotal}${targetAc != null ? ` vs AC ${targetAc} — ${wouldHit ? '✓ hits' : '✗ misses'}` : ' — that monster is no longer in your roster'}${req.dmgTotal != null ? ` · Damage: ${req.dmgTotal}` : ' · no damage dice recorded'}</div>
+          <strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)}${a.isCrit ? ' <span class="weapon-attack-crit">(CRIT)</span>' : a.isFumble ? ' <span class="weapon-attack-fumble">(FUMBLE)</span>' : ''}
+          <div class="pending-attack-detail">To Hit: ${a.toHitTotal}${targetAc != null ? ` vs AC ${targetAc} — ${wouldHit ? '✓ hits' : '✗ misses'}` : ' — that monster is no longer in your roster'}${a.dmgTotal != null ? ` · Damage: ${a.dmgTotal}` : ' · no damage dice recorded'}</div>
         </div>
         <div class="pending-attack-actions">
-          <button class="loot-save-btn" onclick="applyPendingAttackRequest('${req.id}')">✓ Apply</button>
-          <button class="loot-save-btn" onclick="dismissPendingAttackRequest('${req.id}')">✕ Dismiss</button>
+          <button class="loot-save-btn" onclick="applyPendingAttackRequest(${req.id})">✓ Apply</button>
+          <button class="loot-save-btn" onclick="dismissPendingAttackRequest(${req.id})">✕ Dismiss</button>
         </div>
       </div>`;
     }).join('')}
@@ -15302,24 +15318,25 @@ function renderPendingAttacksPanel() {
 function applyPendingAttackRequest(reqId) {
   const req = pendingAttackRequests.find(r => r.id === reqId);
   if (!req) return;
-  const entry = battleRoster.find(e => e.uid === req.monsterUid);
+  const a = req.attackData || {};
+  const entry = battleRoster.find(e => e.uid === a.monsterUid);
   if (entry) {
     const targetAc = entry.ac !== null && entry.ac !== undefined ? entry.ac : entry.monster.ac;
-    // Was purely `req.toHitTotal >= targetAc`, ignoring isFumble/isCrit — meaning a real natural
+    // Was purely `a.toHitTotal >= targetAc`, ignoring isFumble/isCrit — meaning a real natural
     // 1 could still land as a "hit" (docking HP) whenever the flat total happened to clear AC
     // anyway, while the log simultaneously labeled it "Player Fumble", and a real natural 20
     // against a high-AC target could show "Player Critical Hit!" while dealing zero damage.
     // Mirrors resolveBattleAttack's own monster-attack rule exactly.
-    const hit = !req.isFumble && (req.isCrit || req.toHitTotal >= targetAc);
-    if (hit && req.dmgTotal != null && !entry.defeated) {
-      entry.hp = Math.max(0, entry.hp - req.dmgTotal);
+    const hit = !a.isFumble && (a.isCrit || a.toHitTotal >= targetAc);
+    if (hit && a.dmgTotal != null && !entry.defeated) {
+      entry.hp = Math.max(0, entry.hp - a.dmgTotal);
       if (entry.hp <= 0) entry.defeated = true;
     }
-    const cls = req.isFumble ? 'miss' : req.isCrit ? 'crit' : hit ? 'hit' : 'miss';
-    const title = req.isFumble ? 'Player Fumble' : req.isCrit ? 'Player Critical Hit!' : hit ? 'Player Hit' : 'Player Miss';
+    const cls = a.isFumble ? 'miss' : a.isCrit ? 'crit' : hit ? 'hit' : 'miss';
+    const title = a.isFumble ? 'Player Fumble' : a.isCrit ? 'Player Critical Hit!' : hit ? 'Player Hit' : 'Player Miss';
     battleLog.push({
       cls, title,
-      detail: `<strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(req.monsterName)}</strong> with ${escapeHtml(req.weaponName)} — rolled <strong>${req.toHitTotal}</strong> vs AC ${targetAc}. ${hit ? `Hit${req.dmgTotal != null ? ` for <strong>${req.dmgTotal}</strong> damage` : ''}.` : 'Missed.'}`,
+      detail: `<strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)} — rolled <strong>${a.toHitTotal}</strong> vs AC ${targetAc}. ${hit ? `Hit${a.dmgTotal != null ? ` for <strong>${a.dmgTotal}</strong> damage` : ''}.` : 'Missed.'}`,
     });
     if (battleLog.length > 50) battleLog = battleLog.slice(-50);
     renderCombatRoster();
@@ -16100,9 +16117,15 @@ function renderPlayersTab() {
   if (!listEl || !detailEl) return;
   const players = (connectedPlayers || []).filter(p => p.role === 'player');
   listEl.innerHTML = players.length ? players.map(p => `
-    <div class="players-list-row${p.uid === viewedPlayerUid ? ' active' : ''}" onclick="selectViewedPlayer('${p.uid}')">
-      <div class="players-list-name">${escapeHtml(p.username)}</div>
-      <div class="players-list-stats">${p.currentHp != null ? `HP ${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))} · AC ${escapeHtml(String(p.ac))}` : 'No character sheet yet'}</div>
+    <div class="players-list-row${p.uid === viewedPlayerUid ? ' active' : ''}">
+      <div class="players-list-main" onclick="selectViewedPlayer('${p.uid}')">
+        <div class="players-list-name">${escapeHtml(p.username)}</div>
+        <div class="players-list-stats">${p.currentHp != null ? `HP ${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))} · AC ${escapeHtml(String(p.ac))}` : 'No character sheet yet'}</div>
+      </div>
+      ${p.currentHp != null ? `<div class="players-hp-adjust" onclick="event.stopPropagation()">
+        <input type="number" class="players-hp-input" id="hpDelta_${p.uid}" placeholder="±HP" onkeydown="if(event.key==='Enter')applyManualHpDelta('${p.uid}')">
+        <button class="players-hp-btn" onclick="applyManualHpDelta('${p.uid}')" title="Apply a monster attack, a heal, or any other manual HP change">Apply</button>
+      </div>` : ''}
     </div>
   `).join('') : '<div class="empty-results">No players have joined yet.</div>';
 
@@ -16174,6 +16197,21 @@ function renderPlayersTab() {
   if (invTitleEl) invTitleEl.textContent = `📦 Inventory (${slotsUsed} / ${INV_ROWS * INV_COLS} slots used)`;
   const invGridEl = document.getElementById('playersInvGrid');
   if (invGridEl) invGridEl.innerHTML = buildForeignInventoryGridHtml(foreignGrid, foreignPlacements, s.savedGeneratedItems);
+}
+// Manual DM HP control — for applying a monster attack's damage by hand (the automatic path,
+// resolveBattleAttack's own call to window.applyHpDeltaToPlayer, only fires for a monster that's
+// actually targeting a connected player through the Combat tab's own roll buttons), healing, or
+// any other on-the-fly HP ruling. Same underlying bridge function skipping the fixed monster-
+// attack path already uses — a negative number damages, a positive number heals, clamped
+// server-side exactly like every other HP change.
+function applyManualHpDelta(uid) {
+  const input = document.getElementById('hpDelta_' + uid);
+  if (!input) return;
+  const delta = parseInt(input.value, 10);
+  if (!delta || typeof window.applyHpDeltaToPlayer !== 'function') return;
+  window.applyHpDeltaToPlayer(uid, delta);
+  input.value = '';
+  flashInvMessage(`${delta > 0 ? '+' : ''}${delta} HP applied.`);
 }
 // The DM's own searchable Token Library, filtered live — separate from the Inventory tab's
 // own token grid (renderInventoryTokenGrid) since this one needs a "Send to <viewed player>"
