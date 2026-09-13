@@ -50,6 +50,13 @@
 //     { type: 'unsubscribe_player' }                                -- DM only (Phase 6e)
 //     { type: 'kick_player', targetUid }                            -- DM only (Phase 6f); cannot
 //       -- target the DM's own accountUid
+//     { type: 'push_gambling_state', state }                        -- DM only (Phase 6d); state is
+//       -- the monolith's own { game, table } shape, pushed verbatim on every host/close/DM-side
+//       -- action-apply, matching pushBattlefieldState's role in the original design
+//     { type: 'submit_gambling_action', action }                    -- any player, their own bet/
+//       -- hit/stand/spin/hold/discard/fold (Phase 6d) — relayed live to the DM's connection for
+//       -- the DM's own client to apply (the dealer logic itself is the authority, not a manual
+//       -- DM review click, unlike an attack request)
 //   server -> client:
 //     { type: 'identified', state, rev }             -- ack, plus whatever was already persisted for this account
 //     { type: 'push_ack', rev }                       -- confirms a push_state was actually persisted
@@ -90,6 +97,18 @@
 //     { type: 'kicked' }                                           -- Phase 6f: sent to a removed
 //       -- player's live connection just before the server closes it
 //     { type: 'kick_ack', targetUid }                               -- Phase 6f: ack to the DM
+//     { type: 'gambling_state_update', state }                     -- Phase 6d: broadcast to every
+//       -- connected PLAYER (never the DM, same as battlefield_update — the DM is the one who just
+//       -- pushed it) on push_gambling_state, AND sent once on identify if a table is already
+//       -- hosted, matching the battlefield/puzzle-log catch-up pattern exactly
+//     { type: 'push_gambling_state_ack' }                           -- Phase 6d: confirms the DM's
+//       -- push landed, matching push_battlefield_ack/push_puzzle_log_ack
+//     { type: 'gambling_action_list', actions }                     -- Phase 6d: sent to the DM's
+//       -- live connection with ONE action per submit_gambling_action (never batched/queued —
+//       -- see the deliberate-simplification note below), wrapped in a list because that's the
+//       -- shape the monolith's window.applyIncomingGamblingActions already expects
+//     { type: 'gambling_action_submitted' }                        -- Phase 6d: ack to the
+//       -- submitting player
 //     { type: 'error', message }
 //
 // The ack types matter for more than bookkeeping: the original Firestore design lets a caller
@@ -129,6 +148,20 @@
 // roster's main practical use (targeting a live player in combat) only matters for players who
 // are actually connected right now. Noted here as a genuine, deliberate scope reduction, not an
 // oversight.
+//
+// Deliberate simplification (Phase 6d): submit_gambling_action is relayed LIVE to the DM's
+// connection, never persisted in a durable table the way attack_requests is. Two reasons this is
+// the right tradeoff here, not laziness: (1) the monolith's own applyIncomingGamblingActions
+// applies an incoming action immediately on the DM's client and re-pushes the resulting state —
+// there is no manual "does this look right" review step the way an attack request has, so a
+// queue a DM manually works through doesn't match how this feature actually behaves; (2)
+// gambling already assumes the DM is the live dealer (see the monolith's own GAMBLING comment —
+// "the DM is always the dealer/host"), so an action arriving while the DM is briefly
+// disconnected is lost the same way it would be if a real dealer stepped away from the table —
+// acceptable, not silently swallowed forever (the player's own client still shows its own
+// submitted bet/action locally until the next state broadcast reconciles it). If this ever needs
+// to survive a DM reconnect, the fix is a small table shaped like attack_requests, not a redesign
+// of this relay.
 
 import { WebSocketServer } from 'ws';
 import {
@@ -137,8 +170,22 @@ import {
   createAttackRequest, listAttackRequests, deleteAttackRequest,
 } from '../db/database.js';
 
+// Phase 6d: real-time gambling sync, the one gap left over from the original Phase 5 audit (see
+// docs/ARCHITECTURE.md's Phase 6 section — deliberately deprioritized until now). Reuses Phase
+// 2's existing 'gambling' subsystem bucket (the same storage server/gambling.js's REST routes
+// already read/write) rather than adding a new table — this is genuinely the same data, just
+// with a live push/listen loop added on top so it actually reaches connected players.
+
 function send(ws, msg) {
   if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
+}
+
+// Phase 6d: gambling actions are never persisted (see the module comment above), so they need no
+// database-assigned id — just something unique enough for the DM's client to pass back to
+// resolveGamblingActionRemote if it chooses to.
+let _gamblingActionCounter = 0;
+function generateId() {
+  return 'ga' + (++_gamblingActionCounter) + '_' + Date.now().toString(36);
 }
 
 // Mirrors pushBattlefieldState's own destructuring exactly — same allowlisted field set, same
@@ -264,6 +311,10 @@ export function createWebSocketServer(db, httpServer) {
           if (battlefield) send(ws, { type: 'battlefield_update', battleRoster: battlefield.battleRoster, battleLog: battlefield.battleLog });
           const puzzleLog = loadSubsystemState(db, campaignId, 'puzzle_log_broadcast');
           if (puzzleLog) send(ws, { type: 'puzzle_log_update', puzzleLog: puzzleLog.puzzleLog });
+          // Phase 6d: same catch-up spirit — a player joining/reconnecting mid-hand should see
+          // the currently hosted table immediately, not wait for the next DM action.
+          const gambling = loadSubsystemState(db, campaignId, 'gambling');
+          if (gambling && gambling.game) send(ws, { type: 'gambling_state_update', state: gambling });
           // Phase 5d: this player joining/reconnecting changes what the DM's roster should show.
           broadcastRoster(campaignId);
         } else {
@@ -385,6 +436,33 @@ export function createWebSocketServer(db, httpServer) {
         saveSubsystemState(db, identity.campaignId, 'puzzle_log_broadcast', { puzzleLog });
         broadcastToPlayers(identity.campaignId, { type: 'puzzle_log_update', puzzleLog });
         send(ws, { type: 'push_puzzle_log_ack' });
+        return;
+      }
+
+      if (msg.type === 'push_gambling_state') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can push gambling state' });
+        const state = msg.state || { game: null, table: null };
+        saveSubsystemState(db, identity.campaignId, 'gambling', state);
+        broadcastToPlayers(identity.campaignId, { type: 'gambling_state_update', state });
+        send(ws, { type: 'push_gambling_state_ack' });
+        return;
+      }
+
+      if (msg.type === 'submit_gambling_action') {
+        // No role check beyond "must be identified" — any connected account (a player, or the DM
+        // testing their own table) may submit an action; the DM's own client is the authority on
+        // whether it's actually legal (matches applyGamblingAction's own no-op-if-illegal shape).
+        const dmWs = findDmConnection(identity.campaignId);
+        if (dmWs) {
+          send(dmWs, {
+            type: 'gambling_action_list',
+            actions: [{ id: generateId(), ...msg.action, playerUid: identity.accountUid, playerUsername: identity.username }],
+          });
+        }
+        // See the module comment above: no persisted queue, so there's nothing to catch up on if
+        // the DM isn't connected right now — this ack only confirms the message was received and
+        // handed off (or dropped, if no dealer is live), not that it was actually applied.
+        send(ws, { type: 'gambling_action_submitted' });
         return;
       }
 

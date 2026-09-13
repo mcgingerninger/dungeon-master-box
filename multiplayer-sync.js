@@ -55,14 +55,13 @@
 // own. Removed entirely rather than carried forward as dead weight.
 //
 // ---- What's deliberately NOT wired up yet (see docs/ARCHITECTURE.md) ----
-// Phases 6e (viewed-player spectator listener) and 6f (player removal) — the other two gaps the
-// original Phase 5 audit missed — are both implemented below, each against its own scoped
-// server/websocket.js addition, confirmed with the user before being built (same discipline as
-// Phase 5's a-d breakdown). Real-time gambling sync (pushGamblingState/startGamblingListener/
-// gambling action queue) is the one remaining, explicitly deprioritized subsystem: window.
-// pushGamblingState etc. are simply not defined by this file, and every call site in the monolith
-// already guards with `typeof window.X === 'function'` first, so gambling just doesn't sync
-// between players in multiplayer mode yet, with no crash — to be picked back up later.
+// Phases 6e (viewed-player spectator listener), 6f (player removal), and 6d (real-time gambling
+// sync) — the three gaps the original Phase 5 audit missed — are all implemented below, each
+// against its own scoped server/websocket.js addition, confirmed with the user before being
+// built (same discipline as Phase 5's a-d breakdown). window.resolveGamblingActionRemote is the
+// one gambling hook deliberately left undefined (guarded with `typeof x === 'function'` at its
+// one call site in the monolith, same as every other optional hook here) — see the "Real-time
+// gambling sync" section below for why.
 
 // ---------- Config ----------
 // The app is served BY the same server it talks to (Phase 6a's static file serving) — so the
@@ -220,6 +219,12 @@ function handleServerMessage(msg) {
       return;
     case 'player_state_update':
       if (typeof window.applyViewedPlayerState === 'function') window.applyViewedPlayerState(msg.targetUid, msg.state || null);
+      return;
+    case 'gambling_state_update':
+      if (typeof window.applyRemoteGamblingState === 'function') window.applyRemoteGamblingState(msg.state);
+      return;
+    case 'gambling_action_list':
+      if (typeof window.applyIncomingGamblingActions === 'function') window.applyIncomingGamblingActions(msg.actions || []);
       return;
     case 'kicked':
       resetLocalSessionState();
@@ -409,6 +414,28 @@ window.pushPuzzleLogState = function (puzzleLog) {
     send({ type: 'push_puzzle_log', puzzleLog });
   }, 400);
 };
+
+// ---------- Real-time gambling sync (Phase 6d) ----------
+// Mirrors the Battlefield/Puzzle Log push pattern above (DM-owned state, broadcast to players),
+// plus one extra path battlefield/puzzle-log don't need: a PLAYER's own action has to reach the
+// DM's client to actually be applied, since the DM's browser is the one running the dealer logic
+// (see the monolith's own GAMBLING comment — "the DM is always the dealer/host"). No debounce
+// here, unlike battlefield/puzzle-log: those get called in tight loops (rollAllBattleAttacks);
+// gambling pushes happen once per hosted table change or per resolved action, not bursty enough
+// to need one.
+window.pushGamblingState = function (state) {
+  if (!mp.connected || mp.role !== 'dm') return; // no-op for anyone but the connected DM, matching the monolith's own comment on this bridge
+  send({ type: 'push_gambling_state', state });
+};
+window.submitGamblingActionRemote = function (action) {
+  if (!mp.connected) return;
+  send({ type: 'submit_gambling_action', action });
+};
+// window.resolveGamblingActionRemote is deliberately NOT defined — see server/websocket.js's
+// module comment on submit_gambling_action for why there's nothing server-side to resolve
+// (actions aren't persisted in a queue the way attack requests are). The monolith's own call
+// site already guards this with `typeof window.resolveGamblingActionRemote === 'function'`, so
+// leaving it undefined is a real, working no-op, not a bug.
 
 // ---------- Viewed-player spectator listener (Phase 6e, DM-only) ----------
 // A live, read-only view of ONE specific player's full state, for the Players tab — separate

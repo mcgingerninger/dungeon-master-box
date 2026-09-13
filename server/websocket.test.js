@@ -837,3 +837,76 @@ describe('player removal (Phase 6f)', () => {
     assert.equal(identified.state, null);
   });
 });
+
+describe('real-time gambling sync (Phase 6d)', () => {
+  test('a gambling state push reaches every connected player, never the DM', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    const playerNext = messageQueue(player);
+    const state = { game: 'roulette', table: { phase: 'betting', bets: {} } };
+    send(dm, { type: 'push_gambling_state', state });
+    // Alice's connectAs() above triggered a roster_update to the DM (Phase 5d) — skip past it.
+    const ack = await nextNonRosterMessage(dm.next);
+    assert.equal(ack.type, 'push_gambling_state_ack');
+    await assertNoQueuedMessage(dm.next); // no gambling_state_update echoed back to the DM itself
+
+    const update = await playerNext();
+    assert.equal(update.type, 'gambling_state_update');
+    assert.equal(update.state.game, 'roulette');
+  });
+
+  test('a player who identifies AFTER a table is already hosted catches up immediately', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'push_gambling_state', state: { game: 'blackjack', table: { phase: 'betting' } } });
+    await nextMessage(dm);
+
+    const ws = await connect();
+    const wsNext = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-late-player', role: 'player' });
+    const identified = await wsNext();
+    assert.equal(identified.type, 'identified');
+    const catchUp = await wsNext();
+    assert.equal(catchUp.type, 'gambling_state_update');
+    assert.equal(catchUp.state.game, 'blackjack');
+  });
+
+  test('a player who identifies while NO table is hosted gets no catch-up message', async () => {
+    const ws = await connect();
+    const wsNext = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-alice', role: 'player' });
+    await wsNext(); // identified
+    await assert.rejects(wsNext(200), /Timed out/);
+  });
+
+  test('a non-DM cannot push gambling state', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'push_gambling_state', state: { game: 'slots', table: {} } });
+    const msg = await nextMessage(player);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
+  test("a player's submitted action is relayed to the DM's connection, wrapped in a list", async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'submit_gambling_action', action: { type: 'place_bet', amount: 50 } });
+
+    const submittedAck = await nextMessage(player);
+    assert.equal(submittedAck.type, 'gambling_action_submitted');
+
+    const relayed = await nextNonRosterMessage(dm.next);
+    assert.equal(relayed.type, 'gambling_action_list');
+    assert.equal(relayed.actions.length, 1);
+    assert.equal(relayed.actions[0].type, 'place_bet');
+    assert.equal(relayed.actions[0].amount, 50);
+    assert.equal(relayed.actions[0].playerUid, 'uid-alice');
+    assert.ok(relayed.actions[0].id); // assigned an id even though nothing is persisted server-side
+  });
+
+  test('submitting an action while no DM is connected is a graceful no-op, not an error', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'submit_gambling_action', action: { type: 'spin' } });
+    const ack = await nextMessage(player);
+    assert.equal(ack.type, 'gambling_action_submitted'); // still acks the submitter even though no one received it
+  });
+});
