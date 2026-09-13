@@ -21,14 +21,42 @@ export function openDatabase(path = ':memory:') {
 
 // ---------- Campaigns ----------
 
+// Same alphabet the original Firestore-era multiplayer-sync.js used for its room codes:
+// visually-unambiguous (no 0/O, 1/I/L) since these get read aloud and typed by hand at the
+// table. 5 characters from 32 symbols is ~33.5M combinations — collisions against the UNIQUE
+// constraint are handled below by simply retrying, rather than needing a longer code up front.
+const CAMPAIGN_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function generateCampaignCode(len = 5) {
+  let out = '';
+  for (let i = 0; i < len; i++) out += CAMPAIGN_CODE_ALPHABET[Math.floor(Math.random() * CAMPAIGN_CODE_ALPHABET.length)];
+  return out;
+}
+
 export function createCampaign(db, name) {
-  const stmt = db.prepare('INSERT INTO campaigns (name) VALUES (?)');
-  const info = stmt.run(name);
-  return getCampaign(db, Number(info.lastInsertRowid));
+  const insert = db.prepare('INSERT INTO campaigns (name, code) VALUES (?, ?)');
+  // Collision retry rather than a pre-check-then-insert (which would race under concurrent
+  // creates) — the UNIQUE constraint is the actual arbiter; a failed insert just means try again
+  // with a fresh code. Effectively always succeeds on the first attempt at this code space size.
+  for (let attempt = 0; attempt < 10; attempt++) {
+    try {
+      const info = insert.run(name, generateCampaignCode());
+      return getCampaign(db, Number(info.lastInsertRowid));
+    } catch (err) {
+      if (!/UNIQUE constraint failed/.test(err.message) || attempt === 9) throw err;
+    }
+  }
 }
 
 export function getCampaign(db, id) {
   return db.prepare('SELECT * FROM campaigns WHERE id = ?').get(id) || null;
+}
+
+// Case-insensitive: players type this by hand, and the original's own campaignCode.toUpperCase()
+// normalization (see multiplayer-sync.js's signUpPlayer) is the precedent for not making case
+// matter here either. Codes are always generated uppercase, but this matches lowercase input too.
+export function getCampaignByCode(db, code) {
+  if (!code) return null;
+  return db.prepare('SELECT * FROM campaigns WHERE code = ?').get(String(code).trim().toUpperCase()) || null;
 }
 
 export function listCampaigns(db) {
@@ -182,6 +210,15 @@ export function loadPlayerState(db, campaignId, accountUid) {
 export function loadAllPlayerStates(db, campaignId) {
   const rows = db.prepare('SELECT account_uid, state, rev FROM player_states WHERE campaign_id = ?').all(campaignId);
   return rows.map(r => ({ accountUid: r.account_uid, state: JSON.parse(r.state), rev: r.rev }));
+}
+
+// Phase 6f: the DM removing a player from their campaign — deletes their character/inventory
+// progress for THIS campaign, matching the original removePlayer's own scope exactly (their
+// login/identity isn't a thing this app tracks at all in the room-code identity model, so there's
+// nothing else to delete; they can rejoin fresh with the same device uid and the same campaign
+// code any time, same "known limitation, kept deliberately simple" the original documented).
+export function deletePlayerState(db, campaignId, accountUid) {
+  db.prepare('DELETE FROM player_states WHERE campaign_id = ? AND account_uid = ?').run(campaignId, accountUid);
 }
 
 // ---------- Loot claims (Phase 5b — see db/schema.js's comment on loot_claims) ----------

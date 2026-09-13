@@ -18,9 +18,16 @@
 // normalized table, one at a time, without touching the others.
 
 export const SCHEMA_SQL = `
+-- 'code' is the human-shareable join code a DM reads aloud/types to their players (Phase 6b of
+-- the migration -- see docs/ARCHITECTURE.md), replacing the room-code concept multiplayer-sync.js
+-- used to get for free as a Firestore document id. Generated server-side at creation (see
+-- database.js's createCampaign) from the same visually-unambiguous alphabet the original used
+-- (no 0/O/1/I/L), since that reasoning -- read aloud and typed by hand at the table -- still
+-- applies. UNIQUE rather than a separate lookup table; a table this small needs nothing more.
 CREATE TABLE IF NOT EXISTS campaigns (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  code TEXT NOT NULL UNIQUE,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

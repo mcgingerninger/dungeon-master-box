@@ -5,6 +5,9 @@
 // would hit it.
 import { test, describe, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import * as path from 'node:path';
 import { openDatabase } from '../db/database.js';
 import { createServer } from './server.js';
 
@@ -69,6 +72,24 @@ describe('campaigns', () => {
   test('GET /campaigns/:id rejects a non-numeric id with 400, not a crash', async () => {
     const { status } = await req('GET', '/campaigns/not-a-number');
     assert.equal(status, 400);
+  });
+
+  test('POST /campaigns returns a join code', async () => {
+    const { body } = await req('POST', '/campaigns', { name: 'Test' });
+    assert.match(body.code, /^[A-Z0-9]{5}$/);
+  });
+
+  test('GET /campaigns/by-code/:code resolves to the campaign, case-insensitively', async () => {
+    const created = (await req('POST', '/campaigns', { name: 'Test' })).body;
+    const { status, body } = await req('GET', `/campaigns/by-code/${created.code.toLowerCase()}`);
+    assert.equal(status, 200);
+    assert.equal(body.id, created.id);
+  });
+
+  test('GET /campaigns/by-code/:code returns 404 for an unknown code', async () => {
+    const { status, body } = await req('GET', '/campaigns/by-code/ZZZZZ');
+    assert.equal(status, 404);
+    assert.match(body.error, /ZZZZZ/);
   });
 });
 
@@ -171,5 +192,76 @@ describe('error handling', () => {
     // this one request got a 400 — a real crash would fail the NEXT request too.
     const stillAlive = await req('GET', '/campaigns');
     assert.equal(stillAlive.status, 200);
+  });
+});
+
+describe('static file serving (Phase 6a)', () => {
+  let staticRoot, staticDb, staticServer, staticBaseUrl;
+
+  beforeEach(async () => {
+    staticRoot = mkdtempSync(path.join(tmpdir(), 'dmbox-static-'));
+    writeFileSync(path.join(staticRoot, 'index.html'), '<html>home</html>');
+    writeFileSync(path.join(staticRoot, 'app.js'), 'console.log("app");');
+    writeFileSync(path.join(staticRoot, 'secret.db'), 'not for the network');
+    mkdirSync(path.join(staticRoot, 'sub'));
+    writeFileSync(path.join(staticRoot, 'sub', 'nested.css'), 'body{}');
+    // A sibling directory OUTSIDE staticRoot, to confirm a '..' pathname can't escape it.
+    writeFileSync(path.join(staticRoot, '..', `${path.basename(staticRoot)}-escape.txt`), 'should never be servable');
+
+    staticDb = openDatabase(':memory:');
+    staticServer = createServer(staticDb, { staticRoot });
+    await new Promise(resolve => staticServer.listen(0, resolve));
+    staticBaseUrl = `http://localhost:${staticServer.address().port}`;
+  });
+
+  afterEach(async () => {
+    await new Promise(resolve => staticServer.close(resolve));
+    rmSync(staticRoot, { recursive: true, force: true });
+    rmSync(path.join(staticRoot, '..', `${path.basename(staticRoot)}-escape.txt`), { force: true });
+  });
+
+  test('GET / serves index.html', async () => {
+    const res = await fetch(staticBaseUrl + '/');
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('content-type'), /text\/html/);
+    assert.equal(await res.text(), '<html>home</html>');
+  });
+
+  test('GET /app.js serves it with a JS content type', async () => {
+    const res = await fetch(staticBaseUrl + '/app.js');
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('content-type'), /javascript/);
+    assert.equal(await res.text(), 'console.log("app");');
+  });
+
+  test('serves a file in a subdirectory', async () => {
+    const res = await fetch(staticBaseUrl + '/sub/nested.css');
+    assert.equal(res.status, 200);
+    assert.equal(await res.text(), 'body{}');
+  });
+
+  test('a real file with a non-allowlisted extension (.db) is not served', async () => {
+    const res = await fetch(staticBaseUrl + '/secret.db');
+    assert.equal(res.status, 404);
+  });
+
+  test('a path-traversal attempt cannot escape staticRoot', async () => {
+    const res = await fetch(staticBaseUrl + `/../${path.basename(staticRoot)}-escape.txt`);
+    assert.equal(res.status, 404);
+  });
+
+  test('a missing file returns 404, not a crash', async () => {
+    const res = await fetch(staticBaseUrl + '/does-not-exist.js');
+    assert.equal(res.status, 404);
+  });
+
+  test('static serving does not shadow a real API route', async () => {
+    const res = await fetch(staticBaseUrl + '/campaigns', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'X' }) });
+    assert.equal(res.status, 201);
+  });
+
+  test('with no staticRoot configured, an unknown GET path still 404s (existing behavior preserved)', async () => {
+    const res = await fetch(baseUrl + '/app.js'); // baseUrl is the outer describe's staticRoot-less server
+    assert.equal(res.status, 404);
   });
 });

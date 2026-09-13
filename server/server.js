@@ -14,8 +14,10 @@
 // real file — same dependency-injection shape Phase 1/2 already established.
 
 import { createServer as createHttpServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import * as path from 'node:path';
 import {
-  createCampaign, getCampaign, listCampaigns,
+  createCampaign, getCampaign, getCampaignByCode, listCampaigns,
   upsertCharacter, getCharacter, listCharacters,
   saveSubsystemState, loadSubsystemState, loadAllSubsystemState,
 } from '../db/database.js';
@@ -49,10 +51,59 @@ function readJsonBody(req) {
   });
 }
 
+// Phase 6a of the migration (see docs/MIGRATION_PLAN.md, docs/ARCHITECTURE.md): static file
+// serving, so the DM's own machine can serve the actual app files (the monolith HTML,
+// multiplayer-sync.js, game-engine.js, loot-data.js, puzzle-data.js) to every device on the LAN,
+// not just answer JSON API requests. Deliberately narrow rather than "serve the whole repo":
+// - Extension allowlist only. The default sqlite db file (see server/start.js's DB_PATH) lives
+//   at the repo root right alongside the app files; without an allowlist, a naive "serve
+//   whatever exists under the root" would make campaign data fetchable over plain HTTP.
+// - GET only, no directory listing, no caching/ETag headers, no gzip — this is a DM's own local
+//   process on a LAN, not a public web server; those are real gaps if this were ever deployed
+//   more broadly, noted here rather than silently assumed out of scope.
+// - staticRoot is an explicit parameter (not hardcoded), same dependency-injection shape as `db`
+//   — tests point it at a throwaway fixture directory, server/start.js points it at the repo root.
+const STATIC_EXTENSIONS = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+};
+
+// Returns true (and has already written the response) if a static file was actually served;
+// false means the caller should fall through to its own 404 handling. `pathname` is expected
+// already decodeURIComponent'd. The resolved-path prefix check is what actually prevents a
+// '/../../whatever' pathname from escaping staticRoot — path.join/resolve normalize '..'
+// segments away, so this can't be fooled by an unnormalized path string, only by checking where
+// the FINAL resolved path actually lands.
+async function tryServeStatic(res, staticRoot, pathname) {
+  if (!staticRoot) return false;
+  const urlPath = pathname === '/' ? '/index.html' : pathname;
+  const contentType = STATIC_EXTENSIONS[path.extname(urlPath).toLowerCase()];
+  if (!contentType) return false;
+  const resolvedRoot = path.resolve(staticRoot);
+  const resolvedPath = path.resolve(staticRoot, '.' + urlPath);
+  if (resolvedPath !== resolvedRoot && !resolvedPath.startsWith(resolvedRoot + path.sep)) return false;
+  let data;
+  try { data = await readFile(resolvedPath); }
+  catch { return false; }
+  res.writeHead(200, { 'Content-Type': contentType, 'Content-Length': data.length });
+  res.end(data);
+  return true;
+}
+
 // Routes are matched against a small fixed set of path patterns rather than a general router
 // library — the whole point of "plain http, no framework" is that this stays small enough not
 // to need one. Segments are matched positionally after splitting on '/'.
-export function createServer(db) {
+export function createServer(db, { staticRoot } = {}) {
   return createHttpServer(async (req, res) => {
     let url;
     try { url = new URL(req.url, 'http://localhost'); }
@@ -69,6 +120,17 @@ export function createServer(db) {
         }
         if (req.method === 'GET') return sendJson(res, 200, listCampaigns(db));
         return sendError(res, 405, `Method ${req.method} not allowed on /campaigns`);
+      }
+
+      // GET /campaigns/by-code/:code  (Phase 6b: resolves the DM's shareable join code to a
+      // campaign — a 3-segment path shaped like /campaigns/:id/characters below, but segments[1]
+      // is the literal string 'by-code' rather than a numeric id, so the two never actually match
+      // the same request).
+      if (segments.length === 3 && segments[0] === 'campaigns' && segments[1] === 'by-code') {
+        if (req.method !== 'GET') return sendError(res, 405, `Method ${req.method} not allowed`);
+        const campaign = getCampaignByCode(db, segments[2]);
+        if (!campaign) return sendError(res, 404, `No campaign with code "${segments[2]}"`);
+        return sendJson(res, 200, campaign);
       }
 
       // GET /campaigns/:id
@@ -153,6 +215,7 @@ export function createServer(db) {
         return sendJson(res, result.status, result.body);
       }
 
+      if (req.method === 'GET' && await tryServeStatic(res, staticRoot, decodeURIComponent(url.pathname))) return;
       return sendError(res, 404, `No route for ${req.method} ${url.pathname}`);
     } catch (e) {
       if (e.message === 'Malformed JSON body') return sendError(res, 400, e.message);

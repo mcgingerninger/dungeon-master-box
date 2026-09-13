@@ -2,7 +2,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  openDatabase, createCampaign, getCampaign, listCampaigns, touchCampaign,
+  openDatabase, createCampaign, getCampaign, getCampaignByCode, listCampaigns, touchCampaign,
   upsertCharacter, getCharacter, getCharacterById, listCharacters,
   saveSubsystemState, loadSubsystemState, loadAllSubsystemState,
   savePlayerState, loadPlayerState, loadAllPlayerStates,
@@ -26,6 +26,33 @@ describe('campaigns', () => {
   test('get returns null for a nonexistent campaign', () => {
     const db = openDatabase(':memory:');
     assert.equal(getCampaign(db, 999), null);
+  });
+
+  test('createCampaign generates a unique, unambiguous-alphabet join code', () => {
+    const db = openDatabase(':memory:');
+    const c = createCampaign(db, 'Test');
+    assert.match(c.code, /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{5}$/);
+  });
+
+  test('two campaigns never collide on code (100 created, all unique)', () => {
+    const db = openDatabase(':memory:');
+    const codes = new Set();
+    for (let i = 0; i < 100; i++) codes.add(createCampaign(db, `Campaign ${i}`).code);
+    assert.equal(codes.size, 100);
+  });
+
+  test('getCampaignByCode finds the campaign, case-insensitively', () => {
+    const db = openDatabase(':memory:');
+    const c = createCampaign(db, 'Test');
+    assert.deepEqual(getCampaignByCode(db, c.code), c);
+    assert.deepEqual(getCampaignByCode(db, c.code.toLowerCase()), c);
+  });
+
+  test('getCampaignByCode returns null for an unknown or empty code', () => {
+    const db = openDatabase(':memory:');
+    assert.equal(getCampaignByCode(db, 'ZZZZZ'), null);
+    assert.equal(getCampaignByCode(db, ''), null);
+    assert.equal(getCampaignByCode(db, null), null);
   });
 
   test('touchCampaign updates updated_at', () => {
