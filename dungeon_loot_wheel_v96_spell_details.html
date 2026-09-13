@@ -5555,7 +5555,7 @@ function saveDeceasedItemToken(idx, itemIdx, btn) {
   saveLootResultItem(deceasedResults[idx]?.items[itemIdx], btn);
 }
 function lootDeceasedItemToken(idx, itemIdx, btn) {
-  lootItemToRecentlyLooted(deceasedResults[idx]?.items[itemIdx], btn);
+  lootItemDirectly(deceasedResults[idx]?.items[itemIdx], btn);
 }
 function saveWholeDeceasedToCombat(idx) {
   const body = deceasedResults[idx];
@@ -5893,7 +5893,7 @@ function saveCompendiumItem(rarity, index, btn) {
 function lootCompendiumItem(rarity, index, btn) {
   const item = lootData[rarity]?.[index];
   if (!item) return;
-  const { placed } = lootItemToRecentlyLooted({ ...item, rarity }, null);
+  const { placed } = lootItemDirectly({ ...item, rarity }, null);
   flashCompendiumActionBtn(btn, placed ? '✓' : '⚠');
 }
 function editItem(rarity, index) {
@@ -7363,13 +7363,13 @@ function saveSpinItem(enemyIdx, itemIdx, btn) {
   saveLootResultItem(spinResults[enemyIdx]?.items[itemIdx], btn);
 }
 function lootSpinItem(enemyIdx, itemIdx, btn) {
-  lootItemToRecentlyLooted(spinResults[enemyIdx]?.items[itemIdx], btn);
+  lootItemDirectly(spinResults[enemyIdx]?.items[itemIdx], btn);
 }
 function saveChestItemToken(chestIdx, itemIdx, btn) {
   saveLootResultItem(chestResults[chestIdx]?.items[itemIdx], btn);
 }
 function lootChestItemToken(chestIdx, itemIdx, btn) {
-  lootItemToRecentlyLooted(chestResults[chestIdx]?.items[itemIdx], btn);
+  lootItemDirectly(chestResults[chestIdx]?.items[itemIdx], btn);
 }
 // ===================== RECENTLY LOOTED (36-slot staging grid) =====================
 // Every "Loot" action across the app — chests, wheel spins, killed monsters, the Monster
@@ -7390,29 +7390,41 @@ function flashRecentlyLootedMessage(msg, isError) {
   clearTimeout(window._rlMsgTimer);
   window._rlMsgTimer = setTimeout(() => { el.classList.remove('show'); }, 4000);
 }
-// Returns { item: saved, placed: boolean } so callers that don't pass a button (Fleshmancer's
-// saveFleshItem, for one) can still tell the player whether it actually landed in Recently
-// Looted or the holding pen itself is full (36 slots — clear some out via the main grid or
-// discard a few before looting more).
-function lootItemToRecentlyLooted(item, btn) {
-  if (!item) return { item: null, placed: false };
+// Places a freshly-looted item straight into open inventory space — found via real user testing
+// that routing every loot pickup through the Recently Looted staging grid first, requiring a
+// separate manual "move to inventory" click, meant a player who looted a chest item in a live
+// multiplayer session saw nothing land anywhere useful without that extra step (and it was an
+// unnecessary extra click even in solo play). Falls back to the Recently Looted holding pen
+// (36 slots) only when inventory genuinely has no room, so an item is never silently lost the
+// way skipping the pen entirely could have caused. Returns { item: saved, placed, viaFallback }
+// so callers that don't pass a button (Fleshmancer's saveFleshItem, for one) can still tell the
+// player exactly where the item ended up.
+function lootItemDirectly(item, btn) {
+  if (!item) return { item: null, placed: false, viaFallback: false };
   const saved = { ...item, id: Date.now() + Math.random() };
   inferItemMetadata(saved);
   savedGeneratedItems.unshift(saved);
   if (typeof renderSavedItems === 'function') renderSavedItems();
   buildTokenIndex();
   const key = 'gen:' + saved.id;
+  const w = Math.min(3, Math.max(1, saved.slotSize || 1));
+  const spot = findFirstOpenInventorySpot(w);
+  if (spot && placeNewInventoryItem(key, spot.row, spot.col)) {
+    renderInventoryGrid();
+    if (btn) { btn.textContent = '✓ Looted'; btn.disabled = true; btn.classList.add('saved'); }
+    return { item: saved, placed: true, viaFallback: false };
+  }
   const placed = recentlyLooted.length < RL_SLOTS;
   if (placed) {
     recentlyLooted.push(key);
     renderRecentlyLootedGrid();
-    if (btn) { btn.textContent = '✓ Looted'; btn.disabled = true; btn.classList.add('saved'); }
+    if (btn) { btn.textContent = '✓ Looted (Recently Looted)'; btn.disabled = true; btn.classList.add('saved'); }
   } else if (btn) {
-    btn.textContent = '⚠ Recently Looted Full';
+    btn.textContent = '⚠ Inventory Full';
     btn.disabled = true;
     btn.classList.add('saved');
   }
-  return { item: saved, placed };
+  return { item: saved, placed, viaFallback: true };
 }
 function renderRecentlyLootedGrid() {
   const el = document.getElementById('recentlyLootedGrid');
@@ -7532,7 +7544,7 @@ function lootCombatItem(uid, itemId, btn) {
   if (item.claimedBy) { flashInvMessage('That item is already taken.', true); return; }
   if (btn) btn.disabled = true;
   claimThenConsumeLootItem(entry, item, () => {
-    lootItemToRecentlyLooted(item, btn);
+    lootItemDirectly(item, btn);
     renderCombatRoster();
   }, () => {
     if (btn) btn.disabled = false;
@@ -8600,7 +8612,7 @@ function attemptFleshAttach() {
 
 // Grafted limbs are a player-specific roll, not shared reference data, so all three of the
 // standard generated-item actions apply here exactly like they do for chest/wheel-spin/
-// combat loot: Save (Token Library only), Loot (Recently Looted — see lootItemToRecentlyLooted),
+// combat loot: Save (Token Library only), Loot (straight to inventory — see lootItemDirectly),
 // or Discard (nothing kept, the graft attempt's gold cost was already spent and stays spent).
 function saveFleshItem() {
   if (!_pendingFleshItem) return;
@@ -8614,11 +8626,13 @@ function lootFleshItem() {
   if (!_pendingFleshItem) return;
   const item = _pendingFleshItem;
   const actionsEl = document.getElementById('fleshSaveActions');
-  const { placed } = lootItemToRecentlyLooted(item, null);
+  const { placed, viaFallback } = lootItemDirectly(item, null);
   if (actionsEl) {
     actionsEl.innerHTML = placed
-      ? `<span style="color:var(--uncommon);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} sent to Recently Looted.</span>`
-      : `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} saved — Recently Looted is full, so it's waiting in the Token Library instead.</span>`;
+      ? (viaFallback
+        ? `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} sent to Recently Looted — your inventory is full.</span>`
+        : `<span style="color:var(--uncommon);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} added to your inventory.</span>`)
+      : `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} saved — inventory and Recently Looted are both full, so it's waiting in the Token Library instead.</span>`;
   }
   _pendingFleshItem = null;
 }
@@ -15340,9 +15354,6 @@ function renderCombatLog() {
 // see enforceRoleRestrictions in multiplayer-sync.js) for a DM account.
 let battlefieldRoster = [];
 let battlefieldLog = [];
-// Persisted so a reload never re-grants a loot claim this account already won and applied —
-// see applyWonLootClaim. Plain array of "monsterUid_itemId" claim ids.
-let appliedLootClaimIds = [];
 window.applyRemoteBattlefieldState = function (roster, log) {
   battlefieldRoster = roster || [];
   battlefieldLog = log || [];
@@ -15400,36 +15411,36 @@ function openBattlefieldAttackPicker(monsterUid) {
 // themselves had already successfully looted a moment earlier. Disabling the button immediately
 // and showing real success feedback closes that whole loop.
 const playerLootInFlight = new Set();
+// A real bug found via live testing, not hypothetical: this used to only create the loot claim
+// and never actually deliver the item anywhere — it relied on window.applyWonLootClaim (below,
+// now removed) being fired by a Firestore-style listener that replayed every claim doc a reload
+// would re-receive. The WebSocket rewrite (Phase 6c) replaced that listener with a plain
+// resolved/rejected promise from createSelfLootClaim, and nothing was ever wired up to call
+// applyWonLootClaim from that promise — so a player's own "Loot" click showed a success message
+// but the item never reached their inventory OR Recently Looted. Fixed by looking the item up
+// from this account's own already-synced battlefieldRoster (the same data the button itself was
+// rendered from) and delivering it directly the moment the claim promise resolves — no separate
+// listener/replay step needed now that the claim result IS the delivery signal.
 function playerLootItem(entryUid, itemId, btn) {
   const claimKey = entryUid + '_' + itemId;
   if (playerLootInFlight.has(claimKey)) return;
   if (typeof window.createSelfLootClaim !== 'function') return;
+  const entry = battlefieldRoster.find(e => e.uid === entryUid);
+  const item = entry && entry.loot && entry.loot.items.find(it => it.id === itemId);
+  if (!item) return;
   playerLootInFlight.add(claimKey);
   if (btn) { btn.disabled = true; btn.textContent = 'Looting…'; }
   window.createSelfLootClaim(entryUid, itemId).then(() => {
-    flashInvMessage('Looted! Check your inventory.');
-    if (btn) { btn.textContent = '✓ Looted'; }
+    const { placed, viaFallback } = lootItemDirectly(item, btn);
+    flashInvMessage(!placed ? `${item.name} saved — inventory and Recently Looted are both full.`
+      : viaFallback ? `${item.name} looted — sent to Recently Looted, your inventory is full.`
+      : `${item.name} looted!`);
+    if (typeof scheduleSave === 'function') scheduleSave();
   }).catch(() => {
     flashInvMessage('Someone already looted that.', true);
     if (btn) { btn.disabled = false; btn.textContent = '🎒 Loot'; }
   }).finally(() => playerLootInFlight.delete(claimKey));
 }
-// Fires once per claim this account has won, every time the claims collection changes
-// (including on reconnect/reload, when Firestore replays every existing doc) — guarded by
-// appliedLootClaimIds so a claim already applied is never granted a second time.
-window.applyWonLootClaim = function (claimId) {
-  if (appliedLootClaimIds.includes(claimId)) return;
-  const sep = claimId.indexOf('_');
-  const monsterUid = parseInt(claimId.slice(0, sep), 10);
-  const itemId = claimId.slice(sep + 1);
-  const entry = battlefieldRoster.find(e => e.uid === monsterUid);
-  const item = entry && entry.loot && entry.loot.items.find(it => it.id === itemId);
-  if (!item) return; // not visible in our own cached battlefield snapshot yet — the listener will retry as new snapshots arrive
-  appliedLootClaimIds.push(claimId);
-  lootItemToRecentlyLooted(item, null);
-  flashInvMessage(`${item.name} looted!`);
-  if (typeof scheduleSave === 'function') scheduleSave();
-};
 // DM-only bookkeeping: reflects a claim (self-looted by a player, or the DM's own "give to...")
 // onto the matching item in the DM's own roster, purely for display — pushBattlefieldState
 // already keeps a claimed-but-unreserved item from being re-offered to other players simply by
@@ -16951,6 +16962,2043 @@ const JOURNEY_SCENARIOS = {
   ],
 };
 
+// Hand-authored, scenario-specific follow-ups (Journey Encounters rework) — keyed by the
+// exact scenario title in JOURNEY_SCENARIOS above. Each scenario gets 2 tailored options
+// (picked randomly by buildJourneyFollowUp) that reference what specifically just happened,
+// replacing the old fully-generic "In the aftermath of X..." template text. The hook itself
+// (spawn a monster / roll loot / nothing) is still derived generically from archetype+tier —
+// only the flavor text needed to stop being interchangeable.
+const JOURNEY_SCENARIO_FOLLOWUPS = {
+  "A Long, Quiet Stretch of Road": [
+    {
+      "archetype": "choice",
+      "title": "The Cart Wheel Creaks Closer",
+      "text": "The creaking cart from behind finally catches up — its driver looks lost, and asking for directions would cost time you don’t strictly have to spare."
+    },
+    {
+      "archetype": "item",
+      "title": "Something Fell From the Cart",
+      "text": "Whatever’s been rattling around back there finally works itself loose onto the road, wrapped in old sacking and clearly not part of the load anyone would admit to."
+    }
+  ],
+  "Market Day Traffic": [
+    {
+      "archetype": "puzzle",
+      "title": "A Vendor’s Odd Trade",
+      "text": "One of the market vendors won’t sell his wares for coin — only for something specific, described in a riddle none of the other traders seem willing to translate."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Pickpocket Spotted",
+      "text": "A quick hand dips into a cart-driver’s coat right in front of you — say something and lose the crowd’s goodwill, or let it go and keep moving."
+    }
+  ],
+  "Fields Under a Wide Sky": [
+    {
+      "archetype": "creature",
+      "title": "The Hawk Wasn’t Hunting Mice",
+      "text": "The circling hawk finally stoops — not at a field mouse, but at something in the grain that’s now very much aware of you too."
+    },
+    {
+      "archetype": "item",
+      "title": "A Scarecrow’s Pockets",
+      "text": "An old scarecrow slumped at a field’s edge turns out to have more stuffed into its coat than straw."
+    }
+  ],
+  "The Milestone Says You're Close": [
+    {
+      "archetype": "choice",
+      "title": "Two Roads at the Marker",
+      "text": "The milestone lists two names for the same distance in different directions — someone recently scratched one of them out."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "A Message Scratched Into the Stone",
+      "text": "Fresh scratches beneath the milestone’s carved distance spell out something in a hurried hand, cut off mid-word."
+    }
+  ],
+  "A Postman on His Rounds": [
+    {
+      "archetype": "item",
+      "title": "A Letter, Dropped",
+      "text": "The postman’s saddlebag wasn’t latched all the way — one letter lies face-down in the road dust, addressed to someone none of you know, yet."
+    },
+    {
+      "archetype": "choice",
+      "title": "Catching Up to the Postman",
+      "text": "It would be easy enough to catch him and hand back what fell — or just as easy to see who the letter’s actually for first."
+    }
+  ],
+  "A Farmer's Cart, Stuck in a Rut": [
+    {
+      "archetype": "item",
+      "title": "Gratitude, Overpaid",
+      "text": "The farmer insists on paying more than the help was worth, in produce, coin, and a story about \"the thing living in his north field\" nobody asked to hear."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "The Farmer’s North Field",
+      "text": "He mentions, almost as an afterthought, that something’s been flattening crop circles into his north field every full moon — and won’t say more about it."
+    }
+  ],
+  "A Traveling Minstrel": [
+    {
+      "archetype": "choice",
+      "title": "A Song With a Price",
+      "text": "She offers one more song — this one, she says, in exchange for a favor she won’t name until after it’s sung."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "A Verse That Doesn’t Scan",
+      "text": "One verse of her song doesn’t rhyme, doesn’t scan, and doesn’t match the rest — she claims she’s always sung it that way and won’t explain why."
+    }
+  ],
+  "Children Playing at Knights": [
+    {
+      "archetype": "choice",
+      "title": "Settling the Dispute",
+      "text": "The kids won’t let you leave until the \"battle\" is formally judged — and their definitions of who won get more elaborate and contradictory by the second."
+    },
+    {
+      "archetype": "item",
+      "title": "A Real Blade Among the Sticks",
+      "text": "One of the \"swords\" the children are swinging around turns out to be an actual, if child-sized, blade — and none of them will say where they found it."
+    }
+  ],
+  "A Shepherd Counting Sheep": [
+    {
+      "archetype": "puzzle",
+      "title": "One Sheep Too Many",
+      "text": "However many times the shepherd recounts, one particular sheep is always in the total — and none of you can quite recall seeing it move."
+    },
+    {
+      "archetype": "creature",
+      "title": "What’s Herding the Sheep",
+      "text": "Something at the tree line has been keeping the flock bunched tighter than a shepherd’s dog ever could, and it’s not a dog."
+    }
+  ],
+  "Bandits at the Old Ford": [
+    {
+      "archetype": "item",
+      "title": "The Missing Boot",
+      "text": "The bootless bandit left more than his footwear behind in the scramble — a pouch, half-hidden in the reeds, that clearly wasn’t his to carry."
+    },
+    {
+      "archetype": "choice",
+      "title": "What to Do With the Survivors",
+      "text": "The bandits who can still run are begging to be let go rather than handed to the nearest magistrate — and one of them knows something useful."
+    }
+  ],
+  "A Rival Caravan Guard's Grudge": [
+    {
+      "archetype": "choice",
+      "title": "The Debt He Mentioned",
+      "text": "Beaten, he keeps insisting the debt, duel, or dead friend was never really about you — someone else put him up to this, and he’ll say who, for a price."
+    },
+    {
+      "archetype": "creature",
+      "title": "He Wasn’t Alone After All",
+      "text": "The \"backup\" he brought wasn’t the last of it — something he was clearly more afraid of than you arrives to collect on whatever he owed."
+    }
+  ],
+  "Wolves Grown Bold": [
+    {
+      "archetype": "puzzle",
+      "title": "Why the Pack Isn’t Afraid",
+      "text": "A dead livestock carcass nearby, untouched by the wolves despite their hunger, suggests something else taught this pack that some things aren’t worth eating."
+    },
+    {
+      "archetype": "item",
+      "title": "A Collar in the Underbrush",
+      "text": "One of the fallen wolves is wearing a collar, old and half-grown-into its neck, etched with a symbol none of you recognize."
+    }
+  ],
+  "The Toll That Isn't": [
+    {
+      "archetype": "choice",
+      "title": "Where the Rope Came From",
+      "text": "The rope strung across the road is old ship’s rigging, salt-stained and nowhere near a coast — someone here has a story, if you’re willing to ask instead of leaving."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Real Toll Collector",
+      "text": "Whoever actually controls this stretch of road isn’t pleased to find impostors working it, and arrives to settle the matter personally."
+    }
+  ],
+  "A Farmhand Gone Feral": [
+    {
+      "archetype": "puzzle",
+      "title": "What Happened to the Farmhand",
+      "text": "Whatever changed him left a trail back toward the farmhouse — footprints too heavy for a man his size, ending at a cellar door still bolted from the inside."
+    },
+    {
+      "archetype": "item",
+      "title": "A Charm Around His Neck",
+      "text": "Once he stops moving, the farmhand turns out to be wearing a crude charm that wasn’t there in any description of him from before."
+    }
+  ],
+  "Highwaymen in Merchant's Clothing": [
+    {
+      "archetype": "item",
+      "title": "The \"Merchant’s\" Real Cargo",
+      "text": "Under the fake wares, the cart’s actual cargo turns out to be worth the ambush — someone paid well for whatever they were really moving."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Merchant Actually Needs Help",
+      "text": "A real merchant a mile up the road, having heard what happened, is now too frightened to travel alone — and asks outright to be escorted."
+    }
+  ],
+  "A Sudden Squall": [
+    {
+      "archetype": "choice",
+      "title": "Shelter, of a Sort",
+      "text": "An overhang up ahead offers dry ground, but it’s already occupied — the question is whether whoever’s there minds sharing."
+    },
+    {
+      "archetype": "item",
+      "title": "The Mud Gives Something Up",
+      "text": "The downpour washes a layer of topsoil off the roadside, exposing something metal that wasn’t visible an hour ago."
+    }
+  ],
+  "Unseasonable Heat": [
+    {
+      "archetype": "choice",
+      "title": "The Water Runs Low",
+      "text": "The next reliable well is a detour away — press on thirsty, or lose the better part of a day fetching water properly."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Else Feels the Heat",
+      "text": "Whatever usually stays underground in weather like this has been driven to the surface, and it’s just as miserable and short-tempered as you are."
+    }
+  ],
+  "Fog Rolls Off the Fields": [
+    {
+      "archetype": "puzzle",
+      "title": "A Shape in the Fog",
+      "text": "Something roughly your height keeps pace alongside the road, always just at the edge of visibility, and the fog is thick enough that no one can say it isn’t another traveler."
+    },
+    {
+      "archetype": "creature",
+      "title": "What the Fog Was Hiding",
+      "text": "It finally clears enough to reveal exactly what’s been walking beside you this whole time."
+    }
+  ],
+  "The Scarecrow That Wasn't There Yesterday": [
+    {
+      "archetype": "creature",
+      "title": "The Scarecrow Moves",
+      "text": "It’s not turned to watch the road anymore — it’s turned to watch you, specifically, and it’s no longer just turning."
+    },
+    {
+      "archetype": "item",
+      "title": "What’s Stuffed Inside It",
+      "text": "Torn open, the scarecrow’s straw gives way to something that was never straw at all."
+    }
+  ],
+  "A Second Shadow": [
+    {
+      "archetype": "puzzle",
+      "title": "Whose Shadow Was It",
+      "text": "The moment repeats at the same spot on the road, every time someone passes it — always the same wrong angle, always for the same person."
+    },
+    {
+      "archetype": "choice",
+      "title": "Standing on the Spot",
+      "text": "Someone could deliberately stand where it happened and see if it happens again — or just walk past like everyone else and never find out."
+    }
+  ],
+  "Crows Speaking in Turn": [
+    {
+      "archetype": "puzzle",
+      "title": "The Word the Crows Keep Saying",
+      "text": "Listened to closely enough, the sound resolves into an actual word — a name, or close to one, repeated by each crow in the same order every time."
+    },
+    {
+      "archetype": "item",
+      "title": "What the Crows Are Guarding",
+      "text": "The crows scatter all at once from something half-buried beneath their fence post, revealing it was never really about the fence at all."
+    }
+  ],
+  "The Well That Answers": [
+    {
+      "archetype": "choice",
+      "title": "A Question of Your Own",
+      "text": "The well already answered someone else’s wish — it would be easy enough to drop a coin and ask it something yourselves."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Well Wasn’t Alone Down There",
+      "text": "Whatever answered the coin isn’t finished talking, and it’s decided the conversation should continue somewhere you can actually see it."
+    }
+  ],
+  "A Traveling Pilgrim's Blessing": [
+    {
+      "archetype": "puzzle",
+      "title": "The Blessing’s Fine Print",
+      "text": "The pilgrim’s blessing came with a muttered phrase at the end that none of you quite caught — and it’s started nagging at whoever it was cast on."
+    },
+    {
+      "archetype": "choice",
+      "title": "Following the Pilgrim",
+      "text": "She’s only a short way down the road still, and clearly has more to say than she let on — catching up means a delay, but maybe not a wasted one."
+    }
+  ],
+  "An Old Shrine, Freshly Tended": [
+    {
+      "archetype": "puzzle",
+      "title": "Who Left the Flowers",
+      "text": "The flowers are from a plant that doesn’t grow anywhere nearby, which raises the question of how far whoever left them actually traveled to do it."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Shrine’s Actual Caretaker",
+      "text": "Something has been watching the shrine from a distance the whole time you’ve been standing at it, and it doesn’t look inclined to keep quiet about visitors."
+    }
+  ],
+  "A Beggar Who Isn't": [
+    {
+      "archetype": "choice",
+      "title": "A Second Coin",
+      "text": "He’s still there at the crossroads — testing whether that moment happens again means offering him another coin and watching closely this time."
+    },
+    {
+      "archetype": "item",
+      "title": "What the Beggar Left Behind",
+      "text": "After he moves on, the spot where he sat has something small and deliberately placed, exactly where he’d been sitting."
+    }
+  ],
+  "A Collapsed Bridge": [
+    {
+      "archetype": "puzzle",
+      "title": "How the Bridge Actually Fell",
+      "text": "The break in the wood isn’t a clean snap from rot or weight — it’s cut, cleanly, from underneath, by something with a very specific reason not to be crossed today."
+    },
+    {
+      "archetype": "item",
+      "title": "Wreckage Worth Salvaging",
+      "text": "Whatever the bridge was carrying when it went down is still down there, snagged in the rocks of the ford below."
+    }
+  ],
+  "Sinkhole Beneath the Cart Path": [
+    {
+      "archetype": "creature",
+      "title": "Something Lives Down There Now",
+      "text": "The hole hasn’t been empty since it opened — something took up residence in it, and it’s heard you standing at the edge."
+    },
+    {
+      "archetype": "item",
+      "title": "The Cart’s Cargo, Recoverable",
+      "text": "Whatever that cart was hauling overnight is probably still down there with the mule, mostly intact, if someone’s willing to climb."
+    }
+  ],
+  "A Poisoned Well, Marked with Red Cloth": [
+    {
+      "archetype": "puzzle",
+      "title": "Who Tied the Cloth",
+      "text": "The knot in the red cloth is a specific, deliberate style — a guild mark, or a family sign, from whoever last passed this way and cared enough to warn strangers."
+    },
+    {
+      "archetype": "creature",
+      "title": "What Poisoned the Well",
+      "text": "Something upstream is still actively fouling the water, and it’s not going to stop just because travelers know to avoid drinking it."
+    }
+  ],
+  "A Merchant's Lost Strongbox": [
+    {
+      "archetype": "puzzle",
+      "title": "The Strongbox Won’t Open",
+      "text": "It survived the robbery intact, which means the lock is still very much engaged, and whoever built it clearly didn’t expect it to end up in a ditch."
+    },
+    {
+      "archetype": "choice",
+      "title": "Whose Strongbox Was It",
+      "text": "Local rumor has an idea whose robbery this actually was — return the find and possibly earn a reward, or keep it and possibly earn an enemy."
+    }
+  ],
+  "An Abandoned Farmstead": [
+    {
+      "archetype": "creature",
+      "title": "Not as Abandoned as It Looks",
+      "text": "Something has been living in the cold hearth’s chimney, undisturbed, for however long the place has actually been empty."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "Whatever Happened Here, Fast",
+      "text": "A half-eaten meal, a chair knocked over, a door left open — everything says the people who lived here left in the middle of something, and never came back to finish it."
+    }
+  ],
+  "A Peddler's Overturned Cart": [
+    {
+      "archetype": "choice",
+      "title": "Finding the Peddler",
+      "text": "A set of footprints leads away from the wreck into the brush, recent enough to still follow — worth checking on him, or worth just taking the goods and moving on."
+    },
+    {
+      "archetype": "item",
+      "title": "The Good Stuff Was Hidden",
+      "text": "Beneath the scattered common wares, a false bottom in the cart hides what the peddler actually considered worth protecting."
+    }
+  ],
+  "Buried Coin Beneath a Fence Post": [
+    {
+      "archetype": "puzzle",
+      "title": "More Was Buried Than Coin",
+      "text": "The purse wasn’t alone under the post — something else down there was buried with more care than a simple coin stash usually gets."
+    },
+    {
+      "archetype": "creature",
+      "title": "Someone Remembers Burying It",
+      "text": "Someone, or something, that’s been dead a very long time apparently still considers that coin theirs, and objects to it being dug up."
+    }
+  ],
+  "A Deer Trail, Well Worn": [
+    {
+      "archetype": "creature",
+      "title": "Not a Deer Trail After All",
+      "text": "The tracks pressed into the trail’s soft dirt were never a deer’s to begin with, and whatever left them is still using this path."
+    },
+    {
+      "archetype": "item",
+      "title": "What the Trail Actually Leads To",
+      "text": "Followed a little further than usual, the trail ends at a small cache someone, or something, has been maintaining for a long time."
+    }
+  ],
+  "The Canopy Blocks the Sky": [
+    {
+      "archetype": "puzzle",
+      "title": "Losing Track of the Hours",
+      "text": "Without the sun to check, no two people in the group agree on how much time has actually passed — and the disagreement is larger than it should be."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Break in the Leaves",
+      "text": "One gap in the canopy finally shows the sky — climbing up to check your bearings costs time you might not have to spare."
+    }
+  ],
+  "A Stand of Old Growth": [
+    {
+      "archetype": "puzzle",
+      "title": "A Tree Older Than It Should Be",
+      "text": "One trunk among the old growth is carved with symbols predating any script your group can place, worn nearly smooth by centuries of rain."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Nests in the Old Growth",
+      "text": "A hollow high in the oldest tree is occupied, and whatever lives there has clearly been undisturbed for a very long time — until now."
+    }
+  ],
+  "Squirrels Arguing Overhead": [
+    {
+      "archetype": "item",
+      "title": "What They Were Actually Fighting Over",
+      "text": "The squirrels’ dispute finally resolves when the prize drops out of the branches — small, shiny, and not remotely squirrel-made."
+    },
+    {
+      "archetype": "choice",
+      "title": "The Argument Moves On",
+      "text": "The squirrels scatter all at once toward the same direction, which either means nothing or means something is coming from that way."
+    }
+  ],
+  "Moss-Thick and Silent": [
+    {
+      "archetype": "creature",
+      "title": "The Silence Has a Reason",
+      "text": "Whatever usually makes noise in a forest this size has gone quiet for a reason, and that reason has just noticed you noticing."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "A Sound That Shouldn’t Carry Here",
+      "text": "One single sound cuts clean through the muffling moss, far too clearly for how far away it must actually be."
+    }
+  ],
+  "A Hermit Woodcarver": [
+    {
+      "archetype": "puzzle",
+      "title": "A Carving Left Unfinished",
+      "text": "One half-carved figure sits apart from the rest of his work, abandoned mid-cut — he changes the subject fast whenever it’s brought up."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Commission, of Sorts",
+      "text": "He offers to carve something specific for the party, free of charge, provided someone brings him a very particular kind of wood from deeper in."
+    }
+  ],
+  "A Ranger Marking the Trail": [
+    {
+      "archetype": "choice",
+      "title": "The Hunting Party Behind Her",
+      "text": "She mentions, almost too casually, that the hunting party following her blazes isn’t hunting animals — helping her finish marking the trail first might matter."
+    },
+    {
+      "archetype": "item",
+      "title": "Her Own Trail Markers",
+      "text": "One of her blazes, cut deeper than the rest, conceals a small waterproofed cache tucked into the bark behind it."
+    }
+  ],
+  "A Fox That Won’t Stop Following": [
+    {
+      "archetype": "puzzle",
+      "title": "The Fox Isn’t Just a Fox",
+      "text": "It watches with an attentiveness no ordinary fox has any business having, right up until it simply isn’t there anymore."
+    },
+    {
+      "archetype": "item",
+      "title": "What the Fox Was Guarding",
+      "text": "Backtracking the spot where it finally lost interest turns up a small den, and something in it clearly isn’t fox-sized."
+    }
+  ],
+  "A Territorial Owlbear": [
+    {
+      "archetype": "item",
+      "title": "Its Den, Undefended Now",
+      "text": "Whatever the owlbear was guarding this stretch of forest for is still back in its den, unclaimed."
+    },
+    {
+      "archetype": "creature",
+      "title": "This Wasn’t Its First Fight Today",
+      "text": "Fresh wounds on the owlbear that had nothing to do with you suggest something else already tangled with it recently, and may still be close."
+    }
+  ],
+  "Bandits Using the Canopy": [
+    {
+      "archetype": "item",
+      "title": "Their Hidden Stockpile",
+      "text": "The platforms overhead hold more than rope and ambush points — a stash of goods clearly taken from other travelers over a long stretch of time."
+    },
+    {
+      "archetype": "choice",
+      "title": "One of Them Wants Out",
+      "text": "A survivor swears he was forced into it and offers information on the rest of the group’s operation in exchange for being let go."
+    }
+  ],
+  "A Pack of Displacer Beasts": [
+    {
+      "archetype": "puzzle",
+      "title": "Where They Actually Are",
+      "text": "Even after the fight, something about the space around this clearing still isn’t quite lining up the way it should."
+    },
+    {
+      "archetype": "item",
+      "title": "A Den Full of Trophies",
+      "text": "Tracking them back reveals a den littered with the belongings of travelers who apparently never worked out where the beasts actually were, either."
+    }
+  ],
+  "Territorial Dryad": [
+    {
+      "archetype": "choice",
+      "title": "Making Peace With the Tree",
+      "text": "She’s calmer now, but the tree itself isn’t — leaving an offering might smooth things over more permanently than a fight ever could."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "What She Was Really Protecting",
+      "text": "Her tree’s roots, examined closely, wind around something buried far too deliberately to be natural growth."
+    }
+  ],
+  "A Swarm on the Move": [
+    {
+      "archetype": "puzzle",
+      "title": "What They’re Fleeing",
+      "text": "The swarm wasn’t hunting — it was running from something further back in the undergrowth, and that something hasn’t caught up yet."
+    },
+    {
+      "archetype": "item",
+      "title": "Whatever the Swarm Left Behind",
+      "text": "In the swarm’s wake, the undergrowth is stripped bare except for one object too heavy for any of them to have carried off."
+    }
+  ],
+  "A Green Twilight": [
+    {
+      "archetype": "choice",
+      "title": "Racing the Storm",
+      "text": "A denser stand of trees ahead might offer real shelter before the rain hits — but reaching it means moving fast through ground none of you have scouted."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Prefers Storms",
+      "text": "Whatever wakes up when the sky turns this color has just started moving, and it clearly knows this forest better than you do."
+    }
+  ],
+  "Windfall": [
+    {
+      "archetype": "item",
+      "title": "What the Wind Brought Down",
+      "text": "One of the fallen branches splits open on landing, revealing something that was never actually wood."
+    },
+    {
+      "archetype": "creature",
+      "title": "Displaced by the Wind",
+      "text": "A nest knocked loose in the gale lands close by, and whatever built it is furious and airborne."
+    }
+  ],
+  "Trees That Face the Wrong Way": [
+    {
+      "archetype": "puzzle",
+      "title": "What They’re All Facing",
+      "text": "Followed to its source, the direction every tree leans toward turns out to point at one exact, unremarkable spot in the forest floor."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Point They’re Reaching For",
+      "text": "Whatever used to be at that spot is gone now, but something guards where it used to be, and doesn’t appreciate visitors reaching the same conclusion you did."
+    }
+  ],
+  "A Ring of Mushrooms, Freshly Grown": [
+    {
+      "archetype": "choice",
+      "title": "Standing Inside the Ring",
+      "text": "Fresh fairy rings are supposed to mean something — stepping inside deliberately could invite whatever danced here last night to respond."
+    },
+    {
+      "archetype": "creature",
+      "title": "What Danced Here",
+      "text": "Whatever left the ring hasn’t gone far, and it’s decided that standing near its circle counts as an invitation."
+    }
+  ],
+  "Lights Between the Trunks": [
+    {
+      "archetype": "puzzle",
+      "title": "The Lights Keep a Pattern",
+      "text": "Watched long enough, the drifting lights trace the same slow shape over and over, like they’re marking out a boundary no one can see."
+    },
+    {
+      "archetype": "creature",
+      "title": "One Light Gets Closer",
+      "text": "A single light breaks from the others and drifts nearer than the rest ever have, curious in a way that doesn’t feel entirely harmless."
+    }
+  ],
+  "A Song With No Singer": [
+    {
+      "archetype": "choice",
+      "title": "Following the Music",
+      "text": "The melody seems to shift slightly louder in one direction — worth tracking down, or worth leaving well enough alone."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "A Tune You Half-Recognize",
+      "text": "The song is unmistakably familiar to at least one member of the party, who can’t place where they’ve heard it before, or why that bothers them."
+    }
+  ],
+  "The Path That Loops": [
+    {
+      "archetype": "puzzle",
+      "title": "Marking the Log",
+      "text": "Cutting a mark into the log this time would settle whether you’re actually looping, or whether something’s undoing your sense of direction on purpose."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whatever’s Herding You in Circles",
+      "text": "A shape at the treeline seems to always be exactly where you’d have to walk to break the loop, and it isn’t moving out of the way."
+    }
+  ],
+  "A Grove Sacred to Someone": [
+    {
+      "archetype": "puzzle",
+      "title": "Reading the Offerings",
+      "text": "The carved offerings, examined closely, aren’t random — they form a sequence, like a message left for whoever comes next to finish reading."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Grove’s Guardian",
+      "text": "Whatever this grove belongs to has taken quiet notice of you leaving something behind, and it isn’t finished deciding what it thinks about that yet."
+    }
+  ],
+  "A Unicorn at a Distance": [
+    {
+      "archetype": "choice",
+      "title": "Approaching Slowly",
+      "text": "It hasn’t bolted yet, which might mean it’s curious, or might mean whatever usually scares it off hasn’t shown up yet either."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "Where It Keeps Appearing",
+      "text": "It’s been sighted at the same clearing three times now, always facing the same direction, like it’s watching for something specific."
+    }
+  ],
+  "A Bog Hidden by Leaves": [
+    {
+      "archetype": "item",
+      "title": "What the Bog Swallowed Before",
+      "text": "Pulling the stuck boot free brings up more than mud — something else has been sitting at the bottom of this bog for a long time."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Lives in the Muck",
+      "text": "The struggle to get free stirs up more than silt, and whatever’s down there doesn’t appreciate the disturbance."
+    }
+  ],
+  "A Rotted Rope Bridge": [
+    {
+      "archetype": "choice",
+      "title": "Crossing One at a Time",
+      "text": "The bridge might hold one person’s weight at a time, if everyone’s willing to wait their turn over a very long drop."
+    },
+    {
+      "archetype": "creature",
+      "title": "What’s Living Under the Ravine",
+      "text": "Something down in the ravine has clearly been feeding on whatever falls when this bridge finally gives out, and it just heard you testing it."
+    }
+  ],
+  "Territorial Wasps, Disturbed": [
+    {
+      "archetype": "item",
+      "title": "The Nest, Afterward",
+      "text": "Once the wasps settle, the nest itself turns out to be built around something they were clearly using as scaffolding, not just wood."
+    },
+    {
+      "archetype": "creature",
+      "title": "A Second, Larger Nest",
+      "text": "Following the survivors back reveals this wasn’t the only nest on this stretch of trail — just the smaller one."
+    }
+  ],
+  "Poisonous Berries, Freshly Fallen": [
+    {
+      "archetype": "puzzle",
+      "title": "What Ate Them and Lived",
+      "text": "One set of tracks through the berry carpet doesn’t stop or stagger the way the dead birds’ trails do — something here is immune, and worth knowing about."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Thing That Isn’t Poisoned",
+      "text": "Whatever’s been eating these berries without dying is still nearby, and clearly considers this patch its feeding ground."
+    }
+  ],
+  "A Druid's Abandoned Camp": [
+    {
+      "archetype": "puzzle",
+      "title": "Why the Druid Never Returned",
+      "text": "Nothing about the camp suggests a hurried departure — bedroll rolled, fire banked properly — which makes the fact no one’s come back for it stranger, not less."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Took Over the Camp",
+      "text": "Whatever’s using this campsite now isn’t the druid, and it’s already noticed strangers going through its things."
+    }
+  ],
+  "A Hollow Tree, Long Used as a Cache": [
+    {
+      "archetype": "puzzle",
+      "title": "A Lock No One Recognizes",
+      "text": "The cache is sealed behind a mechanism unlike any lock your group has seen, clearly meant to keep out anyone who isn’t the one who built it."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Cache Has an Owner Still",
+      "text": "Whoever’s been stashing goods here for years isn’t as gone as the dust suggested, and doesn’t appreciate strangers helping themselves."
+    }
+  ],
+  "An Old Woodcutter’s Shed": [
+    {
+      "archetype": "item",
+      "title": "Beneath the Floorboards",
+      "text": "One board in the shed floor is looser than the rest, and what’s hidden under it was clearly worth more effort to hide than firewood."
+    },
+    {
+      "archetype": "choice",
+      "title": "The Woodcutter’s Ledger",
+      "text": "A half-legible ledger names debts, favors, and a name that one member of the party might actually recognize."
+    }
+  ],
+  "A Nest of Shed Skin": [
+    {
+      "archetype": "item",
+      "title": "Caught in the Shed Skin",
+      "text": "One of the discarded skins has something snagged in it that clearly didn’t belong to whatever shed it."
+    },
+    {
+      "archetype": "creature",
+      "title": "It’s About Due for Another Shed",
+      "text": "Judging by how fresh the skins are, whatever’s shedding here is close by and about due for another one, right on top of you."
+    }
+  ],
+  "Switchbacks, Endless": [
+    {
+      "archetype": "choice",
+      "title": "A Shortcut, Maybe",
+      "text": "A goat trail cuts straight up the slope instead of following the switchback — faster, if it doesn’t just end in a cliff face."
+    },
+    {
+      "archetype": "item",
+      "title": "Something Left at a Turn",
+      "text": "One of the switchback’s hairpin turns has a small cairn of stones stacked beside it, with something tucked underneath."
+    }
+  ],
+  "A Goat Trail": [
+    {
+      "archetype": "creature",
+      "title": "What Spooked the Goats",
+      "text": "The goats scatter all at once mid-stare, bolting from something further up the trail that hasn’t shown itself yet."
+    },
+    {
+      "archetype": "item",
+      "title": "A Goat’s Unusual Collection",
+      "text": "One goat keeps returning to the same ledge, pawing at something shiny wedged into the rock that clearly isn’t goat-related."
+    }
+  ],
+  "Thin, Cold Air": [
+    {
+      "archetype": "puzzle",
+      "title": "A Marker Meant for Climbers",
+      "text": "A series of notches cut into the rock face at even intervals looks deliberate, like a message meant to be read only by someone climbing exactly this route."
+    },
+    {
+      "archetype": "choice",
+      "title": "Pushing the Pace",
+      "text": "The air only gets thinner from here — press on at full pace and risk exhaustion, or slow down and lose daylight instead."
+    }
+  ],
+  "A Ridge With a View": [
+    {
+      "archetype": "puzzle",
+      "title": "Smoke on the Horizon",
+      "text": "A single thin line of smoke rises from somewhere well off the planned route, in a direction none of the maps account for."
+    },
+    {
+      "archetype": "item",
+      "title": "Something Glints Below",
+      "text": "From this height, one specific spot down in the valley catches the light in a way bare rock or snow shouldn’t."
+    }
+  ],
+  "A Hermit at the Tree Line": [
+    {
+      "archetype": "puzzle",
+      "title": "The Gossip He Shouldn’t Know",
+      "text": "Some of what he casually mentions knowing about the party is information he had no ordinary way of finding out."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Favor for a Favor",
+      "text": "He’ll trade a warm bed and real directions for a small errand higher up the mountain that he’s clearly too old to run himself."
+    }
+  ],
+  "A Herd of Wild Sheep": [
+    {
+      "archetype": "creature",
+      "title": "What’s Herding the Sheep This High",
+      "text": "They’re moving with too much purpose for wild sheep, funneled along the trail by something behind them that isn’t interested in staying hidden much longer."
+    },
+    {
+      "archetype": "item",
+      "title": "Caught in the Wool",
+      "text": "One sheep is dragging a torn strap of leather tangled in its wool, clearly not sheep’s gear."
+    }
+  ],
+  "A Territorial Griffon": [
+    {
+      "archetype": "item",
+      "title": "Its Eyrie, Unguarded",
+      "text": "With the griffon down, whatever it was hoarding in its cliffside nest is there for the taking, assuming someone’s willing to climb."
+    },
+    {
+      "archetype": "creature",
+      "title": "Its Mate Circles Back",
+      "text": "The griffon wasn’t alone up here, and its mate has just noticed exactly where you are."
+    }
+  ],
+  "Rockslide Bandits": [
+    {
+      "archetype": "puzzle",
+      "title": "How They Time the Slides",
+      "text": "Marks in the scree above the ambush point suggest a deliberate release mechanism — someone with real engineering know-how set this up, not just luck."
+    },
+    {
+      "archetype": "item",
+      "title": "Their Cache Up the Slope",
+      "text": "A trail of loose stone leads back to a small camp above the ambush point, stocked with goods clearly taken from other unlucky travelers."
+    }
+  ],
+  "A Young Hill Giant, Hungry": [
+    {
+      "archetype": "choice",
+      "title": "He’s Not Actually Alone",
+      "text": "He keeps glancing back up the slope while you fight — whatever he was sent down here to find food for is watching from higher up."
+    },
+    {
+      "archetype": "item",
+      "title": "What He Was Carrying",
+      "text": "The satchel he dropped mid-fight has supplies in it meant for more than one giant."
+    }
+  ],
+  "Stirges in the Rock Crevices": [
+    {
+      "archetype": "puzzle",
+      "title": "Why So Many, So Suddenly",
+      "text": "A colony this size waking up all at once usually means something drove them out of a larger nest further into the mountain."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whatever Drove Them Out",
+      "text": "Something bigger than a stirge has been moving through the same crevices, and it’s the reason the whole colony panicked in the first place."
+    }
+  ],
+  "A Territorial Yeti": [
+    {
+      "archetype": "item",
+      "title": "Its Frozen Larder",
+      "text": "The yeti had been keeping a stockpile of frozen kills in a nearby crevice, and not all of it is animal."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Cold Isn’t Done With You",
+      "text": "Something about the way the temperature dropped right before the yeti attacked suggests it wasn’t hunting alone."
+    }
+  ],
+  "A Sudden Whiteout": [
+    {
+      "archetype": "choice",
+      "title": "Waiting It Out",
+      "text": "Digging in to wait out the storm costs precious daylight — pushing through blind costs a very real chance of losing the trail entirely."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Moves in the White",
+      "text": "A shape passes close enough to hear in the whiteout, clearly aware of exactly where you are despite the zero visibility."
+    }
+  ],
+  "Thin Ice on the Pass": [
+    {
+      "archetype": "item",
+      "title": "What’s Frozen Into the Ice",
+      "text": "One patch of ice on the trail is clear enough to see something frozen just beneath the surface, undisturbed for who knows how long."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Ice Wasn’t the Only Danger",
+      "text": "Something has been using the icy pass as a hunting ground precisely because travelers are too busy watching their footing to watch anything else."
+    }
+  ],
+  "Lightning at the Ridgeline": [
+    {
+      "archetype": "choice",
+      "title": "The Exposed Ridge",
+      "text": "Staying on the ridgeline is fastest and most dangerous in a storm like this — the safer route down costs real time."
+    },
+    {
+      "archetype": "item",
+      "title": "Struck and Scorched",
+      "text": "A lightning-blasted rock formation nearby has split clean open, exposing something that clearly wasn’t just rock inside it."
+    }
+  ],
+  "An Avalanche, Distant": [
+    {
+      "archetype": "puzzle",
+      "title": "What Set It Off",
+      "text": "The slope that let go wasn’t under any obvious stress — no thaw, no storm — which raises the question of what actually triggered it."
+    },
+    {
+      "archetype": "creature",
+      "title": "It Uncovered Something",
+      "text": "The avalanche has exposed a section of cliff face that wasn’t visible before, along with whatever’s been living inside it."
+    }
+  ],
+  "A Cairn That Wasn’t There": [
+    {
+      "archetype": "puzzle",
+      "title": "Reading the Arrangement",
+      "text": "The stones aren’t stacked randomly — the pattern resembles something deliberate, a warning or a marker, if only someone could place the style."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whoever Built It Is Still Close",
+      "text": "Fresh tracks lead away from the cairn in a direction that circles back toward the party rather than away from it."
+    }
+  ],
+  "Singing Stone": [
+    {
+      "archetype": "choice",
+      "title": "Standing Where It Hums Loudest",
+      "text": "One spot near the formation makes the hum noticeably stronger — worth investigating up close, or worth leaving be."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "The Hum Has a Rhythm",
+      "text": "Listened to over time, the humming isn’t constant — it rises and falls in a pattern too regular to just be wind."
+    }
+  ],
+  "Footprints Ending in Nothing": [
+    {
+      "archetype": "puzzle",
+      "title": "Where the Prints Actually Go",
+      "text": "A closer look shows the prints don’t just stop — the snow around the final one is disturbed upward, like whoever made them left the ground entirely."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Above the Trail",
+      "text": "A shadow crosses the snow from directly overhead, moving with purpose, right where the footprints ended."
+    }
+  ],
+  "A Sky-Shrine at the Summit": [
+    {
+      "archetype": "puzzle",
+      "title": "A Prayer That Needs an Answer",
+      "text": "The old stonework seems to expect something specific said aloud before it fully responds — and none of the surviving carvings say exactly what."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Shrine’s Watcher",
+      "text": "Something that’s clearly kept this place maintained across the centuries takes sudden, deliberate interest in visitors who linger too long."
+    }
+  ],
+  "An Eagle That Watches Too Closely": [
+    {
+      "archetype": "choice",
+      "title": "Following Its Line of Sight",
+      "text": "It always departs toward the same point on the horizon — worth adjusting course to see what’s actually out there."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "Not Quite an Eagle’s Eyes",
+      "text": "Up close, for just a moment before it wheels away, its eyes catch the light in a way no ordinary eagle’s should."
+    }
+  ],
+  "A Crumbling Ledge": [
+    {
+      "archetype": "item",
+      "title": "What the Crumbling Exposed",
+      "text": "The section of ledge that gave way reveals a gap in the rock behind it, and something inside catches the light."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Dislodged With the Rock",
+      "text": "Whatever the falling rock disturbed further down the slope is climbing back up to find out what caused it."
+    }
+  ],
+  "A Hidden Crevasse": [
+    {
+      "archetype": "item",
+      "title": "Something Frozen Below",
+      "text": "A careful look down into the crevasse shows something wedged partway down, clearly not natural ice formation."
+    },
+    {
+      "archetype": "creature",
+      "title": "It Wasn’t Empty Down There",
+      "text": "Something in the crevasse’s depths reacts to the disturbance of the snow bridge giving way, and it’s coming up to investigate."
+    }
+  ],
+  "Falling Rock": [
+    {
+      "archetype": "puzzle",
+      "title": "The Rock Fell on Purpose",
+      "text": "The angle and timing of the fall are too convenient to be accidental — something, or someone, dislodged it deliberately."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whoever Dislodged It",
+      "text": "A shape moves along the ridge above, retreating now that the rockfall didn’t land the way it was meant to."
+    }
+  ],
+  "Thin Mountain Air, Too Thin": [
+    {
+      "archetype": "choice",
+      "title": "Turning Back Early",
+      "text": "Someone in the group is clearly struggling with the altitude — pushing on risks their safety, but turning back costs the whole climb."
+    },
+    {
+      "archetype": "item",
+      "title": "Left by an Earlier Climber",
+      "text": "A discarded pack, abandoned by someone who apparently turned back the same way you’re now considering, still has useful supplies in it."
+    }
+  ],
+  "A Dwarven Waystone": [
+    {
+      "archetype": "puzzle",
+      "title": "The Waystone’s Other Marking",
+      "text": "Beneath the obvious trail-marker carving, older dwarven runes are cut into the stone’s base, in a style predating the waystone itself."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Waystone Has a Warden",
+      "text": "A small stone guardian, built into the waystone’s foundation, activates at the disturbance of its cache being opened."
+    }
+  ],
+  "A Fallen Climber’s Gear": [
+    {
+      "archetype": "puzzle",
+      "title": "What Happened to the Climber",
+      "text": "The gear’s condition suggests they didn’t fall so much as leave in a hurry — deliberately, and not very long ago."
+    },
+    {
+      "archetype": "item",
+      "title": "A Journal, Still Legible",
+      "text": "A water-damaged journal among the gear describes exactly what the climber was looking for higher up the pass."
+    }
+  ],
+  "A Vein of Raw Ore": [
+    {
+      "archetype": "creature",
+      "title": "Something Guards This Vein",
+      "text": "The seam isn’t as unclaimed as it looked — something that lives in the rock nearby considers this deposit its territory."
+    },
+    {
+      "archetype": "item",
+      "title": "More Than Ore in the Seam",
+      "text": "Digging a little further into the vein turns up something that was clearly buried here on purpose, not formed naturally."
+    }
+  ],
+  "An Eagle’s Nest, Abandoned": [
+    {
+      "archetype": "puzzle",
+      "title": "Why the Nest Was Abandoned",
+      "text": "Whatever drove the eagles off this high crag did it recently enough that the nest hasn’t even started to fall apart yet."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Reason It’s Abandoned",
+      "text": "Something considerably less friendly than an eagle has taken over the crag, and it’s just noticed you going through the nest."
+    }
+  ],
+  "Waist-Deep and Slow": [
+    {
+      "archetype": "creature",
+      "title": "Something Brushes Past Underwater",
+      "text": "Something moves against your legs in the murk, unhurried, like it’s only just decided you’re worth the attention."
+    },
+    {
+      "archetype": "item",
+      "title": "Snagged on Something Below",
+      "text": "A boot catches on something solid beneath the water that turns out not to be a root."
+    }
+  ],
+  "A Drone of Insects": [
+    {
+      "archetype": "puzzle",
+      "title": "The Hum Changes Pitch",
+      "text": "The insect drone shifts, briefly and unmistakably, into something closer to a chorus reacting to a single source moving through the swamp."
+    },
+    {
+      "archetype": "creature",
+      "title": "They Finally Bite",
+      "text": "The insects that hadn’t bitten yet finally do, all at once, driven into a frenzy by something moving nearby that isn’t you."
+    }
+  ],
+  "Cypress and Silence": [
+    {
+      "archetype": "puzzle",
+      "title": "Why Nothing Moves Here",
+      "text": "The stillness isn’t natural — no birds, no ripples, no wind through the cypress, like the whole stretch of water is deliberately holding its breath."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Finally Moves",
+      "text": "A single ripple breaks the black water’s surface, slow and deliberate, in a straight line toward the party."
+    }
+  ],
+  "A Swamp Hermit’s Hut": [
+    {
+      "archetype": "puzzle",
+      "title": "What the Charms Are Actually For",
+      "text": "Looked at closely, the hermit’s charms aren’t generic ward-work — they’re specifically shaped against one particular kind of threat, repeated dozens of times."
+    },
+    {
+      "archetype": "choice",
+      "title": "The Hermit’s Warning",
+      "text": "She offers a genuine warning about what’s further into the swamp, in exchange for a favor she’s clearly too afraid to run herself."
+    }
+  ],
+  "A Heron, Unbothered": [
+    {
+      "archetype": "creature",
+      "title": "What the Heron Isn’t Afraid Of",
+      "text": "It finally reacts — not to you, but to something else moving through the reeds that it apparently considers actually worth fleeing from."
+    },
+    {
+      "archetype": "item",
+      "title": "Beneath the Heron’s Perch",
+      "text": "The log the heron favors is hollow, and something’s been stashed inside it, well above the waterline."
+    }
+  ],
+  "A Black Dragon’s Old Territory": [
+    {
+      "archetype": "item",
+      "title": "Old Hoard Scraps",
+      "text": "Scattered among the old bones, a few scraps of the dragon’s hoard were apparently too small or too worthless for it to bother collecting."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Scent Isn’t Old After All",
+      "text": "The territorial marking turns out to be far fresher than the bones around it — whatever left it is still very much active here."
+    }
+  ],
+  "Bullywugs, Territorial": [
+    {
+      "archetype": "item",
+      "title": "Their Muck-Buried Idol",
+      "text": "Once scattered, the bullywugs’ colony reveals a crude idol half-sunk in the muck that they were clearly protecting rather than just guarding territory."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Colony Wasn’t Alone",
+      "text": "Whatever the bullywugs answer to in this bog takes sudden, displeased notice of the disturbance."
+    }
+  ],
+  "Something Beneath the Water": [
+    {
+      "archetype": "puzzle",
+      "title": "Reading the Stillness",
+      "text": "The water only goes unnaturally still right before it moves — learning to read that pause might be the only warning you get next time."
+    },
+    {
+      "archetype": "item",
+      "title": "What It Dragged Under Before",
+      "text": "Whatever’s down there has clearly dragged other things under before — a scrap of cloth, a strap, snagged on a submerged branch nearby, hints at what."
+    }
+  ],
+  "A Will-o’-Wisp’s Lure": [
+    {
+      "archetype": "puzzle",
+      "title": "What It Actually Wants",
+      "text": "The wisp’s light always leads toward the same general direction in this stretch of bog, suggesting it’s guarding something specific, not just hunting at random."
+    },
+    {
+      "archetype": "item",
+      "title": "What the Lure Was Guarding",
+      "text": "Following the trail the wisp tried to lead you down turns up something it clearly didn’t want found."
+    }
+  ],
+  "Rot-Touched and Hungry": [
+    {
+      "archetype": "puzzle",
+      "title": "How Long It’s Been Down There",
+      "text": "What’s left of its clothing and gear suggests it’s been trapped in this bog for years, not days — worth knowing who it might have been."
+    },
+    {
+      "archetype": "creature",
+      "title": "It Wasn’t the Only One",
+      "text": "More movement stirs in the bog nearby, in the same slow, dragging way — this one wasn’t alone down there."
+    }
+  ],
+  "Giant Leeches, Massing": [
+    {
+      "archetype": "puzzle",
+      "title": "What Drew Them All at Once",
+      "text": "This many leeches converging simultaneously means something bled heavily nearby recently, and it wasn’t any of you."
+    },
+    {
+      "archetype": "item",
+      "title": "What Bled Here Before You",
+      "text": "A trail of dried blood, well before yours, leads away from the shallows toward something the leeches were originally drawn to."
+    }
+  ],
+  "A Fog That Doesn’t Lift": [
+    {
+      "archetype": "creature",
+      "title": "What Lives in the Standing Fog",
+      "text": "Something has clearly made a home in this fog bank for a very long time, comfortable enough in it to move without being seen."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "Voices in the Grey",
+      "text": "Distant voices carry through the fog, having what sounds like an entirely mundane conversation that no one can actually place the source of."
+    }
+  ],
+  "A Warm, Sudden Rain": [
+    {
+      "archetype": "choice",
+      "title": "The New Pond",
+      "text": "One of the freshly-flooded low spots has clearly disturbed something that was previously buried dry — worth a look, or worth just slogging past."
+    },
+    {
+      "archetype": "creature",
+      "title": "Flushed Out by the Rain",
+      "text": "The sudden flooding drives something out of its burrow directly into your path, and it’s in no mood to share the higher ground."
+    }
+  ],
+  "A Village That Isn’t on Any Map": [
+    {
+      "archetype": "puzzle",
+      "title": "Why No Map Shows It",
+      "text": "The village looks lived-in, ordinary, entirely unremarkable — which makes its total absence from every map and every local guide considerably harder to explain."
+    },
+    {
+      "archetype": "choice",
+      "title": "Approaching the Lights",
+      "text": "Smoke and lamplight suggest genuine hospitality, or at least genuine people — walking in blind means finding out which, the hard way if it’s the latter."
+    }
+  ],
+  "The Corpse Candles": [
+    {
+      "archetype": "puzzle",
+      "title": "The Burial Ground’s Actual Location",
+      "text": "The lights hover in a pattern too consistent to be random — mapping their positions might actually reveal where the graves really are."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Guards the Unmarked Graves",
+      "text": "Whatever’s buried beneath the pattern the candles mark out doesn’t appreciate the attention, and it isn’t entirely dead about it."
+    }
+  ],
+  "A Tree That Bleeds Sap the Color of Rust": [
+    {
+      "archetype": "puzzle",
+      "title": "What’s Inside the Tree",
+      "text": "The cut in the bark, widened slightly, shows the sap isn’t coming from the wood at all — something else is inside the trunk, and it’s bleeding."
+    },
+    {
+      "archetype": "item",
+      "title": "Sap Worth Collecting",
+      "text": "Whatever’s causing the strange color, the sap itself has properties worth bottling, if someone’s willing to get close enough to collect it."
+    }
+  ],
+  "Frogs Chanting in Unison": [
+    {
+      "archetype": "puzzle",
+      "title": "The Chant Has Words",
+      "text": "Slowed down and listened to carefully, the three-note pattern isn’t nonsense — it resolves into something close to actual language."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Chant Stops All at Once",
+      "text": "Every frog goes silent in the same instant, for the same reason, and that reason is now paying attention to you instead."
+    }
+  ],
+  "A Shrine Half-Sunk in the Muck": [
+    {
+      "archetype": "puzzle",
+      "title": "The Idol’s Missing Piece",
+      "text": "The stone idol is clearly missing something that used to be set into it — a socket, empty, worn smooth by whatever it once held."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Still Tends This Shrine",
+      "text": "Despite being half-submerged and forgotten, the shrine is unmistakably clean of algae and muck in one specific spot, like something’s still tending it."
+    }
+  ],
+  "Quicksand, Well Hidden": [
+    {
+      "archetype": "item",
+      "title": "What the Quicksand Gave Up",
+      "text": "The struggle to get free brings something up from beneath the sinking ground, along with the mud."
+    },
+    {
+      "archetype": "creature",
+      "title": "Not Just Sand Down There",
+      "text": "Whatever’s beneath the quicksand isn’t inert — it reacts to the struggle, and it isn’t trying to help anyone out."
+    }
+  ],
+  "A Cloud of Disease-Bearing Gnats": [
+    {
+      "archetype": "puzzle",
+      "title": "The Bites Aren’t Healing Right",
+      "text": "The itching from the bites isn’t settling down the way an ordinary bug bite would — something about this swarm wasn’t entirely natural."
+    },
+    {
+      "archetype": "choice",
+      "title": "Finding Clean Water Fast",
+      "text": "Whatever’s in those bites, clean water and rest soon would help — but the nearest reliable source means backtracking, losing real time."
+    }
+  ],
+  "Rotted Planking on the Only Bridge": [
+    {
+      "archetype": "item",
+      "title": "What’s Beneath the Bridge",
+      "text": "A careful look through the rotted gaps in the planking shows something resting in the shallows below that predates the bridge itself."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Lives Under This Bridge",
+      "text": "Whatever’s been slowly rotting this bridge from below has been doing it on purpose, and it’s not happy about the crossing attempt."
+    }
+  ],
+  "A Gas Pocket, Disturbed": [
+    {
+      "archetype": "puzzle",
+      "title": "Where the Gas Is Coming From",
+      "text": "The gas pocket isn’t a one-time release — tracing it back leads toward a much larger source still building pressure somewhere nearby."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Stirred by the Blast",
+      "text": "Whatever the flash of igniting gas didn’t kill outright is now considerably more awake, and considerably angrier, than it was a moment ago."
+    }
+  ],
+  "Poisoned Water, No Warning Sign": [
+    {
+      "archetype": "puzzle",
+      "title": "What’s Actually Poisoning It",
+      "text": "The sheen on the water has a source — something upstream, still actively contaminating the only drinkable water for miles."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Source Doesn’t Want Visitors",
+      "text": "Whatever’s poisoning the water clearly did it on purpose to keep something away, and it’s not pleased you traced it back this far."
+    }
+  ],
+  "A Sunken Barge": [
+    {
+      "archetype": "puzzle",
+      "title": "Why the Cargo Hold Stayed Sealed",
+      "text": "The hold’s seals are intact after however many years underwater, which means whatever’s inside was worth protecting from more than just the muck."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Nests in the Wreck",
+      "text": "Whatever’s taken up residence in the barge’s hull doesn’t appreciate the sudden interest in its new home."
+    }
+  ],
+  "A Witch’s Abandoned Still": [
+    {
+      "archetype": "puzzle",
+      "title": "An Unfinished Recipe",
+      "text": "One half-finished concoction has notes scrawled beside it in a hurried hand, cut off mid-instruction, like something interrupted the brewing."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Witch Isn’t as Gone as the Dust Suggests",
+      "text": "Something reacts to the still being disturbed, in a way that suggests its owner never actually left."
+    }
+  ],
+  "A Skeleton, Still Wearing Its Gear": [
+    {
+      "archetype": "puzzle",
+      "title": "How They Actually Died",
+      "text": "Nothing about the skeleton’s wounds matches drowning or the swamp’s usual dangers — whatever killed them did it with clear, deliberate intent."
+    },
+    {
+      "archetype": "item",
+      "title": "A Message They Never Sent",
+      "text": "A sealed, waterlogged letter is still tucked into what’s left of their coat, addressed to someone who never got to read it."
+    }
+  ],
+  "Dunes, Identical": [
+    {
+      "archetype": "puzzle",
+      "title": "This Dune Looks Familiar",
+      "text": "One dune along the way has an oddly specific rock formation at its crest that someone swears they’ve already passed once today."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Moves Beneath the Sand",
+      "text": "A ripple crosses the surface of a dune that has no business rippling, moving steadily closer to the group’s path."
+    }
+  ],
+  "A Sky Without a Cloud": [
+    {
+      "archetype": "choice",
+      "title": "Rationing the Water Early",
+      "text": "The heat’s worse than expected for this stretch — rationing water now means arriving thirsty but safe, pushing on normally risks running dry before the day’s over."
+    },
+    {
+      "archetype": "item",
+      "title": "Sun-Bleached and Half-Buried",
+      "text": "Something pale, half-buried and bleached white by the sun, turns out on closer inspection not to be a rock."
+    }
+  ],
+  "Wind-Scoured Silence": [
+    {
+      "archetype": "puzzle",
+      "title": "The Wind Uncovers Something",
+      "text": "The wind that erases your tracks just as quickly exposes something else buried nearby that hadn’t seen daylight in a long time."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Uses the Silence Too",
+      "text": "Whatever’s been moving parallel to the group has been using the same wind-erased tracks to stay unseen."
+    }
+  ],
+  "A Nomad Caravan": [
+    {
+      "archetype": "puzzle",
+      "title": "A Rumor They Share Reluctantly",
+      "text": "One piece of news they share only after some hesitation concerns something specific further along the route that they clearly don’t like discussing."
+    },
+    {
+      "archetype": "choice",
+      "title": "An Invitation to Travel Together",
+      "text": "They offer to travel together for a stretch, sharing water and safety in numbers — useful, but it means their pace, not yours."
+    }
+  ],
+  "A Desert Fox, Curious": [
+    {
+      "archetype": "item",
+      "title": "What the Fox Keeps Circling Back To",
+      "text": "It keeps returning to sniff at one specific pack rather than begging for scraps generally, like something in it interests it specifically."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Fox Isn’t Alone Out Here",
+      "text": "It suddenly bolts without warning, and whatever spooked it is now the party’s problem instead."
+    }
+  ],
+  "A Buried Ambush": [
+    {
+      "archetype": "item",
+      "title": "Their Buried Supply Cache",
+      "text": "The ambushers had clearly been dug in a while — a small buried cache of water and provisions nearby confirms it."
+    },
+    {
+      "archetype": "choice",
+      "title": "One Ambusher Surrenders Early",
+      "text": "One of them gives up the fight fast, offering information about who sent them in exchange for being let go."
+    }
+  ],
+  "A Young Blue Dragon’s Territory": [
+    {
+      "archetype": "puzzle",
+      "title": "Reading the Scorch Patterns",
+      "text": "The scorched sand isn’t random — the burn patterns radiate from a specific point, like the dragon has a favored perch it keeps returning to."
+    },
+    {
+      "archetype": "item",
+      "title": "What Survived the Lightning",
+      "text": "Something metallic, fused but intact, sits at the center of one of the older scorch marks."
+    }
+  ],
+  "Giant Scorpions, Nesting": [
+    {
+      "archetype": "item",
+      "title": "The Nest’s Hidden Trove",
+      "text": "The burrow network, once cleared, has more than scorpions in it — a small collection of things previous, less lucky travelers were carrying."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Colony’s Matriarch",
+      "text": "A considerably larger scorpion emerges from the deepest burrow, clearly displeased about the disturbance to its brood."
+    }
+  ],
+  "A Sand Elemental, Roused": [
+    {
+      "archetype": "puzzle",
+      "title": "What Roused It",
+      "text": "Elementals like this don’t usually rouse without cause — something buried nearby was disturbed recently enough to wake it specifically."
+    },
+    {
+      "archetype": "item",
+      "title": "What It Was Guarding",
+      "text": "Once it settles back into inert sand, something it had been covering for who knows how long is finally exposed."
+    }
+  ],
+  "Raiders on Camelback": [
+    {
+      "archetype": "choice",
+      "title": "Chasing Down the Fleeing Riders",
+      "text": "A few riders break off with stolen goods rather than fighting — pursuing them on foot in this heat is a real gamble either way."
+    },
+    {
+      "archetype": "item",
+      "title": "Their Base Camp, Nearby",
+      "text": "Tracks from the raiders lead back toward a small, well-hidden camp not far off the main route."
+    }
+  ],
+  "A Sandstorm, Building Fast": [
+    {
+      "archetype": "choice",
+      "title": "Finding Shelter in Time",
+      "text": "A rock outcropping nearby might offer real cover, but reaching it means running flat out across open ground the storm is already crossing."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Rides the Storm In",
+      "text": "A shape moves within the wall of brown haze, clearly using the sandstorm itself as cover to approach unseen."
+    }
+  ],
+  "A Mirage, Convincing": [
+    {
+      "archetype": "puzzle",
+      "title": "Too Convincing to Be a Mirage",
+      "text": "Getting closer, details keep resolving that a real mirage shouldn’t have — footprints leading in, the smell of actual water."
+    },
+    {
+      "archetype": "creature",
+      "title": "What the Mirage Was Hiding",
+      "text": "Whatever the illusion was covering for finally reveals itself once the party gets close enough to see through it."
+    }
+  ],
+  "The Cold Desert Night": [
+    {
+      "archetype": "choice",
+      "title": "Sharing the Only Fire",
+      "text": "Firewood is scarce enough that only one fire is realistic tonight — everyone crowds close, watches thin, and something could slip past unnoticed."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Comes in From the Cold",
+      "text": "Whatever hunts the desert at night has been drawn by the fire’s light, and it’s patient enough to wait at the edge of it."
+    }
+  ],
+  "Heat Haze and Dehydration": [
+    {
+      "archetype": "puzzle",
+      "title": "Trusting What You’re Seeing",
+      "text": "The shimmering heat makes it genuinely hard to tell what’s real anymore — a shape on the horizon might be a landmark, or might be nothing at all."
+    },
+    {
+      "archetype": "creature",
+      "title": "Not a Trick of the Heat",
+      "text": "One of the shapes in the haze turns out to be entirely real, and entirely aware that it’s being watched."
+    }
+  ],
+  "A Buried Statue, Watching": [
+    {
+      "archetype": "puzzle",
+      "title": "Digging It Out Further",
+      "text": "Clearing more sand away from the buried statue reveals an inscription at its base, in a script none of you can read at a glance."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Statue Isn’t Just Stone",
+      "text": "Something about the way its expression seems to have shifted, however slightly, suggests it isn’t entirely inert."
+    }
+  ],
+  "Singing Sands": [
+    {
+      "archetype": "puzzle",
+      "title": "The Hum Isn’t Random",
+      "text": "The pitch changes very slightly depending on exactly where you stand on the dune, like the whole formation is built, not natural."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Answers the Hum",
+      "text": "Something out past the dune responds to the resonant hum with a sound that isn’t wind at all."
+    }
+  ],
+  "A City-Shaped Mirage": [
+    {
+      "archetype": "puzzle",
+      "title": "A Detail That Shouldn’t Be There",
+      "text": "One specific spire in the mirage stays visible slightly longer than the rest before the whole vision fades, like it’s more real than the others."
+    },
+    {
+      "archetype": "choice",
+      "title": "Marking Where You Saw It",
+      "text": "The vantage point where the mirage appeared could be marked and revisited — worth the detour, or worth writing off as heatstroke."
+    }
+  ],
+  "Glass Where Sand Should Be": [
+    {
+      "archetype": "puzzle",
+      "title": "What Fused the Sand",
+      "text": "The glass is a perfect circle, which rules out lightning and points toward something considerably more deliberate."
+    },
+    {
+      "archetype": "item",
+      "title": "Something Embedded in the Glass",
+      "text": "Frozen inside the smooth black glass, barely visible, is something that was clearly caught in whatever caused this."
+    }
+  ],
+  "A Sun-Priest’s Blessing": [
+    {
+      "archetype": "puzzle",
+      "title": "A Word Left Unexplained",
+      "text": "The blessing ends with a phrase in an old liturgical dialect that the priest didn’t bother translating before vanishing into the shimmer."
+    },
+    {
+      "archetype": "choice",
+      "title": "Following the Priest’s Trail",
+      "text": "Footprints leading away from where the blessing was given don’t match someone simply \"vanishing\" — worth tracking, if there’s time."
+    }
+  ],
+  "Quicksand Beneath a Crust of Salt": [
+    {
+      "archetype": "item",
+      "title": "What the Salt Was Hiding",
+      "text": "Once someone’s pulled free, the disturbed salt crust reveals something else that had been resting just beneath it."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Salt-Crusted and Alive",
+      "text": "What looked like part of the salt flat itself turns out to be very much alive, and very much disturbed."
+    }
+  ],
+  "A Flash Flood in a Dry Wash": [
+    {
+      "archetype": "item",
+      "title": "What the Flood Carried Down",
+      "text": "The floodwater brings more than mud through the wash — something heavy enough to survive the current, half-buried where the water finally slowed."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Rides the Flood In",
+      "text": "Whatever the sudden flood swept down from higher ground is still very much alive, and very much disoriented in exactly your direction."
+    }
+  ],
+  "A Nest of Sand Vipers": [
+    {
+      "archetype": "puzzle",
+      "title": "Why So Many in One Spot",
+      "text": "A nest this dense usually means an unusually good food source nearby — worth knowing what’s been keeping them fed and where."
+    },
+    {
+      "archetype": "item",
+      "title": "The Vipers Were Guarding Something",
+      "text": "Cleared out, the nest reveals something buried at its center that the vipers had clearly been curling protectively around."
+    }
+  ],
+  "Collapsing Dune Face": [
+    {
+      "archetype": "item",
+      "title": "What the Collapse Exposed",
+      "text": "The section of dune that gave way uncovers something that had been buried well beneath the surface, undisturbed until now."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Was Living Inside the Dune",
+      "text": "Whatever the collapsing sand disturbed had made a home inside the dune itself, and it isn’t happy about the sudden daylight."
+    }
+  ],
+  "A Half-Buried Ruin": [
+    {
+      "archetype": "puzzle",
+      "title": "An Inscription Worth Deciphering",
+      "text": "Weathered as it is, one section of stonework still bears legible script — in a language dead long before any current kingdom, but not unreadable."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Ruin’s Last Guardian",
+      "text": "Something built to protect this place has been active, in some form, for far longer than the civilization that made it."
+    }
+  ],
+  "A Caravan Lost to Time": [
+    {
+      "archetype": "puzzle",
+      "title": "What the Caravan Was Really Carrying",
+      "text": "The scattered cargo doesn’t match what a normal trade caravan should have been hauling this deep into the wastes."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whatever Ended the Caravan",
+      "text": "Marks on the sun-bleached wagon wheels suggest this caravan didn’t simply run out of luck — something specific ended it, and might still be nearby."
+    }
+  ],
+  "An Oasis, Genuinely Real This Time": [
+    {
+      "archetype": "choice",
+      "title": "Someone Else Got There First",
+      "text": "Fresh signs of another camp at the oasis suggest recent visitors — sharing the water is safer than assuming you’re alone here."
+    },
+    {
+      "archetype": "item",
+      "title": "The Cache Wasn’t Forgotten",
+      "text": "What looked like a forgotten stash by the water turns out to be actively maintained, restocked by someone who clearly plans on coming back."
+    }
+  ],
+  "A Long, Dark Tunnel": [
+    {
+      "archetype": "puzzle",
+      "title": "A Draft From Nowhere",
+      "text": "A faint draft moves through the tunnel from a direction that, by any reasonable map, shouldn’t connect to open air at all."
+    },
+    {
+      "archetype": "creature",
+      "title": "Not as Empty as It Looked",
+      "text": "Something has clearly been living in this tunnel for a while, evidenced only by the fact that it’s now moving toward you."
+    }
+  ],
+  "Dripping Water, Steady": [
+    {
+      "archetype": "puzzle",
+      "title": "The Drip Changes Rhythm",
+      "text": "The steady drip briefly speeds up, then stops entirely, in a pattern too deliberate for simple water finding its way through rock."
+    },
+    {
+      "archetype": "item",
+      "title": "What the Water’s Been Wearing Down",
+      "text": "Centuries of the same steady drip have worn a groove in the stone below, exposing something the water couldn’t erode."
+    }
+  ],
+  "A Fork That Leads Nowhere": [
+    {
+      "archetype": "puzzle",
+      "title": "Solid Rock, Recently",
+      "text": "The stone sealing the dead-end passage looks newer than the tunnel around it, like something was deliberately closed off rather than never finished."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Sealed on the Other Side",
+      "text": "A faint scratching sound comes from behind the solid rock, rhythmic and patient, like whatever’s back there has been waiting a long time."
+    }
+  ],
+  "A Deep Gnome Trader": [
+    {
+      "archetype": "puzzle",
+      "title": "Merchandise With No Explanation",
+      "text": "One item on her stall defies any explanation she’s willing to give for where it came from or what it actually does."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Warning, For a Price",
+      "text": "She’ll share exactly what’s further down this tunnel network, but only in exchange for something specific she won’t say until you agree."
+    }
+  ],
+  "Bioluminescent Fungus": [
+    {
+      "archetype": "puzzle",
+      "title": "The Glow Responds to Something",
+      "text": "The fungus dims and brightens in patches, seemingly reacting to sound, movement, or something the party can’t immediately identify."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Feeds on the Glow",
+      "text": "Something that lives on this fungus, and is considerably less harmless than the fungus itself, has just noticed visitors near its food source."
+    }
+  ],
+  "A Roper, Disguised as Stone": [
+    {
+      "archetype": "item",
+      "title": "What the Roper Had Already Caught",
+      "text": "Remains tangled in old, dried tendrils near the roper’s original position suggest this wasn’t its first meal in this spot."
+    },
+    {
+      "archetype": "creature",
+      "title": "Its Neighbor Wasn’t Fooled Either",
+      "text": "Another stalagmite nearby was never a stalagmite either, and it’s had time to prepare while you dealt with the first one."
+    }
+  ],
+  "Duergar Patrol": [
+    {
+      "archetype": "item",
+      "title": "The Patrol’s Orders",
+      "text": "A sealed set of orders carried by the patrol’s leader describes exactly what, or who, they were actually looking for down here."
+    },
+    {
+      "archetype": "choice",
+      "title": "A Prisoner With the Patrol",
+      "text": "The duergar were escorting someone, bound and clearly unwilling — freeing them means a new complication, leaving them means living with the choice."
+    }
+  ],
+  "A Nest of Carrion Crawlers": [
+    {
+      "archetype": "item",
+      "title": "The Crawlers’ Larder",
+      "text": "The nest is built around a stockpile of past kills, mostly beyond recognition, but not entirely worthless."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Nest Has a Larger Resident",
+      "text": "Something considerably larger than the crawlers has been sharing this nest, and it was only sleeping."
+    }
+  ],
+  "An Otyugh in the Refuse Pit": [
+    {
+      "archetype": "item",
+      "title": "Sifting the Refuse",
+      "text": "Now that the otyugh’s dealt with, the refuse pit itself has years of accumulated debris in it, some of which is worth digging out."
+    },
+    {
+      "archetype": "creature",
+      "title": "It Wasn’t Guarding the Pit for Nothing",
+      "text": "Something down in the deeper refuse takes issue with the otyugh’s territory being disturbed, and it’s coming up to investigate."
+    }
+  ],
+  "A Cave-In, Provoked on Purpose": [
+    {
+      "archetype": "puzzle",
+      "title": "Finding Another Way Around",
+      "text": "The collapsed section blocks the direct route, but old tool-marks on a side wall suggest a second, deliberately hidden passage nearby."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whatever Brought the Ceiling Down",
+      "text": "Whatever intelligence caused the cave-in didn’t do it just to slow you down — it’s still on the other side, waiting to see what happens next."
+    }
+  ],
+  "A Mind Flayer’s Thrall Patrol": [
+    {
+      "archetype": "puzzle",
+      "title": "Freeing a Thrall",
+      "text": "One of the fallen thralls is still breathing, and the compulsion controlling them might actually be broken now that their controller is out of range."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Mind Flayer Notices",
+      "text": "Something in the psychic silence left behind by the fight is not silence at all — their controller is now very aware something happened to its patrol."
+    }
+  ],
+  "Giant Spiders, Web-Warned": [
+    {
+      "archetype": "item",
+      "title": "Cocooned in the Webs",
+      "text": "The thick webbing across the passage isn’t just structural — several cocoons hang from it, and not everything inside them is dead."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Web’s Actual Weaver",
+      "text": "Something considerably larger than the spiders already dealt with is responsible for webbing an entire passage this thoroughly."
+    }
+  ],
+  "A Sudden Updraft": [
+    {
+      "archetype": "puzzle",
+      "title": "Where the Air Is Coming From",
+      "text": "A blast of air this strong means a large, open shaft connects somewhere nearby — worth locating, since it likely leads to the surface."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Rides the Updraft",
+      "text": "Whatever uses that shaft to move through these tunnels has just been carried down along with the gust of air."
+    }
+  ],
+  "The Tunnel Remembers Footsteps That Aren't Yours": [
+    {
+      "archetype": "puzzle",
+      "title": "Following the Backward Prints",
+      "text": "The backward-walking prints, traced forward instead of back, seem to originate from exactly nowhere — the tunnel wall itself, undisturbed."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whoever Left Them Is Still Close",
+      "text": "A faint, deliberately soft footstep sounds from just around the next bend, matching the same backward gait exactly."
+    }
+  ],
+  "Echoes That Arrive Early": [
+    {
+      "archetype": "puzzle",
+      "title": "Testing the Echo Again",
+      "text": "Deliberately timing a second shout confirms it: the echo consistently arrives before the sound could physically have traveled and returned."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Answers Instead of Echoing",
+      "text": "The next sound to come back isn’t an echo of anything anyone actually said."
+    }
+  ],
+  "A Door With No Room Behind It": [
+    {
+      "archetype": "puzzle",
+      "title": "The Door Isn’t Actually Sealed",
+      "text": "A closer inspection of the hinges shows recent wear, like the door has been opened and closed many times despite leading nowhere."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Opens It From the Other Side",
+      "text": "The door that should open onto solid rock creaks slightly ajar, from the other side, on its own."
+    }
+  ],
+  "Runes That Rearrange Themselves": [
+    {
+      "archetype": "puzzle",
+      "title": "Reading Them Fast Enough",
+      "text": "Copying the runes down the instant they’re seen, before looking away, might finally capture what they actually say."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Is Rewriting Them",
+      "text": "A faint scratching sound comes from directly behind the wall, exactly where the runes keep changing."
+    }
+  ],
+  "A Cold Spot With No Draft": [
+    {
+      "archetype": "puzzle",
+      "title": "The Cold Has an Edge",
+      "text": "The cold patch has a sharp, exact boundary — one step colder than the tunnel, the next step normal, with nothing gradual about it."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Occupies the Cold Spot",
+      "text": "Whatever’s causing the unnatural chill is standing in it right now, and has been the whole time."
+    }
+  ],
+  "A Buried Shrine, Older Than the Tunnels": [
+    {
+      "archetype": "puzzle",
+      "title": "Why the Tunnels Route Around It",
+      "text": "The tunnel-builders clearly went out of their way, at real cost, to avoid cutting through this shrine — worth knowing what they knew."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Shrine’s Original Keeper",
+      "text": "Something that predates the tunnels by a wide margin is still, in some form, keeping watch over this place."
+    }
+  ],
+  "A Pressure Plate, Poorly Hidden": [
+    {
+      "archetype": "puzzle",
+      "title": "What the Trap Was Meant to Trigger",
+      "text": "Following the mechanism back from the pressure plate reveals it was rigged to something considerably more elaborate than a simple dart trap."
+    },
+    {
+      "archetype": "creature",
+      "title": "Whoever Sets These Traps",
+      "text": "The trap’s recent maintenance means someone, or something, has been resetting it — and hasn’t gone far."
+    }
+  ],
+  "Unstable Ceiling": [
+    {
+      "archetype": "choice",
+      "title": "Moving Quickly Underneath It",
+      "text": "Rushing past the unstable section is faster but risks bringing it down mid-crossing — moving carefully is safer and much slower."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Living in the Crack",
+      "text": "Whatever’s been widening that ceiling crack from the inside finally breaks through."
+    }
+  ],
+  "A Pit Trap, Freshly Reset": [
+    {
+      "archetype": "puzzle",
+      "title": "Who Reset It",
+      "text": "A trap this old being freshly rearmed means someone maintains these tunnels deliberately — worth knowing who, and why."
+    },
+    {
+      "archetype": "creature",
+      "title": "The Trap-Setter, Nearby",
+      "text": "Whoever’s responsible for resetting this trap is still close enough to have heard it not work as planned."
+    }
+  ],
+  "Poison Gas Vents": [
+    {
+      "archetype": "puzzle",
+      "title": "Tracing the Vent Back",
+      "text": "The hiss and smell lead back toward a much larger source deeper in the rock — worth knowing before going any further this direction."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Immune to the Gas",
+      "text": "Whatever lives in these tunnels near the vents has clearly adapted to the gas, and it doesn’t share the party’s difficulty breathing here."
+    }
+  ],
+  "A Flooded Passage": [
+    {
+      "archetype": "item",
+      "title": "Something Submerged Ahead",
+      "text": "Wading through, a shape becomes visible under the black water — not rock, and not moving with the current."
+    },
+    {
+      "archetype": "creature",
+      "title": "Something Prefers the Water",
+      "text": "Whatever calls this flooded passage home has the clear advantage here, and it knows it."
+    }
+  ],
+  "A Forgotten Vault Door": [
+    {
+      "archetype": "puzzle",
+      "title": "The Seal Isn’t Simple",
+      "text": "The vault’s sealing mechanism is more sophisticated than raw age should allow for, suggesting whoever built it expected exactly this kind of visitor."
+    },
+    {
+      "archetype": "creature",
+      "title": "Not as Unopened as It Looks",
+      "text": "A faint sound from the other side of the vault door suggests something opened it from the inside a very long time ago, and never left."
+    }
+  ],
+  "A Dead Adventurer’s Cache": [
+    {
+      "archetype": "puzzle",
+      "title": "What They Were Actually Looking For",
+      "text": "Notes tucked in with the supplies describe exactly what the previous adventurer was searching for down here, right up until the notes stop."
+    },
+    {
+      "archetype": "creature",
+      "title": "They Didn’t Get Far Past This Point",
+      "text": "A short distance further reveals why the cache was never returned to — and whatever caused it is still around."
+    }
+  ],
+  "A Vein of Gemstones": [
+    {
+      "archetype": "creature",
+      "title": "The Vein Isn’t Unclaimed",
+      "text": "Something that considers this stretch of tunnel its territory takes immediate issue with anyone chipping away at its walls."
+    },
+    {
+      "archetype": "puzzle",
+      "title": "A Deliberate Pattern in the Vein",
+      "text": "The gemstones aren’t distributed randomly through the rock — they trace a shape too regular to be a coincidence of geology."
+    }
+  ]
+};
+
 let journeySetting = 'countryside';
 let journeyLog = [];
 let journeyLogCounter = 0;
@@ -17104,10 +19152,23 @@ const JOURNEY_FOLLOWUP_CHOICE_PREMISES = [
   'the group can push forward together, split up to cover more ground, or fall back and regroup before deciding anything',
 ];
 function journeyFollowUpArchetype() { return weightedPickFromObject(JOURNEY_FOLLOWUP_WEIGHTS); }
+// Scenario-specific follow-ups (JOURNEY_SCENARIO_FOLLOWUPS, defined above) take priority when the
+// parent entry's own title has an authored pair — this is what makes each follow-up read as
+// unique to what actually just happened instead of a template with the title swapped in. Only a
+// follow-up rolled on top of an already-rolled follow-up (whose title was never an original
+// scenario) falls through to the fully generic system below.
 function buildJourneyFollowUp(parentEntry) {
-  const archetype = journeyFollowUpArchetype();
   const tier = journeyFollowUpTier(parentEntry.category);
   const parentTitle = parentEntry.title;
+  const authored = JOURNEY_SCENARIO_FOLLOWUPS[parentTitle];
+  if (authored && authored.length) {
+    const pick = ri(authored);
+    const hook = pick.archetype === 'creature' ? { type: 'monster', crBand: JOURNEY_FOLLOWUP_CR_BAND[tier] }
+      : pick.archetype === 'item' ? { type: 'loot', rarity: JOURNEY_FOLLOWUP_LOOT_RARITY[tier] }
+      : null;
+    return { archetype: pick.archetype, title: pick.title, text: pick.text, hook };
+  }
+  const archetype = journeyFollowUpArchetype();
   if (archetype === 'creature') {
     return {
       archetype, title: 'A Complication Arrives',
@@ -17561,8 +19622,8 @@ function renderGamblingShell() {
 // gold actually belongs to, never cross-account. Placing a bet spends locally before the action
 // is even submitted (see placeGamblingBet); a round's payout is announced in the shared,
 // DM-broadcast table.lastResult.payouts (uid -> amount) and every client checks here, on every
-// render, whether IT has an unapplied payout addressed to its own uid — persisted the same way
-// appliedLootClaimIds guards a reload from re-granting an already-applied combat loot claim.
+// render, whether IT has an unapplied payout addressed to its own uid — persisted across reloads
+// so a reload never re-grants an already-applied payout.
 let appliedGamblingPayoutIds = [];
 // Roulette/Blackjack only ever have ONE round in flight at a time (table.lastResult); Slots
 // (and any future game where players act independently rather than waiting on a shared round)
@@ -18623,8 +20684,8 @@ function retrieveManglerFinishedWork() {
   if (!manglerFinishedWork) return;
   const item = manglerFinishedWork;
   manglerFinishedWork = null;
-  lootItemToRecentlyLooted(item, null);
-  flashManglerMessage(`${item.name} sent to Recently Looted.`);
+  const { viaFallback } = lootItemDirectly(item, null);
+  flashManglerMessage(viaFallback ? `${item.name} sent to Recently Looted — your inventory is full.` : `${item.name} added to your inventory.`);
   renderManglerFinishedWork();
   renderManglerTokenGrid();
 }
@@ -18693,7 +20754,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
-      appliedLootClaimIds, appliedGamblingPayoutIds,
+      appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
       // tracked override object — reconstructed the same way on load, below.
@@ -18778,7 +20839,6 @@ function applyStateBlob(data) {
   if (data.characterHitDice !== undefined) characterHitDice = data.characterHitDice;
   if (typeof data.characterAc === 'number') characterAc = data.characterAc;
   if (data.characterClass !== undefined) characterClass = data.characterClass;
-  if (data.appliedLootClaimIds) appliedLootClaimIds = data.appliedLootClaimIds;
   if (data.appliedGamblingPayoutIds) appliedGamblingPayoutIds = data.appliedGamblingPayoutIds;
   if (data.journeySetting) journeySetting = data.journeySetting;
   if (Array.isArray(data.journeyLog)) journeyLog = data.journeyLog;
@@ -18849,7 +20909,6 @@ window.resetMainAppStateToBlank = function () {
   characterHitDice = '';
   characterAc = 10;
   characterClass = '';
-  appliedLootClaimIds = [];
   battlefieldRoster = [];
   battlefieldLog = [];
   viewedPlayerUid = null;
