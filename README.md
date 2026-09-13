@@ -82,3 +82,8 @@ open question for a future phase.
 and resolves everything locally, completely unchanged. See `docs/ARCHITECTURE.md` for the full
 account of each phase, including real mistakes made and fixed along the way and documented,
 deliberate gaps (no authorization/auth system, no identity verification on the WebSocket layer).
+
+## Running on a dedicated box (self-updating, no monitor needed)
+
+See `docs/AUTO_UPDATE.md` for a launcher script that pulls the latest code over WiFi and
+(re)starts the server automatically, intended for a mini PC running unattended at the table.
