@@ -1142,6 +1142,42 @@ distinct device uid in a second tab) connected to the same campaign, a chest pus
 revealed, the player looted an item, and `inventoryPlacements`/`inventoryGrid` confirmed the item
 landed in the grid while Recently Looted stayed at 0/36.
 
+### Post-6c Fix: Player-Submitted Attacks Never Actually Applied
+
+A second real bug found chasing the user's report that "damage attack rolls... do not seem to do
+anything." Monster-attacks-a-player was already working correctly (`resolveBattleAttack` already
+calls `window.applyHpDeltaToPlayer` when a monster's roll resolves against a connected player) —
+confirmed live, not assumed. What was actually broken was the DM's own "Pending Player Attacks"
+review queue (`renderPendingAttacksPanel`/`applyPendingAttackRequest`), which is how a player's own
+weapon-attack roll (`submitBattlefieldAttack`) is supposed to reach a monster's HP. Two independent
+bugs there, both silent (no error, no crash — everything just quietly did nothing):
+
+1. **Wrong field shape.** `db/database.js`'s attack-request row mapping nests the actual roll data
+   under `attackData` (`{ id, playerUid, playerUsername, attackData: {...}, createdAt }` —
+   confirmed as the deliberate, tested contract by `server/websocket.test.js`'s own assertions),
+   but `renderPendingAttacksPanel`/`applyPendingAttackRequest` were reading `req.monsterUid`,
+   `req.toHitTotal`, etc. directly off the request object. Every field read `undefined` — the panel
+   rendered "undefined" throughout and Apply could never find the monster.
+2. **String vs. number id.** `req.id` is a plain SQLite autoincrement number, but the row's
+   `onclick="applyPendingAttackRequest('${req.id}')"` wrapped it in quotes, passing a *string* into
+   a function that compares it against `r.id` with strict `===`. Neither Apply nor Dismiss could
+   ever match a request to itself, even once bug 1 was fixed.
+
+Fixed by reading through `req.attackData` and dropping the quotes so the id passes through as the
+number it actually is. Also added a **manual DM HP control** (`applyManualHpDelta`, a small ±HP
+input + Apply button on each connected player's row in the Players tab) per the user's explicit
+request — reuses the same `window.applyHpDeltaToPlayer` bridge the automatic monster-attack path
+already calls, so a DM can apply a monster attack, a heal, or any other ad-hoc HP ruling by hand
+regardless of whether the automatic/reviewed paths are in play for a given moment.
+
+Verified live in the browser with two connected identities: a monster's automatic attack landed on
+the connected player's HP correctly (no fix needed there); a player-submitted weapon attack showed
+correctly in the DM's Pending Attacks panel and, on Apply, correctly docked the monster's HP and
+cleared the pending list; the new manual HP control correctly applied a delta and round-tripped to
+the player's own client in real time. Full server suite (159 tests) unaffected, since none of this
+touched server/db code — the bug was entirely a client-side consumption mismatch of an
+already-correct, already-tested server contract.
+
 ### Phase 6g: Superseded By 6c — No Rewrite Needed
 
 The original handoff brief scoped a "6g" as "rewrite `saveAppState`/`loadAppState` against the
