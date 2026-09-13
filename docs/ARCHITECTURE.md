@@ -1109,6 +1109,39 @@ reconnect-on-displacement fix, all observed directly rather than assumed. Real m
 testing remains its own explicit step (Phase 6h) — this was still one machine's browser tabs
 against a local server, not physically separate devices.
 
+### Post-6c Fix: Player Self-Loot Never Delivered the Item
+
+A real bug found via the user's own live testing (a player looting a chest spawned into Combat
+saw a success message but nothing ever reached their inventory), not caught until real
+multi-device play because nothing in the automated suite exercises the monolith's own client-side
+loot-delivery code. Root cause: `playerLootItem` (the player's actual "Loot" button handler) only
+ever created the loot claim over WebSocket — the piece that used to actually place the item,
+`window.applyWonLootClaim`, was designed for the ORIGINAL Firestore listener that replayed every
+claim doc a reload would re-receive, and nothing in the Phase 6c rewrite ever wired it up to fire
+from `createSelfLootClaim`'s resolved promise instead. The function existed, looked complete, and
+was simply never called — confirmed via `grep`, zero call sites anywhere in the file.
+
+Fixed by having `playerLootItem` look the item up from its own already-synced `battlefieldRoster`
+(the same data its own button was rendered from) and deliver it directly the moment the claim
+promise resolves — no separate listener/replay step needed now that the claim result IS the
+delivery signal. `window.applyWonLootClaim` and its supporting `appliedLootClaimIds` (a Firestore-
+replay guard with no equivalent replay to guard against anymore) were deleted as genuinely dead
+code, not just unused — leaving them in place is what let this gap go undetected, since they gave
+the impression delivery was handled.
+
+**Also changed, per explicit user request while diagnosing this**: every loot pickup path (chest,
+corpse, wheel-spin, combat, Fleshmancer, Monster Mangler) now places the item directly into open
+inventory space first, falling back to the Recently Looted staging grid only when inventory has no
+room — replacing `lootItemToRecentlyLooted` with `lootItemDirectly` everywhere it was called. The
+Recently Looted tab, its 36-slot grid, and its move/discard/clear functions are all still in place
+(a real fallback, and still needed for any pre-existing saved data already sitting there) — new
+loot just no longer routes through it as a mandatory extra step by default.
+
+Verified live in the browser (not just read): two separate identities (DM + a player using a
+distinct device uid in a second tab) connected to the same campaign, a chest pushed to Combat and
+revealed, the player looted an item, and `inventoryPlacements`/`inventoryGrid` confirmed the item
+landed in the grid while Recently Looted stayed at 0/36.
+
 ### Phase 6g: Superseded By 6c — No Rewrite Needed
 
 The original handoff brief scoped a "6g" as "rewrite `saveAppState`/`loadAppState` against the
@@ -1219,3 +1252,108 @@ hunting for their own IP.
 commonly prompts (or silently blocks) the first time a process accepts an inbound connection on a
 new port — if a LAN device can't reach the printed URL, that's the first thing to check, not a
 server bug.
+
+Confirmed working for real: the user set up a physically separate Mini PC on their home network,
+ran the app there, and reached it from a second device over LAN. Phase 6h is done, not just
+prepped.
+
+### Phase 6d: Real-Time Gambling Sync
+
+The one gap left over from the original Phase 5 audit, picked back up after being explicitly
+deprioritized by the user earlier in the project ("gambling is the lowest priority... loop back
+later"). Replaces the monolith's three optional gambling bridge hooks
+(`window.pushGamblingState`/`window.submitGamblingActionRemote`/
+`window.resolveGamblingActionRemote`) — previously simply undefined, so gambling worked solo but
+never synced between a DM and connected players.
+
+**No schema change.** Phase 2's `campaign_state` table already has a `gambling` subsystem bucket
+(`SUBSYSTEMS` in `db/schema.js`), and Phase 4's `server/gambling.js` REST routes already read/
+write it. Phase 6d's new WebSocket messages (`server/websocket.js`) read and write that exact same
+bucket via `saveSubsystemState`/`loadSubsystemState` — this is genuinely the same data as Phase 4,
+just with a live push/listen loop added on top so it actually reaches connected players; the Phase
+4 REST routes are untouched and still work, same relationship Phase 4 itself had with Phase 3's
+raw-blob route.
+
+**Two message types**, mirroring the Battlefield/Puzzle Log broadcast pattern (Phase 5c) with one
+addition that pattern didn't need:
+- `push_gambling_state` (DM only) — persists `{ game, table }` and broadcasts `gambling_state_update`
+  to every connected player (never the DM, who already has it locally), plus a catch-up send on
+  `identify` if a table is currently hosted. This covers hosting a game, closing a table, AND the
+  DM's own client applying an action — all three already funnel through the monolith's single
+  `pushGamblingState()` wrapper, so no separate host/close/action-result message was needed.
+- `submit_gambling_action` (any connected account) — relayed **live** to the DM's connection as
+  `gambling_action_list` (a single-item list, matching the shape
+  `window.applyIncomingGamblingActions` already expects), then the DM's client applies it and
+  re-pushes state via `push_gambling_state`, closing the loop back out to every player including
+  the one who submitted it.
+
+**Deliberately not persisted in a queue table**, unlike `attack_requests`: the monolith's own
+`applyIncomingGamblingActions` applies an incoming action immediately and re-pushes — there's no
+manual DM review step the way an attack request has, so a durable queue a DM works through later
+doesn't match how this feature actually behaves. Gambling already assumes the DM is the live
+dealer (per the monolith's own long-standing comment — "the DM is always the dealer/host"), so an
+action arriving while the DM is briefly disconnected is dropped, same as a real dealer stepping
+away from the table would drop it — not silently swallowed forever, just not queued. If this ever
+needs to survive a DM reconnect, the fix is a small table shaped like `attack_requests`, not a
+redesign of the relay. `window.resolveGamblingActionRemote` is correspondingly left undefined on
+the client (its one call site already guards with `typeof x === 'function'`) — there's nothing
+server-side to resolve.
+
+Validated: 6 new tests in `server/websocket.test.js` (full suite now 159 tests) covering the
+broadcast-to-players-never-DM shape, catch-up on identify (both with and without a hosted table),
+non-DM push rejection, the action-relay-to-DM shape (including the assigned id and submitter
+identity), and a graceful no-op when an action is submitted with no DM connected. 40 consecutive
+clean full-suite runs. Not yet exercised in a real multi-device browser session — that's part of
+the planned test session, not this pass.
+
+### Phase 6i: Packaging — Windows Auto-Start
+
+The original roadmap's catch-all "make this easy to actually run" phase, scoped down to what
+matters for the user's actual deployment target (a Windows Mini PC, confirmed directly rather than
+assumed): starting the server automatically so a DM never has to open a terminal and type
+`node server/start.js` before a session.
+
+Three new files under `scripts/`, run directly on the machine hosting the game (no remote access
+to that machine from this project, so these are written to be copy-paste-run by the user, not
+executed as part of this session):
+
+- **`start-server.bat`** — the actual launcher. Resolves the repo root from its own file location
+  (`%~dp0..`), not the caller's working directory — the same anchoring fix `server/start.js`
+  already needed after the Phase 6h database-loss incident, applied here too since a process
+  started by Task Scheduler has no predictable working directory of its own. Output is appended to
+  `server.log` at the repo root (added to `.gitignore`) so a DM can check what happened if the
+  server didn't come up — not rotated, a deliberate simplification for a home deployment, noted in
+  the file itself.
+- **`install-windows-autostart.ps1`** — registers a Windows Scheduled Task (`Register-
+  ScheduledTask`, PowerShell's own built-in module) that runs `start-server.bat` at login, with
+  automatic restart (up to 5 times, 1 minute apart) if the process ever crashes.
+- **`uninstall-windows-autostart.ps1`** — removes it.
+
+**Scheduled Task, not a real Windows Service, and why**: turning an arbitrary process into a true
+service (one Windows can start before anyone logs in at all) needs a service wrapper like NSSM —
+a small, well-known tool, but still a third-party download. A Scheduled Task triggered "at log on"
+needs nothing beyond what Windows already ships. Combined with Windows' own built-in auto-login
+option (`netplwiz` — mentioned in the install script's own output, not automated, since changing a
+login policy is exactly the kind of standing system-configuration change that should be the user's
+own explicit action) this gets the same practical result for a dedicated Mini PC: the server is
+already running by the time anyone opens a browser to it, with no NSSM dependency introduced.
+
+**A real bug caught before it reached the user**: the first draft of both `.ps1` files used
+em dashes and typographic punctuation (matching this project's own prose style elsewhere) inside
+double-quoted strings and comments. `[System.Management.Automation.Language.Parser]::ParseFile`
+(used to verify syntax without actually registering a scheduled task on the dev machine — running
+the install script itself would have been an unwanted side effect on the wrong computer) caught
+real parse errors from this: PowerShell 5.1 misreads certain non-ASCII punctuation depending on
+file encoding, corrupting quote-boundary detection for code appearing *after* the offending
+character, not just garbling the character itself. Fixed by rewriting both scripts (and the
+`.bat`'s comments, for the same reason under `cmd.exe`'s own codepage sensitivity) using plain
+ASCII punctuation only (`--` instead of `—`, straight quotes only) — a real, generalizable lesson
+for any future Windows batch/PowerShell script this project writes, not just these two files.
+
+**Validation performed**: both `.ps1` files parse cleanly via `Parser.ParseFile` (syntax-only,
+zero side effects). The install/uninstall scripts were deliberately NOT executed from here — doing
+so would register a real scheduled task on the development machine, not the Mini PC that's
+actually meant to run this, which is a standing system-configuration change outside this project's
+own scope to make unprompted. Real execution and end-to-end validation (does the task actually
+survive a reboot, does the server come up, does auto-restart-on-crash actually work) is the user's
+own next step, to run directly on the Mini PC.
