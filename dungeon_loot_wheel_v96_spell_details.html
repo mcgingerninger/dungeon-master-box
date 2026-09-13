@@ -13114,7 +13114,7 @@ async function loadMonsterDatabase(force = false) {
     }
     // One-time: build every monster's full set of part items into lootData now that the
     // registry actually has creatures in it — see generatePremadeMonsterParts()'s comment.
-    if (typeof generatePremadeMonsterParts === 'function') generatePremadeMonsterParts();
+    if (typeof generatePremadeMonsterPartsV2 === 'function') generatePremadeMonsterPartsV2();
   } catch (err) {
     // Genuinely unexpected failure (not a network error — see the comment above) — the
     // homebrew NPCs still work with no dependency on any of this, so fall back to just those
@@ -13123,7 +13123,7 @@ async function loadMonsterDatabase(force = false) {
     monsterDatabaseLoaded = true;
     populateMonsterFilters();
     renderMonsterTable();
-    if (typeof generatePremadeMonsterParts === 'function') generatePremadeMonsterParts();
+    if (typeof generatePremadeMonsterPartsV2 === 'function') generatePremadeMonsterPartsV2();
     console.error(err);
   }
 }
@@ -14220,6 +14220,290 @@ function monsterRarityTier(monster, variant) {
   return order.indexOf(variant.tier) > order.indexOf(crTier) ? variant.tier : crTier;
 }
 
+// ===================== MONSTER PARTS v2 (creature family / subtype driven) =====================
+// Replaces the old per-monster-named system (MONSTER_PART_TYPES/buildMonsterPartItem/
+// generateMonsterPart above) for actual gameplay, without deleting any of it — the old system
+// stays fully defined ("background lists") but is no longer called from the live spawn paths
+// (see the call-site swaps at rollMonsterCombatLoot and loadMonsterDatabase, and
+// renderMonsterPartsCompendium below).
+//
+// Architecture: a creature belongs to one of 16 FAMILIES (dragon, undead, fiend, ...), detected
+// from its base type string (reusing the same regex-on-monsterAnatomyText technique the
+// existing anatomy helpers already use, since 5etools' structured type/tag data never survives
+// past monsterNormalize() — a dragon's color or a vampire/zombie/lich distinction only ever
+// exists as plain text in the monster's name, nothing structured to key off instead). Within a
+// family, a NAMED SUBTYPE (Red Dragon, Vampire, Zombie, ...) is matched by keyword against the
+// monster's own name (CREATURE_SUBTYPES); no match falls back to the family's own base theme —
+// every creature resolves to SOME theme, never a dead end. A THEME (PART_THEMES) is a small,
+// reusable magical flavor (which ability score/AC an equip part boosts, which damage type a
+// combine part adds) — this is what lets 16 families x several subtypes each share a manageable,
+// hand-authored mechanical vocabulary instead of 60+ bespoke implementations. CR-based rarity
+// (monsterRarityTier, unchanged) still decides how STRONG a part is; family/subtype/theme only
+// decides WHICH effect it grants.
+function baseCreatureTypeString(monster) {
+  return String(monster?.type || '').split(' (')[0].trim().toLowerCase();
+}
+// Order matters: spirit is checked before undead so a ghost/wraith doesn't fall into the plain
+// Undead bucket; beast is last and always matches, acting as the ultimate fallback family so
+// every creature (even ones 5etools doesn't type cleanly) resolves to something.
+const CREATURE_FAMILIES = [
+  { id: 'spirit', label: 'Spirits/Incorporeal', baseTheme: 'fear_aura',
+    detect: m => /ghost|specter|spectre|wraith|phantom|shade|banshee|incorporeal/.test(monsterAnatomyText(m)) },
+  { id: 'dragon', label: 'Dragons', baseTheme: 'elemental_fire', detect: m => baseCreatureTypeString(m) === 'dragon' },
+  { id: 'undead', label: 'Undead', baseTheme: 'necrotic_resilience', detect: m => baseCreatureTypeString(m) === 'undead' },
+  { id: 'fiend', label: 'Fiends', baseTheme: 'elemental_fire', detect: m => baseCreatureTypeString(m) === 'fiend' },
+  { id: 'celestial', label: 'Celestials', baseTheme: 'radiant_grace', detect: m => baseCreatureTypeString(m) === 'celestial' },
+  { id: 'fey', label: 'Fey', baseTheme: 'nature_ward', detect: m => baseCreatureTypeString(m) === 'fey' },
+  { id: 'elemental', label: 'Elementals', baseTheme: 'elemental_earth', detect: m => baseCreatureTypeString(m) === 'elemental' },
+  { id: 'giant', label: 'Giants', baseTheme: 'giant_might', detect: m => baseCreatureTypeString(m) === 'giant' },
+  { id: 'construct', label: 'Constructs', baseTheme: 'armored_construct', detect: m => baseCreatureTypeString(m) === 'construct' },
+  { id: 'plant', label: 'Plants', baseTheme: 'nature_ward', detect: m => baseCreatureTypeString(m) === 'plant' },
+  { id: 'ooze', label: 'Oozes', baseTheme: 'corrosive_form', detect: m => baseCreatureTypeString(m) === 'ooze' },
+  { id: 'aberration', label: 'Aberrations', baseTheme: 'psychic_mind', detect: m => baseCreatureTypeString(m) === 'aberration' },
+  { id: 'monstrosity', label: 'Monstrosities', baseTheme: 'corrosive_form', detect: m => baseCreatureTypeString(m) === 'monstrosity' },
+  { id: 'swarm', label: 'Swarms/Vermin', baseTheme: 'nature_ward',
+    detect: m => baseCreatureTypeString(m) === 'swarm' || /swarm of|vermin/.test(monsterAnatomyText(m)) },
+  { id: 'humanoid', label: 'Humanoids', baseTheme: 'primal_strength', detect: m => baseCreatureTypeString(m) === 'humanoid' },
+  { id: 'beast', label: 'Beasts', baseTheme: 'primal_strength', detect: () => true },
+];
+function getCreatureFamily(monster) {
+  for (const fam of CREATURE_FAMILIES) { if (fam.detect(monster)) return fam; }
+  return CREATURE_FAMILIES[CREATURE_FAMILIES.length - 1];
+}
+
+// ---------- Themes (shared magical-flavor library, reused across many subtypes) ----------
+// equip.stat is fed through effect text in the exact phrasing game-engine.js's
+// extractStatDeltasFromText already parses ("+N <StatName>") so equipping one of these actually
+// changes the character sheet with zero new character-sheet code; equip.ac uses the existing
+// dedicated `ac` field path (collectEquippedAcBreakdown) the same way. combineDmgType is the
+// damage type a COMBINE-mode part adds via the existing, unmodified Monster Mangler mechanism.
+const PART_THEMES = {
+  primal_strength:     { label: 'Primal Might',        equip: { stat: 'Strength' },     combineDmgType: 'slashing',    flavor: 'raw physical power' },
+  giant_might:         { label: 'Giant Might',          equip: { stat: 'Strength' },     combineDmgType: 'bludgeoning', flavor: 'overwhelming size and strength' },
+  swift_evasion:       { label: 'Swift Reflexes',       equip: { stat: 'Dexterity' },    combineDmgType: 'slashing',    flavor: 'uncanny speed and agility' },
+  necrotic_resilience: { label: 'Deathless Resilience', equip: { stat: 'Maximum Hit Points', mult: 2 }, combineDmgType: 'necrotic', flavor: 'a body that refuses to fail' },
+  arcane_intellect:    { label: 'Arcane Intellect',     equip: { stat: 'Intelligence' }, combineDmgType: 'force',       flavor: 'a keen, calculating mind' },
+  psychic_mind:        { label: 'Alien Intellect',      equip: { stat: 'Intelligence' }, combineDmgType: 'psychic',     flavor: 'a mind bent by unknowable thought' },
+  radiant_grace:       { label: 'Radiant Grace',        equip: { stat: 'Wisdom' },       combineDmgType: 'radiant',     flavor: 'a touch of the divine' },
+  nature_ward:         { label: 'Wild Ward',            equip: { stat: 'Wisdom' },       combineDmgType: 'poison',      flavor: 'the wild, untamed and watchful' },
+  lifedrain:           { label: 'Vampiric Hunger',      equip: { stat: 'Charisma' },     combineDmgType: 'necrotic',    flavor: 'a hunger that feeds on life itself' },
+  fear_aura:           { label: 'Dread Presence',       equip: { stat: 'Charisma' },     combineDmgType: 'psychic',     flavor: 'a presence that unsettles the bravest' },
+  corrosive_form:      { label: 'Corrosive Form',       equip: { stat: 'Constitution' }, combineDmgType: 'acid',        flavor: 'a form that dissolves what it touches' },
+  elemental_fire:      { label: 'Elemental Fire',       equip: { stat: 'Constitution' }, combineDmgType: 'fire',        flavor: 'a smoldering inner heat' },
+  elemental_cold:      { label: 'Elemental Frost',      equip: { stat: 'Constitution' }, combineDmgType: 'cold',        flavor: 'a bone-deep, unnatural chill' },
+  elemental_lightning: { label: 'Elemental Storm',      equip: { stat: 'Dexterity' },    combineDmgType: 'lightning',   flavor: 'a crackling, restless charge' },
+  elemental_earth:     { label: 'Elemental Stone',      equip: { stat: 'Constitution' }, combineDmgType: 'bludgeoning', flavor: 'the weight and patience of stone' },
+  armored_construct:   { label: 'Armored Plating',      equip: { ac: true },             combineDmgType: 'bludgeoning', flavor: 'plating built to endure' },
+};
+
+// ---------- Named subtypes (a small keyword table per family) ----------
+// First keyword match against the monster's name wins; no match falls back to the family's own
+// baseTheme. Adding a new subtype later is one array entry, never a code change — the whole
+// point of this system.
+const CREATURE_SUBTYPES = {
+  dragon: [
+    { keywords: ['red'], label: 'Red Dragon', theme: 'elemental_fire' },
+    { keywords: ['blue'], label: 'Blue Dragon', theme: 'elemental_lightning' },
+    { keywords: ['green'], label: 'Green Dragon', theme: 'nature_ward' },
+    { keywords: ['black'], label: 'Black Dragon', theme: 'corrosive_form' },
+    { keywords: ['white'], label: 'White Dragon', theme: 'elemental_cold' },
+    { keywords: ['gold'], label: 'Gold Dragon', theme: 'radiant_grace' },
+    { keywords: ['silver'], label: 'Silver Dragon', theme: 'elemental_cold' },
+    { keywords: ['bronze'], label: 'Bronze Dragon', theme: 'elemental_lightning' },
+    { keywords: ['copper'], label: 'Copper Dragon', theme: 'corrosive_form' },
+    { keywords: ['brass'], label: 'Brass Dragon', theme: 'elemental_fire' },
+  ],
+  undead: [
+    { keywords: ['vampire'], label: 'Vampire', theme: 'lifedrain' },
+    { keywords: ['zombie'], label: 'Zombie', theme: 'necrotic_resilience' },
+    { keywords: ['lich'], label: 'Lich', theme: 'arcane_intellect' },
+    { keywords: ['mummy'], label: 'Mummy', theme: 'fear_aura' },
+    { keywords: ['skeleton'], label: 'Skeleton', theme: 'primal_strength' },
+    { keywords: ['ghoul', 'ghast'], label: 'Ghoul', theme: 'primal_strength' },
+  ],
+  fiend: [
+    { keywords: ['devil'], label: 'Devil', theme: 'elemental_fire' },
+    { keywords: ['demon'], label: 'Demon', theme: 'corrosive_form' },
+    { keywords: ['imp', 'quasit'], label: 'Imp', theme: 'fear_aura' },
+  ],
+  celestial: [
+    { keywords: ['angel', 'deva', 'planetar', 'solar'], label: 'Angel', theme: 'radiant_grace' },
+    { keywords: ['unicorn'], label: 'Unicorn', theme: 'nature_ward' },
+    { keywords: ['pegasus'], label: 'Pegasus', theme: 'swift_evasion' },
+  ],
+  fey: [
+    { keywords: ['pixie', 'sprite'], label: 'Pixie', theme: 'swift_evasion' },
+    { keywords: ['dryad'], label: 'Dryad', theme: 'nature_ward' },
+    { keywords: ['hag'], label: 'Hag', theme: 'fear_aura' },
+    { keywords: ['satyr'], label: 'Satyr', theme: 'nature_ward' },
+  ],
+  elemental: [
+    { keywords: ['fire', 'flame', 'magma', 'efreet'], label: 'Fire Elemental', theme: 'elemental_fire' },
+    { keywords: ['water', 'ice', 'frost'], label: 'Water Elemental', theme: 'elemental_cold' },
+    { keywords: ['air', 'wind', 'djinn', 'invisible stalker'], label: 'Air Elemental', theme: 'elemental_lightning' },
+    { keywords: ['earth', 'mud', 'dao'], label: 'Earth Elemental', theme: 'elemental_earth' },
+  ],
+  giant: [
+    { keywords: ['hill giant'], label: 'Hill Giant', theme: 'giant_might' },
+    { keywords: ['frost giant'], label: 'Frost Giant', theme: 'elemental_cold' },
+    { keywords: ['fire giant'], label: 'Fire Giant', theme: 'elemental_fire' },
+    { keywords: ['storm giant'], label: 'Storm Giant', theme: 'elemental_lightning' },
+    { keywords: ['stone giant'], label: 'Stone Giant', theme: 'elemental_earth' },
+    { keywords: ['cloud giant'], label: 'Cloud Giant', theme: 'radiant_grace' },
+  ],
+  construct: [
+    { keywords: ['golem'], label: 'Golem', theme: 'armored_construct' },
+    { keywords: ['homunculus'], label: 'Homunculus', theme: 'arcane_intellect' },
+    { keywords: ['animated'], label: 'Animated Construct', theme: 'armored_construct' },
+  ],
+  plant: [
+    { keywords: ['treant'], label: 'Treant', theme: 'giant_might' },
+    { keywords: ['shambling'], label: 'Shambling Mound', theme: 'primal_strength' },
+    { keywords: ['myconid'], label: 'Myconid', theme: 'nature_ward' },
+  ],
+  ooze: [
+    { keywords: ['gelatinous'], label: 'Gelatinous Cube', theme: 'corrosive_form' },
+    { keywords: ['pudding'], label: 'Black Pudding', theme: 'corrosive_form' },
+    { keywords: ['jelly'], label: 'Ochre Jelly', theme: 'corrosive_form' },
+  ],
+  aberration: [
+    { keywords: ['beholder'], label: 'Beholder', theme: 'psychic_mind' },
+    { keywords: ['mind flayer', 'illithid'], label: 'Mind Flayer', theme: 'arcane_intellect' },
+    { keywords: ['aboleth'], label: 'Aboleth', theme: 'psychic_mind' },
+  ],
+  monstrosity: [
+    { keywords: ['owlbear'], label: 'Owlbear', theme: 'primal_strength' },
+    { keywords: ['chimera'], label: 'Chimera', theme: 'elemental_fire' },
+    { keywords: ['medusa'], label: 'Medusa', theme: 'fear_aura' },
+    { keywords: ['basilisk'], label: 'Basilisk', theme: 'fear_aura' },
+  ],
+  swarm: [
+    { keywords: ['rat'], label: 'Rat Swarm', theme: 'swift_evasion' },
+    { keywords: ['insect', 'centipede', 'spider'], label: 'Insect Swarm', theme: 'nature_ward' },
+  ],
+  humanoid: [
+    { keywords: ['elf'], label: 'Elf', theme: 'swift_evasion' },
+    { keywords: ['dwarf'], label: 'Dwarf', theme: 'giant_might' },
+    { keywords: ['orc'], label: 'Orc', theme: 'primal_strength' },
+    { keywords: ['halfling'], label: 'Halfling', theme: 'swift_evasion' },
+    { keywords: ['gnome'], label: 'Gnome', theme: 'arcane_intellect' },
+  ],
+  beast: [
+    { keywords: ['wolf'], label: 'Wolf', theme: 'swift_evasion' },
+    { keywords: ['bear'], label: 'Bear', theme: 'primal_strength' },
+    { keywords: ['spider'], label: 'Spider', theme: 'nature_ward' },
+    { keywords: ['snake', 'serpent'], label: 'Serpent', theme: 'nature_ward' },
+  ],
+};
+function getCreatureSubtype(monster, family) {
+  const list = CREATURE_SUBTYPES[family.id];
+  if (!list) return null;
+  const name = (monster?.name || '').toLowerCase();
+  return list.find(s => s.keywords.some(kw => name.includes(kw))) || null;
+}
+
+// ---------- The ~20 new part definitions (10 equip, 10 combine) ----------
+// eligible(monster) reuses the SAME anatomy-detection helpers the old system already proved out
+// (monsterHasClaws, monsterHasBite, etc.) rather than inventing a parallel check.
+const MONSTER_PARTS_V2 = [
+  // -- Equip (worn in a charm slot; grants a real, enforced passive bonus) --
+  { id: 'heartstone', anatomicalPart: 'Heartstone', mode: 'equip', eligible: () => true },
+  { id: 'soulfragment', anatomicalPart: 'Soul Fragment', mode: 'equip', eligible: m => ['undead','spirit','fiend','celestial','aberration'].includes(getCreatureFamily(m).id) },
+  { id: 'essence', anatomicalPart: 'Essence', mode: 'equip', eligible: m => ['elemental','fey','spirit'].includes(getCreatureFamily(m).id) },
+  { id: 'core', anatomicalPart: 'Core', mode: 'equip', eligible: m => ['construct','elemental'].includes(getCreatureFamily(m).id) },
+  { id: 'eye', anatomicalPart: 'Eye', mode: 'equip', eligible: () => true },
+  { id: 'feather', anatomicalPart: 'Feather', mode: 'equip', eligible: m => monsterIsBirdlike(m) || monsterHasWings(m) },
+  { id: 'tooth', anatomicalPart: 'Tooth', mode: 'equip', eligible: monsterHasBite },
+  { id: 'scale', anatomicalPart: 'Scale', mode: 'equip', eligible: monsterHasScales },
+  { id: 'wingmembrane', anatomicalPart: 'Wing Membrane', mode: 'equip', eligible: monsterHasWings },
+  { id: 'antler', anatomicalPart: 'Antler', mode: 'equip', eligible: monsterHasHorns },
+  // -- Combine (Monster Mangler ingredient; grants a scaled bonus damage die via the existing mechanism) --
+  { id: 'claw', anatomicalPart: 'Claw', mode: 'combine', eligible: () => true },
+  { id: 'fang', anatomicalPart: 'Fang', mode: 'combine', eligible: monsterHasBite },
+  { id: 'talon', anatomicalPart: 'Talon', mode: 'combine', eligible: m => monsterIsBirdlike(m) || getCreatureFamily(m).id === 'dragon' },
+  { id: 'horn', anatomicalPart: 'Horn', mode: 'combine', eligible: monsterHasHorns },
+  { id: 'bone', anatomicalPart: 'Bone', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m) },
+  { id: 'tendon', anatomicalPart: 'Tendon', mode: 'combine', eligible: monsterIsOrganic },
+  { id: 'venomsac', anatomicalPart: 'Venom Sac', mode: 'combine', eligible: monsterHasVenom },
+  { id: 'hide', anatomicalPart: 'Hide', mode: 'combine', eligible: monsterIsOrganic },
+  { id: 'blood', anatomicalPart: 'Blood', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m) },
+  { id: 'marrow', anatomicalPart: 'Marrow', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m) },
+];
+
+let monsterPartV2Counter = 0;
+// Renders the "+N <Stat>" phrasing extractStatDeltasFromText (game-engine.js) already parses out
+// of item effect text. amount scales with the same MANGLER_RARITY_MAGNITUDE curve the Mangler
+// already uses (1-4, defined later in this file — safe: this only ever runs from a real
+// gameplay action, long after the whole script has finished its initial evaluation) so equip and
+// combine parts share one power curve end to end.
+function describeV2EquipEffect(theme, tier) {
+  const magnitude = MANGLER_RARITY_MAGNITUDE[tier] || 1;
+  if (theme.equip.ac) return `+${magnitude} AC.`;
+  const amount = magnitude * (theme.equip.mult || 1);
+  return `+${amount} ${theme.equip.stat}.`;
+}
+function buildMonsterPartItemV2(monster, tier, partDef) {
+  const family = getCreatureFamily(monster);
+  const subtype = getCreatureSubtype(monster, family);
+  const theme = PART_THEMES[(subtype && subtype.theme) || family.baseTheme] || PART_THEMES.primal_strength;
+  const themeLabel = subtype ? subtype.label : family.label;
+  const name = `${themeLabel} ${partDef.anatomicalPart}`;
+  const [wLo, wHi] = MONSTER_PART_WEIGHT_RANGE[tier] || MONSTER_PART_WEIGHT_RANGE.common;
+  const weight = Math.round((wLo + Math.random() * (wHi - wLo)) * 10) / 10;
+  const [gLo, gHi] = MONSTER_PART_GP_RANGE[tier] || MONSTER_PART_GP_RANGE.common;
+  const gp = formatGpAmount(rn(gLo, gHi));
+  const desc = `A ${partDef.anatomicalPart.toLowerCase()} taken from a ${themeLabel.toLowerCase()}, radiating ${theme.flavor}.`;
+  let effect, subcategory;
+  if (partDef.mode === 'equip') {
+    effect = `${describeV2EquipEffect(theme, tier)} Worn as a charm. (${rarityNames[tier] || tier} ${themeLabel} ${partDef.anatomicalPart.toLowerCase()}.)`;
+    subcategory = 'charm';
+  } else {
+    effect = `Raw crafting material — no effect on its own, but the Monster Mangler can work it into a compatible weapon or piece of armor, imbuing a ${theme.combineDmgType} effect themed to ${themeLabel} and scaled by its own rarity (${rarityNames[tier] || tier}).`;
+    subcategory = 'monsterpart';
+  }
+  const part = {
+    id: 'partv2_' + (++monsterPartV2Counter), name, type: 'craftable', subcategory,
+    partType: (subtype && subtype.theme) || family.baseTheme, rarity: tier, weight, gp, slotSize: 1,
+    desc, effect, sourceMonster: monster.name, creatureFamily: family.id,
+  };
+  classifyItemFull(part, tier);
+  return part;
+}
+function generateMonsterPartV2(monster, tier) {
+  const eligible = MONSTER_PARTS_V2.filter(p => { try { return p.eligible(monster); } catch { return false; } });
+  const pick = eligible.length ? ri(eligible) : ri(MONSTER_PARTS_V2);
+  return buildMonsterPartItemV2(monster, tier, pick);
+}
+let premadeMonsterPartsV2Generated = false;
+function generatePremadeMonsterPartsV2() {
+  if (premadeMonsterPartsV2Generated || !monsterDatabase.length) return;
+  premadeMonsterPartsV2Generated = true;
+  monsterDatabase.forEach(monster => {
+    const tier = monsterRarityTier(monster, null);
+    MONSTER_PARTS_V2.forEach(partDef => {
+      let ok; try { ok = partDef.eligible(monster); } catch { ok = false; }
+      if (!ok) return;
+      lootData[tier].push(buildMonsterPartItemV2(monster, tier, partDef));
+    });
+  });
+  buildTokenIndex();
+  if (typeof renderItemsList === 'function') renderItemsList();
+}
+// Theme-keyed combine effect pool, parallel to MONSTER_PART_EFFECT_POOL (keyed by anatomical
+// part type) but keyed by THEME id instead — pickMonsterPartEffect (Monster Mangler section,
+// below) checks this pool as a fallback when partType isn't one of the old anatomical keys, so
+// v2 combine parts flow through the exact same, already-tested combine mechanism unchanged.
+const MONSTER_PART_V2_EFFECT_POOL = {};
+Object.keys(PART_THEMES).forEach(themeId => {
+  const theme = PART_THEMES[themeId];
+  MONSTER_PART_V2_EFFECT_POOL[themeId] = [
+    { id: themeId + '_dmg', label: theme.label, appliesTo: ['weapon'], dmgAdd: true, dmgType: theme.combineDmgType,
+      text: d => `+${d} ${theme.combineDmgType} damage on hit — ${theme.flavor}.` },
+    { id: themeId + '_util', label: theme.label, appliesTo: ['weapon', 'armor'],
+      utilityText: () => `Carries ${theme.flavor} — a DM-adjudicated flourish fitting its origin.` },
+  ];
+});
+
 // ---------- Loot settings: one adjustable preset per monster rarity tier ----------
 // Same "mostly this tier, some spillover across all six rarities" shape as
 // CHEST_LOOT_RARITY_WEIGHTS/CORPSE_LOOT_RARITY_WEIGHTS, just its own (stingier) numbers — a
@@ -14378,7 +14662,7 @@ function rollMonsterCombatLoot(entry) {
     items.push({ ...resolveScrollSpell(raw), rarity: r, id: 'cloot' + (++monsterPartCounter), reserved: false });
   }
   if (Math.random() * 100 < settings.partChance) {
-    items.push({ ...generateMonsterPart(entry.monster, tier), reserved: false });
+    items.push({ ...generateMonsterPartV2(entry.monster, tier), reserved: false });
   }
   return { tier, gold: rollCombatGoldForTier(tier), items };
 }
@@ -18107,7 +18391,10 @@ function bumpAcValue(acStr, magnitude) {
 // base item's type (weapon vs. armor) — falls back to any dual-purpose ("either") template if
 // nothing in the pool targets this item type, so combining never silently no-ops.
 function pickMonsterPartEffect(partType, itemIsWeapon) {
-  const pool = MONSTER_PART_EFFECT_POOL[partType] || MONSTER_PART_EFFECT_POOL.default;
+  // v2 combine parts carry a theme id (e.g. 'elemental_fire') as their partType, which never
+  // collides with the old system's anatomical keys (e.g. 'fang') — checked second so an old
+  // part's exact key always wins first, matching this function's pre-v2 behavior unchanged.
+  const pool = MONSTER_PART_EFFECT_POOL[partType] || MONSTER_PART_V2_EFFECT_POOL[partType] || MONSTER_PART_EFFECT_POOL.default;
   const wantKind = itemIsWeapon ? 'weapon' : 'armor';
   const targeted = pool.filter(e => e.appliesTo.includes(wantKind));
   const fallback = pool.filter(e => e.appliesTo.length > 1);
@@ -18177,26 +18464,42 @@ function previewMonsterPartEffectText(template, magnitude) {
 // player can see how dramatically a part's own rarity changes what it does without having to
 // actually own one and roll it. Purely descriptive — reads MONSTER_PART_EFFECT_POOL directly,
 // never mutates anything.
+// Read-only reference tab (Item Compendium > Monster Parts) — rewritten for Monster Parts v2
+// (see the "MONSTER PARTS v2" section above). Organized by creature FAMILY rather than
+// anatomical part type, since family/subtype is what actually decides which effect a v2 part
+// grants — one card per family, showing its base theme plus every named subtype and the theme
+// it resolves to, with the equip (stat/AC bonus) and combine (bonus damage) effect previewed at
+// both ends of the rarity scale. The old MONSTER_PART_EFFECT_POOL-driven view (by anatomical
+// part type) is left intact as a function above and could still be called directly if ever
+// needed — this tab just no longer calls it, matching "old system stays defined, not spawned or
+// shown" for the whole Monster Parts v2 migration.
+function previewV2EquipEffectText(theme, magnitude) {
+  if (theme.equip.ac) return `+${magnitude} AC.`;
+  return `+${magnitude * (theme.equip.mult || 1)} ${theme.equip.stat}.`;
+}
+function previewV2CombineEffectText(theme, magnitude) {
+  const die = MANGLER_BONUS_DIE_BY_MAGNITUDE[magnitude] || '1d4';
+  return `+${die} ${theme.combineDmgType} damage on hit.`;
+}
 function renderMonsterPartsCompendium() {
   const wrap = document.getElementById('monsterPartsCompendiumWrap');
   if (!wrap) return;
-  const partKeys = Object.keys(MONSTER_PART_EFFECT_POOL).filter(k => k !== 'default');
-  wrap.innerHTML = `<div class="monsterparts-grid">${partKeys.map(key => {
-    const label = MONSTER_PART_TYPE_LABEL[key] || key;
-    const templates = MONSTER_PART_EFFECT_POOL[key] || [];
-    const effectRows = templates.map(t => {
-      const appliesTo = t.appliesTo.length > 1 ? 'Weapon or Armor' : (t.appliesTo[0] === 'weapon' ? 'Weapon only' : 'Armor only');
-      const lowText = previewMonsterPartEffectText(t, 1);
-      const highText = previewMonsterPartEffectText(t, 4);
-      return `<div class="mp-effect-row">
-        <div class="mp-effect-label">${escapeHtml(t.label)} <span class="mp-effect-applies">(${appliesTo})</span></div>
-        <div class="mp-effect-text"><b>Common/Uncommon part:</b> ${escapeHtml(lowText)}</div>
-        ${highText !== lowText ? `<div class="mp-effect-text"><b>Celestial part:</b> ${escapeHtml(highText)}</div>` : ''}
-      </div>`;
-    }).join('');
+  const themeRow = (themeId, themeLabelOverride) => {
+    const theme = PART_THEMES[themeId];
+    if (!theme) return '';
+    return `<div class="mp-effect-row">
+      <div class="mp-effect-label">${escapeHtml(themeLabelOverride || theme.label)} <span class="mp-effect-applies">(${escapeHtml(theme.flavor)})</span></div>
+      <div class="mp-effect-text"><b>Common/Uncommon:</b> equip ${escapeHtml(previewV2EquipEffectText(theme, 1))} &nbsp;|&nbsp; combine ${escapeHtml(previewV2CombineEffectText(theme, 1))}</div>
+      <div class="mp-effect-text"><b>Celestial:</b> equip ${escapeHtml(previewV2EquipEffectText(theme, 4))} &nbsp;|&nbsp; combine ${escapeHtml(previewV2CombineEffectText(theme, 4))}</div>
+    </div>`;
+  };
+  wrap.innerHTML = `<div class="monsterparts-grid">${CREATURE_FAMILIES.map(fam => {
+    const subtypes = CREATURE_SUBTYPES[fam.id] || [];
+    const subtypeRows = subtypes.map(s => themeRow(s.theme, s.label)).join('');
     return `<div class="mp-parttype-card">
-      <div class="mp-parttype-title">${escapeHtml(label)}</div>
-      ${effectRows}
+      <div class="mp-parttype-title">${escapeHtml(fam.label)}</div>
+      ${themeRow(fam.baseTheme, `${fam.label} (unnamed/base)`)}
+      ${subtypeRows}
     </div>`;
   }).join('')}</div>`;
 }
