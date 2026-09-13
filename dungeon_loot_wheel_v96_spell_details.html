@@ -11575,6 +11575,55 @@ function inventoryItemContextMenu(evt, placementId) {
     flashInvMessage(`No open slot for ${entry.item.name}.`, true);
   }
 }
+// Right-click handler for every "Your Inventory" mirror inside the Store tab (see
+// INV_GRID_MIRRORS' storeContext flag) — deliberately never equips. Routes to whichever slot
+// the CURRENTLY SELECTED merchant actually uses, resolved live off currentMerchant rather than
+// baked in at render time, so the always-visible top mirror behaves identically to whichever
+// merchant-specific mirror is also on screen at the same time. Anything ambiguous — no merchant
+// selected, or a merchant with no item-slot mechanic at all (the Bounty Hunter) — does nothing,
+// per explicit design: a silent no-op beats a wrong guess.
+function storeInventoryItemContextMenu(evt, placementId) {
+  evt.preventDefault();
+  const p = inventoryPlacements[placementId];
+  if (!p || !currentMerchant) return;
+  if (currentMerchant === 'monstermangler') { mangerAssignItemByKey(p.key); return; }
+  if (currentMerchant === 'fleshmancer') { fleshAssignMaterialByKey(p.key); return; }
+  if (currentMerchant === 'bountyhunter') return; // no sell/work mechanic here — do nothing
+  addTokenToMerchantTill(p.key);
+}
+// Monster Mangler "work slot" routing for a right-clicked item: a monster part goes to the part
+// slot, a weapon/armor goes to the item slot — mirrors manglerPartDrop/manglerItemDrop's own
+// eligibility checks exactly, just reachable by key instead of a drag event. Neither eligible —
+// do nothing (see storeInventoryItemContextMenu's own "silent no-op beats a wrong guess" note).
+function mangerAssignItemByKey(key) {
+  if (!TOKEN_INDEX[key]) buildTokenIndex();
+  const entry = TOKEN_INDEX[key];
+  if (!entry) return;
+  if (!entry.item.interactions) classifyItemFull(entry.item, entry.rarity);
+  if (canInteract(entry.item, 'monster_material')) {
+    manglerPartKey = key;
+    manglerFocus = 'item';
+    renderManglerSlots();
+    renderManglerTokenGrid();
+    return;
+  }
+  if (canInteract(entry.item, 'socket') || canInteract(entry.item, 'enchant')) {
+    manglerItemKey = key;
+    manglerFocus = null;
+    renderManglerSlots();
+    renderManglerTokenGrid();
+  }
+}
+// Fleshmancer "work slot" routing — mirrors fleshMaterialDrop's own eligibility check exactly.
+function fleshAssignMaterialByKey(key) {
+  if (!TOKEN_INDEX[key]) buildTokenIndex();
+  const entry = TOKEN_INDEX[key];
+  if (!entry) return;
+  if (!entry.item.interactions) classifyItemFull(entry.item, entry.rarity);
+  if (!canInteract(entry.item, 'fleshmancer_input')) return;
+  fleshMaterialKey = key;
+  renderFleshWorkshop();
+}
 
 // The refill zone: drag any item here — from the inventory grid, an equip slot, or straight
 // from the library — to restore its charges. Purely an action, not a move: the item stays
@@ -11608,7 +11657,7 @@ function clearInventory() {
 // Builds the grid markup once; idPrefix keeps element ids unique per rendered copy (two
 // copies of #inv-cell-0-0 in the DOM at once would be invalid and make getElementById
 // ambiguous) — see renderInventoryGrid, which mirrors this into every registered instance.
-function buildInventoryGridHtml(idPrefix, dimFilter) {
+function buildInventoryGridHtml(idPrefix, dimFilter, storeContext) {
   let html = '';
   for (let row = 0; row < INV_ROWS; row++) {
     html += `<div class="inv-row">`;
@@ -11635,9 +11684,10 @@ function buildInventoryGridHtml(idPrefix, dimFilter) {
         // Repositioning onto a spot that overlaps the item's OWN old footprint still
         // works because invCanPlaceAt ignores the dragged item's own cells; it just has
         // to be dropped starting on an empty cell, same as any other move.
+        const contextMenuFn = storeContext ? 'storeInventoryItemContextMenu' : 'inventoryItemContextMenu';
         html += `<div class="inv-item ${rarity}${wide ? ' inv-item-fill' : ''}${dimmed ? ' inv-item-dimmed' : ''}" id="${idPrefix}inv-cell-${row}-${col}" style="width:${p.w * 44 + (p.w - 1) * 3}px" draggable="true"
           ondragstart="inventoryItemDragStart(event,'${placementId}')"
-          oncontextmenu="inventoryItemContextMenu(event,'${placementId}')"
+          oncontextmenu="${contextMenuFn}(event,'${placementId}')"
           onmouseenter="showTokenTooltip(event,'${safeKey}')"
           onmousemove="moveTokenTooltip(event)"
           onmouseleave="hideTokenTooltip()">${body}</div>`;
@@ -11661,17 +11711,21 @@ function buildInventoryGridHtml(idPrefix, dimFilter) {
 // visually dims — never hides — items that don't fit whatever's currently being worked on
 // (see manglerFocusFilter), since a real slot-based grid can't remove an item from view
 // without it also disappearing from the slot it actually occupies.
+// storeContext (default false): true for every mirror that lives inside the Store tab. A
+// right-click there must never equip — the whole point of being in a merchant screen is to
+// sell/use items, not gear up mid-negotiation — so these route through
+// storeInventoryItemContextMenu instead of inventoryItemContextMenu (see buildInventoryGridHtml).
 const INV_GRID_MIRRORS = [
   { id: 'inventoryGrid', prefix: '' },
-  { id: 'storeInventoryGrid', prefix: 'store-' },
-  { id: 'traderSellInvGrid', prefix: 'trader-', dimFilter: (item, rarity) => currentMerchant ? traderSellDimFilter(item, rarity) : true },
-  { id: 'manglerInvGrid', prefix: 'mangler-', dimFilter: (item, rarity) => manglerFocusFilter({ item, rarity }) },
-  { id: 'fleshInvGrid', prefix: 'flesh-', dimFilter: (item, rarity) => { if (!item.interactions) classifyItemFull(item, rarity); return canInteract(item, 'fleshmancer_input'); } },
+  { id: 'storeInventoryGrid', prefix: 'store-', storeContext: true },
+  { id: 'traderSellInvGrid', prefix: 'trader-', dimFilter: (item, rarity) => currentMerchant ? traderSellDimFilter(item, rarity) : true, storeContext: true },
+  { id: 'manglerInvGrid', prefix: 'mangler-', dimFilter: (item, rarity) => manglerFocusFilter({ item, rarity }), storeContext: true },
+  { id: 'fleshInvGrid', prefix: 'flesh-', dimFilter: (item, rarity) => { if (!item.interactions) classifyItemFull(item, rarity); return canInteract(item, 'fleshmancer_input'); }, storeContext: true },
 ];
 function renderInventoryGrid() {
-  INV_GRID_MIRRORS.forEach(({ id, prefix, dimFilter }) => {
+  INV_GRID_MIRRORS.forEach(({ id, prefix, dimFilter, storeContext }) => {
     const el = document.getElementById(id);
-    if (el) el.innerHTML = buildInventoryGridHtml(prefix, dimFilter);
+    if (el) el.innerHTML = buildInventoryGridHtml(prefix, dimFilter, storeContext);
   });
   updateInventorySummary();
   if (typeof scheduleSave === 'function') scheduleSave();
