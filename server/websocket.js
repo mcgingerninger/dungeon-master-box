@@ -5,9 +5,13 @@
 // (createLootClaim/startLootClaimListener), DM-to-players battlefield/puzzle-log broadcast
 // (pushBattlefieldState/startBattlefieldListener, pushPuzzleLogState/startPuzzleLogListener),
 // the DM roster listener (startRosterListener), and the attack-request review queue
-// (submitBattlefieldAttack/startAttackRequestListener/resolveAttackRequest). This is the last
-// planned Phase 5 sub-phase — Firebase Auth and the login/account UI remain explicitly out of
-// scope; see docs/ARCHITECTURE.md for the open question of whether Auth is ever replaced.
+// (submitBattlefieldAttack/startAttackRequestListener/resolveAttackRequest).
+//
+// Phase 6e added the DM's per-player viewed-player spectator subscription
+// (startViewedPlayerListener/stopViewedPlayerListener) and Phase 6f added player removal
+// (removePlayer/removeAllPlayers) — both gaps the original Phase 5 audit missed (see
+// docs/ARCHITECTURE.md's Phase 6 section). Firebase Auth and the login/account UI were replaced
+// by Phase 6b/6c's room-code identity model, not by this file — see docs/ARCHITECTURE.md.
 //
 // Loot claims deliberately do NOT carry the actual item data over this layer, matching the
 // original design exactly: a claim only records who won the race for a given claim id (see
@@ -39,6 +43,13 @@
 //     { type: 'resolve_attack_request', requestId }                -- DM only (apply/dismiss both
 //       -- resolve the same way in the original: delete the request doc — this file doesn't need
 //       -- to know which)
+//     { type: 'subscribe_player', targetUid }                      -- DM only (Phase 6e); only one
+//       -- active subscription per DM connection — a later subscribe_player silently replaces the
+//       -- previous target, matching startViewedPlayerListener's own "only ever one of these
+//       -- active at a time" in the original
+//     { type: 'unsubscribe_player' }                                -- DM only (Phase 6e)
+//     { type: 'kick_player', targetUid }                            -- DM only (Phase 6f); cannot
+//       -- target the DM's own accountUid
 //   server -> client:
 //     { type: 'identified', state, rev }             -- ack, plus whatever was already persisted for this account
 //     { type: 'push_ack', rev }                       -- confirms a push_state was actually persisted
@@ -70,6 +81,15 @@
 //       -- list... on every change" behavior in the original.
 //     { type: 'attack_request_submitted', requestId }             -- ack to the submitting player
 //     { type: 'attack_request_resolved', requestId }               -- ack to the DM after resolving
+//     { type: 'player_state_update', targetUid, state }            -- Phase 6e: sent to whichever
+//       -- DM connection is currently subscribed (via subscribe_player) to targetUid, on every
+//       -- push_state or cross-write affecting that target, AND once immediately on subscribe
+//       -- (catch-up, same "fire immediately with whatever's already there" spirit as
+//       -- battlefield_update/puzzle_log_update above) — state is null if the target has never
+//       -- pushed anything yet
+//     { type: 'kicked' }                                           -- Phase 6f: sent to a removed
+//       -- player's live connection just before the server closes it
+//     { type: 'kick_ack', targetUid }                               -- Phase 6f: ack to the DM
 //     { type: 'error', message }
 //
 // The ack types matter for more than bookkeeping: the original Firestore design lets a caller
@@ -112,7 +132,7 @@
 
 import { WebSocketServer } from 'ws';
 import {
-  getCampaign, savePlayerState, loadPlayerState, createLootClaim,
+  getCampaign, savePlayerState, loadPlayerState, deletePlayerState, createLootClaim,
   saveSubsystemState, loadSubsystemState,
   createAttackRequest, listAttackRequests, deleteAttackRequest,
 } from '../db/database.js';
@@ -160,6 +180,14 @@ export function createWebSocketServer(db, httpServer) {
 
   // Phase 5d. See the module comment above for the one real simplification versus the original
   // (connected players only). Clamping mirrors startRosterListener's own clamp exactly.
+  //
+  // Found during Phase 6e's browser testing (the first sub-phase to actually exercise the
+  // monolith's Players tab live): this was missing a `role` field on every entry. The original's
+  // own roster entries always carried `role: d.role` (see startRosterListener), and the
+  // monolith's renderPlayersTab() filters on exactly `p.role === 'player'` — without it, every
+  // entry was silently excluded, so the Players tab has shown "No players have joined yet." since
+  // Phase 5d, undetected because nothing exercised that specific consumer until now. Every entry
+  // here is already known to be a player (the `dm` check above), so this is just `'player'`.
   function buildRoster(campaignId) {
     const roster = [];
     for (const [accountUid, entry] of roomFor(campaignId).entries()) {
@@ -169,13 +197,24 @@ export function createWebSocketServer(db, httpServer) {
       const maxHp = typeof s.characterMaxHpEffective === 'number' ? s.characterMaxHpEffective : s.characterMaxHp;
       const currentHp = typeof s.characterCurrentHp === 'number' && typeof maxHp === 'number'
         ? Math.max(0, Math.min(s.characterCurrentHp, maxHp)) : s.characterCurrentHp;
-      roster.push({ uid: accountUid, username: entry.username || 'Unnamed', currentHp, maxHp, ac: s.characterAc });
+      roster.push({ uid: accountUid, username: entry.username || 'Unnamed', role: 'player', currentHp, maxHp, ac: s.characterAc });
     }
     return roster;
   }
   function broadcastRoster(campaignId) {
     const dmWs = findDmConnection(campaignId);
     if (dmWs) send(dmWs, { type: 'roster_update', roster: buildRoster(campaignId) });
+  }
+
+  // Phase 6e: the DM's Players-tab spectator view — a live, read-only look at ONE specific
+  // player's full state, separate from buildRoster (which only ever extracts a thin HP/AC
+  // summary for every player at once). Only ever one DM connection could plausibly be viewing at
+  // a time in practice, but this checks every connection in the room rather than assuming a
+  // single DM, same defensive shape findDmConnection already uses.
+  function notifyViewers(campaignId, targetUid, state) {
+    for (const entry of roomFor(campaignId).values()) {
+      if (entry.viewingUid === targetUid) send(entry.ws, { type: 'player_state_update', targetUid, state });
+    }
   }
 
   wss.on('connection', (ws) => {
@@ -194,8 +233,27 @@ export function createWebSocketServer(db, httpServer) {
         if (!msg.accountUid || typeof msg.accountUid !== 'string') {
           return send(ws, { type: 'error', message: '"accountUid" is required' });
         }
+        // Phase 6c found this the hard way: a second connection identifying with an accountUid
+        // that's already live (e.g. the DM opening a second tab, or a page reload racing its own
+        // still-closing old connection) would otherwise silently REPLACE the map entry without
+        // touching the old connection at all. The old tab looks connected (its socket is still
+        // open) but is now untracked — no roster/battlefield/puzzle broadcasts reach it, and if
+        // it's the DM, findDmConnection stops finding them entirely. Worse: if that orphaned old
+        // connection later closes, its own close handler's `room.get(uid)?.ws === ws` check
+        // correctly no-ops (the map already points at the new ws) — so this wasn't crashing
+        // anything, it was just going quietly deaf, which is harder to notice than a crash.
+        // Explicitly closing the old connection (with a reason) converts an invisible zombie
+        // connection into a visible, honest "you're connected elsewhere now."
+        const room = roomFor(campaignId);
+        const displaced = room.get(msg.accountUid);
+        if (displaced && displaced.ws !== ws && displaced.ws.readyState === displaced.ws.OPEN) {
+          send(displaced.ws, { type: 'error', message: 'Connected from another tab or device — this connection is being closed.' });
+          displaced.ws.close();
+        }
         identity = { campaignId, accountUid: msg.accountUid, role: msg.role, username: msg.username };
-        roomFor(campaignId).set(msg.accountUid, { ws, role: msg.role, username: msg.username });
+        // viewingUid: Phase 6e — which OTHER player's live state this connection is currently
+        // subscribed to (DM only; null for everyone else, and null here until subscribe_player).
+        room.set(msg.accountUid, { ws, role: msg.role, username: msg.username, viewingUid: null });
         const existing = loadPlayerState(db, campaignId, msg.accountUid);
         send(ws, { type: 'identified', state: existing ? existing.state : null, rev: existing ? existing.rev : 0 });
         if (msg.role !== 'dm') {
@@ -234,6 +292,26 @@ export function createWebSocketServer(db, httpServer) {
         // delay was long enough, which is genuinely unsafe under variable system load.
         send(ws, { type: 'push_ack', rev });
         if (identity.role !== 'dm') broadcastRoster(identity.campaignId); // Phase 5d: stats may have changed
+        notifyViewers(identity.campaignId, identity.accountUid, msg.state); // Phase 6e
+        return;
+      }
+
+      if (msg.type === 'subscribe_player') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can view a player.' });
+        const entry = roomFor(identity.campaignId).get(identity.accountUid);
+        if (entry) entry.viewingUid = msg.targetUid;
+        // Catch-up, matching the original's onSnapshot firing immediately with whatever the doc
+        // already held the moment a listener subscribes — the DM shouldn't have to wait for the
+        // target's NEXT action just to see their current state.
+        const existingTarget = loadPlayerState(db, identity.campaignId, msg.targetUid);
+        send(ws, { type: 'player_state_update', targetUid: msg.targetUid, state: existingTarget ? existingTarget.state : null });
+        return;
+      }
+
+      if (msg.type === 'unsubscribe_player') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that.' });
+        const entry = roomFor(identity.campaignId).get(identity.accountUid);
+        if (entry) entry.viewingUid = null;
         return;
       }
 
@@ -267,6 +345,7 @@ export function createWebSocketServer(db, httpServer) {
         // have to guess how long "probably done by now" is.
         send(ws, { type: 'cross_write_ack', targetUid, rev: nextRev });
         broadcastRoster(identity.campaignId); // Phase 5d: the target's stats (e.g. HP) may have changed
+        notifyViewers(identity.campaignId, targetUid, nextState); // Phase 6e
         return;
       }
 
@@ -328,6 +407,31 @@ export function createWebSocketServer(db, httpServer) {
         deleteAttackRequest(db, identity.campaignId, msg.requestId);
         send(ws, { type: 'attack_request_resolved', requestId: msg.requestId });
         send(ws, { type: 'attack_request_list', requests: listAttackRequests(db, identity.campaignId) });
+        return;
+      }
+
+      if (msg.type === 'kick_player') {
+        // Phase 6f. Matches the original removePlayer's own scope exactly: deletes this
+        // campaign's character/inventory progress for the target, nothing about their identity
+        // (there's no separate login to revoke in this identity model — see deletePlayerState's
+        // own comment) — they can rejoin fresh with the same device uid and campaign code any
+        // time, a known, deliberately-simple limitation carried forward from the original.
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can remove a player.' });
+        const targetUid = msg.targetUid;
+        if (targetUid === identity.accountUid) return send(ws, { type: 'error', message: "You can't remove yourself." });
+        deletePlayerState(db, identity.campaignId, targetUid);
+        const room = roomFor(identity.campaignId);
+        const target = room.get(targetUid);
+        if (target) {
+          // Told explicitly (not just disconnected) so their client shows a real reason instead
+          // of silently reconnecting and looking like nothing happened — same spirit as the
+          // Phase 6c displaced-connection fix above.
+          send(target.ws, { type: 'kicked' });
+          target.ws.close();
+          room.delete(targetUid);
+        }
+        send(ws, { type: 'kick_ack', targetUid });
+        broadcastRoster(identity.campaignId);
         return;
       }
 

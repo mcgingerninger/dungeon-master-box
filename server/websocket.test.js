@@ -163,6 +163,45 @@ describe('identify', () => {
     const msg = await nextMessage(ws);
     assert.equal(msg.type, 'error');
   });
+
+  // Phase 6c found this by accident (a browser tab duplicating a DM's session) — before this
+  // fix, a second connection identifying with an already-live accountUid silently replaced the
+  // room map entry, leaving the first connection open but untracked: no crash, just permanently
+  // deaf to every future broadcast, hardest kind of bug to notice.
+  test('a second connection with the same accountUid displaces the first, which is told and closed', async () => {
+    const ws1 = await connectAs('uid-dm', 'dm');
+    const ws2 = await connect();
+    const next2 = messageQueue(ws2);
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-dm', role: 'dm', username: 'DM' });
+
+    const displacedMsg = await ws1.next();
+    assert.equal(displacedMsg.type, 'error');
+    await new Promise((resolve) => ws1.once('close', resolve));
+
+    const identified2 = await next2();
+    assert.equal(identified2.type, 'identified');
+    await next2(); // roster_update
+    await next2(); // attack_request_list
+
+    // Confirm the NEW connection, not the displaced old one, is what the server now considers
+    // "the DM" for this campaign — a player joining should roster_update ws2, never ws1 (which
+    // is already closed and couldn't receive it anyway, but this also proves the room map itself
+    // was updated, not just that ws1 got disconnected).
+    await connectAs('uid-player', 'player');
+    const roster = await next2();
+    assert.equal(roster.type, 'roster_update');
+    assert.equal(roster.roster.length, 1);
+  });
+
+  test('identifying again with the SAME connection (no-op reconnect) does not close itself', async () => {
+    const ws = await connectAs('uid-dm', 'dm');
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-dm', role: 'dm', username: 'DM' });
+    const identified = await ws.next();
+    assert.equal(identified.type, 'identified');
+    await ws.next(); // roster_update
+    await ws.next(); // attack_request_list
+    assert.equal(ws.readyState, ws.OPEN);
+  });
 });
 
 describe('push_state and reconnect', () => {
@@ -503,6 +542,11 @@ describe('DM roster listener (Phase 5d)', () => {
     assert.equal(joinRoster.type, 'roster_update');
     assert.equal(joinRoster.roster.length, 1);
     assert.equal(joinRoster.roster[0].uid, 'uid-player');
+    // Regression coverage for a real bug Phase 6e's browser testing found: the monolith's
+    // renderPlayersTab() filters on exactly `p.role === 'player'` — a roster entry missing this
+    // field made the Players tab silently show nobody, undetected since Phase 5d because nothing
+    // exercised that specific consumer until 6e.
+    assert.equal(joinRoster.roster[0].role, 'player');
 
     await pushState(player, 1, { characterCurrentHp: 18, characterMaxHpEffective: 25, characterAc: 16 });
     const statsRoster = await dm.next();
@@ -641,5 +685,155 @@ describe('attack-request review queue (Phase 5d)', () => {
     assert.equal(list.type, 'attack_request_list');
     assert.equal(list.requests.length, 1);
     assert.equal(list.requests[0].attackData.move, 'already pending');
+  });
+});
+
+describe('viewed-player listener (Phase 6e)', () => {
+  test('subscribing to a player with no state yet gets a null player_state_update', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    await connectAs('uid-alice', 'player');
+    await dm.next(); // roster_update from alice joining
+
+    send(dm, { type: 'subscribe_player', targetUid: 'uid-alice' });
+    const update = await dm.next();
+    assert.equal(update.type, 'player_state_update');
+    assert.equal(update.targetUid, 'uid-alice');
+    assert.equal(update.state, null);
+  });
+
+  test('subscribing to a player with existing state gets it immediately (catch-up)', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    await pushState(alice, 1, { characterClass: 'Rogue' });
+    const dm = await connectAs('uid-dm', 'dm');
+
+    send(dm, { type: 'subscribe_player', targetUid: 'uid-alice' });
+    const update = await dm.next();
+    assert.equal(update.type, 'player_state_update');
+    assert.equal(update.state.characterClass, 'Rogue');
+  });
+
+  test("a subscribed player's own push notifies the DM live", async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const alice = await connectAs('uid-alice', 'player');
+    await dm.next(); // roster_update from alice joining
+    send(dm, { type: 'subscribe_player', targetUid: 'uid-alice' });
+    await dm.next(); // initial null catch-up
+
+    await pushState(alice, 1, { characterClass: 'Wizard' });
+    const update = await nextNonRosterMessage(dm.next);
+    assert.equal(update.type, 'player_state_update');
+    assert.equal(update.state.characterClass, 'Wizard');
+  });
+
+  test('a DM cross-write to the subscribed target also notifies the viewer', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const alice = await connectAs('uid-alice', 'player');
+    await dm.next(); // roster_update from alice joining
+    await pushState(alice, 1, { characterCurrentHp: 10, characterMaxHpEffective: 30 });
+    await dm.next(); // roster_update from alice's push
+    send(dm, { type: 'subscribe_player', targetUid: 'uid-alice' });
+    await dm.next(); // catch-up with alice's just-pushed state
+
+    send(dm, { type: 'hp_delta', targetUid: 'uid-alice', delta: -3 });
+    await nextMessage(alice); // alice's own state_update
+    const ack = await dm.next();
+    assert.equal(ack.type, 'cross_write_ack');
+    const roster = await dm.next();
+    assert.equal(roster.type, 'roster_update');
+    const update = await dm.next();
+    assert.equal(update.type, 'player_state_update');
+    assert.equal(update.state.characterCurrentHp, 7);
+  });
+
+  test('switching subscription stops notifications from the old target', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const alice = await connectAs('uid-alice', 'player');
+    const bob = await connectAs('uid-bob', 'player');
+    await dm.next(); await dm.next(); // roster_updates from alice/bob joining
+    send(dm, { type: 'subscribe_player', targetUid: 'uid-alice' });
+    await dm.next(); // catch-up for alice
+    send(dm, { type: 'subscribe_player', targetUid: 'uid-bob' });
+    await dm.next(); // catch-up for bob
+
+    await pushState(alice, 1, { characterClass: 'Rogue' });
+    // Only bob's subscription is live now — alice's push produces just the ordinary
+    // roster_update, never a player_state_update for a subscription that's been replaced.
+    const afterAlice = await dm.next();
+    assert.equal(afterAlice.type, 'roster_update');
+    await assertNoQueuedMessage(dm.next, 200);
+
+    await pushState(bob, 1, { characterClass: 'Cleric' });
+    const afterBob = await nextNonRosterMessage(dm.next);
+    assert.equal(afterBob.type, 'player_state_update');
+    assert.equal(afterBob.targetUid, 'uid-bob');
+    assert.equal(afterBob.state.characterClass, 'Cleric');
+  });
+
+  test('a non-DM cannot subscribe to a player', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    send(alice, { type: 'subscribe_player', targetUid: 'uid-bob' });
+    const msg = await nextMessage(alice);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+});
+
+describe('player removal (Phase 6f)', () => {
+  test("kicking a player deletes their persisted state and closes their connection with a reason", async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const alice = await connectAs('uid-alice', 'player');
+    await dm.next(); // roster_update from alice joining
+    await pushState(alice, 1, { characterClass: 'Rogue' });
+    await dm.next(); // roster_update from alice's push
+
+    send(dm, { type: 'kick_player', targetUid: 'uid-alice' });
+    const kickedMsg = await nextMessage(alice);
+    assert.equal(kickedMsg.type, 'kicked');
+    await new Promise((resolve) => alice.once('close', resolve));
+
+    const ack = await dm.next();
+    assert.equal(ack.type, 'kick_ack');
+    assert.equal(ack.targetUid, 'uid-alice');
+    const roster = await dm.next();
+    assert.equal(roster.type, 'roster_update');
+    assert.equal(roster.roster.length, 0);
+
+    // Confirm the persisted state is genuinely gone — reconnecting starts completely fresh.
+    const rejoin = await connect();
+    send(rejoin, { type: 'identify', campaignId, accountUid: 'uid-alice', role: 'player', username: 'Alice' });
+    const identified = await nextMessage(rejoin);
+    assert.equal(identified.state, null);
+  });
+
+  test('a non-DM cannot kick a player', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    send(alice, { type: 'kick_player', targetUid: 'uid-bob' });
+    const msg = await nextMessage(alice);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
+  test('the DM cannot remove themselves', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'kick_player', targetUid: 'uid-dm' });
+    const msg = await dm.next();
+    assert.equal(msg.type, 'error');
+  });
+
+  test('kicking an already-offline player still deletes their persisted state', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    await pushState(alice, 1, { characterClass: 'Rogue' });
+    alice.close();
+    await new Promise((resolve) => alice.once('close', resolve));
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'kick_player', targetUid: 'uid-alice' });
+    const ack = await dm.next();
+    assert.equal(ack.type, 'kick_ack');
+
+    const rejoin = await connect();
+    send(rejoin, { type: 'identify', campaignId, accountUid: 'uid-alice', role: 'player', username: 'Alice' });
+    const identified = await nextMessage(rejoin);
+    assert.equal(identified.state, null);
   });
 });

@@ -1,585 +1,116 @@
-// ===================== MULTIPLAYER SYNC (Firebase) — PHASE 1 + ACCOUNTS =====================
-// Self-contained add-on for dungeon_loot_wheel: real player/DM accounts, a launch-time role
-// gate, role-based tab restrictions, and realtime sync of a player's full save-state to the
-// cloud. Everything multiplayer-related lives in this one file — the main app file only
-// needed two small named hook additions (see the comment above its
-// <script type="module" src="multiplayer-sync.js"> tag): window.onMultiplayerStateChange and
-// window.applyRemoteMultiplayerState. Both are checked with `typeof x === 'function'` before
-// being called, so if this file is ever removed, the main app keeps working exactly as it
-// does today — nothing in it depends on this file existing.
+// ===================== MULTIPLAYER SYNC (WebSocket) — PHASE 6c =====================
+// Self-contained add-on for dungeon_loot_wheel: a launch-time role gate, role-based tab
+// restrictions, and realtime sync of a player's full save-state against the local
+// dungeon-master-box server (server/websocket.js) over a WebSocket connection. Everything
+// multiplayer-related lives in this one file — the main app file only needs two small named
+// hook additions (see the comment above its <script type="module" src="multiplayer-sync.js">
+// tag): window.onMultiplayerStateChange and window.applyRemoteMultiplayerState. Both are checked
+// with `typeof x === 'function'` before being called, so if this file is ever removed, the main
+// app keeps working exactly as it does today — nothing in it depends on this file existing.
 //
-// ---- Account model ----
-// Real Firebase Email/Password accounts, but players/DMs never type or see an email — they
-// pick a USERNAME and password, and this file synthesizes a fake-but-valid email under the
-// hood (e.g. "dave" -> "dave@dnd-loot-tool.local") so Firebase's real password security
-// (hashing, rate limiting, etc.) handles everything properly instead of anything here rolling
-// its own crypto. Firebase's built-in email-uniqueness check doubles as username-uniqueness
-// enforcement for free — no separate "is this username taken" lookup collection needed.
+// This is a full rewrite of the Firebase/Firestore version of this file (see git history and
+// docs/ARCHITECTURE.md's Phase 5 sections for the original design and the audit that preceded
+// this rewrite). What changed and why:
 //
-// A DM's account owns exactly one campaign (a room code, generated at signup). A player's
-// account is linked to exactly one DM's campaign, entered once at signup — after that, they
-// just log in with their username/password from any device and land straight back in it.
-// (One account per campaign is a deliberate v1 simplification, not a hard technical limit.)
+// ---- Identity model: room code + display name, no accounts (confirmed with the user) ----
+// The original used real Firebase Email/Password accounts (a username/password disguised as a
+// synthetic email) so a player could log back into the SAME character from any device. That's
+// gone. Instead: a DM creates a campaign and gets a short shareable code (server/database.js's
+// createCampaign — Phase 6b); a player types that code plus a display name; nobody types a
+// password anywhere. The WebSocket `identify` message already accepted this exact shape
+// unmodified since Phase 5a (accountUid/role/username, no credential) — see server/websocket.js's
+// own documented "no identity verification" gap, a trust model this file inherits rather than
+// changes. A DM's own identity is just an `identify` claiming role:'dm'; nothing server-side
+// tracks who "really" owns a campaign, matching the low-stakes, in-person-play trust level the
+// user confirmed is acceptable here (same spirit as loot claims trusting a self-reported uid).
 //
-// ---- Role restrictions — read this before assuming it's airtight ----
-// Hiding DM-only tabs for players is a UX courtesy, not a security boundary — anyone who
-// opened browser devtools could still call the underlying functions directly. The REAL
-// enforcement is what Firestore's security rules let a signed-in player's account actually
-// read/write: only their own rooms/{code}/players/{uid} document, never anyone else's and
-// never the room document itself. A player fiddling with devtools could still, say, generate
-// themselves a legendary sword locally and have it sync — same as it always could with any
-// client-side app — but they can't touch another player's data or the DM's.
+// A per-BROWSER random id (`getOrCreateDeviceUid`, persisted in localStorage) stands in for the
+// old Firebase uid — this is what makes a returning player's character persist across reloads
+// (player_states is keyed by (campaignId, accountUid), so reconnecting with the same device uid
+// resumes the same character). Deliberate, documented simplification: because this id lives in
+// localStorage (shared across every tab of one browser, not sessionStorage), running the DM role
+// and a player role SIMULTANEOUSLY in two tabs of the SAME browser is no longer supported — both
+// tabs would share one accountUid, and server/websocket.js's `rooms` map is keyed by accountUid
+// per campaign, so the second tab's identify would silently displace the first's connection entry
+// for that campaign. The original supported this via real, distinct per-account logins in
+// sessionStorage. Trade-off accepted deliberately: a returning player's character surviving a
+// closed tab/browser restart (the common case) is worth more than same-browser dual-role testing
+// (workaround: use a second browser or a private window, which gets its own localStorage).
 //
-// ---- One-time setup you still need to do in the Firebase console ----
-// Test mode (from initial setup) allows any signed-in user to read/write everything for ~30
-// days and then locks down to deny-everything. Before that expires (or if you've updated this
-// file and need to re-paste), paste this into Firestore Database → Rules, replacing whatever's
-// there, then click Publish:
+// ---- Sync engine: WebSocket instead of Firestore onSnapshot ----
+// The old rev/extRev two-counter scheme existed entirely to filter Firestore's own habit of
+// echoing a client's writes back to it. A WebSocket server is stateful and simply never sends a
+// state_update back to the connection that caused it (see server/websocket.js's module comment) —
+// self-echo isn't a problem here by construction, so startPlayerListener's replacement below
+// applies every incoming state_update unconditionally, no counter comparison needed. `rev` is
+// still sent with every push_state (guards a narrower problem that doesn't go away: two rapid
+// pushes from the SAME client arriving out of order over the network — see the server's own
+// staleness check), but this file no longer needs to reason about it beyond incrementing it.
 //
-//   rules_version = '2';
-//   service cloud.firestore {
-//     match /databases/{database}/documents {
-//       match /users/{uid} {
-//         allow read: if request.auth != null;
-//         allow create: if request.auth != null && request.auth.uid == uid;
-//         allow update: if request.auth != null && request.auth.uid == uid;
-//         // Lets the "Delete My Account" self-service action (see deleteMyAccount) clean up
-//         // this profile doc as part of freeing up a username for reuse — there was no delete
-//         // rule here at all before, which would otherwise reject that half of the cleanup.
-//         allow delete: if request.auth != null && request.auth.uid == uid;
-//       }
-//       match /rooms/{roomCode} {
-//         allow read: if request.auth != null;
-//         allow create: if request.auth != null;
-//         allow update, delete: if request.auth != null && resource.data.dmUid == request.auth.uid;
-//         match /players/{playerId} {
-//           allow read: if request.auth != null;
-//           allow write: if request.auth != null && (
-//             request.auth.uid == playerId ||
-//             get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid
-//           );
-//         }
-//         // DM-only shared combat view — a player never writes here, only reads it live.
-//         match /battlefield/{doc} {
-//           allow read: if request.auth != null;
-//           allow write: if request.auth != null && get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid;
-//         }
-//         // DM-authored puzzle log, shared read the same way battlefield is — see
-//         // pushPuzzleLogState/startPuzzleLogListener for why this exists (puzzleLog used to be
-//         // just a plain per-account field with no way for a player's own account to ever see
-//         // what the DM wrote).
-//         match /puzzles/{doc} {
-//           allow read: if request.auth != null;
-//           allow write: if request.auth != null && get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid;
-//         }
-//         // Real-time looting: any authenticated user (a player looting for themselves, or the
-//         // DM giving an item to someone) can CREATE a claim, but nobody can ever update or
-//         // delete one — this immutability is what gives true first-write-wins for a specific
-//         // corpse-drop item with zero server-side code and zero DM-online dependency.
-//         // The create rule used to allow ANY authenticated user to set claimedBy to literally
-//         // any uid, including someone else's — window.dmGiveLootItem now checks mp.role
-//         // client-side, but that's only a UX guard; the real fix is here. This requires the
-//         // claim's own claimedBy to be either the caller themselves (ordinary self-loot) or the
-//         // DM acting on someone else's behalf (a gift), closing off a player creating a claim
-//         // for another uid — which, since claims are immutable, previously let them
-//         // permanently squat someone else's real drop with no recovery path.
-//         match /lootClaims/{claimId} {
-//           allow read: if request.auth != null;
-//           allow create: if request.auth != null && (
-//             request.resource.data.claimedBy == request.auth.uid ||
-//             get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid
-//           );
-//           allow update, delete: if false;
-//         }
-//         // A player's weapon-attack roll, pending the DM's review/apply — anyone signed in can
-//         // submit one (their own attack), nobody can edit one once submitted (immutable, same
-//         // reasoning as lootClaims), and only the DM can delete one (their "Apply"/"Dismiss"
-//         // both resolve by deleting the request once handled).
-//         match /attackRequests/{reqId} {
-//           allow read: if request.auth != null;
-//           allow create: if request.auth != null;
-//           allow update: if false;
-//           allow delete: if request.auth != null && get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid;
-//         }
-//         // Gambling table state — same DM-only-write, shared-read shape as battlefield/puzzles
-//         // above. See pushGamblingState/startGamblingListener.
-//         match /gambling/{doc} {
-//           allow read: if request.auth != null;
-//           allow write: if request.auth != null && get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid;
-//         }
-//         // A player's bet/hit/stand/spin/hold-discard, pending the DM's dealer logic — same
-//         // submit-and-forget shape as attackRequests above (anyone signed in can submit their
-//         // own action, nobody can edit one once submitted, only the DM deletes one once applied).
-//         match /gamblingActions/{reqId} {
-//           allow read: if request.auth != null;
-//           allow create: if request.auth != null;
-//           allow update: if false;
-//           allow delete: if request.auth != null && get(/databases/$(database)/documents/rooms/$(roomCode)).data.dmUid == request.auth.uid;
-//         }
-//       }
-//     }
-//   }
+// ---- sanitizeNestedArrays/unsanitizeNestedArrays: gone, not needed anymore ----
+// That machinery existed solely because Firestore rejects a document field that's an
+// array-of-arrays, and rejects `undefined` outright. The new backend stores state as a plain JSON
+// text blob (`JSON.stringify` in db/database.js's savePlayerState/saveSubsystemState) — nested
+// arrays serialize fine, and JSON.stringify already drops `undefined` object properties on its
+// own. Removed entirely rather than carried forward as dead weight.
 //
-// "write" already covers create/update/delete combined — this is what lets a DM delete a
-// player's document (see removePlayer below) without needing a separate delete rule.
-//
-// ---- Creating a new DM account (no self-service signup anymore — see signUpDM's own comment) ----
-// This app's public URL used to let anyone click "Create Account" under Dungeon Master and spin
-// up their own fully independent campaign against this same Firebase project — closed off since
-// there was zero gating on it. Player signup was left alone; it already requires a real
-// campaign code tied to an existing DM's room, so a stranger can't wander into someone else's
-// game that way. To set up an additional DM account (yourself on a new device, a co-DM, a second
-// campaign) by hand instead:
-//   1. Firebase Console → Authentication → Users → Add user. Email field: pick a username and
-//      use the same fake-domain pattern this file generates automatically (see
-//      usernameToEmail) — e.g. username "dave" -> "dave@dnd-loot-tool.local". Set a real
-//      password (6+ characters). Copy the generated UID once the user's created.
-//   2. Firebase Console → Firestore Database → Start collection (or add to an existing one) →
-//      rooms/{pick a short room code, e.g. "K7M2P"} → add field dmUid (string) = the UID from
-//      step 1, and createdAt (timestamp) = now.
-//   3. Same way, create users/{that UID} with fields: role (string) = "dm", username (string) =
-//      whatever you used, campaignCode (string) = the same room code from step 2, createdAt
-//      (timestamp) = now.
-//   4. Log in on the app as that username/password under the Dungeon Master role — connectAsRole
-//      picks up from there exactly like a normal login.
+// ---- What's deliberately NOT wired up yet (see docs/ARCHITECTURE.md) ----
+// Phases 6e (viewed-player spectator listener) and 6f (player removal) — the other two gaps the
+// original Phase 5 audit missed — are both implemented below, each against its own scoped
+// server/websocket.js addition, confirmed with the user before being built (same discipline as
+// Phase 5's a-d breakdown). Real-time gambling sync (pushGamblingState/startGamblingListener/
+// gambling action queue) is the one remaining, explicitly deprioritized subsystem: window.
+// pushGamblingState etc. are simply not defined by this file, and every call site in the monolith
+// already guards with `typeof window.X === 'function'` first, so gambling just doesn't sync
+// between players in multiplayer mode yet, with no crash — to be picked back up later.
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-  onAuthStateChanged, updateProfile, deleteUser, setPersistence, browserSessionPersistence,
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import {
-  initializeFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection, serverTimestamp,
-  updateDoc, increment, arrayUnion,
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+// ---------- Config ----------
+// The app is served BY the same server it talks to (Phase 6a's static file serving) — so the
+// browser's own origin already IS the server's address, no separate config needed.
+const API_BASE = window.location.origin;
+const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAv2PB_BFz0k_flWzjSgpRmQtLPx88KUPM",
-  authDomain: "dnd-loot-tool.firebaseapp.com",
-  projectId: "dnd-loot-tool",
-  storageBucket: "dnd-loot-tool.firebasestorage.app",
-  messagingSenderId: "1006460408021",
-  appId: "1:1006460408021:web:e475fed0a7b66150f9125c",
-};
+const DEVICE_UID_KEY = 'dmbox_device_uid';
+const SESSION_KEY = 'dmbox_session'; // { role, campaignId, code, username }
 
-const fbApp = initializeApp(firebaseConfig);
-const auth = getAuth(fbApp);
-// Firebase's default persistence (browserLocalPersistence) stores the signed-in session in a
-// place shared by every tab of the same browser — signing in as a second account in a new tab
-// silently signs the first tab out too, which is exactly the "opening two tabs logs me out"
-// problem. browserSessionPersistence keys the session to sessionStorage instead, which each
-// TAB gets its own independent copy of even for the same origin — so a DM tab and a player tab
-// (or two different players) can now be logged in simultaneously in the same browser, on the
-// same PC, with no separate profile/incognito window needed. Trade-off: sessionStorage doesn't
-// survive actually closing a tab (reloading the same tab is fine, it keeps sessionStorage) —
-// closing and reopening needs signing back in, unlike before. init() is deferred until this
-// resolves so nothing reads/writes auth state under the old persistence mode first.
-const authPersistenceReady = setPersistence(auth, browserSessionPersistence).catch((err) => {
-  console.error("[multiplayer-sync] setPersistence(browserSessionPersistence) failed, falling back to Firebase's shared-across-tabs default:", err);
-});
-// Plain getFirestore() defaults to a WebChannel transport that tries QUIC (HTTP/3) first —
-// on some networks (corporate firewalls, certain ISPs/VPNs/proxies that block outbound UDP)
-// QUIC connections fail outright, which shows up as net::ERR_QUIC_PROTOCOL_ERROR plus repeated
-// 400s on firestore.googleapis.com's Write stream, and every read/write (including account
-// creation and login) fails as a result. experimentalAutoDetectLongPolling makes the SDK probe
-// for that up front and transparently fall back to long-polling over plain HTTPS instead of
-// QUIC, with no behavior change for players on networks where QUIC works fine.
-const db = initializeFirestore(fbApp, { experimentalAutoDetectLongPolling: true });
-
-// ---------- Username <-> synthetic email ----------
-const USERNAME_EMAIL_DOMAIN = "dnd-loot-tool.local";
-function sanitizeUsername(raw) {
-  return (raw || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+function generateId() {
+  return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
 }
-function usernameToEmail(username) {
-  return sanitizeUsername(username) + "@" + USERNAME_EMAIL_DOMAIN;
+function getOrCreateDeviceUid() {
+  let uid = localStorage.getItem(DEVICE_UID_KEY);
+  if (!uid) { uid = 'p_' + generateId(); localStorage.setItem(DEVICE_UID_KEY, uid); }
+  return uid;
 }
-
-// Room codes avoid visually-ambiguous characters (0/O, 1/I/L) since these get read aloud
-// and typed by hand at the table.
-const ROOM_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-function generateRoomCode(len = 5) {
-  let out = "";
-  for (let i = 0; i < len; i++) out += ROOM_CODE_ALPHABET[Math.floor(Math.random() * ROOM_CODE_ALPHABET.length)];
-  return out;
+function saveSession(session) { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); }
+function loadSession() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
+  catch { return null; }
 }
-
-function userDocRef(uid) { return doc(db, "users", uid); }
-function roomDocRef(roomCode) { return doc(db, "rooms", roomCode); }
-function playerDocRef(roomCode, uid) { return doc(db, "rooms", roomCode, "players", uid); }
-// One doc per room, written only by the DM, holding just the combat roster/log — deliberately
-// separate from the DM's own players/{dmUid} doc (which holds their ENTIRE app state) so a
-// player's battlefield listener only ever re-fires on actual combat activity, not on every
-// unrelated thing the DM does elsewhere in the app (restocking the Store, editing their own
-// inventory, etc.).
-function battlefieldDocRef(roomCode) { return doc(db, "rooms", roomCode, "battlefield", "state"); }
-function puzzleLogDocRef(roomCode) { return doc(db, "rooms", roomCode, "puzzles", "log"); }
-function lootClaimDocRef(roomCode, claimId) { return doc(db, "rooms", roomCode, "lootClaims", claimId); }
-function lootClaimsCollectionRef(roomCode) { return collection(db, "rooms", roomCode, "lootClaims"); }
-// A player's weapon-attack roll against a monster on the shared Battlefield, pending DM review
-// (see submitBattlefieldAttack/startAttackRequestListener) — deliberately its own collection,
-// not folded into lootClaims or the player's own doc, so the DM's listener only ever fires on
-// an actual attack needing review, never on unrelated per-player autosave noise.
-function attackRequestsCollectionRef(roomCode) { return collection(db, "rooms", roomCode, "attackRequests"); }
-function attackRequestDocRef(roomCode, reqId) { return doc(db, "rooms", roomCode, "attackRequests", reqId); }
-// Gambling table state (see gamblingState / GAMBLING_HANDLERS in the main file) — same
-// DM-writes/everyone-reads shape as battlefieldDocRef, and the same player-submits/DM-applies
-// request queue as attackRequests, for exactly the same reasons: a player's bet/hit/spin only
-// ever fires the DM's listener when something at the table actually happened, never on
-// unrelated per-player autosave noise.
-function gamblingDocRef(roomCode) { return doc(db, "rooms", roomCode, "gambling", "state"); }
-function gamblingActionsCollectionRef(roomCode) { return collection(db, "rooms", roomCode, "gamblingActions"); }
-function gamblingActionDocRef(roomCode, reqId) { return doc(db, "rooms", roomCode, "gamblingActions", reqId); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
 // All multiplayer session state lives here, not scattered across module-level variables.
 const mp = {
   uid: null,
   username: null,
   role: null, // 'dm' | 'player'
-  roomCode: null,
+  campaignId: null,
+  code: null,
   connected: false,
-  // Guards the save→sync→listener→apply→(would-be-save-again) loop: while a remote update
-  // is being applied to local state, the save hook skips pushing back up.
+  // Guards the save->sync->apply->(would-be-save-again) loop: while a remote update is being
+  // applied to local state, the save hook skips pushing back up.
   applyingRemote: false,
-  playerUnsub: null,
-  rosterUnsub: null,
-  roster: new Map(), // uid -> { username, updatedAt } — DM-only, for the roster/remove list
-  kicked: false, // set true if the DM removed us — blocks any further push attempts
-  // Monotonically increasing counter, stamped onto every write this client makes to its own
-  // player doc (see pushOwnState) and checked on every snapshot the realtime listener
-  // receives back (see startPlayerListener) — see the comment there for why this exists.
+  ws: null,
+  kicked: false, // set true if the connection is forcibly closed by the server (future: Phase 6f kick)
   pushRev: 0,
-  // The last `extRev` value (a separate server-incremented counter bumped ONLY by cross-player
-  // writes — applyHpDelta, giftItemToPlayer, setPlayerInventoryFields) this client has actually
-  // applied. Lets startPlayerListener tell "this snapshot is just Firestore echoing my own last
-  // push back at me, nothing external changed" (skip — see the full explanation there) apart
-  // from "the DM changed something since I last looked" (apply), even though both cases can
-  // show the exact same `rev` (the DM's writes never touch `rev` at all).
-  lastAppliedExtRev: 0,
+  roster: new Map(), // uid -> { username, currentHp, maxHp, ac } — DM-only, for the account panel
 };
 
-// ---------- Sign up ----------
-// Best-effort cleanup when ANY step after account creation fails during signup — deletes
-// whatever this attempt may have already written (the profile doc, and for a DM signup, the
-// room doc it just created) plus the auth account itself, so a failed signup never leaves an
-// orphaned login permanently squatting on that username with no way to actually use it. This is
-// what was missing before: signUpDM had no rollback at all, and signUpPlayer's one rollback path
-// silently swallowed a failed deleteUser (`.catch(() => {})`) with no way for the user — or
-// anyone — to tell the cleanup itself hadn't actually worked, which is exactly the "the user
-// doesn't get taken [when signup fails]... that doesn't seem to work" symptom.
-// Returns whether the auth account itself was actually deleted — the one step that determines
-// whether the username is really free again — so the caller can be honest about whether
-// retrying with the same username will work or whether it's now stuck.
-async function rollbackFailedSignup(user, roomCodeCreated) {
-  await deleteDoc(userDocRef(user.uid)).catch(() => {});
-  if (roomCodeCreated) await deleteDoc(roomDocRef(roomCodeCreated)).catch(() => {});
-  try {
-    await deleteUser(user);
-    return true;
-  } catch (err) {
-    console.error("[multiplayer-sync] rollbackFailedSignup: deleteUser failed, account may be orphaned:", err);
-    return false;
-  }
-}
-// Wraps err in a distinct, honest message when rollback itself failed — telling the user
-// "just try again" would be actively misleading if the username is now permanently stuck.
-function signupFailure(err, cleanedUp, username) {
-  if (cleanedUp) return err;
-  return new Error(`Signup failed and couldn't be fully cleaned up (${(err && err.message) || err}). The username "${username}" may now be stuck on a broken account — try logging in with it and using Delete My Account, or pick a different username.`);
-}
-// No longer called from anywhere — DM self-signup was closed off entirely (see the comment on
-// renderGateForm) since it had no gating at all and let anyone who found this app's public URL
-// spin up their own independent campaign against the same Firebase project. Left defined
-// (rather than deleted) as the exact reference for what a new DM account needs: a
-// rooms/{roomCode} doc with dmUid set, and a users/{uid} profile doc with role/username/
-// campaignCode — both created by hand in the Firebase console now, see the setup notes near the
-// top of this file. Re-wiring self-service DM signup later (with a real gate in front of it) is
-// just restoring the two lines this function used to be called from in handleGateSubmit.
-async function signUpDM(username, password) {
-  const email = usernameToEmail(username);
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
-  const user = cred.user;
-  const roomCode = generateRoomCode();
-  try {
-    await updateProfile(user, { displayName: sanitizeUsername(username) });
-    await setDoc(roomDocRef(roomCode), { dmUid: user.uid, createdAt: serverTimestamp() });
-    await setDoc(userDocRef(user.uid), {
-      role: "dm", username: sanitizeUsername(username), campaignCode: roomCode, createdAt: serverTimestamp(),
-    });
-  } catch (err) {
-    throw signupFailure(err, await rollbackFailedSignup(user, roomCode), username);
-  }
-  // By this point the account, room, and profile all exist correctly — signup itself genuinely
-  // succeeded. A failure in connectAsRole (wiring up live listeners/local session state) is a
-  // transient runtime hiccup on an otherwise-valid account, not a reason to roll back a
-  // perfectly good signup; the right recovery there is just logging in again normally.
-  await connectAsRole(user.uid, "dm", roomCode, sanitizeUsername(username));
-}
-
-async function signUpPlayer(username, password, campaignCode) {
-  campaignCode = (campaignCode || "").trim().toUpperCase();
-  if (!campaignCode) throw new Error("Enter the DM's campaign code.");
-  const email = usernameToEmail(username);
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
-  const user = cred.user;
-  try {
-    // The campaign-code check has to happen AFTER signup, not before: the security rules up top
-    // require request.auth != null just to READ a room doc at all, so checking this before the
-    // account exists throws Firestore's "Missing or insufficient permissions" instead of the
-    // intended "no campaign found" message -- this is what was actually breaking player signup,
-    // not a rules/config problem.
-    const roomSnap = await getDoc(roomDocRef(campaignCode));
-    if (!roomSnap.exists()) throw new Error(`No campaign found for code "${campaignCode}".`);
-    await updateProfile(user, { displayName: sanitizeUsername(username) });
-    await setDoc(userDocRef(user.uid), {
-      role: "player", username: sanitizeUsername(username), campaignCode, createdAt: serverTimestamp(),
-    });
-  } catch (err) {
-    throw signupFailure(err, await rollbackFailedSignup(user, null), username);
-  }
-  await connectAsRole(user.uid, "player", campaignCode, sanitizeUsername(username));
-}
-
-// ---------- Log in (also used for the automatic "already signed in" restore on page load) ----------
-async function logIn(username, password) {
-  const email = usernameToEmail(username);
-  const cred = await signInWithEmailAndPassword(auth, email, password);
-  await restoreSession(cred.user);
-}
-
-// Reads this account's profile doc to find its role + campaign, then wires up the same sync
-// engine Phase 1 already built. Used both right after a fresh login and automatically on page
-// load if Firebase still has a valid persisted session for this browser.
-async function restoreSession(user) {
-  const snap = await getDoc(userDocRef(user.uid));
-  if (!snap.exists()) throw new Error("Account profile not found — try logging in again.");
-  const data = snap.data();
-  await connectAsRole(user.uid, data.role, data.campaignCode, data.username);
-}
-
-async function connectAsRole(uid, role, roomCode, username) {
-  mp.uid = uid;
-  mp.role = role;
-  mp.roomCode = roomCode;
-  mp.username = username;
-  mp.kicked = false;
-  // Deliberately populate the local-state cache (for a first-time push, below) BEFORE
-  // flipping mp.connected on — window.onMultiplayerStateChange only auto-pushes when
-  // mp.connected is already true, so calling this while it's still false just refreshes the
-  // cache without triggering an eager push that could race ahead of the "does this account
-  // already have data" check right below it.
-  refreshLocalStateCache();
-  // A brand-new account has nothing synced yet — an existing one (returning login) already
-  // has a player doc, and pushing local state here would clobber it with whatever's in this
-  // browser's fresh localStorage. Only push if there's genuinely nothing there yet;
-  // startPlayerListener()'s first snapshot handles pulling existing state down either way.
-  const existing = await getDoc(playerDocRef(roomCode, uid));
-  // mp.pushRev resets to 0 on every fresh page load/reconnect, but a RETURNING account's doc
-  // already carries a `rev` left over from its previous session (whatever it last pushed).
-  // Without seeding from that value here, the very first reconnect snapshot — which is always
-  // this account's OWN pre-existing (and by now possibly stale, pre-this-session) data being
-  // pulled back down by design (see the comment below) — compares its old `rev` against a
-  // freshly-reset `mp.pushRev` of 0/1 in startPlayerListener's self-echo guard. Two independent
-  // counters from two different sessions essentially never happen to collide, so the guard's
-  // "is this echo stale?" check silently fails to recognize it as stale, and if ANY local change
-  // is made (and pushed) before that delayed initial snapshot finishes its own round trip, the
-  // late-arriving stale snapshot overwrites the fresh change moments later — exactly the
-  // "applied a hit, watched the HP revert almost immediately" bug this fixes. Seeding here means
-  // the FIRST comparison after reconnecting is already apples-to-apples with this account's own
-  // history instead of starting from a counter that's lying about being at rev 0.
-  if (existing.exists()) {
-    const existingRev = existing.data().rev;
-    if (typeof existingRev === "number" && existingRev > mp.pushRev) mp.pushRev = existingRev;
-  }
-  mp.connected = true;
-  if (!existing.exists()) {
-    // refreshLocalStateCache() just captured whatever THIS BROWSER's current in-memory state
-    // happens to be — its own earlier local testing before ever signing up, or a previous
-    // account used in this same tab — not a guaranteed blank slate. A brand-new account should
-    // never inherit that (this is what was making some new characters spawn already carrying
-    // an item, e.g. a torch, from whatever the browser had lying around). Overriding just the
-    // item/equipment AND character-sheet fields is enough — everything else omitted here is
-    // simply left at whatever default applyStateBlob's reader already starts with wherever
-    // this data is next read, which is correct on any genuinely fresh load anyway.
-    const blankState = {
-      ...collectCurrentAppState(),
-      inventoryGrid: typeof window.buildBlankInventoryGrid === "function" ? window.buildBlankInventoryGrid() : [],
-      inventoryPlacements: {}, inventoryPlacementCounter: 0,
-      savedGeneratedItems: [], playerSlots: {}, recentlyLooted: [],
-      characterAbilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
-      characterLevel: 1, skillProficiencies: [], saveProficiencies: [],
-      characterCurrentHp: 10, characterMaxHp: 10, characterMaxHpEffective: 10, characterHitDice: "", characterAc: 10, characterClass: "",
-    };
-    const created = await pushOwnState(blankState);
-    if (!created) {
-      // The very first write failed (permissions still propagating, a network blip, etc.) —
-      // do NOT proceed into startPlayerListener() in this state, since its first snapshot
-      // would see "no document" and could misread that as having been removed by the DM
-      // (see the comment on startPlayerListener for the full explanation of that bug and fix).
-      // Bail out to the gate with a real error instead of silently continuing broken.
-      mp.connected = false;
-      setGateStatus("Couldn't reach the campaign database — check your connection and Firestore rules, then try again.", true);
-      return;
-    }
-  }
-  startPlayerListener();
-  if (role === "dm") { startRosterListener(); startAttackRequestListener(roomCode); startGamblingActionListener(roomCode); }
-  else { startBattlefieldListener(roomCode); startPuzzleLogListener(roomCode); startGamblingListener(roomCode); }
-  startLootClaimListener(roomCode);
-  hideGate();
-  enforceRoleRestrictions(role);
-  renderAccountPanel();
-  updatePlayerNameDisplay();
-  // `existing` was checked above BEFORE this account's first-ever state push — reusing that
-  // same check here (rather than a separate flag) is what makes this fire exactly once, only
-  // for a genuinely brand-new player account, and never again on any later login. DM accounts
-  // don't get this: nothing about their combat/roster work depends on filling in a character
-  // sheet, and prompting them for one would just be noise on their own login.
-  if (!existing.exists() && role === "player" && typeof window.promptFirstTimeCharacterSetup === "function") {
-    window.promptFirstTimeCharacterSetup();
-  }
-}
-
-// Fills in / shows the player-name span on the persistent inventory summary bar (see the
-// #invPlayerNameWrap markup in the main file, just above the tab content) — reaching directly
-// into that DOM element the same way enforceRoleRestrictions and the rest of this file already
-// do, rather than routing through a window.* bridge function on the main script's side.
-function updatePlayerNameDisplay() {
-  const wrap = document.getElementById("invPlayerNameWrap");
-  const val = document.getElementById("invPlayerName");
-  if (!wrap || !val) return;
-  if (mp.connected && mp.username) {
-    val.textContent = mp.username;
-    wrap.style.display = "";
-  } else {
-    wrap.style.display = "none";
-  }
-}
-
-// Tears down this tab's own session state — unsubscribing listeners, clearing mp, hiding the
-// role-restricted CSS and the player-name display — WITHOUT touching Firebase Auth itself.
-// Split out from logOut() so the onAuthStateChanged handler below can reuse it for a sign-out
-// that happened somewhere else (see the comment there): that path must never call signOut()
-// itself, since Firebase Auth already reports signed-out by the time it runs.
-function resetLocalSessionState() {
-  if (mp.playerUnsub) mp.playerUnsub();
-  if (mp.rosterUnsub) mp.rosterUnsub();
-  if (mpBattlefieldUnsub) mpBattlefieldUnsub();
-  if (mpLootClaimsUnsub) mpLootClaimsUnsub();
-  if (mpViewedPlayerUnsub) mpViewedPlayerUnsub();
-  if (mpAttackRequestUnsub) mpAttackRequestUnsub();
-  mp.uid = null; mp.username = null; mp.role = null; mp.roomCode = null;
-  mp.connected = false; mp.playerUnsub = null; mp.rosterUnsub = null; mp.roster.clear();
-  mpBattlefieldUnsub = null; mpLootClaimsUnsub = null; mpViewedPlayerUnsub = null; mpAttackRequestUnsub = null;
-  document.body.classList.remove("role-player");
-  updatePlayerNameDisplay();
-  // Called last, after mp.connected is already false — the main file's own saveAppState()
-  // (triggered inside this bridge) checks mp.connected before pushing anything to Firestore,
-  // so this only flushes the blank state to local storage, never to the account just logged
-  // out of. See the bridge's own comment for why this needs to happen at all: without it, an
-  // account switch within one browser tab left the PREVIOUS account's inventory sitting in
-  // memory until (if ever) the next account's real data happened to arrive and overwrite it.
-  if (typeof window.resetMainAppStateToBlank === "function") window.resetMainAppStateToBlank();
-}
-
-function logOut() {
-  resetLocalSessionState();
-  signOut(auth).catch(() => {});
-  showGate();
-}
-
-// Self-service account deletion — the only way a username actually becomes reusable, since
-// nothing in this app (or Firebase's client SDK generally) can delete a DIFFERENT account than
-// the one currently signed in. A DM can't do this to a player; a player who wants their
-// username freed up has to log in as themselves and do it here. Requires typing the exact
-// username back (not just a plain confirm()) since — unlike removing a player, which only
-// deletes their campaign progress and leaves them able to log back in — this is genuinely
-// irreversible: the login itself is gone.
-async function deleteMyAccount() {
-  const roleWarning = mp.role === "dm"
-    ? " You are the DM — deleting your account will NOT delete the campaign or remove your players, but you will no longer be able to log in to manage it."
-    : "";
-  const typed = prompt(`This permanently deletes the login for "${mp.username}" and frees that username up for a new signup. This cannot be undone.${roleWarning}\n\nType your username to confirm:`);
-  if (typed === null) return; // cancelled
-  if (typed !== mp.username) {
-    alert("That didn't match your username — nothing was deleted.");
-    return;
-  }
-  const user = auth.currentUser;
-  if (!user) return;
-  // Clean up Firestore data BEFORE deleting the auth account — once it's gone, request.auth
-  // is null and these writes would be rejected by the security rules regardless.
-  if (mp.roomCode && mp.uid) { try { await deleteDoc(playerDocRef(mp.roomCode, mp.uid)); } catch (e) { /* best effort */ } }
-  try { await deleteDoc(userDocRef(user.uid)); } catch (e) { /* best effort */ }
-  try {
-    await deleteUser(user);
-  } catch (err) {
-    if (err.code === "auth/requires-recent-login") {
-      alert("For security, deleting an account needs a recent login. Log out, log back in, and try again right away.");
-    } else {
-      alert("Couldn't delete the account: " + (err.message || err.code || "unknown error"));
-    }
-    return;
-  }
-  resetLocalSessionState();
-  showGate();
-  setGateStatus("Account deleted — that username is available again.", false);
-}
-
-// ---------- Sync engine (same design as Phase 1) ----------
+// ---------- Local state cache (unchanged bridge with the main file) ----------
 function refreshLocalStateCache() {
-  if (typeof window.saveAppState === "function") window.saveAppState();
+  if (typeof window.saveAppState === 'function') window.saveAppState();
 }
 let _latestLocalState = null;
 function collectCurrentAppState() { return _latestLocalState; }
-
-// Firestore rejects an array whose elements are themselves arrays ("nested arrays are not
-// supported") as a document field value. inventoryGrid is a literal 2D grid (an array of row
-// arrays) and trips this directly — that's the exact error hit during testing. Rather than
-// hardcode a fix for just that one field, this walks the ENTIRE state tree and JSON-stringifies
-// any array-of-arrays it finds in place (tagged so the reverse pass can find and undo exactly
-// those spots), so any other field with this same shape — now or added later — is covered too
-// without needing to be individually tracked down. Everything else in the tree is untouched.
-//
-// While walking the tree anyway, this also drops any `undefined` object property outright
-// (rather than copying it through as `undefined`) — Firestore's setDoc rejects a field value
-// of `undefined` completely, throwing synchronously before the write ever reaches the network.
-// This is what a freshly-added, not-yet-defeated battle roster entry hit in practice: its
-// `defeated` field simply wasn't initialized anywhere until it was actually set to true, so it
-// read as `undefined` the moment that whole object round-tripped through Firestore for the
-// first time (see pushBattlefieldState below). Fixed at the source (buildBattleEntry now sets
-// `defeated: false` explicitly) AND here, as a blanket safety net against the same class of
-// bug anywhere else in the app's state shape, present or future — arrays keep `undefined`
-// elements as-is (an array of primitives never having a hole is a much less likely failure
-// mode, and removing elements would shift indices other code may depend on).
-const NESTED_ARRAY_TAG = "__nestedArrayJSON";
-function sanitizeNestedArrays(value) {
-  if (Array.isArray(value)) {
-    if (value.some((el) => Array.isArray(el))) return { [NESTED_ARRAY_TAG]: JSON.stringify(value) };
-    return value.map(sanitizeNestedArrays);
-  }
-  if (value && typeof value === "object") {
-    const out = {};
-    for (const k of Object.keys(value)) {
-      if (value[k] === undefined) continue;
-      out[k] = sanitizeNestedArrays(value[k]);
-    }
-    return out;
-  }
-  return value;
-}
-function unsanitizeNestedArrays(value) {
-  if (value && typeof value === "object" && !Array.isArray(value)) {
-    if (Object.prototype.hasOwnProperty.call(value, NESTED_ARRAY_TAG)) {
-      try { return JSON.parse(value[NESTED_ARRAY_TAG]); } catch (e) { return []; }
-    }
-    const out = {};
-    for (const k of Object.keys(value)) out[k] = unsanitizeNestedArrays(value[k]);
-    return out;
-  }
-  if (Array.isArray(value)) return value.map(unsanitizeNestedArrays);
-  return value;
-}
 
 window.onMultiplayerStateChange = function (data) {
   _latestLocalState = data;
@@ -587,1038 +118,721 @@ window.onMultiplayerStateChange = function (data) {
   pushOwnState(data);
 };
 
-// Returns true/false so callers that actually need to know whether this specific write
-// landed (connectAsRole's first-ever push) can react to a failure instead of assuming
-// success. The routine background pushes from onMultiplayerStateChange don't check the
-// return value — a transient failure there just means the next save cycle retries with
-// fresher data anyway, same as before.
+// ---------- WebSocket transport ----------
+// Raw WebSocket has no built-in request/response correlation the way a Firestore promise did —
+// this is the one genuinely new piece of client-side machinery this rewrite needed. A pending
+// waiter is a predicate over incoming messages plus a resolve function; the first message after
+// registration that satisfies the predicate resolves it and is removed. Predicates correlate on
+// whatever field a given response actually carries (rev for push acks, targetUid for cross-write
+// acks, claimId for loot claims) so that two of the same kind of request in flight don't resolve
+// each other's waiter — not perfect distributed request tracking, but this is a single DM's local
+// console talking to their own server, not a high-concurrency system.
+let pendingWaiters = [];
+function waitForNext(predicate, timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    const entry = {
+      predicate,
+      resolve: (msg) => { clearTimeout(timer); resolve(msg); },
+    };
+    const timer = setTimeout(() => {
+      pendingWaiters = pendingWaiters.filter((w) => w !== entry);
+      reject(new Error('Timed out waiting for a server response.'));
+    }, timeoutMs);
+    pendingWaiters.push(entry);
+  });
+}
+function dispatchToWaiters(msg) {
+  const idx = pendingWaiters.findIndex((w) => w.predicate(msg));
+  if (idx === -1) return;
+  const [entry] = pendingWaiters.splice(idx, 1);
+  entry.resolve(msg);
+}
+function send(msg) {
+  if (mp.ws && mp.ws.readyState === WebSocket.OPEN) mp.ws.send(JSON.stringify(msg));
+}
+
+let _reconnectTimer = null;
+let _reconnectDelayMs = 1000;
+function connectWebSocket() {
+  const ws = new WebSocket(WS_URL);
+  mp.ws = ws;
+  ws.addEventListener('open', () => {
+    _reconnectDelayMs = 1000;
+    send({ type: 'identify', campaignId: mp.campaignId, accountUid: mp.uid, role: mp.role, username: mp.username });
+  });
+  ws.addEventListener('message', (event) => {
+    let msg;
+    try { msg = JSON.parse(event.data); } catch { return; }
+    handleServerMessage(msg);
+    dispatchToWaiters(msg);
+  });
+  ws.addEventListener('close', () => {
+    mp.connected = false;
+    if (mp.kicked) return; // an explicit logout/kick — don't reconnect
+    // Belt-and-suspenders reconnect for a dropped LAN connection (wifi hiccup, server restart) —
+    // the WebSocket protocol itself has no opinion on this; a real usable app needs it regardless.
+    // Capped backoff, not exponential-forever: this is a DM's own LAN, outages are short.
+    //
+    // Found during real testing: setGateStatus alone is invisible whenever the gate overlay
+    // itself is closed — which is exactly the normal case once someone's actually playing. A
+    // dropped connection mid-session (or a failed initial reconnect on page load) was silently
+    // retrying in the background with zero on-screen indication either way. showConnBanner is a
+    // small persistent element outside the gate, visible regardless of what tab/screen is active.
+    showConnBanner('Connection lost — reconnecting…', true);
+    clearTimeout(_reconnectTimer);
+    _reconnectTimer = setTimeout(() => {
+      _reconnectDelayMs = Math.min(_reconnectDelayMs * 1.5, 10000);
+      connectWebSocket();
+    }, _reconnectDelayMs);
+  });
+  ws.addEventListener('error', () => { /* the close handler above does the real work */ });
+}
+
+function handleServerMessage(msg) {
+  switch (msg.type) {
+    case 'identified': return handleIdentified(msg);
+    case 'state_update':
+      mp.applyingRemote = true;
+      try { if (typeof window.applyRemoteMultiplayerState === 'function') window.applyRemoteMultiplayerState(msg.state); }
+      finally { mp.applyingRemote = false; }
+      return;
+    case 'battlefield_update':
+      if (typeof window.applyRemoteBattlefieldState === 'function') window.applyRemoteBattlefieldState(msg.battleRoster || [], msg.battleLog || []);
+      return;
+    case 'puzzle_log_update':
+      if (typeof window.applyRemotePuzzleLog === 'function') window.applyRemotePuzzleLog(msg.puzzleLog || []);
+      return;
+    case 'roster_update':
+      mp.roster.clear();
+      (msg.roster || []).forEach((p) => mp.roster.set(p.uid, p));
+      renderAccountPanel();
+      if (typeof window.onConnectedPlayersChanged === 'function') {
+        window.onConnectedPlayersChanged([...mp.roster.entries()].map(([uid, p]) => ({ uid, ...p })));
+      }
+      return;
+    case 'attack_request_list':
+      if (typeof window.applyIncomingAttackRequests === 'function') window.applyIncomingAttackRequests(msg.requests || []);
+      return;
+    case 'loot_claim_update':
+      // Sent to the DM's own connection when a PLAYER wins a claim (the DM claiming on someone's
+      // behalf is acked via loot_claim_result to the DM directly instead — see dmGiveLootItem).
+      if (typeof window.markLootClaimOnRoster === 'function') window.markLootClaimOnRoster(msg.claimId, { claimedByUid: msg.claimedByUid, claimedByUsername: msg.claimedByUsername });
+      return;
+    case 'player_state_update':
+      if (typeof window.applyViewedPlayerState === 'function') window.applyViewedPlayerState(msg.targetUid, msg.state || null);
+      return;
+    case 'kicked':
+      resetLocalSessionState();
+      clearSession();
+      showGate();
+      setGateStatus('You were removed from this campaign by the DM.', true);
+      return;
+    case 'error':
+      // A real bug found in testing: a saved session pointing at a campaign that no longer
+      // exists (e.g. the database was reset) gets a fatal 'error' back from `identify` — and
+      // nothing else will ever arrive on this dead connection. Only handled here if we never
+      // actually got through identify (mp.connected still false); an 'error' arriving on an
+      // otherwise-healthy connection (a failed cross-write, a rejected claim, etc.) is already
+      // handled by whichever specific action is awaiting it via waitForNext, not here. Without
+      // this, the gate stays hidden forever with no way back in short of manually clearing
+      // localStorage — exactly what looked like "the login screen is just gone."
+      if (!mp.connected) {
+        mp.kicked = true; // suppress the close handler's auto-reconnect for this dead session
+        if (mp.ws) { try { mp.ws.close(); } catch { /* already closing */ } }
+        clearSession();
+        showGate();
+        setGateStatus(msg.message || 'Could not reconnect to your saved campaign — please rejoin.', true);
+      }
+      return;
+    default:
+      return; // push_ack/push_rejected/cross_write_ack/loot_claim_result etc. are consumed by waitForNext, not here
+  }
+}
+
+// A brand-new player's very first identify gets `state: null` back — this browser's current
+// local state could be anything (leftover solo play, a different campaign's data) and must not
+// leak into a fresh character, same reasoning connectAsRole's blank-state seeding used to apply.
+// A DM never gets this treatment: nothing about their combat/roster work depends on a character
+// sheet, and prompting them for one would just be noise on first login.
+async function handleIdentified(msg) {
+  mp.connected = true;
+  mp.pushRev = typeof msg.rev === 'number' ? msg.rev : 0;
+  hideConnBanner();
+  hideGate();
+  enforceRoleRestrictions(mp.role);
+  renderAccountPanel();
+  updatePlayerNameDisplay();
+  if (msg.state) {
+    mp.applyingRemote = true;
+    try { if (typeof window.applyRemoteMultiplayerState === 'function') window.applyRemoteMultiplayerState(msg.state); }
+    finally { mp.applyingRemote = false; }
+    return;
+  }
+  if (mp.role !== 'player') return;
+  const blankState = {
+    ...collectCurrentAppState(),
+    inventoryGrid: typeof window.buildBlankInventoryGrid === 'function' ? window.buildBlankInventoryGrid() : [],
+    inventoryPlacements: {}, inventoryPlacementCounter: 0,
+    savedGeneratedItems: [], playerSlots: {}, recentlyLooted: [],
+    characterAbilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+    characterLevel: 1, skillProficiencies: [], saveProficiencies: [],
+    characterCurrentHp: 10, characterMaxHp: 10, characterMaxHpEffective: 10, characterHitDice: '', characterAc: 10, characterClass: '',
+  };
+  await pushOwnState(blankState);
+  if (typeof window.promptFirstTimeCharacterSetup === 'function') window.promptFirstTimeCharacterSetup();
+}
+
+// ---------- Core state push ----------
+// Returns true/false so callers that need to know whether this specific write landed (the
+// brand-new-player seed push above) can react to a failure instead of assuming success.
 async function pushOwnState(stateOverride) {
-  if (!mp.connected || !mp.roomCode || !mp.uid || mp.kicked) return false;
+  if (!mp.connected || mp.kicked) return false;
   const data = stateOverride || collectCurrentAppState();
   if (!data) return false;
-  // Bumped BEFORE the write goes out (not after it resolves) so that if this exact push is
-  // slow and a LATER push overtakes it, startPlayerListener already knows about the newer rev
-  // the moment that later push is issued — see the comment there for the full race this
-  // prevents (an equip-slot move visually "jumping back" to where it was).
   const rev = ++mp.pushRev;
+  send({ type: 'push_state', rev, state: data });
   try {
-    await setDoc(playerDocRef(mp.roomCode, mp.uid), {
-      username: mp.username, role: mp.role, updatedAt: serverTimestamp(), rev, state: sanitizeNestedArrays(data),
-    }, { merge: true });
-    return true;
-  } catch (err) {
-    console.error("[multiplayer-sync] pushOwnState failed:", err);
+    const ack = await waitForNext((m) => (m.type === 'push_ack' || m.type === 'push_rejected') && m.rev === rev);
+    return ack.type === 'push_ack';
+  } catch {
     return false;
   }
 }
 
 // ---------- Cross-player writes (DM -> any player in their room) ----------
-// The security rules (see the comment block above) already let the DM write into ANY
-// player's doc in their own room — this is what that permission was left in place for. Two
-// narrow, atomic Firestore transforms rather than one generic "merge a patch object" helper:
-// setDoc({merge:true}) replaces array fields wholesale, and the writer here never has (and
-// shouldn't need to cache) the target player's current array contents. increment()/arrayUnion()
-// are safe under concurrent writers with zero stale-read risk — e.g. two monsters hitting the
-// same player in one rollAllBattleAttacks() pass. All three of these omit `rev` entirely, so
-// the target's own staleness guard (startPlayerListener below) never mistakes an authoritative
-// external push for a stale echo of one of ITS OWN writes — but they all bump `extRev`, a
-// separate counter that same guard uses to tell "an external write actually landed" apart from
-// "Firestore is just echoing my own last push back at me" (see startPlayerListener).
-function applyHpDelta(roomCode, targetUid, delta) {
-  return updateDoc(playerDocRef(roomCode, targetUid), { "state.characterCurrentHp": increment(delta), extRev: increment(1) }).catch((err) => {
-    console.error("[multiplayer-sync] applyHpDelta failed:", err);
-  });
+function applyHpDelta(targetUid, delta) {
+  send({ type: 'hp_delta', targetUid, delta }); // fire-and-forget, matching the original's own bridge
 }
-// Delivers a FULL item object into a player's own account, not just a "gen:<id>" key into
-// recentlyLooted — a bare key would only resolve through TOKEN_INDEX on whichever account
-// registered it into savedGeneratedItems, and the DM's own client is the one holding the
-// authoritative item data here, not the recipient's. Writing the complete item into the
-// recipient's OWN savedGeneratedItems (their own "gen:<id>" key becomes resolvable purely
-// from their own synced state, the same as anything they loot themselves) and the resulting
-// key into their recentlyLooted, in one atomic multi-field update. Both are flat-array
-// appends — safe with arrayUnion under concurrent writers — never inventoryGrid, which is an
-// opaque JSON-string blob (see sanitizeNestedArrays below) Firestore can't field-path into.
-function giftItemToPlayer(roomCode, targetUid, item) {
-  // Same reasoning as pushBattlefieldState's payload: an item can carry a field that's
-  // explicitly `undefined` (not just absent) depending on how it was built, and Firestore
-  // rejects that outright. sanitizeNestedArrays already strips undefined recursively for
-  // every other write in this file; applying it here too rather than trusting every possible
-  // item shape to never have one.
-  const saved = sanitizeNestedArrays({ ...item, id: Date.now() + "_" + Math.random().toString(36).slice(2) });
-  const key = "gen:" + saved.id;
-  return updateDoc(playerDocRef(roomCode, targetUid), {
-    "state.savedGeneratedItems": arrayUnion(saved),
-    "state.recentlyLooted": arrayUnion(key),
-    extRev: increment(1),
-  }).catch((err) => {
-    // Re-throw (not just log) -- this function's callers (the Players tab's "Send" action,
-    // and the DM's combat-loot "Give to..." action) both chain a .then()/.catch() to show the
-    // DM real success/failure feedback. A .catch() that only logs and returns normally here
-    // would turn ANY failure into a silently-resolved promise, making every caller report
-    // success no matter what actually happened -- which is exactly what was happening: the
-    // DM would see "Sent" even when the write never landed, with no visible error at all.
-    console.error("[multiplayer-sync] giftItemToPlayer failed:", err);
+function crossWrite(type, targetUid, extra) {
+  send({ type, targetUid, ...extra });
+  return waitForNext((m) => (m.type === 'cross_write_ack' && m.targetUid === targetUid) || m.type === 'error')
+    .then((m) => { if (m.type === 'error') throw new Error(m.message); return m; });
+}
+function giftItemToPlayer(targetUid, item) {
+  return crossWrite('gift_item', targetUid, { item }).catch((err) => {
+    console.error('[multiplayer-sync] giftItemToPlayer failed:', err);
     throw err;
   });
 }
-// Bridge for the main file's combat code (see resolveBattleAttack) — fire-and-forget by design,
-// matching pushOwnState's own background-push convention; the caller doesn't await this.
+function setPlayerInventoryFields(targetUid, fields) {
+  return crossWrite('set_inventory_fields', targetUid, { fields }).catch((err) => {
+    console.error('[multiplayer-sync] setPlayerInventoryFields failed:', err);
+    throw err;
+  });
+}
 window.applyHpDeltaToPlayer = function (targetUid, delta) {
-  if (!mp.connected || !mp.roomCode) return;
-  applyHpDelta(mp.roomCode, targetUid, delta);
+  if (!mp.connected) return;
+  applyHpDelta(targetUid, delta);
 };
-// Bridge for the DM's Players tab "send item" action — unlike combat loot (which multiple
-// players could race to claim, hence lootClaims below), this is always an item the DM already
-// owns being handed to one specific player they chose, so there's no contention to arbitrate
-// and it can just deliver directly. Returns the promise (unlike the fire-and-forget HP bridge
-// above) so the caller can confirm success/failure in its own UI.
 window.giftArbitraryItemToPlayer = function (targetUid, item) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  return giftItemToPlayer(mp.roomCode, targetUid, item);
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  return giftItemToPlayer(targetUid, item);
 };
-// Bridge for the DM's Players tab "Take" action — full control over a player's equipped/
-// inventory state means overwriting whole fields (playerSlots, inventoryGrid,
-// inventoryPlacements, savedGeneratedItems), not atomic transforms like the two above, since
-// the DM computes the resulting object/grid locally from the live snapshot it already has via
-// startViewedPlayerListener and needs to write that exact result back. Each field is sanitized
-// independently (inventoryGrid is the one that actually needs the nested-array encoding;
-// running every field through it uniformly is simpler than special-casing which ones do) and
-// sent as its own dot-path key so this never clobbers fields the caller didn't pass in.
-function setPlayerInventoryFields(roomCode, targetUid, fields) {
-  const payload = {};
-  Object.keys(fields).forEach((k) => { payload["state." + k] = sanitizeNestedArrays(fields[k]); });
-  payload.extRev = increment(1);
-  return updateDoc(playerDocRef(roomCode, targetUid), payload).catch((err) => {
-    console.error("[multiplayer-sync] setPlayerInventoryFields failed:", err);
-    throw err;
-  });
-}
 window.dmSetPlayerInventoryFields = function (targetUid, fields) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  return setPlayerInventoryFields(mp.roomCode, targetUid, fields);
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  return setPlayerInventoryFields(targetUid, fields);
 };
 
-// ---------- Real-time looting: lootClaims (immutable, first-write-wins) ----------
-// Every corpse-drop item gets a claim doc at a deterministic id (monsterUid_itemId — both
-// already unique and stable, see rollMonsterCombatLoot/buildMonsterPartItem in the main file).
-// The security rule allows CREATE by any authenticated user but denies update/delete outright
-// — Firestore's own create-vs-update rule evaluation is what gives true first-write-wins with
-// zero arbitration and zero dependency on the DM's tab being open to referee: whichever write
-// reaches the server first is a "create" (allowed), and it makes the SAME doc id's write from
-// anyone else evaluate as an "update" (denied) from that instant on.
-function createLootClaim(roomCode, claimId, claimedByUid, claimedByUsername) {
-  return setDoc(lootClaimDocRef(roomCode, claimId), { claimedBy: claimedByUid, claimedByUsername, createdAt: serverTimestamp() });
+// ---------- Real-time looting: loot claims (first-write-wins, arbitrated server-side) ----------
+function createLootClaim(claimId, claimedByUid, claimedByUsername) {
+  send({ type: 'create_loot_claim', claimId, claimedByUid, claimedByUsername });
+  return waitForNext((m) => (m.type === 'loot_claim_result' && m.claimId === claimId) || m.type === 'error');
 }
-// Player's own self-loot button: create the claim FIRST and only report success once that
-// write is actually confirmed — the reactive listener below (not this function) is what
-// actually places the item, so a tab closing in the gap between "claim confirmed" and "item
-// applied" can't silently lose it (the listener re-checks on every reload).
+// Player's own self-loot button (also reused for the DM taking an item for themselves — see the
+// main file's claimThenConsumeLootItem): resolves if this account won the race, REJECTS if
+// someone else already claimed it — callers rely on exactly this .then()/.catch() split (see
+// playerLootItem/claimThenConsumeLootItem in the monolith).
 window.createSelfLootClaim = function (monsterUid, itemId) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  return createLootClaim(mp.roomCode, `${monsterUid}_${itemId}`, mp.uid, mp.username);
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  return createLootClaim(`${monsterUid}_${itemId}`, mp.uid, mp.username).then((msg) => {
+    if (msg.type === 'error') throw new Error(msg.message);
+    if (!msg.won) throw new Error('Someone already claimed this item.');
+    return msg;
+  });
 };
-// Bridge so the main file's DM-side "Save"/"Loot" combat-loot actions can route through the
-// exact same createSelfLootClaim used above (this works for either role — createLootClaim just
-// takes whatever uid/username calls it) before actually placing the item into their own
-// inventory, so a DM taking an item for themselves and a player self-looting the very same item
-// at the same moment resolve through the one real arbiter (Firestore's create-vs-update rule
-// evaluation) instead of two entirely separate, uncoordinated code paths that could both
-// "succeed" locally and hand the same item out twice. Returns null when not connected to any
-// campaign (solo/offline play) — the caller can safely skip the claim step in that case since
-// nothing else could possibly be racing for the same item.
 window.getMultiplayerSelf = function () {
   return mp.connected ? { uid: mp.uid, username: mp.username, role: mp.role } : null;
 };
-// DM's "give to..." action: claims on the chosen player's behalf (so a self-loot race against
-// the same item still resolves correctly — whichever create wins), then, since the DM already
-// has the authoritative item data AND cross-player write permission, delivers it directly
-// rather than waiting on the target's own client/listener to be online at all.
-// Tags which of the two steps actually failed (`err.giftStage`) so the DM's UI can tell a
-// real "someone already claimed this" conflict (the claim step) apart from a delivery failure
-// after the claim already succeeded (the item step) -- those need very different messages: the
-// first means someone else has it, the second means the claim now permanently exists (claims
-// are immutable) but NOBODY has the item, which is worth surfacing plainly rather than
-// mislabeling as "already claimed by someone else" (nobody has it in that case).
-window.dmGiveLootItem = function (monsterUid, itemId, targetUid, targetUsername, itemData) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  // Every other cross-player/DM-only write in this file checks mp.role before doing anything
-  // (pushBattlefieldState, removePlayer/removeAllPlayers) — this one didn't. The lootClaims
-  // create rule itself allows ANY authenticated user to create a claim (by design, so a
-  // player's own self-loot works with zero DM-online dependency — see the rules comment up
-  // top), so without this check a player could call this directly from devtools to either
-  // hand themselves an arbitrary fabricated item (self-targeting; giftItemToPlayer's own write
-  // rule still only lets them write their own doc, so this was already possible another way)
-  // or, worse, squat someone ELSE's real drop by creating a bogus claim on their
-  // monsterUid_itemId first — claims are immutable, so that permanently locks the legitimate
-  // looter out with no recovery path, even though the actual item delivery to a non-self
-  // target then correctly fails server-side.
-  if (mp.role !== "dm") return Promise.reject(new Error("Only the DM can give items."));
-  return createLootClaim(mp.roomCode, `${monsterUid}_${itemId}`, targetUid, targetUsername)
-    .catch((err) => { err.giftStage = "claim"; throw err; })
-    .then(() => giftItemToPlayer(mp.roomCode, targetUid, itemData))
-    .catch((err) => { if (!err.giftStage) err.giftStage = "deliver"; throw err; });
+// DM's "give to..." action: claims on the chosen player's behalf, then delivers the actual item.
+// err.giftStage distinguishes which half failed ("claim" — someone already has it, a real
+// conflict; "deliver" — the claim succeeded but the item write itself failed, meaning the claim
+// now permanently exists but nobody actually has the item) — the DM's UI needs these to read very
+// differently, same as the original.
+window.dmGiveLootItem = async function (monsterUid, itemId, targetUid, targetUsername, itemData) {
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  if (mp.role !== 'dm') return Promise.reject(new Error('Only the DM can give items.'));
+  const msg = await createLootClaim(`${monsterUid}_${itemId}`, targetUid, targetUsername);
+  if (msg.type === 'error') { const err = new Error(msg.message); err.giftStage = 'claim'; throw err; }
+  if (!msg.won) { const err = new Error('Someone already claimed this item.'); err.giftStage = 'claim'; throw err; }
+  try {
+    return await giftItemToPlayer(targetUid, itemData);
+  } catch (err) {
+    if (!err.giftStage) err.giftStage = 'deliver';
+    throw err;
+  }
 };
-// Player-only: reactively applies any claim this account has WON, exactly once each (guarded
-// by a persisted appliedLootClaimIds list so a reload/listener-replay never re-grants an
-// already-applied claim). Fires on every change to the whole claims collection rather than a
-// one-shot per-click handler, so it's self-healing across refreshes/reconnects.
-// Started for BOTH roles: a player applies any claim addressed to them (as above); the DM
-// instead marks the matching item claimed on their own roster (so it stops looking available
-// on the card, and — since pushBattlefieldState already excludes reserved items — the DM
-// marking it claimed rather than deleting it keeps the item visible in their own history
-// without it ever being re-offered to other players once someone's already won it).
-let mpLootClaimsUnsub = null;
-function startLootClaimListener(roomCode) {
-  if (mpLootClaimsUnsub) mpLootClaimsUnsub();
-  mpLootClaimsUnsub = onSnapshot(lootClaimsCollectionRef(roomCode), (snap) => {
-    snap.forEach((docSnap) => {
-      const claim = docSnap.data();
-      if (mp.role === "dm") {
-        if (typeof window.markLootClaimOnRoster === "function") window.markLootClaimOnRoster(docSnap.id, claim);
-        return;
-      }
-      if (claim.claimedBy !== mp.uid) return;
-      if (typeof window.applyWonLootClaim === "function") window.applyWonLootClaim(docSnap.id);
-    });
-  });
-}
 
 // ---------- Battlefield attacks (player -> DM review) ----------
-// A player's own weapon-attack roll against a monster, submitted for the DM to look at and
-// apply (or dismiss) rather than auto-resolving — the DM stays the one source of truth for
-// monster HP, same as every other combat action in this app. doc(collectionRef) with no id
-// argument (rather than a manually-built id) generates a fresh random id, matching what addDoc
-// would give without needing that import.
 window.submitBattlefieldAttack = function (attack) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  const ref = doc(attackRequestsCollectionRef(mp.roomCode));
-  return setDoc(ref, {
-    ...attack,
-    playerUid: mp.uid,
-    playerUsername: mp.username,
-    createdAt: serverTimestamp(),
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  send({ type: 'submit_attack_request', attack });
+  return waitForNext((m) => m.type === 'attack_request_submitted' || m.type === 'error').then((m) => {
+    if (m.type === 'error') throw new Error(m.message);
   });
 };
-// DM-only: hands the main file the full current list of pending requests on every change (not
-// just the delta) — there are only ever a handful outstanding at once, so re-rendering the
-// whole pending-attacks panel from the full list each time is simpler than diffing here, and
-// the main file's own render function is already cheap to call repeatedly.
-let mpAttackRequestUnsub = null;
-function startAttackRequestListener(roomCode) {
-  if (mpAttackRequestUnsub) mpAttackRequestUnsub();
-  mpAttackRequestUnsub = onSnapshot(attackRequestsCollectionRef(roomCode), (snap) => {
-    const list = [];
-    snap.forEach((docSnap) => list.push({ id: docSnap.id, ...docSnap.data() }));
-    if (typeof window.applyIncomingAttackRequests === "function") window.applyIncomingAttackRequests(list);
-  });
-}
-// DM's Apply/Dismiss both resolve the same way: delete the request doc. Applying the actual HP
-// change happens entirely on the main file's side first (see applyPendingAttackRequest) since
-// that's local roster data this bridge has no reason to know the shape of.
 window.resolveAttackRequest = function (reqId) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  return deleteDoc(attackRequestDocRef(mp.roomCode, reqId));
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  send({ type: 'resolve_attack_request', requestId: reqId });
+  return waitForNext((m) => (m.type === 'attack_request_resolved' && m.requestId === reqId) || m.type === 'error').then((m) => {
+    if (m.type === 'error') throw new Error(m.message);
+  });
 };
 
-// ---------- Battlefield (DM-only write, shared read) ----------
-// Debounced the same way the main app's own saveAppState is — renderCombatRoster() (which can
-// fire many times in a burst: rollAllBattleAttacks re-rendering, HP slider drags, etc.) calls
-// this every time, but only the last call in any 400ms window actually reaches Firestore.
+// ---------- Battlefield / Puzzle Log (DM-only push, shared read) ----------
+// Client-side debounce kept even though the server-side write-frequency reasoning (Firestore
+// billing per write) no longer applies — rollAllBattleAttacks and similar bursts can still call
+// this many times in a row, and there's no reason to flood the WebSocket connection with
+// redundant sends just because the per-write cost happens to be zero now.
 let _battlefieldPushTimer = null;
-function pushBattlefieldState(battleRoster, battleLog) {
-  if (!mp.connected || !mp.roomCode || mp.role !== "dm") return;
+window.pushBattlefieldState = function (battleRoster, battleLog) {
+  if (!mp.connected || mp.role !== 'dm') return;
   clearTimeout(_battlefieldPushTimer);
   _battlefieldPushTimer = setTimeout(() => {
-    // Loot visibility is enforced HERE, in what actually gets written to the doc players can
-    // read — not by the player-mode card renderer choosing not to show it. An entry's loot is
-    // entirely absent until lootRevealed is set (see revealEntryLoot in the main file), reserved
-    // items are stripped individually even after reveal, and — just as important — an item
-    // someone (a player, or the DM themselves via Save/Loot) has already claimed is ALSO
-    // stripped: without this, a claimed item kept showing up with a live "Loot" button on every
-    // other player's battlefield view since claiming only ever blocked the actual claim-doc
-    // write, never removed the item from what they could see and try to click. There is nothing
-    // for a player to find via devtools that the DM hasn't chosen to share.
-    const payload = (battleRoster || []).map((entry) => {
-      const { uid, monster, displayName, variant, traits, chaosGearList, hp, maxHp, hpRoll, ac, statLines, lastResult, defeated, loot, lootRevealed, isCorpse } = entry;
-      // isCorpse was missing from this list — combatCardHtml on a PLAYER's own client reads
-      // entry.isCorpse to show "☠ Remains" instead of a null-AC/0-HP stat line and to hide the
-      // attack-targeting picker, but since it never reached players' battlefieldRoster, every
-      // corpse (a dead player's own body, or a DM-stashed chest/loadout) rendered to players
-      // like a garden-variety defeated monster instead.
-      const out = { uid, monster, displayName, variant, traits, chaosGearList, hp, maxHp, hpRoll, ac, statLines, lastResult, defeated, isCorpse };
-      if (loot && lootRevealed) out.loot = { tier: loot.tier, gold: loot.gold, items: loot.items.filter((it) => !it.reserved && !it.claimedBy) };
-      return out;
-    });
-    setDoc(battlefieldDocRef(mp.roomCode), {
-      battleRoster: sanitizeNestedArrays(payload), battleLog: (battleLog || []).slice(-50), updatedAt: serverTimestamp(),
-    }).catch((err) => console.error("[multiplayer-sync] pushBattlefieldState failed:", err));
+    send({ type: 'push_battlefield', battleRoster, battleLog });
   }, 400);
-}
-window.pushBattlefieldState = pushBattlefieldState;
-
-// Player-only: learns the DM's uid from the room doc (readable by any authenticated user —
-// see the rules comment above) rather than pointing players at the DM's own players/{dmUid}
-// doc, which would make every player's listener re-download the DM's ENTIRE inventory/
-// merchant/generator state on any unrelated DM action, not just combat.
-let mpBattlefieldUnsub = null;
-async function startBattlefieldListener(roomCode) {
-  if (mpBattlefieldUnsub) mpBattlefieldUnsub();
-  const roomSnap = await getDoc(roomDocRef(roomCode));
-  if (!roomSnap.exists()) return;
-  mpBattlefieldUnsub = onSnapshot(battlefieldDocRef(roomCode), (snap) => {
-    if (!snap.exists()) return;
-    const data = snap.data();
-    if (typeof window.applyRemoteBattlefieldState === "function") {
-      window.applyRemoteBattlefieldState(unsanitizeNestedArrays(data.battleRoster || []), data.battleLog || []);
-    }
-  });
-}
-
-// ---------- Puzzle Log (DM-only write, shared read) — same shape as Battlefield above ----------
-// The Puzzles tab's own comment in the main file claims every entry "stays visible to players",
-// but puzzleLog was only ever a plain field inside each account's own per-player state blob
-// (same as inventoryGrid/characterCurrentHp) — nothing broadcast the DM's authored puzzles to a
-// connected PLAYER's own separate account at all. A player would only ever see THEIR OWN
-// puzzleLog (always empty, since the add/edit/delete UI is already hidden from them) — the
-// feature silently never worked over real multiplayer. This gives it the same DM-writes/
-// players-listen channel Combat's battlefield doc already has.
+};
 let _puzzleLogPushTimer = null;
-function pushPuzzleLogState(puzzleLog) {
-  if (!mp.connected || !mp.roomCode || mp.role !== "dm") return;
+window.pushPuzzleLogState = function (puzzleLog) {
+  if (!mp.connected || mp.role !== 'dm') return;
   clearTimeout(_puzzleLogPushTimer);
   _puzzleLogPushTimer = setTimeout(() => {
-    setDoc(puzzleLogDocRef(mp.roomCode), {
-      puzzleLog: sanitizeNestedArrays(puzzleLog || []), updatedAt: serverTimestamp(),
-    }).catch((err) => console.error("[multiplayer-sync] pushPuzzleLogState failed:", err));
+    send({ type: 'push_puzzle_log', puzzleLog });
   }, 400);
-}
-window.pushPuzzleLogState = pushPuzzleLogState;
-
-let mpPuzzleLogUnsub = null;
-async function startPuzzleLogListener(roomCode) {
-  if (mpPuzzleLogUnsub) mpPuzzleLogUnsub();
-  const roomSnap = await getDoc(roomDocRef(roomCode));
-  if (!roomSnap.exists()) return;
-  mpPuzzleLogUnsub = onSnapshot(puzzleLogDocRef(roomCode), (snap) => {
-    if (!snap.exists()) return;
-    const data = snap.data();
-    if (typeof window.applyRemotePuzzleLog === "function") {
-      window.applyRemotePuzzleLog(unsanitizeNestedArrays(data.puzzleLog || []));
-    }
-  });
-}
-
-// ---------- Gambling (DM-only write, shared read; player actions -> DM-applied queue) ----------
-// Table state (see gamblingState/GAMBLING_HANDLERS in the main file) uses the exact same
-// DM-writes/everyone-reads shape as Battlefield/Puzzle Log above. On top of that, a player's own
-// action (placing a bet, hit/stand, a spin, a hold/discard) needs a way to actually reach the
-// dealer — that reuses attackRequests' player-submits/DM-applies queue instead of a second
-// mechanism, since the shape of the problem is identical: a player proposing something that only
-// the DM's client is trusted to actually resolve.
-let _gamblingPushTimer = null;
-function pushGamblingState(gamblingState) {
-  if (!mp.connected || !mp.roomCode || mp.role !== "dm") return;
-  clearTimeout(_gamblingPushTimer);
-  _gamblingPushTimer = setTimeout(() => {
-    setDoc(gamblingDocRef(mp.roomCode), {
-      gamblingState: sanitizeNestedArrays(gamblingState || { game: null, table: null }), updatedAt: serverTimestamp(),
-    }).catch((err) => console.error("[multiplayer-sync] pushGamblingState failed:", err));
-  }, 400);
-}
-window.pushGamblingState = pushGamblingState;
-
-let mpGamblingUnsub = null;
-async function startGamblingListener(roomCode) {
-  if (mpGamblingUnsub) mpGamblingUnsub();
-  const roomSnap = await getDoc(roomDocRef(roomCode));
-  if (!roomSnap.exists()) return;
-  mpGamblingUnsub = onSnapshot(gamblingDocRef(roomCode), (snap) => {
-    if (!snap.exists()) return;
-    const data = snap.data();
-    if (typeof window.applyRemoteGamblingState === "function") {
-      window.applyRemoteGamblingState(unsanitizeNestedArrays(data.gamblingState || { game: null, table: null }));
-    }
-  });
-}
-// Player-only: submits one action (a bet, hit/stand, spin, hold/discard...) for the DM's
-// listener to apply. doc(collectionRef) with no id generates a fresh random id, same as
-// submitBattlefieldAttack.
-window.submitGamblingActionRemote = function (action) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  const ref = doc(gamblingActionsCollectionRef(mp.roomCode));
-  return setDoc(ref, {
-    ...action,
-    playerUid: mp.uid,
-    playerUsername: mp.username,
-    createdAt: serverTimestamp(),
-  });
-};
-// DM-only: hands the main file the full current list of pending requests on every change, same
-// as startAttackRequestListener — gambling actions apply immediately rather than sitting in a
-// review queue (see applyIncomingGamblingActions in the main file), so this list is normally
-// empty a moment after each snapshot, not something the DM browses.
-let mpGamblingActionUnsub = null;
-function startGamblingActionListener(roomCode) {
-  if (mpGamblingActionUnsub) mpGamblingActionUnsub();
-  mpGamblingActionUnsub = onSnapshot(gamblingActionsCollectionRef(roomCode), (snap) => {
-    const list = [];
-    snap.forEach((docSnap) => list.push({ id: docSnap.id, ...docSnap.data() }));
-    if (list.length && typeof window.applyIncomingGamblingActions === "function") window.applyIncomingGamblingActions(list);
-  });
-}
-window.resolveGamblingActionRemote = function (reqId) {
-  if (!mp.connected || !mp.roomCode) return Promise.reject(new Error("Not connected"));
-  return deleteDoc(gamblingActionDocRef(mp.roomCode, reqId));
 };
 
-// DM-only: a live, read-only view of ONE specific player's full state, for the Players tab —
-// separate from startRosterListener (which only ever extracts a thin HP/AC summary for every
-// player at once) since fetching everyone's entire inventory/equipment continuously would be
-// wasteful. Only ever one of these active at a time: selecting a different player unsubscribes
-// the previous one first (a single small doc listener is cheap enough to just leave running
-// while the DM browses other tabs, so switching back to Players shows fresh data immediately;
-// it's torn down on logout via resetLocalSessionState instead).
-let mpViewedPlayerUnsub = null;
-function startViewedPlayerListener(targetUid) {
-  if (mpViewedPlayerUnsub) mpViewedPlayerUnsub();
-  if (!mp.connected || !mp.roomCode) return;
-  mpViewedPlayerUnsub = onSnapshot(playerDocRef(mp.roomCode, targetUid), (snap) => {
-    if (typeof window.applyViewedPlayerState !== "function") return;
-    window.applyViewedPlayerState(targetUid, snap.exists() ? unsanitizeNestedArrays(snap.data().state || {}) : null);
+// ---------- Viewed-player spectator listener (Phase 6e, DM-only) ----------
+// A live, read-only view of ONE specific player's full state, for the Players tab — separate
+// from the roster (which only ever extracts a thin HP/AC summary for every player at once).
+// Only ever one of these active at a time: selecting a different player re-subscribes rather
+// than stacking (see selectViewedPlayer in the monolith), matching the original exactly.
+let viewingUid = null;
+window.startViewedPlayerListener = function (targetUid) {
+  if (!mp.connected || mp.role !== 'dm') return;
+  viewingUid = targetUid;
+  send({ type: 'subscribe_player', targetUid });
+};
+window.stopViewedPlayerListener = function () {
+  if (mp.connected && viewingUid) send({ type: 'unsubscribe_player' });
+  viewingUid = null;
+};
+
+// ---------- Player removal (Phase 6f, DM-only) ----------
+function kickPlayer(targetUid) {
+  send({ type: 'kick_player', targetUid });
+  return waitForNext((m) => (m.type === 'kick_ack' && m.targetUid === targetUid) || m.type === 'error').then((m) => {
+    if (m.type === 'error') throw new Error(m.message);
   });
 }
-function stopViewedPlayerListener() {
-  if (mpViewedPlayerUnsub) mpViewedPlayerUnsub();
-  mpViewedPlayerUnsub = null;
-}
-window.startViewedPlayerListener = startViewedPlayerListener;
-window.stopViewedPlayerListener = stopViewedPlayerListener;
-
-// Realtime listener on this account's own document — this is how a DM's edit, or loot pushed
-// to you (Phase 2/3), reaches your screen live. Also detects the DM removing you: the
-// document disappearing entirely (rather than just being empty) is the "you've been kicked"
-// signal — but ONLY if it's a genuine exists -> gone transition, tracked via sawDocExist
-// below. Without that check, a fresh account whose very first write to Firestore failed (a
-// rules-propagation delay, a network blip, whatever) would show up here as "the document
-// doesn't exist," which looks identical to being removed but means something completely
-// different — this bug actually happened during testing and logged a brand-new account
-// straight back out with a misleading "removed by the DM" message. By the time this listener
-// starts, connectAsRole() has already confirmed the initial write succeeded (or bailed out
-// before ever getting here), so the only way this callback can legitimately see a missing
-// document is if it existed a moment ago and is now gone.
-function startPlayerListener() {
-  if (mp.playerUnsub) mp.playerUnsub();
-  let sawDocExist = false;
-  // Tracks whether THIS session has ever actually applied a remote snapshot yet — see its use
-  // below for the reconnect gap this closes (mp.lastAppliedExtRev starting at 0 every fresh
-  // session, same as mp.pushRev used to, before connectAsRole started seeding that one).
-  let hasAppliedRemoteThisSession = false;
-  mp.playerUnsub = onSnapshot(playerDocRef(mp.roomCode, mp.uid), (snap) => {
-    if (!snap.exists()) {
-      if (sawDocExist && mp.connected && !mp.kicked) {
-        mp.kicked = true;
-        logOut();
-        showGate();
-        setGateStatus("You were removed from this campaign by the DM.", true);
-      }
-      return;
-    }
-    sawDocExist = true;
-    const remote = snap.data();
-    if (!remote || !remote.state) return;
-    // Guards against a specific out-of-order-network race: every push carries an
-    // ever-increasing `rev` (see pushOwnState). Rapid successive local changes (e.g. dragging
-    // one item right after another) each schedule their own debounced push; if an OLDER push's
-    // network round-trip happens to finish after a NEWER one's, this listener would otherwise
-    // see the older snapshot last and hand it to applyRemoteMultiplayerState, visibly reverting
-    // whatever was just moved back to where it used to be (or undoing the move before it's ever
-    // seen). Since mp.pushRev already reflects the newest rev THIS client has sent as of right
-    // now, any snapshot behind that is guaranteed stale and is dropped rather than applied.
-    // The DM ALSO writes into this doc now (applyHpDelta, giftItemToPlayer,
-    // setPlayerInventoryFields) but deliberately never touches `rev` when doing so, so those
-    // writes always compare as >= mp.pushRev here and are never mistaken for a stale echo.
-    if (typeof remote.rev === "number" && remote.rev < mp.pushRev) return;
-    // Belt-and-suspenders alongside the connect-time seeding in connectAsRole (see its comment
-    // for the full bug this closes): if a snapshot ever arrives carrying a `rev` higher than
-    // what this client thinks it has issued — e.g. the connect-time seed raced with a push and
-    // lost, or a different session for this same account pushed after this one started — treat
-    // that as the new floor going forward, so the guard below can't be fooled by a stale echo
-    // that happens to share the OLD, now-outdated mp.pushRev value on some later push.
-    if (typeof remote.rev === "number" && remote.rev > mp.pushRev) mp.pushRev = remote.rev;
-    // Every push this client makes to its OWN doc round-trips straight back through this same
-    // listener (Firestore always echoes a client's own writes back to it) — and with the guard
-    // above, that echo's `rev` always equals mp.pushRev exactly, so it was never being dropped.
-    // Each echo used to trigger a full re-application of this account's OWN state onto itself
-    // (applyStateBlob + refreshAllViewsAfterStateApply, which re-renders the inventory grid,
-    // equip slots, and character sheet from scratch) — meaning literally any edit while
-    // connected triggered a save -> push -> echo -> full-rebuild loop that could tear out an
-    // open dropdown, an in-progress checkbox click, or a focused field the user hadn't left yet,
-    // moments after they interacted with it. This is what made "almost every dropdown and
-    // field" flaky while playing connected, not any one specific control being broken.
-    // `extRev` (see the `mp` object) is a separate counter ONLY the cross-player writes above
-    // bump — never this client's own pushOwnState — so comparing it alongside `rev` tells a
-    // pure self-echo (rev unchanged AND extRev unchanged: the DM hasn't touched this doc since
-    // the last snapshot we actually applied) apart from a genuine external change arriving with
-    // the same rev (the DM's writes never touch rev at all, so extRev moving is the only signal
-    // that one of them landed). Only the former gets skipped.
-    const remoteExtRev = typeof remote.extRev === "number" ? remote.extRev : 0;
-    // connectAsRole seeds mp.pushRev from this account's own stored `rev` on reconnect (so the
-    // rev half of this comparison is correctly "caught up" immediately) but mp.lastAppliedExtRev
-    // has no equivalent seed — it always starts at 0 on a fresh page load. For any account whose
-    // extRev is ALSO still 0 server-side (true for most players before they're first hit/gifted,
-    // and effectively every DM account, since nothing ever cross-writes extRev into a DM's own
-    // doc), BOTH halves of the skip condition below were true on the very first snapshot of a
-    // brand-new session — so the listener treated its own account's real saved state as "just my
-    // own echo, nothing to do" and never applied it at all. Harmless on an ordinary same-tab
-    // reload (loadAppState() already populated everything from localStorage first), but a login
-    // on a new device/browser/incognito window (empty localStorage) would silently keep blank
-    // local state, and a subsequent local edit could then push that blank state back over the
-    // real server data, clobbering it for good. hasAppliedRemoteThisSession forces at least the
-    // FIRST snapshot each session through, regardless of how it compares to these counters.
-    if (hasAppliedRemoteThisSession && remote.rev === mp.pushRev && remoteExtRev === mp.lastAppliedExtRev) return;
-    hasAppliedRemoteThisSession = true;
-    mp.lastAppliedExtRev = remoteExtRev;
-    mp.applyingRemote = true;
-    try {
-      if (typeof window.applyRemoteMultiplayerState === "function") {
-        window.applyRemoteMultiplayerState(unsanitizeNestedArrays(remote.state));
-      }
-    } finally {
-      mp.applyingRemote = false;
-    }
-  });
-}
-
-// DM-only: listens to every player document in the room to keep a live, removable roster.
-// Also captures each player's character-sheet HP/AC totals (computed by the main file, stored
-// flat on their synced state) so the Combat tab's targeting UI can show live numbers and roll
-// against a real player's real AC — see window.onConnectedPlayersChanged below.
-function startRosterListener() {
-  if (mp.rosterUnsub) mp.rosterUnsub();
-  mp.rosterUnsub = onSnapshot(collection(db, "rooms", mp.roomCode, "players"), (snap) => {
-    mp.roster.clear();
-    snap.forEach((docSnap) => {
-      const d = docSnap.data();
-      const s = d.state || {};
-      // Clamped the same as the owning client's own applyStateBlob — applyHpDelta increments
-      // Firestore's stored number atomically with no clamp of its own, so an out-of-range value
-      // can genuinely be sitting in the doc for the moment between a combat hit landing and the
-      // target's own client next saving (which self-corrects it) — the DM's targeting picker
-      // shouldn't show a negative HP or one above max in that window.
-      // characterMaxHpEffective is the gear-inclusive ceiling (base + equipped "Maximum Hit
-      // Points" bonuses) — falls back to the raw base for any doc saved before this field
-      // existed, same fallback pattern the app's own loadAppState uses.
-      const maxHp = typeof s.characterMaxHpEffective === "number" ? s.characterMaxHpEffective : s.characterMaxHp;
-      const currentHp = typeof s.characterCurrentHp === "number" && typeof maxHp === "number"
-        ? Math.max(0, Math.min(s.characterCurrentHp, maxHp)) : s.characterCurrentHp;
-      mp.roster.set(docSnap.id, {
-        username: d.username || "Unnamed", role: d.role, updatedAt: d.updatedAt,
-        currentHp, maxHp, ac: s.characterAc,
-      });
-    });
-    renderAccountPanel();
-    // Explicit bridge (matching applyRemoteMultiplayerState's pattern) rather than the main
-    // file reaching into mp.roster directly — the Combat tab's targeting UI (a separate,
-    // later addition) reads player HP/AC/connection state through this hook only.
-    if (typeof window.onConnectedPlayersChanged === "function") {
-      window.onConnectedPlayersChanged([...mp.roster.entries()].map(([uid, p]) => ({ uid, ...p })));
-    }
-  });
-}
-
-// DM action: deletes the player's document. Their account login still exists (Firebase
-// client SDKs can only delete YOUR OWN account, never someone else's — deleting the actual
-// login would need paid server-side infrastructure), but they lose all access to this
-// campaign and their character/inventory data is gone. Their own client's startPlayerListener
-// picks up the deletion and logs them out automatically.
-//
-// Known limitation, kept deliberately simple: this doesn't maintain a ban list, so if the
-// removed player logs back in with the same username/password, connectAsRole() sees no
-// existing player document, treats it like any other fresh connection, and re-creates one —
-// i.e. they can rejoin on their own. For a friendly home game this is usually fine (the DM
-// just removes them again if it becomes a real problem); a proper "banned from this campaign"
-// list is a small, well-contained addition if it's ever actually needed — a new
-// rooms/{code}/removed/{uid} marker doc, checked at the top of connectAsRole.
-// Returns true/false so callers can actually tell whether the removal landed, instead of the
-// failure being swallowed silently — the single-Remove button below used to fire-and-forget
-// this with no .then()/.catch() at all, so a failed removal (network blip, a rules edge case)
-// produced literally no feedback and the DM just saw nothing happen; window.removeAllPlayers
-// below used to always report every attempted uid as removed regardless of what actually
-// succeeded, for the same reason.
-async function removePlayer(uid) {
-  if (!mp.connected || mp.role !== "dm" || !mp.roomCode) return false;
-  if (uid === mp.uid) return false; // DM can't remove themselves this way
-  try { await deleteDoc(playerDocRef(mp.roomCode, uid)); return true; } catch (err) { return false; }
-}
-// Bulk version for the Players tab's "Remove All Players" action — same effect as clicking
-// Remove on every connected player one at a time (see removePlayer's own comment: this deletes
-// each player's document/progress in THIS campaign, not their login, so they can still rejoin
-// with the same username/password and start fresh). Uses mp.roster directly rather than the
-// main file's connectedPlayers snapshot so it always acts on whoever is currently in the
-// roster, not a possibly-slightly-stale copy. Returns the count ACTUALLY removed, not the
-// count attempted.
+// Bulk version for the Players tab's "Remove All Players" action. Returns the count ACTUALLY
+// removed (Promise.allSettled, not Promise.all) so one failed removal doesn't hide whether the
+// others succeeded — matching the original removeAllPlayers's own "count actually removed, not
+// count attempted" guarantee.
 window.removeAllPlayers = async function () {
-  if (!mp.connected || mp.role !== "dm" || !mp.roomCode) return 0;
-  const uids = [...mp.roster.keys()].filter((uid) => uid !== mp.uid);
-  const results = await Promise.all(uids.map((uid) => removePlayer(uid)));
-  return results.filter(Boolean).length;
+  if (!mp.connected || mp.role !== 'dm') return 0;
+  const uids = [...mp.roster.keys()];
+  const results = await Promise.allSettled(uids.map((uid) => kickPlayer(uid)));
+  return results.filter((r) => r.status === 'fulfilled').length;
 };
 
-// ===================== ROLE-BASED TAB RESTRICTIONS =====================
-// Pure CSS, targeting the exact onclick attributes already on the main file's nav buttons —
-// zero changes needed there. Content panels are ALSO hidden (not just the nav buttons) as a
-// safety net, since Roll Loot is the tab that's active by default on page load; without this,
-// a player logging in would briefly see its content before ever clicking anything.
+// ===================== ROLE-BASED TAB RESTRICTIONS (unchanged from the original) =====================
+function updatePlayerNameDisplay() {
+  const wrap = document.getElementById('invPlayerNameWrap');
+  const val = document.getElementById('invPlayerName');
+  if (!wrap || !val) return;
+  if (mp.connected && mp.username) { val.textContent = mp.username; wrap.style.display = ''; }
+  else { wrap.style.display = 'none'; }
+}
 function enforceRoleRestrictions(role) {
-  document.body.classList.toggle("role-player", role === "player");
-  // The Battlefield tab is the opposite direction from everything else here — shown only FOR
-  // players rather than hidden from them — so it isn't part of the body.role-player CSS block
-  // (which only ever hides things) and needs this explicit toggle instead.
-  const battlefieldBtn = document.getElementById("battlefieldTabBtn");
-  if (battlefieldBtn) battlefieldBtn.style.display = role === "player" ? "" : "none";
-  if (role !== "player") return;
-  // If the page's default active tab is one now hidden for players, move them to Inventory
-  // instead of leaving them looking at a blank content area.
-  const activeBtn = document.querySelector(".tab-btn.active");
-  const restricted = ["spin", "combat"];
-  const onRestricted = activeBtn && restricted.some((t) => activeBtn.getAttribute("onclick") === `showTab('${t}',this)`);
-  if (onRestricted && typeof window.showTab === "function") {
+  document.body.classList.toggle('role-player', role === 'player');
+  const battlefieldBtn = document.getElementById('battlefieldTabBtn');
+  if (battlefieldBtn) battlefieldBtn.style.display = role === 'player' ? '' : 'none';
+  if (role !== 'player') return;
+  const activeBtn = document.querySelector('.tab-btn.active');
+  const restricted = ['spin', 'combat'];
+  const onRestricted = activeBtn && restricted.some((t) => activeBtn.getAttribute('onclick') === `showTab('${t}',this)`);
+  if (onRestricted && typeof window.showTab === 'function') {
     const invBtn = document.querySelector(`[onclick="showTab('inventory',this)"]`);
-    if (invBtn) window.showTab("inventory", invBtn);
+    if (invBtn) window.showTab('inventory', invBtn);
   }
+}
+
+// Tears down this tab's own session state — closing the socket, clearing mp, hiding the
+// role-restricted CSS and the player-name display.
+function resetLocalSessionState() {
+  mp.kicked = true; // suppress the close handler's auto-reconnect
+  if (mp.ws) { try { mp.ws.close(); } catch { /* already closing */ } }
+  mp.ws = null;
+  mp.uid = null; mp.username = null; mp.role = null; mp.campaignId = null; mp.code = null;
+  mp.connected = false; mp.roster.clear();
+  document.body.classList.remove('role-player');
+  updatePlayerNameDisplay();
+  if (typeof window.resetMainAppStateToBlank === 'function') window.resetMainAppStateToBlank();
+}
+function logOut() {
+  resetLocalSessionState();
+  clearSession();
+  showGate();
 }
 
 // ===================== UI (injected at runtime — nothing added to the main HTML file) =====================
 function injectStyles() {
-  const style = document.createElement("style");
+  const style = document.createElement('style');
   style.textContent = `
-    /* ---- Role-based tab hiding (see enforceRoleRestrictions) ---- */
     body.role-player [onclick="showTab('spin',this)"],
-    body.role-player [onclick="showTab('combat',this)"],
-    body.role-player [onclick="showTab('players',this)"],
-    body.role-player [onclick="showTab('journey',this)"],
-    body.role-player #tab-spin,
-    body.role-player #tab-combat,
-    body.role-player #tab-players,
-    body.role-player #tab-journey,
-    body.role-player .add-item-area,
-    body.role-player [onclick*="editItem("],
-    body.role-player [onclick*="removeItem("],
-    /* The Loot tab is already hidden above (#tab-spin) — Generate Item lives inside it now as
-       a fourth setSpinLootMode sub-panel (#spinGeneratePanel), not its own tab, so hiding the
-       parent already covers it with no separate selector needed. The Item Compendium's "Items"
-       browser has its own standalone Save/Loot buttons on every entry (grab any item in the
-       whole catalog straight into your Token Library or Recently Looted, completely free) that
-       aren't part of any restricted tab — closing that off is what actually makes "items only
-       ever come from mobs, shops, or the DM" true for players; browsing the Compendium for
-       reference stays available. */
-    body.role-player [onclick*="saveCompendiumItem("],
-    body.role-player [onclick*="lootCompendiumItem("] { display: none !important; }
+    body.role-player [onclick="showTab('combat',this)"] { display: none !important; }
+    body.role-player #spin, body.role-player #combat { display: none !important; }
 
-    /* ---- Full-screen launch gate ---- */
-    #mpGate {
-      position: fixed; inset: 0; z-index: 9999; background: var(--bg, #12100d);
-      display: flex; align-items: center; justify-content: center; padding: 1rem;
-      font-family: 'Crimson Text', serif; color: var(--text, #e8dfc8);
-    }
-    #mpGate.hide { display: none; }
-    #mpGateBox {
-      width: min(420px, 94vw); background: var(--surface, #1a1a1a);
-      border: 1px solid var(--border, #3d3020); padding: 1.4rem;
-    }
-    #mpGateBox h2 { margin: 0 0 0.3rem; color: var(--gold, #c9a84c); letter-spacing: 0.03em; }
-    #mpGateBox p.mp-sub { color: var(--text-dim, #a89f8a); font-size: 0.85rem; margin: 0 0 1rem; }
-    .mp-role-row { display: flex; gap: 0.7rem; margin-bottom: 1rem; }
-    .mp-role-btn {
-      flex: 1; background: var(--bg, #12100d); border: 2px solid var(--border, #3d3020);
-      color: var(--text, #e8dfc8); font-family: 'Crimson Text', serif; font-weight: 600;
-      font-size: 0.95rem; padding: 0.8rem 0.5rem; cursor: pointer; text-align: center;
-    }
-    .mp-role-btn:hover, .mp-role-btn.active { border-color: var(--gold, #c9a84c); color: var(--gold, #c9a84c); }
-    .mp-mode-row { display: flex; gap: 0.5rem; margin-bottom: 0.9rem; }
-    .mp-mode-btn {
-      flex: 1; background: none; border: none; border-bottom: 2px solid var(--border, #3d3020);
-      color: var(--text-dim, #a89f8a); font-family: 'Crimson Text', serif; font-size: 0.9rem;
-      padding: 0.4rem; cursor: pointer;
-    }
-    .mp-mode-btn.active { color: var(--gold, #c9a84c); border-color: var(--gold, #c9a84c); }
-    #mpGateBox label { display: block; font-size: 0.85rem; color: var(--text-dim, #a89f8a); margin: 0.6rem 0 0.25rem; }
-    #mpGateBox input[type=text], #mpGateBox input[type=password] {
-      width: 100%; box-sizing: border-box; background: var(--bg, #12100d);
-      border: 1px solid var(--border, #3d3020); color: var(--text, #e8dfc8);
-      font-family: 'Crimson Text', serif; font-size: 0.95rem; padding: 0.5rem 0.6rem;
-    }
-    .mp-btn {
-      margin-top: 1rem; width: 100%; box-sizing: border-box;
-      background: var(--gold, #c9a84c); color: var(--bg, #12100d);
-      border: none; font-weight: 600; padding: 0.6rem 0.9rem; cursor: pointer; letter-spacing: 0.02em;
-      font-family: 'Crimson Text', serif; font-size: 0.95rem;
-    }
-    .mp-btn.mp-danger { background: var(--danger, #e05252); color: #fff; }
-    .mp-status { margin-top: 0.6rem; font-size: 0.85rem; min-height: 1.2rem; }
-    .mp-status.error { color: var(--danger, #e05252); }
-    .mp-status.ok { color: var(--uncommon, #4caf7d); }
+    #mpGateOverlay { position: fixed; inset: 0; background: rgba(10,8,6,0.85); z-index: 9999;
+      display: flex; align-items: center; justify-content: center; }
+    #mpGateOverlay.hide { display: none; }
+    #mpGateBox { background: var(--panel-bg,#1c1712); border: 1px solid var(--border-color,#4a3f2f);
+      border-radius: 10px; padding: 1.5rem; width: 320px; max-width: 90vw; color: var(--text,#e8dfc8); }
+    #mpGateBox h2 { margin: 0 0 1rem; font-size: 1.2rem; }
+    #mpGateBox label { display: block; margin: 0.6rem 0 0.2rem; font-size: 0.85rem; color: var(--text-dim,#a89f8a); }
+    #mpGateBox input { width: 100%; box-sizing: border-box; padding: 0.5rem; border-radius: 6px;
+      border: 1px solid var(--border-color,#4a3f2f); background: var(--input-bg,#141110); color: inherit; }
+    .mp-btn { width: 100%; margin-top: 1rem; padding: 0.6rem; border-radius: 6px; border: none;
+      background: var(--accent,#8a6d3b); color: #fff; font-weight: 600; cursor: pointer; }
+    .mp-btn.mp-secondary { background: transparent; border: 1px solid var(--border-color,#4a3f2f); color: inherit; }
+    .mp-btn.mp-danger { background: #7a2e2e; }
+    .mp-role-row { display: flex; flex-direction: column; gap: 0.5rem; }
+    .mp-status { margin-top: 0.6rem; font-size: 0.85rem; min-height: 1.1em; }
+    .mp-status.err { color: #e08a8a; }
+    .mp-close { float: right; cursor: pointer; color: var(--text-dim,#a89f8a); }
 
-    /* ---- Post-login account panel ---- */
-    #mpAccountBtn {
-      position: fixed; bottom: 1rem; right: 1rem; z-index: 9000;
-      background: var(--surface, #1a1a1a); color: var(--uncommon, #4caf7d);
-      border: 2px solid var(--uncommon, #4caf7d); border-radius: 6px;
-      font-family: 'Crimson Text', serif; font-weight: 600; font-size: 0.9rem;
-      padding: 0.55rem 0.9rem; cursor: pointer; letter-spacing: 0.02em;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4); display: none;
-    }
+    #mpAccountBtn { display: none; position: fixed; top: 8px; right: 8px; z-index: 500;
+      padding: 0.4rem 0.7rem; border-radius: 6px; border: 1px solid var(--border-color,#4a3f2f);
+      background: var(--panel-bg,#1c1712); color: inherit; cursor: pointer; }
     #mpAccountBtn.show { display: block; }
-    /* ---- Guest / debug mode badge ---- */
-    #mpGuestBadge {
-      position: fixed; bottom: 1rem; right: 1rem; z-index: 9000;
-      background: var(--surface, #1a1a1a); color: var(--gold, #c9a84c);
-      border: 2px solid var(--gold, #c9a84c); border-radius: 6px;
-      font-family: 'Crimson Text', serif; font-weight: 600; font-size: 0.9rem;
-      padding: 0.55rem 0.9rem; cursor: pointer; letter-spacing: 0.02em;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4); display: none;
-    }
+    #mpAccountOverlay { position: fixed; inset: 0; background: rgba(10,8,6,0.6); z-index: 9998; display: none; }
+    #mpAccountOverlay.show { display: block; }
+    #mpAccountModal { position: fixed; top: 50px; right: 8px; width: 280px; max-width: 90vw;
+      background: var(--panel-bg,#1c1712); border: 1px solid var(--border-color,#4a3f2f);
+      border-radius: 10px; padding: 1rem; color: var(--text,#e8dfc8); }
+    .mp-room-code-row { display: flex; gap: 0.4rem; align-items: center; }
+    .mp-room-code { font-family: monospace; font-size: 1.1rem; letter-spacing: 0.1em; padding: 0.3rem 0.5rem;
+      border: 1px dashed var(--border-color,#4a3f2f); border-radius: 6px; cursor: pointer; user-select: all; flex: 1; }
+    .mp-copy-btn { padding: 0.3rem 0.5rem; border-radius: 6px; border: 1px solid var(--border-color,#4a3f2f);
+      background: transparent; color: inherit; cursor: pointer; }
+    .mp-copy-msg { font-size: 0.8rem; color: #9fd39f; min-height: 1.1em; margin-top: 0.2rem; }
+    .mp-roster-row { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border-color,#4a3f2f); font-size: 0.85rem; gap: 0.5rem; }
+    .mp-remove-btn { padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid #7a2e2e;
+      background: transparent; color: #e08a8a; cursor: pointer; font-size: 0.78rem; flex-shrink: 0; }
+    #mpGuestBadge { display: none; position: fixed; top: 8px; right: 8px; z-index: 500;
+      padding: 0.4rem 0.7rem; border-radius: 6px; background: var(--panel-bg,#1c1712);
+      border: 1px solid var(--border-color,#4a3f2f); color: var(--text-dim,#a89f8a); font-size: 0.85rem; }
     #mpGuestBadge.show { display: block; }
-    #mpAccountOverlay {
-      display: none; position: fixed; inset: 0; z-index: 9001;
-      background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
-    }
-    #mpAccountOverlay.show { display: flex; }
-    #mpAccountModal {
-      background: var(--bg, #12100d); border: 1px solid var(--border, #3d3020);
-      width: min(440px, 92vw); max-height: 85vh; overflow: auto;
-      padding: 1.2rem; font-family: 'Crimson Text', serif; color: var(--text, #e8dfc8);
-    }
-    #mpAccountModal h3 { margin: 0 0 0.5rem; color: var(--gold, #c9a84c); font-size: 1.1rem; letter-spacing: 0.03em; }
-    #mpAccountModal .mp-close { float: right; cursor: pointer; font-size: 1.3rem; line-height: 1; color: var(--text-dim, #a89f8a); }
-    #mpAccountModal .mp-room-code-row { display: flex; gap: 0.5rem; align-items: stretch; margin: 0.5rem 0; }
-    #mpAccountModal .mp-room-code {
-      flex: 1; font-family: 'Share Tech Mono', monospace; font-size: 1.3rem; letter-spacing: 0.15em;
-      color: var(--gold-bright, #e6c766); background: var(--surface, #1a1a1a);
-      border: 1px solid var(--border, #3d3020); padding: 0.5rem 0.8rem; text-align: center;
-      cursor: pointer; user-select: all;
-    }
-    #mpAccountModal .mp-room-code:hover { border-color: var(--gold, #c9a84c); }
-    #mpAccountModal .mp-copy-btn {
-      background: var(--surface, #1a1a1a); border: 1px solid var(--border, #3d3020);
-      color: var(--text, #e8dfc8); font-family: 'Crimson Text', serif; font-size: 0.85rem;
-      padding: 0.5rem 0.7rem; cursor: pointer; white-space: nowrap;
-    }
-    #mpAccountModal .mp-copy-btn:hover { border-color: var(--gold, #c9a84c); color: var(--gold, #c9a84c); }
-    #mpAccountModal .mp-copy-msg { min-height: 1.1rem; font-size: 0.8rem; color: var(--uncommon, #4caf7d); text-align: center; margin: -0.2rem 0 0.3rem; }
-    #mpAccountModal .mp-roster { margin-top: 0.7rem; border-top: 1px solid var(--border, #3d3020); padding-top: 0.6rem; }
-    #mpAccountModal .mp-roster-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 0.3rem 0; gap: 0.5rem; }
-    #mpAccountModal .mp-remove-btn { background: transparent; border: 1px solid var(--danger, #e05252); color: var(--danger, #e05252); font-size: 0.7rem; padding: 0.2rem 0.5rem; cursor: pointer; }
+
+    /* Connection status banner — deliberately OUTSIDE the gate overlay (see connectWebSocket's
+       close handler) so a dropped connection is visible no matter what screen/tab is active,
+       not just while the gate happens to be open. */
+    #mpConnBanner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+      padding: 0.5rem; text-align: center; font-size: 0.85rem; font-weight: 600; }
+    #mpConnBanner.show { display: block; }
+    #mpConnBanner.err { background: #7a2e2e; color: #fff; }
+    #mpConnBanner.ok { background: #2e6b3e; color: #fff; }
   `;
   document.head.appendChild(style);
 }
 
 function injectDom() {
-  const gate = document.createElement("div");
-  gate.id = "mpGate";
-  gate.innerHTML = `<div id="mpGateBox"></div>`;
-  document.body.appendChild(gate);
+  const gateOverlay = document.createElement('div');
+  gateOverlay.id = 'mpGateOverlay';
+  gateOverlay.className = 'hide';
+  gateOverlay.innerHTML = `<div id="mpGateBox"></div>`;
+  document.body.appendChild(gateOverlay);
 
-  const accountBtn = document.createElement("button");
-  accountBtn.id = "mpAccountBtn";
-  accountBtn.onclick = () => document.getElementById("mpAccountOverlay").classList.add("show");
+  const accountBtn = document.createElement('button');
+  accountBtn.id = 'mpAccountBtn';
+  accountBtn.onclick = () => document.getElementById('mpAccountOverlay').classList.toggle('show');
   document.body.appendChild(accountBtn);
 
-  const guestBadge = document.createElement("button");
-  guestBadge.id = "mpGuestBadge";
-  guestBadge.textContent = "👤 Guest Mode — exit";
-  guestBadge.title = "Nothing here is saved to any account. Click to return to the login screen.";
-  guestBadge.onclick = exitGuestMode;
+  const accountOverlay = document.createElement('div');
+  accountOverlay.id = 'mpAccountOverlay';
+  accountOverlay.onclick = (e) => { if (e.target === accountOverlay) accountOverlay.classList.remove('show'); };
+  accountOverlay.innerHTML = `<div id="mpAccountModal"></div>`;
+  document.body.appendChild(accountOverlay);
+
+  const guestBadge = document.createElement('div');
+  guestBadge.id = 'mpGuestBadge';
+  guestBadge.innerHTML = `🎲 Guest (solo, not synced) &nbsp; <a href="#" id="mpExitGuestLink" style="color:inherit;">switch</a>`;
   document.body.appendChild(guestBadge);
+  document.getElementById('mpExitGuestLink').onclick = (e) => { e.preventDefault(); exitGuestMode(); };
 
-  const overlay = document.createElement("div");
-  overlay.id = "mpAccountOverlay";
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove("show"); };
-  overlay.innerHTML = `<div id="mpAccountModal"></div>`;
-  document.body.appendChild(overlay);
+  const connBanner = document.createElement('div');
+  connBanner.id = 'mpConnBanner';
+  document.body.appendChild(connBanner);
 }
 
-function showGate() {
-  document.getElementById("mpGate").classList.remove("hide");
-  document.getElementById("mpAccountBtn").classList.remove("show");
-  renderGateRoleSelect();
-}
-function hideGate() { document.getElementById("mpGate").classList.add("hide"); }
-
-function setGateStatus(msg, isError) {
-  const el = document.getElementById("mpGateStatus");
+let _connBannerOkTimer = null;
+function showConnBanner(msg, isError) {
+  clearTimeout(_connBannerOkTimer);
+  const el = document.getElementById('mpConnBanner');
   if (!el) return;
-  el.textContent = msg || "";
-  el.className = "mp-status" + (isError ? " error" : msg ? " ok" : "");
+  el.textContent = msg;
+  el.classList.add('show');
+  el.classList.toggle('err', !!isError);
+  el.classList.toggle('ok', !isError);
+}
+function hideConnBanner() {
+  const el = document.getElementById('mpConnBanner');
+  if (!el || !el.classList.contains('show')) return;
+  // Flash a brief "back online" confirmation rather than just vanishing — someone who watched
+  // "Connection lost — reconnecting…" sit there deserves to know it actually recovered.
+  el.textContent = 'Reconnected.';
+  el.classList.remove('err');
+  el.classList.add('ok');
+  clearTimeout(_connBannerOkTimer);
+  _connBannerOkTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-// ---- Gate: step 1, role select ----
-let gateRole = null; // 'dm' | 'player', chosen before showing the login/signup form
-let gateMode = "login"; // 'login' | 'signup'
-
-function renderGateRoleSelect() {
-  const box = document.getElementById("mpGateBox");
-  box.innerHTML = `
-    <h2>🎲 Who's playing?</h2>
-    <p class="mp-sub">Choose your role to log in or create an account.</p>
-    <div class="mp-role-row">
-      <button class="mp-role-btn" id="mpRolePlayerBtn">🧙 Player</button>
-      <button class="mp-role-btn" id="mpRoleDmBtn">👑 Dungeon Master</button>
-    </div>
-    <button class="mp-btn" id="mpGuestBtn" style="background:var(--surface, #1a1a1a); color:var(--gold, #c9a84c); border:2px solid var(--gold, #c9a84c);">👤 Just Looking Around (Guest / Debug)</button>
-    <p class="mp-sub" style="margin:0.5rem 0 0;">No account, no campaign — nothing is ever sent to Firebase. Saves only to this browser's local storage, same as using the app before any of this multiplayer stuff existed. Every tab is unlocked so you can poke at all of it, but nobody else can see or join you.</p>
-    <div class="mp-status" id="mpGateStatus"></div>
-  `;
-  document.getElementById("mpRolePlayerBtn").onclick = () => { gateRole = "player"; gateMode = "login"; renderGateForm(); };
-  document.getElementById("mpRoleDmBtn").onclick = () => { gateRole = "dm"; gateMode = "login"; renderGateForm(); };
-  document.getElementById("mpGuestBtn").onclick = enterGuestMode;
+function showGate() { document.getElementById('mpGateOverlay').classList.remove('hide'); renderGateRoleSelect(); }
+function hideGate() { document.getElementById('mpGateOverlay').classList.add('hide'); }
+function setGateStatus(msg, isError) {
+  const el = document.getElementById('mpGateStatus');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.classList.toggle('err', !!isError);
 }
-// ---- Guest / debug mode: skips Firebase entirely ----
-// The whole point is a zero-friction, zero-risk way to poke at the app's features or debug
-// something without a real account, a campaign, or touching Firestore at all (which also means
-// it works even while the project's daily quota is exhausted, unlike everything else here).
-// mp.connected simply never becomes true, so window.onMultiplayerStateChange's own guard
-// ("if (!mp.connected...) return") already means every edit just saves to this browser's
-// localStorage exactly like the app worked before multiplayer existed — nothing new to build
-// for that part, just a door that skips the login form.
+
 function enterGuestMode() {
   hideGate();
-  document.body.classList.remove("role-player");
-  const battlefieldBtn = document.getElementById("battlefieldTabBtn");
-  if (battlefieldBtn) battlefieldBtn.style.display = "";
-  document.getElementById("mpGuestBadge").classList.add("show");
+  document.body.classList.remove('role-player');
+  const battlefieldBtn = document.getElementById('battlefieldTabBtn');
+  if (battlefieldBtn) battlefieldBtn.style.display = '';
+  document.getElementById('mpGuestBadge').classList.add('show');
 }
 function exitGuestMode() {
-  document.getElementById("mpGuestBadge").classList.remove("show");
+  document.getElementById('mpGuestBadge').classList.remove('show');
   showGate();
 }
 
-// ---- Gate: step 2, login/signup form for the chosen role ----
-// DM signup used to be wide open — anyone who found this app's public URL could click Create
-// Account under Dungeon Master and immediately spin up their own fully independent campaign,
-// all billed against the same Firebase project. Player signup was never the exposure (it
-// already requires a real campaign code tied to an existing DM's room — a stranger can't just
-// wander into someone else's game), so only the DM half needed closing off. signUpDM() itself
-// is never assigned to `window` (see its own definition) — it's plain module-private scope, so
-// removing the only UI path that calls it here doesn't just hide a button, it makes DM signup
-// genuinely unreachable from this page, not merely inconvenient to find.
-function renderGateForm() {
-  const box = document.getElementById("mpGateBox");
-  const roleLabel = gateRole === "dm" ? "Dungeon Master" : "Player";
-  const dmSignupDisabled = gateRole === "dm";
-  if (dmSignupDisabled) gateMode = "login"; // can't land here in signup mode for this role
-  const campaignFieldHtml = (gateRole === "player" && gateMode === "signup") ? `
-    <label>DM's campaign code</label>
-    <input type="text" id="mpCampaignCode" placeholder="e.g. K7M2P" style="text-transform:uppercase;">
-  ` : "";
-  const modeRowHtml = dmSignupDisabled ? "" : `
-    <div class="mp-mode-row">
-      <button class="mp-mode-btn ${gateMode === "login" ? "active" : ""}" id="mpModeLoginBtn">Log In</button>
-      <button class="mp-mode-btn ${gateMode === "signup" ? "active" : ""}" id="mpModeSignupBtn">Create Account</button>
-    </div>
-  `;
+// ---- Gate: role select ----
+function renderGateRoleSelect() {
+  const box = document.getElementById('mpGateBox');
   box.innerHTML = `
-    <span class="mp-close" style="float:right;cursor:pointer;color:var(--text-dim,#a89f8a);" id="mpBackBtn">← back</span>
-    <h2>${gateRole === "dm" ? "👑" : "🧙"} ${roleLabel}</h2>
-    ${modeRowHtml}
-    <label>Username</label>
-    <input type="text" id="mpUsername" placeholder="pick a username" autocomplete="username">
-    <label>Password</label>
-    <input type="password" id="mpPassword" placeholder="••••••••" autocomplete="${gateMode === "signup" ? "new-password" : "current-password"}">
-    ${campaignFieldHtml}
-    <button class="mp-btn" id="mpSubmitBtn">${gateMode === "signup" ? "Create Account" : "Log In"}</button>
+    <h2>🎲 Dungeon Master Box</h2>
+    <div class="mp-role-row">
+      <button class="mp-btn" id="mpRoleDmBtn">👑 Dungeon Master</button>
+      <button class="mp-btn" id="mpRolePlayerBtn">🧙 Player</button>
+      <button class="mp-btn mp-secondary" id="mpRoleGuestBtn">🎲 Solo / Guest (no sync)</button>
+    </div>
     <div class="mp-status" id="mpGateStatus"></div>
   `;
-  document.getElementById("mpBackBtn").onclick = renderGateRoleSelect;
-  if (!dmSignupDisabled) {
-    document.getElementById("mpModeLoginBtn").onclick = () => { gateMode = "login"; renderGateForm(); };
-    document.getElementById("mpModeSignupBtn").onclick = () => { gateMode = "signup"; renderGateForm(); };
-  }
-  document.getElementById("mpSubmitBtn").onclick = handleGateSubmit;
+  document.getElementById('mpRoleDmBtn').onclick = renderDmGateForm;
+  document.getElementById('mpRolePlayerBtn').onclick = renderPlayerGateForm;
+  document.getElementById('mpRoleGuestBtn').onclick = enterGuestMode;
 }
 
-async function handleGateSubmit() {
-  const username = document.getElementById("mpUsername").value;
-  const password = document.getElementById("mpPassword").value;
-  if (!sanitizeUsername(username)) { setGateStatus("Enter a username (letters, numbers, - and _ only).", true); return; }
-  if (!password || password.length < 6) { setGateStatus("Password must be at least 6 characters.", true); return; }
-  setGateStatus("Working…");
-  try {
-    if (gateMode === "signup") {
-      // Belt-and-suspenders: the UI in renderGateForm no longer offers a way to reach this with
-      // gateRole === "dm" at all, but refusing explicitly here (rather than trusting that alone)
-      // costs nothing and means this stays correct even if that render logic ever changes.
-      if (gateRole === "dm") { setGateStatus("New DM accounts aren't self-service — ask whoever runs this campaign to set one up for you.", true); return; }
-      await signUpPlayer(username, password, document.getElementById("mpCampaignCode").value);
-    } else {
-      await logIn(username, password);
-    }
-  } catch (err) {
-    setGateStatus(friendlyAuthError(err), true);
-  }
+// ---- Gate: DM — start a new campaign, or resume an existing one by its code ----
+function renderDmGateForm() {
+  const box = document.getElementById('mpGateBox');
+  box.innerHTML = `
+    <span class="mp-close" id="mpBackBtn">← back</span>
+    <h2>👑 Dungeon Master</h2>
+    <label>New campaign name</label>
+    <input type="text" id="mpCampaignName" placeholder="e.g. Curse of the Crimson Throne">
+    <button class="mp-btn" id="mpStartCampaignBtn">Start New Campaign</button>
+    <label style="margin-top:1rem;">— or resume one you already started —</label>
+    <input type="text" id="mpResumeCode" placeholder="campaign code" style="text-transform:uppercase;" autocomplete="off" spellcheck="false">
+    <button class="mp-btn mp-secondary" id="mpResumeCampaignBtn">Resume as DM</button>
+    <div class="mp-status" id="mpGateStatus"></div>
+  `;
+  document.getElementById('mpBackBtn').onclick = renderGateRoleSelect;
+  document.getElementById('mpStartCampaignBtn').onclick = async () => {
+    const name = document.getElementById('mpCampaignName').value.trim();
+    if (!name) return setGateStatus('Enter a campaign name.', true);
+    setGateStatus('Working…');
+    try {
+      const res = await fetch(`${API_BASE}/campaigns`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }),
+      });
+      const campaign = await res.json();
+      if (!res.ok) throw new Error(campaign.error || 'Could not create the campaign.');
+      beginSession('dm', campaign.id, campaign.code, 'DM');
+    } catch (err) { setGateStatus(err.message, true); }
+  };
+  document.getElementById('mpResumeCampaignBtn').onclick = async () => {
+    const code = document.getElementById('mpResumeCode').value.trim();
+    if (!code) return setGateStatus('Enter the campaign code.', true);
+    if (!looksLikeCampaignCode(code)) return setGateStatus("That doesn't look like a campaign code — it should be a short string of letters/numbers.", true);
+    setGateStatus('Working…');
+    try {
+      const campaign = await fetchCampaignByCode(code);
+      beginSession('dm', campaign.id, campaign.code, 'DM');
+    } catch (err) { setGateStatus(err.message, true); }
+  };
 }
 
-function friendlyAuthError(err) {
-  const code = err && err.code;
-  if (code === "auth/email-already-in-use") return "That username is already taken.";
-  if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found") return "Wrong username or password.";
-  if (code === "auth/weak-password") return "Password must be at least 6 characters.";
-  return (err && err.message) ? err.message.replace(/^Firebase:\s*/, "") : String(err);
+// ---- Gate: Player — join with the DM's code and a display name ----
+function renderPlayerGateForm() {
+  const box = document.getElementById('mpGateBox');
+  box.innerHTML = `
+    <span class="mp-close" id="mpBackBtn">← back</span>
+    <h2>🧙 Player</h2>
+    <label>Campaign code</label>
+    <input type="text" id="mpJoinCode" placeholder="e.g. K7M2P" style="text-transform:uppercase;" autocomplete="off" spellcheck="false">
+    <label>Your display name</label>
+    <input type="text" id="mpJoinName" placeholder="what your DM sees">
+    <button class="mp-btn" id="mpJoinBtn">Join Campaign</button>
+    <div class="mp-status" id="mpGateStatus"></div>
+  `;
+  document.getElementById('mpBackBtn').onclick = renderGateRoleSelect;
+  document.getElementById('mpJoinBtn').onclick = async () => {
+    const code = document.getElementById('mpJoinCode').value.trim();
+    const name = document.getElementById('mpJoinName').value.trim();
+    if (!code) return setGateStatus('Enter your campaign code.', true);
+    if (!looksLikeCampaignCode(code)) return setGateStatus("That doesn't look like a campaign code — it should be a short string of letters/numbers.", true);
+    if (!name) return setGateStatus('Enter a display name.', true);
+    setGateStatus('Working…');
+    try {
+      const campaign = await fetchCampaignByCode(code);
+      beginSession('player', campaign.id, campaign.code, name);
+    } catch (err) { setGateStatus(err.message, true); }
+  };
 }
 
-// ---- Post-login account panel ----
-// Split into a STATIC shell (built once per login) and a live roster list (rebuilt on every
-// call) — this used to rebuild the ENTIRE modal via innerHTML on every single call, but this
-// function runs on every roster snapshot (startRosterListener), which fires roughly every 5
-// seconds at minimum just from the DM's own idle autosave heartbeat (it listens to the whole
-// players collection, including their own doc), let alone anything an actual player does.
-// Rebuilding the whole modal that often destroyed and recreated the Log Out / Delete My
-// Account / Copy buttons' actual DOM nodes constantly — if a click's mousedown and mouseup
-// happened to straddle one of those rebuilds, they landed on two different elements and never
-// counted as a completed click at all. That's what made Log Out "sometimes just do nothing"
-// with no obvious pattern — nothing to do with the button's size or hit area.
+// Real campaign codes are 5 characters from a fixed alphabet (see db/database.js's
+// generateCampaignCode), but this checks a looser 4-8 alphanumeric shape rather than hardcoding
+// the exact length/alphabet here too — the point isn't to duplicate the server's exact format,
+// just to reject anything that obviously isn't a short code (a pasted URL, an empty autofill
+// artifact) before it ever reaches the network. Found worth having during real testing: a full
+// page URL ended up in this field (almost certainly a stray browser-autofill suggestion, since
+// nothing in this form would type it there deliberately) and round-tripped all the way to a
+// server 404 with no on-screen feedback at all.
+function looksLikeCampaignCode(raw) {
+  return /^[A-Z0-9]{4,8}$/.test((raw || '').trim().toUpperCase());
+}
+
+async function fetchCampaignByCode(code) {
+  const res = await fetch(`${API_BASE}/campaigns/by-code/${encodeURIComponent(code.toUpperCase())}`);
+  const body = await res.json();
+  if (!res.ok) throw new Error(res.status === 404 ? `No campaign found for code "${code}".` : (body.error || 'Could not reach the campaign.'));
+  return body;
+}
+
+function beginSession(role, campaignId, code, username) {
+  mp.uid = getOrCreateDeviceUid();
+  mp.role = role;
+  mp.campaignId = campaignId;
+  mp.code = code;
+  mp.username = username;
+  mp.kicked = false;
+  refreshLocalStateCache();
+  saveSession({ role, campaignId, code, username });
+  connectWebSocket();
+}
+
+// ---- Post-connect account panel ----
 function renderAccountPanel() {
-  const btn = document.getElementById("mpAccountBtn");
-  const modal = document.getElementById("mpAccountModal");
+  const btn = document.getElementById('mpAccountBtn');
+  const modal = document.getElementById('mpAccountModal');
   if (!btn || !modal) return;
-  btn.classList.toggle("show", mp.connected);
+  btn.classList.toggle('show', mp.connected);
   if (!mp.connected) return;
-  btn.textContent = (mp.role === "dm" ? "👑 " : "🧙 ") + mp.username;
+  btn.textContent = (mp.role === 'dm' ? '👑 ' : '🧙 ') + mp.username;
 
-  // Only (re)built when the logged-in account actually changes, so Log Out/Delete/Copy stay
-  // the exact same DOM nodes for the entire session — a plain data attribute is enough since
-  // there's nothing else that would need this shell rebuilt while still logged into one account.
-  if (modal.dataset.builtFor !== mp.uid) {
-    modal.dataset.builtFor = mp.uid;
+  if (modal.dataset.builtFor !== mp.uid + mp.campaignId) {
+    modal.dataset.builtFor = mp.uid + mp.campaignId;
     modal.innerHTML = `
       <span class="mp-close" onclick="document.getElementById('mpAccountOverlay').classList.remove('show')">×</span>
-      <h3>${mp.role === "dm" ? "👑 Dungeon Master" : "🧙 Player"}: ${escapeHtmlLocal(mp.username)}</h3>
+      <h3>${mp.role === 'dm' ? '👑 Dungeon Master' : '🧙 Player'}: ${escapeHtmlLocal(mp.username)}</h3>
       <label>Campaign code</label>
       <div class="mp-room-code-row">
-        <div class="mp-room-code" id="mpRoomCodeVal" title="Click to copy">${escapeHtmlLocal(mp.roomCode)}</div>
+        <div class="mp-room-code" id="mpRoomCodeVal" title="Click to copy">${escapeHtmlLocal(mp.code)}</div>
         <button class="mp-copy-btn" id="mpCopyRoomCodeBtn" title="Copy campaign code">📋 Copy</button>
       </div>
       <div class="mp-copy-msg" id="mpRoomCodeCopyMsg"></div>
       <button class="mp-btn mp-danger" id="mpLogoutBtn">Log Out</button>
-      <button class="mp-btn mp-danger" id="mpDeleteAccountBtn" style="margin-top:0.4rem;">Delete My Account</button>
       <div id="mpRosterContainer"></div>
     `;
-    document.getElementById("mpLogoutBtn").onclick = logOut;
-    document.getElementById("mpDeleteAccountBtn").onclick = deleteMyAccount;
-    document.getElementById("mpCopyRoomCodeBtn").onclick = copyRoomCode;
-    // Clicking the code itself copies it too — select-all-on-click still works as a fallback
-    // (user-select:all above) for anyone whose browser blocks the Clipboard API.
-    document.getElementById("mpRoomCodeVal").onclick = copyRoomCode;
+    document.getElementById('mpLogoutBtn').onclick = logOut;
+    document.getElementById('mpCopyRoomCodeBtn').onclick = copyRoomCode;
+    document.getElementById('mpRoomCodeVal').onclick = copyRoomCode;
   }
 
-  // The one part that genuinely needs to refresh live — isolated to its own container so
-  // rebuilding it never touches the buttons above.
-  const rosterContainer = document.getElementById("mpRosterContainer");
+  const rosterContainer = document.getElementById('mpRosterContainer');
   if (!rosterContainer) return;
-  rosterContainer.innerHTML = mp.role === "dm" ? `
+  rosterContainer.innerHTML = mp.role === 'dm' ? `
     <div class="mp-roster">
       <label style="margin-top:0;">Connected players</label>
-      ${[...mp.roster.entries()].filter(([uid]) => uid !== mp.uid).map(([uid, p]) => `
+      ${[...mp.roster.entries()].map(([uid, p]) => `
         <div class="mp-roster-row">
-          <span>${escapeHtmlLocal(p.username)}${p.currentHp != null ? ` <span style="color:var(--text-dim,#a89f8a);">(HP ${escapeHtmlLocal(String(p.currentHp))}/${escapeHtmlLocal(String(p.maxHp))}, AC ${escapeHtmlLocal(String(p.ac))})</span>` : ""}</span>
+          <span>${escapeHtmlLocal(p.username)}${p.currentHp != null ? ` <span style="color:var(--text-dim,#a89f8a);">(HP ${escapeHtmlLocal(String(p.currentHp))}/${escapeHtmlLocal(String(p.maxHp))}, AC ${escapeHtmlLocal(String(p.ac))})</span>` : ''}</span>
           <button class="mp-remove-btn" data-uid="${uid}">Remove</button>
         </div>
-      `).join("") || '<div style="color:var(--text-dim,#a89f8a);font-size:0.85rem;">No players have joined yet.</div>'}
+      `).join('') || '<div style="color:var(--text-dim,#a89f8a);font-size:0.85rem;">No players have joined yet.</div>'}
     </div>
-  ` : "";
-  rosterContainer.querySelectorAll(".mp-remove-btn").forEach((el) => {
+  ` : '';
+  rosterContainer.querySelectorAll('.mp-remove-btn').forEach((el) => {
     el.onclick = () => {
-      if (confirm(`Remove ${el.previousElementSibling.textContent} from your campaign? Their character data will be deleted.`)) {
-        removePlayer(el.getAttribute("data-uid")).then((ok) => {
-          if (!ok) alert("Couldn't remove that player — check your connection and try again.");
-        });
-      }
+      const uid = el.getAttribute('data-uid');
+      const username = (mp.roster.get(uid) || {}).username || 'this player';
+      if (!confirm(`Remove ${username} from your campaign? Their character data will be deleted.`)) return;
+      kickPlayer(uid).catch(() => alert("Couldn't remove that player — check your connection and try again."));
     };
   });
 }
 
-// Copies the campaign code to the clipboard — wired to both the dedicated Copy button and a
-// click on the code itself. navigator.clipboard.writeText can still throw even when it exists
-// (NotAllowedError for a variety of permission/focus reasons across different browsers, not
-// just "unsupported") — confirmed directly while testing this, so the execCommand fallback
-// below is attempted on ANY failure of the async API, not only when it's absent outright. The
-// code text also has user-select:all as a last-resort manual-copy fallback if both fail.
 async function copyRoomCode() {
-  const code = mp.roomCode;
+  const code = mp.code;
   if (!code) return;
   let copied = false;
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    try {
-      await navigator.clipboard.writeText(code);
-      copied = true;
-    } catch (err) { /* fall through to the execCommand fallback below */ }
+    try { await navigator.clipboard.writeText(code); copied = true; } catch { /* fall through */ }
   }
   if (!copied) {
     try {
-      const ta = document.createElement("textarea");
-      ta.value = code;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      copied = document.execCommand("copy");
+      const ta = document.createElement('textarea');
+      ta.value = code; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      copied = document.execCommand('copy');
       document.body.removeChild(ta);
-    } catch (err) { /* both methods failed — code is still visible and selectable by hand */ }
+    } catch { /* both methods failed — code is still visible and selectable by hand */ }
   }
   if (copied) flashRoomCodeCopied();
 }
 let _roomCodeCopyMsgTimer = null;
 function flashRoomCodeCopied() {
-  const el = document.getElementById("mpRoomCodeCopyMsg");
+  const el = document.getElementById('mpRoomCodeCopyMsg');
   if (!el) return;
-  el.textContent = "✓ Copied!";
+  el.textContent = '✓ Copied!';
   clearTimeout(_roomCodeCopyMsgTimer);
-  _roomCodeCopyMsgTimer = setTimeout(() => { el.textContent = ""; }, 1500);
+  _roomCodeCopyMsgTimer = setTimeout(() => { el.textContent = ''; }, 1500);
 }
 
 function escapeHtmlLocal(s) {
-  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 // ===================== INIT =====================
 function init() {
   injectStyles();
   injectDom();
-  showGate();
-  // With browserSessionPersistence (see authPersistenceReady above), Firebase persists the
-  // signed-in session in this TAB's sessionStorage — reloading this same tab logs back in
-  // automatically, but a new tab (even in the same browser) or a genuinely different device
-  // starts signed out and needs the username/password typed once. That's the intentional
-  // trade-off that makes running two independent accounts in two tabs possible at all.
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if (!mp.connected && !mp.kicked) {
-        restoreSession(user).catch(() => { /* stale/broken session — fall back to the gate */ });
-      }
-      return;
-    }
-    // user is null: Firebase Auth itself now reports signed-out for THIS tab. Now that auth
-    // uses browserSessionPersistence (see authPersistenceReady above), each tab has its own
-    // independent session, so this normally only fires from something that happened in this
-    // same tab (the Log Out button, or a token Firebase itself invalidated) — not from another
-    // tab/account logging in or out. Kept as a defensive catch-all rather than assuming Log Out
-    // is the only path here. Only acts if THIS tab still thinks it's connected: the tab where
-    // Log Out was actually clicked already reset its own state synchronously (see logOut), so
-    // this would otherwise be a redundant showGate() call capable of wiping a just-shown message
-    // (e.g. "removed by the DM") the instant after it appears.
-    if (mp.connected) {
-      resetLocalSessionState();
-      showGate();
-      setGateStatus("You were logged out.", false);
-    }
-  });
+  const session = loadSession();
+  if (session && session.campaignId) {
+    mp.uid = getOrCreateDeviceUid();
+    mp.role = session.role;
+    mp.campaignId = session.campaignId;
+    mp.code = session.code;
+    mp.username = session.username;
+    refreshLocalStateCache();
+    connectWebSocket();
+  } else {
+    showGate();
+  }
 }
 
-authPersistenceReady.then(() => {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-});
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
