@@ -37,6 +37,19 @@ is the whole job.
    schtasks /Run /TN "DungeonMasterBox-Server"
    ```
 
+5. (optional) Create a Desktop shortcut for manually forcing an update, instead
+   of waiting for the 30-minute timer or typing commands:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\scripts\windows\create-desktop-shortcut.ps1
+   ```
+
+   This adds an "Update Dungeon Master Box" icon to your Desktop. Double-click
+   it any time to pull the latest code, reinstall dependencies if needed, and
+   restart the server - it runs `refresh-now.bat`, which does the same thing as
+   the scheduled `DungeonMasterBox-AutoUpdate` task but immediately, with a
+   console window showing progress and a "Done" pause at the end.
+
 ## Logs
 
 - `logs\server.log` - server stdout/stderr
