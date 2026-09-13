@@ -916,3 +916,306 @@ every real-time multiplayer system identified in the original `multiplayer-sync.
 WebSocket-based replacement, backed by SQLite instead of Firestore, none of it wired into the live
 browser app yet. Firebase Auth's replacement (or retention) remains the one explicitly open
 question for a future phase.
+
+## Phase 6: Frontend Wiring
+
+Closing the gap between "the backend exists" and "a DM could actually run this with real
+players." `docs/NEXT_SESSION_BRIEF.md` (written at the end of Phase 5) proposed auditing
+`multiplayer-sync.js`'s 52 exported functions and the monolith's 27+13 call sites into it before
+writing any code. That audit turned up two things not previously documented:
+
+**`multiplayer-sync.js` is five subsystems, not two.** Beyond "Firebase Auth + account UI" (long
+known to be out of scope for Phase 5, see above) and "real-time sync" (which Phase 5a-d fully
+replaced), the file also contains real-time **gambling** sync (`pushGamblingState`/
+`startGamblingListener`/`submitGamblingActionRemote`/`startGamblingActionListener`/
+`resolveGamblingActionRemote`), the DM's live per-player **viewed-player listener**
+(`startViewedPlayerListener`/`stopViewedPlayerListener`, backing the Players tab's spectator
+view), and **player removal** (`removePlayer`/`removeAllPlayers`). None of these three have a
+WebSocket or database counterpart yet — Phase 4's gambling work made resolution
+server-authoritative over REST, but never built the live push/listen loop around it. These were
+missed by the original Phase 5a audit's own "what's still needed" list and are treated as their
+own scoped sub-phases (6d-6f below), not folded silently into "wiring."
+
+**The monolith's 27 call sites resolve to ~15 named bridge functions**, not 27 distinct
+behaviors — `window.dmSetPlayerInventoryFields`, `window.pushBattlefieldState`, etc. are each
+called from several places. The bridge surface (both directions — the functions
+`multiplayer-sync.js` exposes on `window`, and the hook functions it expects the monolith to have
+defined, like `window.applyRemoteMultiplayerState`) is already clean, which is why keeping
+exported names/signatures stable during the rewrite is viable.
+
+**`saveAppState`/`loadAppState` have a head start**: `db/schema.js`'s `SUBSYSTEMS` map and the
+`characters` table already give a complete field-by-field decomposition of the old localStorage
+blob — that groundwork was laid in Phase 2, well before Phase 6 was scoped. What's not yet solved:
+`loadAppState()` is called synchronously today (page-load init assumes it returns immediately);
+a REST-backed version is async, touching the init sequence. There's also no human-shareable
+"campaign code" in the new backend yet — `campaigns` are bare auto-increment integers, whereas the
+old Firestore room code (read aloud at the table) was the document id itself. Resolved by the
+identity decision below.
+
+**Confirmed with the user**: identity uses a lightweight model — a DM creates a campaign and gets
+a short shareable code; players enter the code and pick a display name; no passwords, no accounts
+table, no Firebase-Auth-equivalent to build. The WebSocket `identify` message already accepts
+this shape (`accountUid`/`role`/`username`, no credential) unchanged. This eliminates
+`multiplayer-sync.js`'s entire Auth + login/account-gate-UI subsystems (~25 functions, ~500 lines)
+outright rather than porting them — the single largest scope reduction found in the audit.
+
+Sub-phases, in confirmed order: 6a (static file serving — this section), 6b (room-code identity),
+6c (rewrite `multiplayer-sync.js`'s internals for the subsystems Phase 5 already covers), 6d
+(gambling real-time sync), 6e (viewed-player listener), 6f (player removal), 6g (rewrite
+`saveAppState`/`loadAppState` against REST), 6h (real multi-device LAN testing), 6i (Phase 6
+packaging, i.e. the original roadmap's "Phase 6"). 6d-6f build genuinely new server-side surface
+area (not translation of existing WS work) and are each confirmed with the user individually
+before being built, matching Phase 5's own a-d precedent.
+
+### Phase 6a: Static File Serving
+
+Small and standalone by design — `server/server.js` had no way to serve the actual app files
+(the monolith HTML, `multiplayer-sync.js`, `game-engine.js`, `loot-data.js`, `puzzle-data.js`),
+only answer JSON API requests. `createServer(db, { staticRoot })` now takes an optional second
+argument (same dependency-injection shape as `db` itself — tests point it at a throwaway fixture
+directory, `server/start.js` points it at the repo root via `import.meta.dirname`); when a request
+matches no API route and is a GET, it falls through to `tryServeStatic` before returning 404.
+
+Deliberate simplifications, to revisit if this is ever exposed beyond a DM's own LAN:
+- **Extension allowlist, not "serve whatever exists under the root."** The default sqlite db file
+  (`server/start.js`'s `DB_PATH`) lives at the repo root right alongside the app files; without an
+  allowlist, campaign data would be fetchable over plain HTTP as e.g. `GET /dungeon-master-box.db`.
+- **GET only** — nothing here needs HEAD/Range support today.
+- **No directory listing, no caching/ETag headers, no gzip/compression.** A DM's own local
+  process on a LAN has no meaningful cache-invalidation or bandwidth story to optimize yet.
+- Path-traversal protection is a resolved-path prefix check (`tryServeStatic` in
+  `server/server.js`) rather than relying solely on `new URL()`'s own dot-segment normalization —
+  belt-and-suspenders, since the normalization already makes an actual escape essentially
+  unreachable through a spec-compliant HTTP client, but cheap enough to keep as defense-in-depth
+  for anything that isn't one.
+
+Validated with a real end-to-end smoke test (started `server/start.js` for real, fetched `/`,
+`/game-engine.js`, and the actual ~1.2MB monolith HTML over real HTTP) in addition to the 8 new
+regression tests in `server/server.test.js`. Full suite: 134 tests, 45 consecutive clean runs.
+
+Also required installing Node.js itself (v24.19.0 LTS via winget) — this session started on a
+machine with no Node install at all, confirming the handoff brief's anticipated "continuing from
+a different computer" scenario.
+
+### Phase 6b: Room-Code Identity (server-side)
+
+Server-side half of the identity decision confirmed with the user above. `campaigns` gains a
+`code` column: a 5-character join code from the same visually-unambiguous alphabet (no 0/O/1/I/L)
+`multiplayer-sync.js`'s original `generateRoomCode` used, for the same reason (read aloud and
+typed by hand at the table). `createCampaign` generates and assigns one automatically, retrying
+on the rare `UNIQUE` collision (~33.5M possible codes at this length, so this is a formality, not
+a real contention point). `getCampaignByCode` resolves a typed code back to a campaign,
+case-insensitively — new `GET /campaigns/by-code/:code` route exposes it.
+
+Deliberately server-only for this sub-phase: no client-side UI (join screen, code entry) yet —
+that lands in 6c alongside the rest of `multiplayer-sync.js`'s rewrite, since the new lightweight
+gate UI is inherently part of replacing that file's DOM-injected login screen. What 6b actually
+unblocks: a client can now go from "DM typed/read out a 5-character code" to "a real campaign id
+to `identify` against" without needing accounts, sessions, or a password anywhere in the loop.
+
+**Deliberate non-migration**: the `code` column was added directly to the `CREATE TABLE IF NOT
+EXISTS campaigns` statement, not introduced via an `ALTER TABLE` migration path. Fine for now
+because nothing has been deployed with real campaign data yet — an existing on-disk `.db` file
+from before this change would keep its old schema (`CREATE TABLE IF NOT EXISTS` is a no-op against
+an existing table) and every `code`-dependent query would then fail. Worth revisiting with a real
+migration mechanism before this is ever deployed somewhere a database file needs to survive an
+upgrade; noted here rather than silently assumed away.
+
+Validated: 7 new tests (4 in `db/database.test.js` covering code generation/uniqueness/lookup, 3
+in `server/server.test.js` covering the REST route), full suite now 141 tests, 50 consecutive
+clean runs.
+
+### Phase 6c: Rewrite `multiplayer-sync.js` Against the WebSocket Protocol
+
+Full rewrite of `multiplayer-sync.js` (see the file's own header comment for the complete design
+rationale — this section summarizes it and records what building it actually found). Every
+exported `window.*` function and expected hook name is unchanged from the original — the 27 call
+sites in the monolith needed zero edits, confirming the bridge-surface design from Phase 5 held up
+under a real rewrite, not just in theory.
+
+**What got simpler, not just swapped:**
+- `sanitizeNestedArrays`/`unsanitizeNestedArrays` are gone entirely. That machinery existed only
+  because Firestore rejects array-of-arrays fields and `undefined` values; the new backend stores
+  state as a plain `JSON.stringify`'d text blob (`db/database.js`), which has neither restriction.
+- The `rev`/`extRev` self-echo detection dance is gone from the client. A WebSocket server never
+  sends a `state_update` back to the connection that caused it (by construction, per
+  `server/websocket.js`), so `state_update` is now applied unconditionally. `rev` is still sent
+  with every `push_state` (guards genuinely out-of-order delivery of the same client's rapid
+  pushes — a problem that doesn't go away), but the client no longer reasons about it beyond
+  incrementing it.
+
+**The one new client-side mechanism this rewrite genuinely needed**: raw WebSocket has no
+request/response correlation the way a Firestore write's returned promise did. `waitForNext(
+predicate)` registers a one-shot waiter matched against the next incoming message satisfying an
+arbitrary predicate (correlated on whatever field a given response actually carries — `rev` for
+push acks, `targetUid` for cross-write acks, `claimId` for loot claims), resolved by the
+WebSocket's `message` handler. Not perfect distributed request tracking (two of the exact same
+kind of request in flight at once could theoretically cross-resolve if neither carries a
+correlating field), but this is a single DM's local console talking to their own server, not a
+high-concurrency system — documented as a reasonable-effort tradeoff, not overlooked.
+
+**Identity, confirmed with the user**: room code + display name, no accounts (see Phase 6b above
+and this file's own header comment for the full reasoning). A per-browser random id
+(`getOrCreateDeviceUid`, localStorage) replaces the Firebase uid — what makes a returning player's
+character persist across reloads. **Deliberate, documented scope reduction**: because this id is
+in localStorage (shared across every tab of one browser) rather than the original's
+sessionStorage (private per tab), running the DM role and a player role simultaneously in two tabs
+of the *same* browser is no longer supported — both tabs would share one accountUid, and
+`server/websocket.js`'s `rooms` map is keyed by accountUid per campaign, so the second identify
+would displace the first's connection (see the bug below). Accepted deliberately: a character
+surviving a closed tab/browser restart (the common case) matters more than same-browser dual-role
+testing, which still works fine across two different browsers or a private window.
+
+**A real bug found by testing, not invented as a hypothetical**: manual two-tab browser testing
+(deliberately exercising the "shared localStorage" edge case above) surfaced that
+`server/websocket.js`'s `identify` handler, when a second connection identifies with an
+`accountUid` already live in the room map, silently *replaced* the map entry — leaving the first
+connection's socket still open but completely untracked. No crash; the old tab just went
+permanently deaf to every future broadcast (for a DM, this means `findDmConnection` stops finding
+them — no more roster updates, no attack requests, nothing). Fixed in `server/websocket.js`:
+identify now explicitly notifies (`{type:'error', message:'Connected from another tab or device…'}`)
+and closes the displaced connection before taking over, converting an invisible zombie into a
+visible, honest disconnect. Two new regression tests in `server/websocket.test.js` cover this
+(the displacement itself, and confirming a same-connection re-identify is a no-op that doesn't
+close itself). This is the one change in this sub-phase that touched already-merged Phase 5 code.
+
+**Also added, beyond a literal protocol translation**: a capped-backoff auto-reconnect on
+unexpected WebSocket close. The protocol itself has no opinion on reconnection, but a real,
+usable app over a LAN needs it regardless (a WiFi hiccup or a server restart shouldn't require a
+manual page reload) — `connectWebSocket`'s close handler retries with backoff up to 10s, using the
+same in-memory identity (not re-reading localStorage), and surfaces "Connection lost —
+reconnecting…" via the gate status line if the reconnect attempt is visible.
+
+**What's still deliberately absent (not oversights — see the file's header comment and Phase
+6d/6e/6f below)**: real-time gambling sync, the DM's per-player viewed-player listener, and player
+removal. None of their `window.*` functions are defined by this rewrite; every monolith call site
+already guards with `typeof window.X === 'function'`, so these subsystems simply don't work yet in
+multiplayer mode, with no crash — exactly the same graceful-absence property the original file's
+own header comment already relied on for "if this file doesn't exist at all."
+
+**Testing approach for this file specifically**: `multiplayer-sync.js` is fundamentally
+browser-coupled (`document`, `window`, `WebSocket` client, `fetch`, `localStorage`) — unlike
+`game-engine.js`'s pure extracted core, there's no DOM-free logic worth pulling out here, and
+adding a DOM-shim dependency (e.g. jsdom) under `node --test` would cut against the project's
+zero-framework-dependencies stance for a file whose real correctness question is "does it behave
+right in an actual browser talking to the actual server," not "does this pure function return the
+right value." Validated instead by: the already-extensive `server/websocket.test.js` protocol
+coverage (143 tests total now, 50 consecutive clean runs) plus real, manual end-to-end browser
+testing against a live `server/start.js` instance — DM campaign creation, a player joining by
+code, first-time character setup firing, live roster sync reaching the DM with zero page reload,
+full state round-tripping through the server (verified by wiping a player's local save entirely
+and confirming `identified`'s persisted state restored it), role-restricted tabs, and the
+reconnect-on-displacement fix, all observed directly rather than assumed. Real multi-device LAN
+testing remains its own explicit step (Phase 6h) — this was still one machine's browser tabs
+against a local server, not physically separate devices.
+
+### Phase 6g: Superseded By 6c — No Rewrite Needed
+
+The original handoff brief scoped a "6g" as "rewrite `saveAppState`/`loadAppState` against the
+REST API." Revisited after actually building 6c and confirmed with the user rather than built on
+the stale premise: **this task no longer exists in the shape it was originally scoped.**
+
+`saveAppState`/`loadAppState` (in the monolith) were already fully transport-agnostic before 6c —
+they only ever called the generic `window.onMultiplayerStateChange`/`window.applyRemoteMultiplayerState`
+hooks, never anything Firebase- or Firestore-specific directly. That's exactly why Phase 5's
+bridge-function design let 6c rewrite every hook's *implementation* without touching a single
+monolith call site. Once 6c wired those hooks against the WebSocket protocol, `player_states`
+(Phase 5a) became the full persistence layer for connected play — proven directly, not assumed:
+6c's own validation wiped a player's local save entirely, reloaded, and confirmed the server's
+`identified` message restored everything (both the player's own data and, by the same mechanism,
+the DM's — a DM's state pushes through the identical `push_state` path as a player's). Solo/guest
+play was never in scope for server persistence and correctly stays on localStorage untouched.
+
+Net effect: there is no leftover Firebase-shaped code in `saveAppState`/`loadAppState` to replace,
+and no durability gap — connected state already round-trips through real SQLite via the WS layer,
+disconnected/solo state already round-trips through localStorage. Confirmed with the user: no
+code changes needed for this sub-phase.
+
+**Side effect worth flagging explicitly, not silently left dangling**: this leaves Phase 2/3's
+REST `characters` and `campaign_state` PUT/GET routes (`server/server.js`) genuinely unused by the
+live app — they were built before `player_states` existed and have since been superseded for this
+purpose. Confirmed with the user: leave them in place for now (tested, harmless, possibly useful
+later for tooling or a future companion view) rather than deleting them as part of this pass.
+
+### Phase 6e: Viewed-Player Spectator Listener
+
+The DM's Players-tab live view of one specific player's full state (`startViewedPlayerListener`/
+`stopViewedPlayerListener`/`applyViewedPlayerState` in the original) — one of the two gaps the
+original Phase 5 audit missed, alongside 6f below. Real-time gambling sync (the third gap) stays
+deliberately deprioritized per the user, to return to later.
+
+Two new `server/websocket.js` messages: `subscribe_player`/`unsubscribe_player` (DM only) and
+`player_state_update` (server -> the subscribing DM connection). A room-map entry gained a
+`viewingUid` field (null unless a DM has subscribed); `notifyViewers` checks it on every
+`push_state` and cross-write, alongside the existing `broadcastRoster` call at each of those
+sites. Subscribing sends an immediate catch-up read of the target's current persisted state (or
+`null` if they've never pushed), matching the original's `onSnapshot`-fires-immediately-on-
+subscribe behavior. Only one subscription per DM connection, matching the original's own "only
+ever one of these active at a time."
+
+**A real, previously-undetected bug found while browser-testing this sub-phase** (not by 6e's own
+new code — in already-merged Phase 5d): `buildRoster()` never included a `role` field on its
+entries, but the monolith's `renderPlayersTab()` filters on exactly `p.role === 'player'` — so
+every entry was silently excluded, and the Players tab has shown "No players have joined yet."
+since Phase 5d was built. Undetected until now because nothing exercised `renderPlayersTab()`'s
+actual consumption of the roster shape end-to-end before 6e made it possible to reach the Players
+tab live for the first time. Fixed by adding `role: 'player'` to every `buildRoster` entry (every
+entry there is already known to be a player, via the `dm` filter immediately above it) — one line,
+covered by a new regression assertion in the existing "adds them to the DM's roster" test.
+
+Validated with the full server test suite (153 tests, 50 consecutive clean runs) plus real
+browser testing: DM viewing a live player's character sheet with zero page reload, confirmed via
+the actual Players tab UI, not just the protocol messages.
+
+### Phase 6f: Player Removal
+
+`removePlayer`/`removeAllPlayers` from the original — deletes a player's character/inventory
+progress for the campaign; there's no separate login to revoke in this identity model (see Phase
+6b/6c), so unlike the original there's nothing else to clean up — a removed player can rejoin
+fresh with the same device uid and campaign code any time, the same "known limitation, kept
+deliberately simple" the original documented for its own equivalent case.
+
+New `db/database.js` function `deletePlayerState`. New `server/websocket.js` message `kick_player`
+(DM only, cannot target the DM's own accountUid): deletes the persisted state, and if the target
+has a live connection, explicitly sends `{type:'kicked'}` before closing it — reusing the same
+"tell them, don't just silently disconnect" pattern the Phase 6c displaced-connection fix
+established, rather than leaving them to guess why they got dropped. `kick_ack` confirms the DM's
+own request landed either way (target online or not).
+
+Client side (`multiplayer-sync.js`): `window.removeAllPlayers` kicks every roster entry in
+parallel (`Promise.allSettled`, returning the count actually removed, matching the original's own
+"count actually removed, not count attempted" contract) and the account panel's roster rows got
+their "Remove" button back (held back in 6c pending this). A kicked player's own client handles
+the `kicked` message by resetting local session state, clearing the persisted session, and showing
+the gate with an explicit "You were removed from this campaign by the DM." message — confirmed
+directly in the browser, not just inferred from the protocol.
+
+Validated: 4 new server tests (kicking an online player closes their connection with a reason and
+genuinely deletes their state; a non-DM cannot kick; the DM cannot remove themselves; kicking an
+already-offline player still deletes their state), full suite 153 tests, 50 consecutive clean
+runs, plus real browser testing of the full loop (DM removes a connected player, that player's
+own tab immediately shows the removal message, the DM's roster and Players list both update).
+
+### Phase 6h Prep: LAN Reachability
+
+Checked before handing real multi-device testing to the user (this genuinely needs a second
+physical device, not something drivable from here): `server/start.js`'s `server.listen(PORT)`
+already binds to every network interface by Node's own default (no host argument = 0.0.0.0 for
+IPv4) — the server was already LAN-reachable with zero code change. Confirmed directly, not
+assumed: started the server and hit it over an actual LAN IP (not `localhost`) from a separate
+process, got a real `200`.
+
+`multiplayer-sync.js` also needed no change — `API_BASE`/`WS_URL` both derive from
+`window.location`, never a hardcoded host, so a phone browsing to the DM machine's LAN IP
+automatically talks to the right origin.
+
+The one real gap was informational, not functional: `start.js` only ever printed
+`http://localhost:PORT`, which is actively misleading for this exact use case (`localhost` only
+ever resolves on the same machine). Now prints every non-internal IPv4 address from
+`os.networkInterfaces()` alongside it, so the DM can just read the URL to give players rather than
+hunting for their own IP.
+
+**Known gotcha for the user to expect, not something fixable from here**: Windows Firewall
+commonly prompts (or silently blocks) the first time a process accepts an inbound connection on a
+new port — if a LAN device can't reach the printed URL, that's the first thing to check, not a
+server bug.
