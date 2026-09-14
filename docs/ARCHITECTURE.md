@@ -1460,3 +1460,35 @@ actually meant to run this, which is a standing system-configuration change outs
 own scope to make unprompted. Real execution and end-to-end validation (does the task actually
 survive a reboot, does the server come up, does auto-restart-on-crash actually work) is the user's
 own next step, to run directly on the Mini PC.
+
+### Phase 6j: Auto-Update on Startup
+
+`scripts/check-for-updates.bat` — checks GitHub for a newer commit on `main` and fast-forwards the
+Mini PC's working copy to it, so the DM never has to `git pull` by hand. Wired into
+`start-server.bat` (with a `--silent` flag) so it runs automatically every time the Scheduled Task
+fires at login; also directly double-click-able on its own, in which case it pauses at the end so
+the console window doesn't just flash and close.
+
+Deliberate choices, confirmed with the user:
+- **`git pull --ff-only`, never `reset --hard`.** If the Mini PC's copy has any local commits or
+  uncommitted edits that don't cleanly fast-forward onto `origin/main`, git aborts on its own
+  without touching any files. The script never discards work a DM did by hand on that machine.
+- **A failed or skipped update never blocks the server from starting.** No git on PATH, no network
+  reachable, or a non-fast-forward working copy all fall through to a logged message and the server
+  starts anyway on whatever version is already on disk.
+- **Self-relaunch from a `%TEMP%` copy before touching git.** This script lives inside the exact
+  repo it updates, and `cmd.exe` executes a running `.bat` by seeking to byte offsets in the file as
+  it goes rather than loading it into memory first — if `git pull` rewrote this file's own bytes
+  mid-execution, later lines could be read from the wrong offset and misexecute. It copies itself
+  to `%TEMP%`, re-invokes that copy (passing the real repo root and the silent flag through as
+  arguments, since `%~dp0` in the copy would otherwise resolve to `%TEMP%` instead of `scripts\`),
+  and deletes the copy when done. Everything past that point is safe to have rewritten out from
+  under the original file.
+- **`npm install` runs only when the pull actually moved `HEAD`** (compared before/after by commit
+  hash), so a no-op check doesn't pay npm's startup cost on every single login.
+
+**Not validated end-to-end on real Windows** (no such machine reachable from this session, same
+constraint as Phase 6i's install/uninstall scripts) — the batch syntax was checked carefully by
+hand, but actually running it on the Mini PC (does the fast-forward apply cleanly, does the
+self-relaunch survive a real `git pull` mid-flight, does `start-server.bat` still come up
+afterward) is the user's own next step.

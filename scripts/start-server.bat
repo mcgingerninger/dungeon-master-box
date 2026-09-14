@@ -6,6 +6,12 @@ REM has no predictable working directory of its own, and a relative path there c
 REM data-loss incident earlier in this project (see docs/ARCHITECTURE.md's Phase 6h notes).
 cd /d "%~dp0.."
 
+REM Checks GitHub for a newer main branch and fast-forwards to it before starting (see
+REM check-for-updates.bat for how and why -- --silent skips its interactive pause, since nobody's
+REM watching this window at login). A failed or skipped update never blocks the server from
+REM starting -- this line's own exit code is ignored, same as any other pre-flight step here.
+call scripts\check-for-updates.bat --silent >> server.log 2>&1
+
 REM Adjust this path if Node is installed somewhere else on this machine (check with `where node`
 REM from a normal terminal). Output is appended to server.log in the repo root -- not rotated, so
 REM it will grow indefinitely over a long-running deployment; fine for a home game, worth trimming
