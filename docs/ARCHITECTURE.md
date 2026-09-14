@@ -1460,3 +1460,37 @@ actually meant to run this, which is a standing system-configuration change outs
 own scope to make unprompted. Real execution and end-to-end validation (does the task actually
 survive a reboot, does the server come up, does auto-restart-on-crash actually work) is the user's
 own next step, to run directly on the Mini PC.
+
+### Post-6h Fix: Reconnect Loop on the Mini PC (No WebSocket Keepalive)
+
+**Reported symptom**: a player connecting to the Mini PC over the home WiFi would see the
+"Connected" gate close, then almost immediately "Connection lost — reconnecting…" fire, reconnect
+successfully, and repeat this forever — never staying connected long enough to actually do
+anything.
+
+**Root cause**: `server/websocket.js` never sent anything once a connection was idle — no
+periodic ping, nothing. A WebSocket with zero traffic for a while is indistinguishable, on the
+wire, from a dead one, and most home routers/OS WiFi stacks silently drop an "idle" NAT or
+firewall mapping after a timeout with no FIN and no error raised on either side — the connection
+just stops delivering data. The client's own `close` event (multiplayer-sync.js) only fires once
+something *tries* to use that dead mapping and fails, which for a mostly-idle player tab could be
+the very next heartbeat-free minute. The reconnect succeeds (a fresh TCP connection gets a fresh
+NAT mapping), goes idle again, and the same silent death repeats — exactly the observed loop. This
+is a well-known class of bug with the `ws` package specifically (documented in its own README
+under "how to detect and close broken connections") — the library deliberately leaves the
+keepalive strategy up to the application rather than assuming one.
+
+**Fix**: `createWebSocketServer` now runs a 25-second heartbeat — `ws.ping()` to every connection
+in `wss.clients`, tracked via an `isAlive` flag flipped by the automatic `pong` reply (browsers and
+the `ws` client both answer a ping frame with a pong with no application code involved — this
+needed zero changes to multiplayer-sync.js). A connection that misses two consecutive pings gets
+`ws.terminate()`'d, which fires the existing `close` handler's room-cleanup path same as any other
+disconnect. The interval is `.unref()`'d and cleared on the underlying `httpServer`'s own `close`
+event, so it doesn't keep a test process (or a real shutdown) alive — `server/websocket.test.js`'s
+existing per-test `httpServer.close()` in `afterEach` was enough, no test changes needed.
+
+**Validation performed**: full suite (168 tests) run 5 consecutive times, 0 failures, process exits
+cleanly each time (confirming the heartbeat interval doesn't leak a hanging handle). The actual
+fix — whether this eliminates the reconnect loop over real WiFi to the Mini PC — still needs the
+user's own confirmation on their LAN; a dropped-NAT-mapping bug is inherently something a local
+dev-machine test run can't reproduce.

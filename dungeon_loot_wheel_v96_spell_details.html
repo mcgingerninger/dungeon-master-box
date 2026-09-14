@@ -3197,7 +3197,7 @@
       <div class="sheet-top-row">
         <div class="sheet-field"><label>Class</label><input type="text" id="dmEditClass" placeholder="e.g. Fighter"></div>
         <div class="sheet-field"><label>Level</label><input type="number" id="dmEditLevel" min="1" max="20"></div>
-        <div class="sheet-field"><label>Hit Dice</label><input type="text" id="dmEditHitDice" placeholder="e.g. 3d8"></div>
+        <div class="sheet-field"><label>Hit Dice <span class="sheet-hp-bonus-note">(short rest healing)</span></label><input type="text" id="dmEditHitDice" placeholder="e.g. 3d8" title="Class hit die × level (e.g. 3d8 for a level-3 Fighter) — for reference when the player spends Hit Dice on a short rest."></div>
       </div>
       <div class="sheet-top-row">
         <div class="sheet-field sheet-field-narrow"><label>Current HP</label><input type="number" id="dmEditCurHp"></div>
@@ -3447,12 +3447,12 @@
         <input type="number" id="sheetLevel" min="1" max="20" value="1" oninput="updateCharacterField('characterLevel', parseInt(this.value,10)||1)">
       </div>
       <div class="sheet-field sheet-field-narrow">
-        <label>Prof.</label>
-        <strong id="sheetProfBonus" class="sheet-static-val">+2</strong>
+        <label>Prof. <span class="sheet-hp-bonus-note">(auto)</span></label>
+        <strong id="sheetProfBonus" class="sheet-static-val" title="Proficiency bonus — calculated automatically from your level, not editable.">+2</strong>
       </div>
       <div class="sheet-field">
-        <label>Hit Dice</label>
-        <input type="text" id="sheetHitDice" placeholder="e.g. 3d8" oninput="updateCharacterField('characterHitDice', this.value)">
+        <label>Hit Dice <span class="sheet-hp-bonus-note">(short rest healing)</span></label>
+        <input type="text" id="sheetHitDice" placeholder="e.g. 3d8" title="Your class's hit die × level (e.g. 3d8 for a level-3 Fighter). Just for your reference when spending Hit Dice to heal on a short rest — nothing here is calculated for you." oninput="updateCharacterField('characterHitDice', this.value)">
       </div>
       <div class="sheet-field sheet-field-narrow">
         <label>Cur HP</label>

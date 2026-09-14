@@ -291,6 +291,11 @@ export function createWebSocketServer(db, httpServer) {
   wss.on('connection', (ws) => {
     let identity = null; // { campaignId, accountUid, role, username }
 
+    // Heartbeat (see HEARTBEAT_INTERVAL_MS below): browsers reply to a ping frame with a pong
+    // automatically, no client-side code needed — this is purely a protocol-level keepalive.
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
+
     ws.on('message', (raw) => {
       let msg;
       try { msg = JSON.parse(raw.toString()); }
@@ -611,6 +616,27 @@ export function createWebSocketServer(db, httpServer) {
       }
     });
   });
+
+  // Keepalive: a WebSocket with no application traffic for a while (a player just idling on a
+  // tab, doing nothing that pushes state) looks identical, on the wire, to a dead connection — and
+  // routers/mobile carriers commonly drop an "idle" NAT/firewall mapping after a timeout with no
+  // FIN and no error either side ever sees, until the next real message attempts to use it. That
+  // silent death is exactly what showed up as a real bug report: a player on the DM's LAN seeing
+  // "reconnecting…" fire over and over, each reconnect succeeding just long enough to go idle
+  // again before the underlying network path drops it once more. A periodic ping keeps the
+  // connection's traffic pattern alive so those idle timeouts never trigger, and doubles as a
+  // faster way to notice a connection that's actually gone (missed two pongs in a row) than
+  // waiting on the OS's own TCP-level timeout, which can take minutes.
+  const HEARTBEAT_INTERVAL_MS = 25000;
+  const heartbeat = setInterval(() => {
+    for (const ws of wss.clients) {
+      if (ws.isAlive === false) { ws.terminate(); continue; }
+      ws.isAlive = false;
+      ws.ping();
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+  heartbeat.unref();
+  httpServer.on('close', () => clearInterval(heartbeat));
 
   return wss;
 }
