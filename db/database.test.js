@@ -187,8 +187,9 @@ describe('campaign_state (subsystem blobs)', () => {
     // puzzle_log_broadcast (Phase 5c) aren't fields from the old blob at all — they're the
     // DM-published, player-facing broadcast versions of battle/puzzle_log, deliberately kept
     // separate (see db/schema.js's comment) — included here since this is the source-of-truth
-    // list check for SUBSYSTEMS as a whole, not just the original blob's coverage.
-    const expectedSubsystems = ['inventory', 'battle', 'merchant', 'bounties', 'mangler', 'loot_settings', 'effects', 'claims', 'journey', 'puzzle_log', 'gambling', 'battlefield_broadcast', 'puzzle_log_broadcast'];
+    // list check for SUBSYSTEMS as a whole, not just the original blob's coverage. Same for
+    // merchant_stock (post-6c) — the shared, arbitrated staple-stock state, no old blob field.
+    const expectedSubsystems = ['inventory', 'battle', 'merchant', 'bounties', 'mangler', 'loot_settings', 'effects', 'claims', 'journey', 'puzzle_log', 'gambling', 'battlefield_broadcast', 'puzzle_log_broadcast', 'merchant_stock'];
     assert.deepEqual(Object.keys(SUBSYSTEMS).sort(), expectedSubsystems.sort());
   });
 });

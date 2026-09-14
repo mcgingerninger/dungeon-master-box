@@ -910,3 +910,141 @@ describe('real-time gambling sync (Phase 6d)', () => {
     assert.equal(ack.type, 'gambling_action_submitted'); // still acks the submitter even though no one received it
   });
 });
+
+describe('store purchase sync — staple stock arbitration', () => {
+  // buy_staple always triggers TWO messages back-to-back on the buyer's own connection
+  // (buy_staple_result, then its own copy of the merchant_stock_update broadcast) — close enough
+  // together that they can both arrive and get 'message'-emitted before a test's `await
+  // nextMessage(...)` continuation even runs, exactly the message-loss race Phase 5c's own
+  // messageQueue helper exists to close (see this file's top-of-file comment on it). Every test
+  // below uses connectAs's exposed `.next` queue instead of raw nextMessage for that reason.
+  test('the first purchase seeds shared stock from the client-supplied maxStock and decrements it', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'buy_staple', merchantKey: 'blacksmith', index: 0, maxStock: [8, 15, 8, 5, 3] });
+    const result = await player.next();
+    assert.equal(result.type, 'buy_staple_result');
+    assert.equal(result.bought, true);
+
+    const update = await player.next();
+    assert.equal(update.type, 'merchant_stock_update');
+    assert.equal(update.merchantKey, 'blacksmith');
+    assert.deepEqual(update.remaining, [7, 15, 8, 5, 3]); // only index 0 decremented
+  });
+
+  test('buying down to zero then buying again is rejected, not decremented below zero', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    // Index 2 starts at 3 — buy it out exactly, confirming each of the 3 succeeds.
+    for (let i = 0; i < 3; i++) {
+      send(player, { type: 'buy_staple', merchantKey: 'alchemist', index: 2, maxStock: [1, 1, 3] });
+      const result = await player.next();
+      assert.equal(result.bought, true, `purchase ${i + 1} of 3 should succeed`);
+      await player.next(); // merchant_stock_update
+    }
+    // A 4th attempt against the now-empty stock must be rejected, not go negative. A rejected
+    // purchase changes nothing, so — unlike a successful one — it sends no merchant_stock_update
+    // broadcast at all (see the handler's own comment); buy_staple_result alone is the complete
+    // answer here.
+    send(player, { type: 'buy_staple', merchantKey: 'alchemist', index: 2, maxStock: [1, 1, 3] });
+    const result = await player.next();
+    assert.equal(result.bought, false);
+    await assertNoQueuedMessage(player.next);
+  });
+
+  test('two players racing for the LAST unit: exactly one wins, both converge on the same final count', async () => {
+    const alice = await connectAs('uid-alice', 'player');
+    const bob = await connectAs('uid-bob', 'player');
+    // Fired without awaiting between them, same reasoning as the loot-claim race test above —
+    // the arbitration has to hold regardless of processing order. Each connection gets exactly
+    // two messages (its own buy_staple_result, plus the ONE merchant_stock_update the winning
+    // side's purchase broadcasts to the whole room — a rejected purchase broadcasts nothing, see
+    // the handler's own comment), but NOT in a guaranteed order relative to each other: the
+    // loser's own result and the winner's broadcast come from two independently-processed
+    // requests, so this collects both messages per connection and classifies by type rather than
+    // assuming a fixed position — the same reasoning messageQueue exists for in the first place.
+    send(alice, { type: 'buy_staple', merchantKey: 'mage', index: 0, maxStock: [1] });
+    send(bob, { type: 'buy_staple', merchantKey: 'mage', index: 0, maxStock: [1] });
+    const aliceMsgs = [await alice.next(), await alice.next()];
+    const bobMsgs = [await bob.next(), await bob.next()];
+
+    const results = [...aliceMsgs, ...bobMsgs].filter(m => m.type === 'buy_staple_result');
+    assert.equal(results.length, 2);
+    const winners = results.filter(r => r.bought);
+    assert.equal(winners.length, 1, 'exactly one side should win the last unit');
+
+    // Exactly one merchant_stock_update fires (the winner's), but the room broadcast means BOTH
+    // connections receive that same one copy.
+    const aliceUpdate = aliceMsgs.find(m => m.type === 'merchant_stock_update');
+    const bobUpdate = bobMsgs.find(m => m.type === 'merchant_stock_update');
+    assert.deepEqual(aliceUpdate.remaining, [0]);
+    assert.deepEqual(bobUpdate.remaining, [0]);
+  });
+
+  test('the DM sees a player\'s purchase live, including the DM\'s own connection in the broadcast', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'buy_staple', merchantKey: 'trader', index: 1, maxStock: [40, 50, 30] });
+    await player.next(); // buy_staple_result
+    await player.next(); // merchant_stock_update to the buyer
+
+    // Alice's own connectAs() triggered a roster_update to the DM (Phase 5d) — skip past it.
+    const dmUpdate = await nextNonRosterMessage(dm.next);
+    assert.equal(dmUpdate.type, 'merchant_stock_update');
+    assert.equal(dmUpdate.merchantKey, 'trader');
+    assert.deepEqual(dmUpdate.remaining, [40, 49, 30]);
+  });
+
+  test('a non-DM cannot restock a merchant', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'restock_merchant', merchantKey: 'trader', maxStock: [40, 50, 30] });
+    const msg = await player.next();
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
+  test('the DM restocking resets shared stock back to full for everyone, including a connected player', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'buy_staple', merchantKey: 'trader', index: 0, maxStock: [40, 50, 30] });
+    await player.next();
+    await player.next();
+    await nextNonRosterMessage(dm.next); // the purchase's own broadcast to the DM
+
+    send(dm, { type: 'restock_merchant', merchantKey: 'trader', maxStock: [40, 50, 30] });
+    const dmUpdate = await nextNonRosterMessage(dm.next);
+    assert.equal(dmUpdate.type, 'merchant_stock_update');
+    assert.deepEqual(dmUpdate.remaining, [40, 50, 30]);
+    const playerUpdate = await player.next();
+    assert.deepEqual(playerUpdate.remaining, [40, 50, 30]);
+  });
+
+  test('a player who connects AFTER purchases already happened catches up via merchant_stock_full on identify', async () => {
+    const first = await connectAs('uid-alice', 'player');
+    send(first, { type: 'buy_staple', merchantKey: 'trader', index: 0, maxStock: [40, 50, 30] });
+    await first.next();
+    await first.next();
+
+    const ws = await connect();
+    const wsNext = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-late-player', role: 'player' });
+    const identified = await wsNext();
+    assert.equal(identified.type, 'identified');
+    const catchUp = await wsNext();
+    assert.equal(catchUp.type, 'merchant_stock_full');
+    assert.deepEqual(catchUp.stock.trader, [39, 50, 30]);
+  });
+
+  test('a fresh campaign with no purchases yet sends no merchant_stock_full at all on identify', async () => {
+    const ws = await connect();
+    const wsNext = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-alice', role: 'player' });
+    await wsNext(); // identified
+    await assert.rejects(wsNext(200), /Timed out/);
+  });
+
+  test('an invalid buy_staple request (missing merchantKey) is rejected with an error, not a crash', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'buy_staple', index: 0, maxStock: [5] });
+    const msg = await player.next();
+    assert.equal(msg.type, 'error');
+  });
+});

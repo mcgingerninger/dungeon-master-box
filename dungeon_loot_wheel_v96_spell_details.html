@@ -9180,8 +9180,24 @@ function ensureMerchantStock(key) {
 function restockMerchant(key) {
   merchantDailyItems[key] = rollMerchantDaily(key);
   merchantDailySold[key] = merchantDailyItems[key].map(() => false);
-  merchantStapleStock[key] = (MERCHANTS[key]?.staples || []).map(s => (s.stock != null ? s.stock : 99));
+  const maxStock = (MERCHANTS[key]?.staples || []).map(s => (s.stock != null ? s.stock : 99));
+  merchantStapleStock[key] = maxStock;
+  // Connected play: push the reset out to everyone sharing this campaign's staple stock —
+  // window.restockMerchantRemote already no-ops on its own if not connected or not the DM, so
+  // this is always safe to call unconditionally (and correctly does nothing in solo/guest play).
+  if (typeof window.restockMerchantRemote === 'function') window.restockMerchantRemote(key, maxStock);
 }
+// Fired by multiplayer-sync.js on merchant_stock_update (a purchase or restock, by anyone in the
+// campaign) and merchant_stock_full (catch-up on identify) — the server's array always replaces
+// this account's own local copy outright, never merged/diffed, so every connected client
+// (DM included) converges on the exact same shared numbers. Only re-renders the Store panel if
+// the affected merchant is the one currently open; otherwise the next time it's opened picks up
+// the already-updated merchantStapleStock naturally.
+window.applyMerchantStockSync = function (merchantKey, remaining) {
+  merchantStapleStock[merchantKey] = remaining;
+  if (currentMerchant === merchantKey) renderStoreTab();
+  if (typeof scheduleSave === 'function') scheduleSave();
+};
 
 function selectMerchant(key) {
   currentMerchant = key;
@@ -9501,7 +9517,11 @@ function placeItemIntoInventory(item) {
   if (placed) renderInventoryGrid();
   return { item: saved, placed };
 }
-function buyStapleItem(evt, merchantKey, idx) {
+// Guards against a double-click firing two purchase attempts before the first's server
+// round-trip (connected play only) resolves — same "in-flight" discipline the loot/attack
+// flows already use elsewhere in this file.
+const staplePurchaseInFlight = new Set();
+async function buyStapleItem(evt, merchantKey, idx) {
   // Captured before anything below can trigger a renderStoreTab() re-render, which replaces
   // the whole panel's innerHTML and detaches this exact button — a detached element still
   // exists as a JS reference but reports a zeroed-out getBoundingClientRect(), so the anchor
@@ -9509,11 +9529,33 @@ function buyStapleItem(evt, merchantKey, idx) {
   const anchorRect = evt?.currentTarget?.getBoundingClientRect();
   const staple = MERCHANTS[merchantKey]?.staples?.[idx];
   if (!staple) return;
+  const flightKey = merchantKey + '_' + idx;
+  if (staplePurchaseInFlight.has(flightKey)) return;
   ensureMerchantStock(merchantKey);
   const stock = merchantStapleStock[merchantKey];
   if (stock && stock[idx] <= 0) { flashStoreBuyMessage(`${staple.name} is out of stock — restock to bring in more.`, true, anchorRect); return; }
   const price = gpToNumber(staple.gp);
   if (!spendPlayerGold(price)) { flashStoreBuyMessage(`You can't afford ${staple.name} (${staple.gp}) — you have ${coinPouchGpText(getPlayerGold())}.`, true, anchorRect); return; }
+
+  // Connected play: the local out-of-stock check above is only a fast pre-check — someone else
+  // could have bought the last unit moments ago and this account's own copy hasn't caught up
+  // yet. The server is the real arbiter (see server/websocket.js's buy_staple handler); a
+  // rejection here means gold was already spent above, so it gets refunded rather than lost.
+  const self = typeof window.getMultiplayerSelf === 'function' ? window.getMultiplayerSelf() : null;
+  if (self && typeof window.buyStapleRemote === 'function') {
+    staplePurchaseInFlight.add(flightKey);
+    const maxStock = (MERCHANTS[merchantKey]?.staples || []).map(s => (s.stock != null ? s.stock : 99));
+    let result;
+    try { result = await window.buyStapleRemote(merchantKey, idx, maxStock); }
+    catch { result = { bought: false }; }
+    staplePurchaseInFlight.delete(flightKey);
+    if (!result.bought) {
+      addPlayerGold(price);
+      flashStoreBuyMessage(`${staple.name} is out of stock — someone else just bought the last one.`, true, anchorRect);
+      return;
+    }
+  }
+
   const type = staple.type || 'misc';
   // Same canonical fields as every other item in the project: subcategory (derived from
   // the name, same as everywhere else) drives slotSize instead of a hardcoded 1.

@@ -166,4 +166,19 @@ export const SUBSYSTEMS = {
   // either leak DM-only data to players or silently drop the DM's own unfiltered save data.
   battlefield_broadcast: ['battleRoster', 'battleLog'],
   puzzle_log_broadcast:  ['puzzleLog'],
+  // Added post-Phase-6c for shared, campaign-wide merchant staple stock (see
+  // docs/ARCHITECTURE.md's "Store Purchase Sync" section). Deliberately separate from the
+  // 'merchant' subsystem above, which is per-player field-mapping documentation for the old
+  // localStorage blob (currentMerchant/merchantTills/etc. are each player's own local view) —
+  // this one holds ONE shared, arbitrated remaining-stock array per merchant key
+  // ({ [merchantKey]: [remainingForStaple0, remainingForStaple1, ...] }), the actual source of
+  // truth every connected client's own merchantStapleStock[key] gets synced against. Daily
+  // wares are deliberately NOT included — each merchant's 5 daily items are randomly rolled per
+  // account by design, with no shared catalog to arbitrate against, so syncing "index 2 sold"
+  // across two independently-rolled daily lists would be meaningless. Staples are safe to
+  // arbitrate because MERCHANTS[key].staples is static, identical content for every client.
+  // No old blob field to map from — this is new, shared state with no per-player equivalent.
+  // Non-empty so assertValidSubsystem's truthiness check (database.js) accepts the key; the
+  // array's contents aren't otherwise meaningful, unlike every other entry above.
+  merchant_stock: ['(no legacy field — new shared state)'],
 };

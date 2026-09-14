@@ -226,6 +226,14 @@ function handleServerMessage(msg) {
     case 'gambling_action_list':
       if (typeof window.applyIncomingGamblingActions === 'function') window.applyIncomingGamblingActions(msg.actions || []);
       return;
+    case 'merchant_stock_update':
+      if (typeof window.applyMerchantStockSync === 'function') window.applyMerchantStockSync(msg.merchantKey, msg.remaining || []);
+      return;
+    case 'merchant_stock_full':
+      if (typeof window.applyMerchantStockSync === 'function') {
+        Object.entries(msg.stock || {}).forEach(([merchantKey, remaining]) => window.applyMerchantStockSync(merchantKey, remaining));
+      }
+      return;
     case 'kicked':
       resetLocalSessionState();
       clearSession();
@@ -436,6 +444,31 @@ window.submitGamblingActionRemote = function (action) {
 // (actions aren't persisted in a queue the way attack requests are). The monolith's own call
 // site already guards this with `typeof window.resolveGamblingActionRemote === 'function'`, so
 // leaving it undefined is a real, working no-op, not a bug.
+
+// ---------- Store purchase sync ----------
+// Unlike gambling (DM-authored table, players only ever submit actions for the DM to apply),
+// buying a staple is a genuine shared race — two players could go for the last unit at once — so
+// this needs real server-side arbitration, the same shape loot claims already use, not a
+// DM-relay. window.buyStapleRemote resolves to { bought } once the server has actually decided;
+// the caller (buyStapleItem in the monolith) only proceeds with spending gold/placing the item
+// if bought is true. Daily wares are deliberately NOT synced here at all — see
+// server/websocket.js's own module comment on buy_staple for why syncing them would be
+// meaningless (each account rolls its own random daily items, no shared catalog to arbitrate).
+function buyStaple(merchantKey, index, maxStock) {
+  send({ type: 'buy_staple', merchantKey, index, maxStock });
+  return waitForNext((m) => (m.type === 'buy_staple_result' && m.merchantKey === merchantKey && m.index === index) || m.type === 'error');
+}
+window.buyStapleRemote = function (merchantKey, index, maxStock) {
+  if (!mp.connected) return Promise.resolve({ bought: null }); // null = "not connected", distinct from a real false
+  return buyStaple(merchantKey, index, maxStock).then((m) => {
+    if (m.type === 'error') throw new Error(m.message);
+    return { bought: m.bought };
+  });
+};
+window.restockMerchantRemote = function (merchantKey, maxStock) {
+  if (!mp.connected || mp.role !== 'dm') return; // fire-and-forget, matching pushGamblingState's own no-op-unless-DM shape
+  send({ type: 'restock_merchant', merchantKey, maxStock });
+};
 
 // ---------- Viewed-player spectator listener (Phase 6e, DM-only) ----------
 // A live, read-only view of ONE specific player's full state, for the Players tab — separate

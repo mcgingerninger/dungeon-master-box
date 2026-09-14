@@ -57,6 +57,13 @@
 //       -- hit/stand/spin/hold/discard/fold (Phase 6d) — relayed live to the DM's connection for
 //       -- the DM's own client to apply (the dealer logic itself is the authority, not a manual
 //       -- DM review click, unlike an attack request)
+//     { type: 'buy_staple', merchantKey, index, maxStock }           -- any connected account;
+//       -- maxStock is the merchant's full static staple-stock array (MERCHANTS[key].staples'
+//       -- own stock numbers), sent by the client so the server can lazily seed shared stock the
+//       -- first time this merchant is ever bought from in a campaign, without needing to know
+//       -- the merchant catalog itself — see the module comment above buy_staple's handler
+//     { type: 'restock_merchant', merchantKey, maxStock }            -- DM only; resets a
+//       -- merchant's shared stock back to full for everyone
 //   server -> client:
 //     { type: 'identified', state, rev }             -- ack, plus whatever was already persisted for this account
 //     { type: 'push_ack', rev }                       -- confirms a push_state was actually persisted
@@ -109,6 +116,16 @@
 //       -- shape the monolith's window.applyIncomingGamblingActions already expects
 //     { type: 'gambling_action_submitted' }                        -- Phase 6d: ack to the
 //       -- submitting player
+//     { type: 'buy_staple_result', merchantKey, index, bought }     -- sent to the buyer only;
+//       -- bought is false if the server's own arbitration found nothing left
+//     { type: 'merchant_stock_update', merchantKey, remaining }     -- broadcast to EVERY
+//       -- connection in the room (the DM included, unlike every other broadcast type above) on
+//       -- a successful buy_staple OR a restock_merchant — remaining is the merchant's full
+//       -- current stock array, always a full replace, never a per-index patch
+//     { type: 'merchant_stock_full', stock }                        -- sent to both roles right
+//       -- after identify, catch-up for whatever merchant stock already exists in this campaign
+//       -- (stock is { [merchantKey]: [...] } for every merchant with any persisted state; absent
+//       -- entirely if nothing has ever been bought from anyone yet)
 //     { type: 'error', message }
 //
 // The ack types matter for more than bookkeeping: the original Firestore design lets a caller
@@ -224,6 +241,13 @@ export function createWebSocketServer(db, httpServer) {
       if (entry.role !== 'dm') send(entry.ws, msg);
     }
   }
+  // Store purchase sync: unlike battlefield/puzzle-log/gambling (all DM-authored, so the DM
+  // never needs its own broadcast echoed back), merchant stock has no single owner — anyone
+  // connected can deplete it, and EVERYONE (the DM included) needs to see the result live, so
+  // this reaches every connection in the room regardless of role.
+  function broadcastToRoom(campaignId, msg) {
+    for (const entry of roomFor(campaignId).values()) send(entry.ws, msg);
+  }
 
   // Phase 5d. See the module comment above for the one real simplification versus the original
   // (connected players only). Clamping mirrors startRosterListener's own clamp exactly.
@@ -303,6 +327,12 @@ export function createWebSocketServer(db, httpServer) {
         room.set(msg.accountUid, { ws, role: msg.role, username: msg.username, viewingUid: null });
         const existing = loadPlayerState(db, campaignId, msg.accountUid);
         send(ws, { type: 'identified', state: existing ? existing.state : null, rev: existing ? existing.rev : 0 });
+        // Store purchase sync: unlike the player-only catch-ups below, merchant stock matters to
+        // BOTH roles equally (the DM's own store view needs to show accurate stock too), so this
+        // sends regardless of role, right after identify, same immediate-catch-up spirit as the
+        // rest — a merchant nobody's bought anything from yet simply has no persisted stock.
+        const merchantStock = loadSubsystemState(db, campaignId, 'merchant_stock');
+        if (merchantStock) send(ws, { type: 'merchant_stock_full', stock: merchantStock });
         if (msg.role !== 'dm') {
           // Phase 5c: a player who just (re)connected should see whatever the DM already
           // published, not wait for the next push — matching Firestore's onSnapshot firing
@@ -463,6 +493,59 @@ export function createWebSocketServer(db, httpServer) {
         // the DM isn't connected right now — this ack only confirms the message was received and
         // handed off (or dropped, if no dealer is live), not that it was actually applied.
         send(ws, { type: 'gambling_action_submitted' });
+        return;
+      }
+
+      if (msg.type === 'buy_staple') {
+        // Any connected account (a player, or the DM buying/testing) may attempt a purchase —
+        // the arbitration below is what actually decides it, the same "no role check needed
+        // because the server is the real gatekeeper" shape create_loot_claim already uses.
+        const merchantKey = msg.merchantKey;
+        const index = Number(msg.index);
+        const maxStock = Array.isArray(msg.maxStock) ? msg.maxStock : [];
+        if (!merchantKey || !Number.isInteger(index) || index < 0) {
+          return send(ws, { type: 'error', message: 'Invalid buy_staple request' });
+        }
+        const stockState = loadSubsystemState(db, identity.campaignId, 'merchant_stock') || {};
+        // Lazily seeded from the CLIENT-supplied maxStock the first time this merchant is ever
+        // bought from in this campaign — safe because MERCHANTS[key].staples' stock numbers are
+        // static content identical for every client, not a secret the server needs to own
+        // independently (same reasoning loot claims already lean on: the server only needs to
+        // arbitrate the race, not know what the item even is).
+        if (!stockState[merchantKey]) stockState[merchantKey] = [...maxStock];
+        // Widen (never shrink) if the merchant's own staple list has grown since this campaign's
+        // stock was first seeded, so an older campaign doesn't stay permanently missing newer
+        // staples added to MERCHANTS later.
+        while (stockState[merchantKey].length < maxStock.length) {
+          stockState[merchantKey].push(maxStock[stockState[merchantKey].length]);
+        }
+        const remaining = stockState[merchantKey][index];
+        const bought = typeof remaining === 'number' && remaining > 0;
+        if (bought) stockState[merchantKey][index] = remaining - 1;
+        // Persisted either way — even a rejected buy may have just lazily seeded this merchant's
+        // stock for the very first time (see above), and that seed needs to stick around for
+        // catch-up even though this particular index didn't move.
+        saveSubsystemState(db, identity.campaignId, 'merchant_stock', stockState);
+        send(ws, { type: 'buy_staple_result', merchantKey, index, bought });
+        // Broadcast the merchant's full current array (not just this one index) to EVERY
+        // connection, buyer included — one source of truth every client's own
+        // merchantStapleStock[merchantKey] gets overwritten from, so nothing can drift. Only on
+        // an actual change: a rejected purchase already tells the buyer via buy_staple_result
+        // alone, and broadcasting an unchanged array on every losing attempt would mean a hot
+        // contest over one popular item spams the whole room with no-op updates.
+        if (bought) broadcastToRoom(identity.campaignId, { type: 'merchant_stock_update', merchantKey, remaining: stockState[merchantKey] });
+        return;
+      }
+
+      if (msg.type === 'restock_merchant') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can restock a merchant' });
+        const merchantKey = msg.merchantKey;
+        const maxStock = Array.isArray(msg.maxStock) ? msg.maxStock : [];
+        if (!merchantKey) return send(ws, { type: 'error', message: 'Invalid restock_merchant request' });
+        const stockState = loadSubsystemState(db, identity.campaignId, 'merchant_stock') || {};
+        stockState[merchantKey] = [...maxStock];
+        saveSubsystemState(db, identity.campaignId, 'merchant_stock', stockState);
+        broadcastToRoom(identity.campaignId, { type: 'merchant_stock_update', merchantKey, remaining: stockState[merchantKey] });
         return;
       }
 
