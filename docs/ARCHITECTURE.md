@@ -1526,3 +1526,62 @@ constraint as Phase 6i's install/uninstall scripts) — the batch syntax was che
 hand, but actually running it on the Mini PC (does the fast-forward apply cleanly, does the
 self-relaunch survive a real `git pull` mid-flight, does `start-server.bat` still come up
 afterward) is the user's own next step.
+
+### Post-6j: Hiding Monster HP/AC From Players (8-bit Condition Icons)
+
+A DM table convention this app wasn't respecting: players could see a monster's exact HP bar,
+exact HP numbers, and exact AC on their own Battlefield cards — full combat math a DM traditionally
+keeps behind the screen so players read the fight through fiction (a monster "looking wounded"), not
+a number ticking down. Requested fix: hide both, and give players a fuzzy substitute for HP instead
+of nothing.
+
+**AC**: `combatCardHtml` (dungeon_loot_wheel...html) now only renders the `AC N` span in the `isDm`
+branch. `buildMonsterTooltipHtml`'s hover popup had the same leak (it showed exact AC and HP
+unconditionally to anyone hovering a card, DM or player) — now checks
+`window.getMultiplayerSelf()?.role !== 'dm'` and drops both stat lines for a connected non-DM
+viewer. Solo/guest play (no `self` at all) keeps full stats — there's no separate player to hide
+anything from.
+
+**HP → condition icon**: in place of the player's old `combat-hp-bar-outer`/`-inner` bar and exact
+`hp/maxHp` text, `renderMonsterConditionIcon` draws a small inline SVG "8-bit" icon (no external
+image assets — a handful of `<rect>` pixels at a shared 10x10 resolution) whose damage look
+escalates across four HP quartiles: healthy (>75%), hurt (51-75%), wounded (26-50%), and bloodied
+(<=25%, the threshold explicitly requested) — bloodied gets a distinct look (blood streaming from
+the eyes, dripping off the chin) plus a pulsing red glow via CSS, not just a color swap, so it reads
+as unmistakably different at a glance. The DM's own card is completely unaffected — same exact HP
+slider/numbers as always.
+
+**Why a shared wound overlay instead of one art set per monster**: hand-authoring four full
+redraws for every monster type wasn't worth it, and would have made "the wolf is bloodied" and "the
+zombie is bloodied" look inconsistent. Instead the wound overlay (`MONSTER_ICON_OVERLAYS`, one grid
+per quartile, using `R` for a wound pixel) is completely shared across every creature archetype and
+layers on top of whichever base silhouette applies — "getting hurt" reads the same way regardless of
+what's being fought, while the base shape is still what tells a wolf apart from a zombie.
+
+**Archetypes, not one grid per family**: reuses the existing `getCreatureFamily` detector from the
+Monster Parts v2 system (see the "Monster Parts v2" section elsewhere in this doc) rather than
+inventing a second classifier, but collapses its 16 families down to 7 hand-drawn silhouettes
+(`beast`, `humanoid`, `undead`, `dragon`, `ooze`, `aberration`, `construct`) via
+`MONSTER_ICON_ARCHETYPE_BY_FAMILY` — drawing and maintaining 16 distinct blocky faces wasn't worth
+it when several families already read as visually similar (a giant is just a big humanoid at this
+resolution; a fiend reads fine as a horned dragon-ish shape). A monster with missing/unrecognized
+type data falls all the way through to `getCreatureFamily`'s own existing `beast` catch-all
+(`detect: () => true`) exactly as it already did for Monster Parts v2 — confirmed during testing
+against a pre-existing malformed compendium entry ("Ogre Skeleton", type "Unknown" on the DM's own
+card too, unrelated to this change) that this degrades gracefully to the generic beast icon instead
+of erroring.
+
+Each archetype's 10x10 grid is authored as five hand-written characters per row (`mirrorRow`
+reflects it into the full symmetric width) purely to cut the authoring effort in half — every
+monster face this draws happens to be left-right symmetric, so this isn't a general-purpose
+constraint on future archetypes, just a shortcut for these seven.
+
+**Validation performed**: live end-to-end test — a real DM connection and a real player connection
+(two separate `dmbox_device_uid`s, same campaign) over an actual WebSocket, not just unit tests
+(this is pure client-rendering logic with no server-side surface, so there's nothing to add to
+`server/websocket.test.js`). Confirmed: player's card shows no AC and no HP numbers/bar at any HP
+level; the icon correctly walks Healthy → Hurt → Wounded → Bloodied as the DM drags the HP slider
+through each threshold; a wolf (beast) and a zombie (undead) render visibly distinct base shapes;
+the DM's own card is unaffected throughout (still shows exact `AC 13` and a live `10/14` slider).
+Full suite still 168/168 (this change has no server-side code, so this just confirms nothing else
+broke).

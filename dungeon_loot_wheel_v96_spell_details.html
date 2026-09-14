@@ -2029,8 +2029,10 @@
   /* ---- Targeting, player-mode HP bar, loot reserve/reveal/claim/give (DM-vs-players combat) ---- */
   .combat-targeting-row{display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--text-dim);margin:.3rem 0}
   .combat-targeting-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Crimson Text',serif;font-size:.8rem;padding:.15rem .3rem}
-  .combat-hp-bar-outer{display:inline-block;width:90px;height:8px;background:var(--bg);border:1px solid var(--border);vertical-align:middle}
-  .combat-hp-bar-inner{display:block;height:100%;background:var(--uncommon)}
+  .monster-condition-icon{display:inline-flex;align-items:center;vertical-align:middle;padding:2px;border-radius:4px;cursor:help}
+  .monster-condition-icon svg{display:block;image-rendering:pixelated}
+  .monster-condition-icon.bloodied{background:rgba(224,69,58,0.18);box-shadow:0 0 6px rgba(224,69,58,0.55);animation:monsterBloodiedPulse 1.6s ease-in-out infinite}
+  @keyframes monsterBloodiedPulse{0%,100%{box-shadow:0 0 4px rgba(224,69,58,0.4)}50%{box-shadow:0 0 10px rgba(224,69,58,0.85)}}
   .combat-loot-revealed{display:inline-block;margin-top:.4rem;color:var(--uncommon);font-size:.8rem;font-style:italic}
   .loot-reserved{opacity:.85}
   .loot-reserved-tag{color:var(--superrare);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}
@@ -12587,7 +12589,15 @@ function buildTooltipHtml(entry) {
 // for a combat roster card's creature — full stat-line context plus its flavor description,
 // without permanently bloating every card in a roster that might hold a dozen entries at once.
 function buildMonsterTooltipHtml(m) {
-  const stats = [`🛡 AC ${m.ac}`, `❤ HP ${m.hp}`, `🏃 ${m.speed}`, `⚔ CR ${m.cr}`];
+  // Same fog-of-war as the card itself (see renderMonsterConditionIcon's module comment): a
+  // connected player shouldn't be able to recover the exact AC/HP this tooltip used to show
+  // unconditionally just by hovering. Solo play (no `self` at all) keeps full stats — there's no
+  // separate player to hide anything from.
+  const self = typeof window.getMultiplayerSelf === 'function' ? window.getMultiplayerSelf() : null;
+  const isPlayerView = !!(self && self.role !== 'dm');
+  const stats = isPlayerView
+    ? [`🏃 ${m.speed}`, `⚔ CR ${m.cr}`]
+    : [`🛡 AC ${m.ac}`, `❤ HP ${m.hp}`, `🏃 ${m.speed}`, `⚔ CR ${m.cr}`];
   const statsLine = `<div class="tt-stats">${stats.map(s => `<span>${escapeHtml(s)}</span>`).join('')}</div>`;
   // Unlike the Compendium's full detail card (which always shows every field, '—' included, as
   // a consistent reference table), this hover popup is a quick mid-combat glance — resistance/
@@ -15066,6 +15076,107 @@ function rollAllBattleAttacks() {
   renderCombatLog();
 }
 
+// ---------- 8-bit monster condition icon (player-facing HP obfuscation) ----------
+// Players no longer see a monster's exact HP bar/numbers or AC (see combatCardHtml's isDm
+// branches below and buildMonsterTooltipHtml) — a DM hiding exact combat math from players is a
+// common table convention this app wasn't previously respecting. In place of the HP bar, players
+// get a small blocky "8-bit" icon whose damage look escalates across four HP quartiles, ending in
+// a distinct "bloodied" appearance at 25% HP or less. The base silhouette varies by creature
+// family (reuses the existing getCreatureFamily detection from the Monster Parts v2 system) so a
+// wolf doesn't read as a skull; the wound overlay itself is shared across every archetype so
+// "getting hurt" looks the same regardless of what's being fought. The DM's own card is
+// unaffected — it keeps the exact HP slider/numbers and AC it always had.
+const MONSTER_ICON_ARCHETYPE_BY_FAMILY = {
+  dragon: 'dragon', fiend: 'dragon',
+  undead: 'undead', spirit: 'undead',
+  humanoid: 'humanoid', celestial: 'humanoid', fey: 'humanoid', giant: 'humanoid',
+  ooze: 'ooze', elemental: 'ooze', plant: 'ooze',
+  aberration: 'aberration',
+  construct: 'construct',
+  beast: 'beast', monstrosity: 'beast', swarm: 'beast',
+};
+
+// Each row is the LEFT half (5 cells) of a symmetric 10x10 face; mirrorRow reflects it into the
+// full 10-wide row so every archetype only needed 5 characters per row to hand-author, not 10.
+function mirrorRow(half) { return half + half.split('').reverse().join(''); }
+function buildIconGrid(halves) { return halves.map(mirrorRow); }
+
+// K = outline, W/M/T = archetype-specific detail colors, B = body, S = shade, E = eye/visor.
+const MONSTER_ICON_GRIDS = {
+  beast:      buildIconGrid(['..K..', '.KBK.', '.KBB.', 'KBBB.', 'KBEB.', 'KBBB.', 'KBBS.', '.KBW.', '.KWW.', '..KK.']),
+  humanoid:   buildIconGrid(['..KK.', '.KBB.', 'KBBB.', 'KBEB.', 'KBBB.', 'KBSS.', 'KBBB.', '.KBB.', '..KK.', '.....']),
+  undead:     buildIconGrid(['..KK.', '.KWW.', 'KWWW.', 'KWEW.', 'KWWW.', 'KWWW.', 'KWSW.', '.KWW.', '.KWK.', '..KK.']),
+  dragon:     buildIconGrid(['.H...', '.HB..', 'KBBB.', 'KBEB.', 'KBBB.', 'KBBS.', 'KBBB.', '.KBW.', '.KWW.', '..KK.']),
+  ooze:       buildIconGrid(['.....', '..K..', '.KBK.', 'KBBBK', 'KBEBK', 'KBBBK', 'KBBBK', 'KBBBK', '.KSK.', '..K..']),
+  aberration: buildIconGrid(['.....', '.TBT.', 'KBBBK', 'KBEBK', 'KBBBK', 'KBBBK', 'KTBTK', '.TBT.', '..T..', '.....']),
+  construct:  buildIconGrid(['.KKK.', 'KMMMK', 'KMEMK', 'KMMMK', 'KMSMK', 'KMMMK', 'KMMMK', '.KMK.', '.KKK.', '.....']),
+};
+const MONSTER_ICON_PALETTES = {
+  beast:      { B: '#8a6b4d', S: '#6b4f36', E: '#e8c14d', W: '#f2ede1' },
+  humanoid:   { B: '#7fa66b', S: '#5d7d4e', E: '#e8e2c8' },
+  undead:     { B: '#d8d2c0', S: '#a89f88', E: '#2a1f33', W: '#eae5d6' },
+  dragon:     { B: '#5c8a5c', S: '#3d6b3d', E: '#e0a83a', W: '#f2ede1', H: '#d8d2c0' },
+  ooze:       { B: '#7cc98a', S: '#4f9a5e', E: '#dff2e0' },
+  aberration: { B: '#8a5ca8', S: '#6b3d8a', E: '#e0453a', T: '#5d3d78' },
+  construct:  { B: '#8a8a8a', S: '#5c5c5c', E: '#e0453a', M: '#a8a8a8' },
+};
+const MONSTER_ICON_OUTLINE = '#1a1a1a';
+const MONSTER_ICON_WOUND_COLOR = '#e0453a';
+const MONSTER_ICON_BLOOD_DRIP_COLOR = '#8a1f1f';
+
+// Wound overlays are shared across every archetype (same 10x10 shape as the base grids above) —
+// 'R' marks a wound/blood pixel that replaces whatever's underneath; '.' leaves the base alone.
+// Escalates from a couple of flecks (quartile 1) to blood streaming from the eyes and dripping
+// off the chin (quartile 3 — bloodied).
+const MONSTER_ICON_OVERLAYS = {
+  1: buildIconGrid(['.....', '.....', '.....', '.....', '...R.', '.....', '.....', '.....', '.....', '.....']),
+  2: buildIconGrid(['.....', '.....', '.....', '...R.', '..R..', '.....', '...R.', '..R..', '.....', '.....']),
+  3: buildIconGrid(['.....', '.....', '...R.', '..RR.', '.RRR.', '..RR.', '...RR', '..RRR', '...RR', '....R']),
+};
+
+// 0 = healthy (>75%), 1 = hurt (51-75%), 2 = wounded (26-50%), 3 = bloodied (<=25%) — the exact
+// thresholds the user asked for, with "bloodied" reserved for the bottom quartile specifically.
+function monsterConditionQuartile(hp, maxHp) {
+  if (!maxHp || maxHp <= 0) return 0;
+  const frac = Math.max(0, Math.min(1, hp / maxHp));
+  if (frac <= 0.25) return 3;
+  if (frac <= 0.50) return 2;
+  if (frac <= 0.75) return 1;
+  return 0;
+}
+
+// Renders a small inline SVG (crisp blocky pixels, no external image assets) standing in for the
+// monster's exact HP bar on a player's card. `monster` just needs whatever getCreatureFamily
+// already reads (name/type) to pick an archetype; hp/maxHp pick the wound stage.
+function renderMonsterConditionIcon(monster, hp, maxHp) {
+  const archetype = MONSTER_ICON_ARCHETYPE_BY_FAMILY[getCreatureFamily(monster).id] || 'beast';
+  const grid = MONSTER_ICON_GRIDS[archetype];
+  const palette = MONSTER_ICON_PALETTES[archetype];
+  const quartile = monsterConditionQuartile(hp, maxHp);
+  const overlay = MONSTER_ICON_OVERLAYS[quartile] || null;
+  const cell = 3;
+  const size = grid.length * cell;
+  let rects = '';
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y];
+    const overlayRow = overlay ? overlay[y] : null;
+    for (let x = 0; x < row.length; x++) {
+      const overlayChar = overlayRow ? overlayRow[x] : '.';
+      const baseChar = row[x];
+      let color = null;
+      if (overlayChar === 'R') color = quartile >= 3 ? MONSTER_ICON_BLOOD_DRIP_COLOR : MONSTER_ICON_WOUND_COLOR;
+      else if (baseChar === 'K') color = MONSTER_ICON_OUTLINE;
+      else if (baseChar !== '.') color = palette[baseChar] || null;
+      if (!color) continue;
+      rects += `<rect x="${x * cell}" y="${y * cell}" width="${cell}" height="${cell}" fill="${color}"/>`;
+    }
+  }
+  const label = quartile >= 3 ? 'Bloodied — badly hurt' : quartile === 2 ? 'Wounded' : quartile === 1 ? 'Hurt' : 'Healthy';
+  return `<span class="monster-condition-icon${quartile >= 3 ? ' bloodied' : ''}" title="${label}">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges">${rects}</svg>
+  </span>`;
+}
+
 // Shared by the DM's own roster (renderCombatRoster) and the read-only player Battlefield
 // view (renderBattlefieldForPlayer) so the two never drift out of sync with each other.
 // mode 'dm' gets every control (defeat/loot right-click, HP slider, remove, Roll Attack,
@@ -15205,8 +15316,9 @@ function combatCardHtml(entry, mode, shellOnly) {
        <span id="combatHpNum${entry.uid}">${escapeHtml(String(entry.hp))}</span>/${entry.maxHp}${hpDiceNote}
        <button class="hp-nudge-btn" onclick="event.stopPropagation();nudgeBattleHp(${entry.uid},1)" title="+1 HP">›</button>
        <button class="hp-nudge-btn" onclick="event.stopPropagation();nudgeBattleHp(${entry.uid},10)" title="+10 HP">»</button>`
-    : `<span class="combat-hp-bar-outer"><span class="combat-hp-bar-inner" style="width:${entry.maxHp ? Math.max(0, Math.min(100, entry.hp / entry.maxHp * 100)) : 0}%"></span></span>
-       <span>${escapeHtml(String(entry.hp))}/${entry.maxHp}</span>`;
+    // Players get the 8-bit condition icon instead of an exact bar/number — see the module
+    // comment above renderMonsterConditionIcon for why this app now hides exact monster HP.
+    : renderMonsterConditionIcon(m, entry.hp, entry.maxHp);
 
   return `<div class="combat-card${v ? ' has-variant ' + v.tier : ''}${traits.length && !v ? ' has-trait' : ''}${bountyTag}${defeatedTag}"
     data-entry-uid="${entry.uid}"
@@ -15222,8 +15334,8 @@ function combatCardHtml(entry, mode, shellOnly) {
     ${entry.isCorpse
       ? `<div class="combat-card-stats"><span>☠ Remains — nothing left to fight, only to loot.</span></div>`
       : `<div class="combat-card-stats">
-      <span>AC ${entry.ac !== null ? escapeHtml(String(entry.ac)) : escapeHtml(String(m.ac))}</span>
-      <span class="combat-hp-row">HP ${hpHtml}</span>
+      ${isDm ? `<span>AC ${entry.ac !== null ? escapeHtml(String(entry.ac)) : escapeHtml(String(m.ac))}</span>` : ''}
+      <span class="combat-hp-row">${isDm ? `HP ${hpHtml}` : hpHtml}</span>
     </div>`}
     ${targetingHtml}
     ${statLinesHtml}
