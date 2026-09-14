@@ -1178,6 +1178,73 @@ the player's own client in real time. Full server suite (159 tests) unaffected, 
 touched server/db code — the bug was entirely a client-side consumption mismatch of an
 already-correct, already-tested server contract.
 
+### Post-6c: Store Purchase Sync (Shared Staple Stock)
+
+Real, previously-missing gap: buying something from a merchant was entirely per-player, client-
+local state (`merchantStapleStock`/`merchantDailyItems`/`merchantDailySold`) — nothing about a
+purchase reached the DM or any other player, and two players could each "buy" the same last unit
+of a limited staple in their own independent local simulations.
+
+**Deliberately scoped to staples only, not daily wares.** `MERCHANTS[key].staples` is static
+content identical for every client — safe to arbitrate a shared depleting count against. Each
+merchant's 5 daily wares are randomly rolled per account by design; there's no shared catalog two
+clients' random rolls would even agree on, so "index 2 sold" would be meaningless across them.
+Syncing daily wares would mean a real redesign (the DM seeding one shared roll for everyone) —
+noted as a real, deliberate scope boundary, not attempted here.
+
+**Real arbitration, not DM-relay** — this is the same shape as loot claims (Phase 5b), not
+gambling (Phase 6d): a shared depleting resource two players can race for needs the server to be
+the actual decision-maker, not a "tell the DM and let them apply it" relay. New WS messages
+(`server/websocket.js`): `buy_staple` (any connected account; carries the merchant's full static
+stock array so the server can lazily seed shared state the first time a merchant is ever bought
+from in a campaign, without needing to know the merchant catalog itself — same reasoning loot
+claims already lean on, the server only arbitrates, it doesn't need to understand what the item
+is) → `buy_staple_result` to the buyer, and — only on an actual change, never on a rejected
+attempt — `merchant_stock_update` broadcasts the merchant's full current array to *every*
+connection in the room, DM included (unlike every other broadcast type in this file, which is
+always DM-authored and never echoed back to the DM). `restock_merchant` (DM only) resets a
+merchant back to full for everyone. Reuses Phase 2's generic `campaign_state` mechanism via a new
+`merchant_stock` subsystem (`db/schema.js`) — no new table.
+
+**A real bug found and fixed while writing this, not hypothetical**: the first draft broadcast
+`merchant_stock_update` on *every* `buy_staple` request, including rejected ones. Since a rejected
+purchase changes nothing, this meant a hot contest over one popular item (or, more mundanely, the
+regression test for exactly this scenario) produced a redundant broadcast per losing attempt —
+harmless in content but noisy, and it broke the natural "exactly one broadcast per successful
+purchase" invariant the arbitration is supposed to guarantee. Fixed by only broadcasting when
+`bought` is true; a rejection is now fully answered by `buy_staple_result` alone. The state is
+still *persisted* either way, since even a rejected buy may have just lazily seeded a merchant's
+stock for the first time in this campaign.
+
+**A real, structural test bug found while writing the tests for this — not flakiness, not the
+fix above**: this file's own documented Phase 5c lesson ("a listener that isn't attached yet loses
+the message") applies to `buy_staple` specifically because it always fires *two* messages back to
+back on the buyer's own connection (`buy_staple_result`, then that buyer's own copy of the
+`merchant_stock_update` broadcast) — close enough together that both could arrive and get
+'message'-emitted before a test's `await nextMessage(...)` continuation even ran to attach the
+*second* listener. Every test in this section uses `connectAs`'s exposed `.next()` queue instead
+of raw `nextMessage` for exactly this reason — the same fix this project already established for
+Phase 5c/5d, now confirmed to matter for a brand-new feature that happens to share the same
+two-messages-in-a-row shape.
+
+**Client side** (`buyStapleItem` in the monolith): the existing local out-of-stock/afford checks
+run first, unchanged, for solo/guest play. When connected, after spending gold locally (same as
+before), it awaits `window.buyStapleRemote` before finalizing the purchase; a server rejection
+(lost the race) refunds the gold via `addPlayerGold` and shows an honest "someone else just bought
+the last one" message rather than silently eating the player's gold for nothing.
+`window.applyMerchantStockSync` (multiplayer-sync.js → monolith) overwrites this account's local
+`merchantStapleStock[key]` outright on every update/catch-up — never merged — so every connected
+client, DM included, converges on the exact same shared numbers.
+
+Validated: 9 new tests in `server/websocket.test.js` (full suite now 168 tests) covering seeding
+from client-supplied maxStock, buying out to exactly zero without going negative, a genuine
+two-player race for the last unit (classified by message type, not position, per the test-bug
+note above), the DM seeing a player's purchase live, restock (DM-only, resets for everyone),
+catch-up via `merchant_stock_full` on identify (both with and without existing purchases), and
+input validation. 40 consecutive clean full-suite runs. Verified live in the browser with two
+connected identities: a player bought a staple, and the DM's already-open Store panel updated its
+displayed stock count with zero action on the DM's part.
+
 ### Phase 6g: Superseded By 6c — No Rewrite Needed
 
 The original handoff brief scoped a "6g" as "rewrite `saveAppState`/`loadAppState` against the
