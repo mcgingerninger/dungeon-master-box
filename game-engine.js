@@ -47,6 +47,14 @@ export const RITUAL_PARTS          = new Set(['eye', 'horn', 'venomsac', 'heart'
 export const SUMMON_PARTS          = new Set(['heart', 'bone']);
 export const FLESHMANCER_PARTS     = new Set(['eye', 'heart', 'tongue', 'venomsac', 'claw', 'talon', 'fang', 'horn', 'wing', 'shell', 'bone', 'hide', 'pelt', 'tail']);
 export const TROPHY_PARTS          = new Set(['eye', 'hide', 'horn', 'wing', 'tail', 'heart', 'shell', 'pelt', 'talon']);
+// Every FLESHMANCER_PARTS type can already be dropped into the Fleshmancer (the "usable there at
+// all" gate), but not every one of those makes sense as an actual body graft once you're in it —
+// a Venom Sac is a gland and a Bone is raw skeletal material, not a limb a body has a slot for the
+// way an Eye, Claw, or Wing plausibly is (PART_TO_LIMB_CATEGORY in the main app already routes
+// every OTHER type to a real limb category — eye/tongue/heart/hand/ear/arm/leg). Those two stay
+// fully usable everywhere else a monster part already was (reagent, weapon/armor material,
+// summoning component) — this only blocks the specific "wear this" action.
+export const UNWEARABLE_MONSTER_PARTS = new Set(['venomsac', 'bone']);
 export const ARMOR_BODY_SLOT_LABEL = { head:'Head', chest:'Chest', handwear:'Hands', leggings:'Legs', boots:'Feet', facewear:'Head' };
 
 // A centralized "what can this item be used FOR" layer, kept deliberately separate from
@@ -69,6 +77,8 @@ export const INTERACTIONS = {
   summon_component: { cat: 'Magic',       label: 'Summoning Component', default: it => it.type === 'craftable' && SUMMON_PARTS.has(it.partType) },
   monster_material: { cat: 'Monster',     label: 'Monster Material',   default: it => it.type === 'craftable' && it.subcategory === 'monsterpart' },
   fleshmancer_input:{ cat: 'Monster',     label: 'Fleshmancer Input',  default: it => it.type === 'craftable' && FLESHMANCER_PARTS.has(it.partType) },
+  wearable_part:    { cat: 'Monster',     label: 'Wearable Part',      default: it => it.type === 'craftable' && FLESHMANCER_PARTS.has(it.partType) && !UNWEARABLE_MONSTER_PARTS.has(it.partType) },
+  unwearable_part:  { cat: 'Monster',     label: 'Not Wearable',       default: it => it.type === 'craftable' && UNWEARABLE_MONSTER_PARTS.has(it.partType) },
   trophy:           { cat: 'Monster',     label: 'Trophy',             default: it => it.type === 'craftable' && TROPHY_PARTS.has(it.partType) },
   salvage:          { cat: 'Processing',  label: 'Salvage',            default: it => ['weapon', 'armor'].includes(it.type) },
   harvest:          { cat: 'Processing',  label: 'Harvest',            default: it => it.type !== 'craftable' && (it.classification || [])[0] === 'Material' },
@@ -930,6 +940,65 @@ export function evaluatePokerHand(cards) {
   }
   return { rank: 'highCard', label: 'High Card' };
 }
+// ===================== LONG REST / "SIMULATE A DAY" =====================
+// The DM's "Simulate a Day" action needs to run identically in two places: the browser (the
+// DM's own local character, and the solo/offline path when nobody's connected) and the server
+// (server/websocket.js, applied directly to every player's PERSISTED row so it reaches players
+// who aren't even currently connected — the same reason hp_delta/gift_item mutate stored state
+// server-side rather than only pushing to a live socket). Kept here, dependency-free, so both
+// callers share one implementation instead of two copies drifting apart.
+const DAILY_DICE_CHARGE_RE = /(\d+)\s*d\s*(\d+)\s*([+-]\s*\d+)?/i;
+const DAILY_FLAT_CHARGE_RE = /\d+/;
+
+// Only "Xd Y" / "X/day" / "X per day" / "X per long rest" charge text recharges here — a "1 use"
+// potion or "7" days of rations never comes back just because a day passed; those stay spent
+// until actually replaced, exactly like today.
+export function isPerDayCharge(chargesText) {
+  return /\/\s*day\b|per\s+day|per\s+long\s+rest|\/\s*long\s+rest/i.test(String(chargesText || ''));
+}
+
+// Same "reset the whole string back to its pristine template, re-rolling if the template itself
+// is dice notation" behavior as the monolith's own refillItemCharges (the manual drag-to-refill
+// action) — this is that function's rand-injectable, DOM-free twin, gated to per-day items only.
+// Mutates and returns `item`, matching this file's existing mutate-in-place convention (e.g.
+// classifyItemFull).
+export function refillDailyItemCharges(item, rand = Math.random) {
+  if (!item || !item.charges) return item;
+  const template = item.chargesFormat != null ? item.chargesFormat : item.charges;
+  if (!isPerDayCharge(template) || !DAILY_FLAT_CHARGE_RE.test(template)) return item;
+  if (item.chargesFormat === undefined) item.chargesFormat = item.charges;
+  const m = DAILY_DICE_CHARGE_RE.exec(template);
+  if (m) {
+    const n = parseInt(m[1], 10), sides = parseInt(m[2], 10);
+    const mod = m[3] ? parseInt(m[3].replace(/\s+/g, ''), 10) : 0;
+    let total = mod;
+    for (let i = 0; i < n; i++) total += rn(1, sides, rand);
+    item.charges = template.slice(0, m.index) + Math.max(0, total) + template.slice(m.index + m[0].length);
+  } else {
+    item.charges = template;
+  }
+  return item;
+}
+
+// A long rest for one player's persisted state: full HP, every temporary effect ends, death
+// save counters clear, and every per-day-charged item in savedGeneratedItems recharges. Returns
+// a NEW state object (the one exception, per this file's convention, is each item object inside
+// savedGeneratedItems, which is mutated in place like every other item-mutating function here).
+export function applyLongRestToPlayerState(state, rand = Math.random) {
+  if (!state) return state;
+  const maxHp = typeof state.characterMaxHpEffective === 'number' ? state.characterMaxHpEffective
+    : (typeof state.characterMaxHp === 'number' ? state.characterMaxHp : state.characterCurrentHp);
+  const savedGeneratedItems = (state.savedGeneratedItems || []).map(it => refillDailyItemCharges({ ...it }, rand));
+  return {
+    ...state,
+    characterCurrentHp: maxHp != null ? maxHp : state.characterCurrentHp,
+    activeTimedEffects: [],
+    deathSaveSuccesses: 0,
+    deathSaveFailures: 0,
+    savedGeneratedItems,
+  };
+}
+
 export function newPokerTable() { return { hands: {}, results: [], roundCounter: 0 }; }
 // Already fully self-contained (deal + draw both resolve entirely within this function) — no
 // split needed, unlike Roulette/Blackjack.

@@ -234,6 +234,14 @@ function handleServerMessage(msg) {
         Object.entries(msg.stock || {}).forEach(([merchantKey, remaining]) => window.applyMerchantStockSync(merchantKey, remaining));
       }
       return;
+    // Sent to every PLAYER (never echoed back to the DM who triggered it — see simulateADay's
+    // own comment for why) once the DM's simulate_day lands server-side. Each player's own
+    // character long-rest arrives separately via the ordinary state_update path below (the
+    // server already mutated their persisted state directly); this is only the signal for the
+    // one piece with no shared catalog to push — daily wares reroll locally per account.
+    case 'day_advanced':
+      if (typeof window.onDayAdvanced === 'function') window.onDayAdvanced();
+      return;
     case 'kicked':
       resetLocalSessionState();
       clearSession();
@@ -468,6 +476,13 @@ window.buyStapleRemote = function (merchantKey, index, maxStock) {
 window.restockMerchantRemote = function (merchantKey, maxStock) {
   if (!mp.connected || mp.role !== 'dm') return; // fire-and-forget, matching pushGamblingState's own no-op-unless-DM shape
   send({ type: 'restock_merchant', merchantKey, maxStock });
+};
+// Fire-and-forget, same shape as restockMerchantRemote — the DM's own client already applied the
+// long rest + restock locally (simulateADay), this just asks the server to do the same long-rest
+// transform to every OTHER player's persisted state and tell them to reroll their own daily wares.
+window.simulateDayRemote = function () {
+  if (!mp.connected || mp.role !== 'dm') return;
+  send({ type: 'simulate_day' });
 };
 
 // ---------- Viewed-player spectator listener (Phase 6e, DM-only) ----------

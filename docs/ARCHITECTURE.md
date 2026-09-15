@@ -1925,3 +1925,93 @@ HP."; repeated at full HP and confirmed "Already at full HP." with no HP change.
 Unarmed button opens the same attack popup as a weapon (1d6 + STR + proficiency, no finesse), and
 confirmed a synthetic Iron-Claw-worded item in an unrelated equip slot correctly added its +4 to
 `computeUnarmedAttackRoll`'s damage bonus.
+
+### Post-6j: Colored Property Chips, Fixed Token-Library Discard Button
+
+**Property chips.** The Item Compendium/tooltip's `.tt-prop-chip` badges (RARE/UNIQUE/MAGICAL/
+NECROTIC/etc. — see `deriveItemProperties` in game-engine.js for the full 14-value list) all
+shared one gold box with no way to tell them apart at a glance. Added `PROP_CHIP_CLASS`/
+`propChipClass(p)` mapping each property string to a `.tp-*` modifier class, each with its own
+color and — reusing the exact `tagFlicker`/`tagGlowPulse`/`tagCrackle`/`tagBreathe`/`tagHueShift`/
+`tagWarp` keyframes the synergy flavor tags (`.ic-tag.t-fire` etc.) already established, not a new
+visual language — its own small thematic animation (Rare: blue pulse; Unique: purple warp; Magical:
+teal hue-shift; Cursed: magenta crackle; Necrotic: violet breathe; Radiant: pale-gold pulse; Heavy/
+Durable stay static, being mundane physical traits rather than magical ones). Both render sites
+(`classificationTagsRowHtml`, the full tooltip builder) updated identically.
+
+**Token Library discard button did nothing for ~99.9% of items.** The Token Library (Inventory
+tab) deliberately shows the ENTIRE item catalog (3,800+ entries) as a searchable equip browser, not
+just what you own — but its ✕ discard button rendered unconditionally on every card, and
+`removeTokenEverywhere` (by design — see its own long-standing comment) only ever actually deletes
+a `gen:` (player-generated) instance or a consumed monster-part craftable; every ordinary shared
+catalog template is deliberately left untouched, since deleting one would permanently erase it from
+the whole game for the rest of the session. The result: clicking ✕ on a plain catalog item (a
+Torch, say) flashed "✓ Torch discarded." and the card just sat there, unchanged — reproduced live
+and confirmed. Fixed by adding `isTokenDiscardable(e)` (mirrors `removeTokenEverywhere`'s own
+gen:/monsterpart check exactly) and only rendering the discard button in `tokenCardHtml` when it
+returns true — a real generated item still shows ✕ and still works; a shared catalog browse card
+no longer offers a button that lied about what it did.
+
+**Validation**: full suite 168/168. Verified live: a `loot:` catalog entry (Torch) renders with no
+discard button; a `gen:` instance still renders one and `discardTokenLibraryItem` still removes it.
+
+### Phase 6k: Wearable vs. Non-Wearable Monster Parts; "Simulate a Day" (Long Rest + Shop Restock)
+
+**Wearable/unwearable monster parts.** Every one of the 14 monster-part types (`FLESHMANCER_PARTS`
+in game-engine.js) could already be dropped into the Fleshmancer and turned into a worn graft via
+`PART_TO_LIMB_CATEGORY`, with no distinction between, say, a Claw (plausibly a hand graft) and a
+Venom Sac (a gland — not something a body has a slot for) or a Bone (raw skeletal crafting
+material, not a limb). Added two new INTERACTIONS entries, `wearable_part`/`unwearable_part`, and
+a new `UNWEARABLE_MONSTER_PARTS` set (`venomsac`, `bone` — everything else in FLESHMANCER_PARTS
+stays wearable) in game-engine.js. Both `fleshMaterialDrop` (drag) and `fleshAssignMaterialByKey`
+(click-to-select) — the two paths into the Fleshmancer's Rework workshop — now also require
+`wearable_part`, with the drag path explaining why ("Venom Sac can't be worn as a graft — use it
+as a crafting material or reagent instead"); the click path stays silent on rejection, matching its
+pre-existing behavior for the ineligible-entirely case. The unwearable parts remain fully usable
+everywhere they already were (reagent, weapon/armor material, ritual/summoning component) — this
+only blocks the one "wear it" action. The `fleshInvGrid` dim filter was switched from
+`fleshmancer_input` to `wearable_part` too, so the "Your Items" picker visually reflects the same
+rule instead of looking eligible for something that will actually be turned away.
+
+**"Simulate a Day."** Two behaviors changed together because they're the same underlying gap: shop
+stock had no real day/night cycle behind it, and the game had no long-rest action at all.
+- The per-merchant "🔄 Restock (resets stock)" button was reachable by ANY connected account, not
+  just the DM — nothing gated it. A player mashing it themselves (thinking of it as a personal
+  "reroll," since each account's daily wares were already private/unsynced to begin with — see
+  `buyStapleRemote`'s own comment) is exactly what "items refresh every time someone visits the
+  shop" looks like from that seat. Now gated `isRealPlayerAccount() ? '' : ...`, same convention
+  as every other DM-only control in this app.
+- Added `applyLongRestToPlayerState(state, rand)` to game-engine.js — dependency-free and
+  rand-injectable so it runs identically in the browser and on the server: full HP (to
+  `characterMaxHpEffective`), every `activeTimedEffects` entry cleared, death-save counters reset
+  to 0, and every item in `savedGeneratedItems` whose charge format reads as per-day
+  (`isPerDayCharge` — "3/day", dice-based "1d4+1/day", "per long rest", etc., via the new
+  `refillDailyItemCharges`) refilled back to its pristine `chargesFormat`, re-rolling if that
+  template is itself dice notation. A flat "1 use" or "7" (days of rations) is deliberately left
+  alone — nothing about a day passing brings a fully-spent consumable back.
+- New 🌅 FAB (`simulateADay()`, DM/solo-only, confirm-gated) sits above the existing Dice Roller
+  FAB. Local-first: always long-rests THIS account's own character and restocks every real
+  daily-wares merchant (`DAILY_WARES_MERCHANT_KEYS` — skips Fleshmancer/Monster Mangler/Bounty
+  Hunter, which don't use the mechanic) immediately, so solo/offline play gets the full effect
+  with zero server round-trip. If connected as DM, also calls `simulateDayRemote()`.
+- Server: new `simulate_day` message (DM-only). Mutates every OTHER player's PERSISTED
+  `player_states` row directly via the new `loadAllPlayerStates` query — reaching players who
+  aren't even connected right now, the same reasoning `hp_delta`/`gift_item` already use rather
+  than only pushing to a live socket — pushing `state_update` to whoever's actually connected
+  (reusing the exact same client-side apply path `hp_delta` already rides, so no new client code
+  was needed for the long-rest half at all). Daily wares were deliberately never a shared/
+  arbitrated catalog (only the staple STOCK numbers are), so there's no single "the shop" to push;
+  instead a `day_advanced` broadcast reaches every connected PLAYER (never echoed back to the
+  triggering DM, who already did its own local half) telling their own client to reroll its own
+  local daily wares via the new `window.onDayAdvanced`.
+
+**Validation**: full suite now 180/180 (12 new tests: 7 in game-engine.test.js for the pure
+long-rest/charge-recharge functions and the new interaction tags, 5 in websocket.test.js covering
+the DM-only gate, a connected player's full rest, an OFFLINE player's rest delivered on next
+identify, and `day_advanced` reaching players but never echoing to the DM). Verified live: damaged
+a DM character to 5/30 HP with an active timed effect and a `0/day`-charged item, depleted the
+Alchemist's stock, clicked Simulate a Day — HP restored to 30/30, the effect cleared, the item
+read `3/day` again, and Alchemist stock returned to its full `[200,150,150,40,60]`. Verified a
+synthetic Claw is accepted into the Fleshmancer workshop while a Venom Sac and a Bone are rejected
+(with the drag path's explanatory message confirmed), and that both remain classified with
+`fleshmancer_input` (still usable for other purposes) despite carrying `unwearable_part`.

@@ -1048,3 +1048,73 @@ describe('store purchase sync — staple stock arbitration', () => {
     assert.equal(msg.type, 'error');
   });
 });
+
+describe('simulate a day (Phase 6k — long rest for every player)', () => {
+  test('a non-DM cannot simulate a day', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'simulate_day' });
+    const msg = await player.next();
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
+  test('heals a connected player to full, clears timed effects, and refills a per-day item charge — but leaves a "1 use" item alone', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    await pushState(player, 1, {
+      characterCurrentHp: 3, characterMaxHpEffective: 30,
+      activeTimedEffects: [{ id: 'aeff1', name: 'Bull\'s Strength', expiresAt: Date.now() + 60000 }],
+      savedGeneratedItems: [
+        { id: 'g1', name: 'Wand of Sparks', charges: '2/day', chargesFormat: '3/day' },
+        { id: 'g2', name: 'Healing Potion', charges: '0', chargesFormat: '1 use' },
+      ],
+    });
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'simulate_day' });
+
+    // pushState above already consumed player's push_ack via a plain nextMessage listener (see
+    // its own comment) rather than player's messageQueue — matching every other test that mixes
+    // pushState with a connectAs'd connection (e.g. the hp_delta test above), so this reads the
+    // same way: a fresh nextMessage, not player.next()/the queue.
+    const update = await nextMessage(player);
+    assert.equal(update.type, 'state_update');
+    assert.equal(update.state.characterCurrentHp, 30);
+    assert.deepEqual(update.state.activeTimedEffects, []);
+    const wand = update.state.savedGeneratedItems.find(it => it.id === 'g1');
+    assert.equal(wand.charges, '3/day');
+    const potion = update.state.savedGeneratedItems.find(it => it.id === 'g2');
+    assert.equal(potion.charges, '0'); // a "1 use" item never comes back on its own
+
+    const ack = await nextNonRosterMessage(dm.next);
+    assert.equal(ack.type, 'simulate_day_ack');
+  });
+
+  test('also rests a player who is not currently connected, delivered on their next identify', async () => {
+    const offline = await connectAs('uid-offline', 'player');
+    await pushState(offline, 1, { characterCurrentHp: 1, characterMaxHpEffective: 20 });
+    offline.close();
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'simulate_day' });
+    const ack = await nextNonRosterMessage(dm.next);
+    assert.equal(ack.type, 'simulate_day_ack');
+
+    const ws2 = await connect();
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-offline', role: 'player' });
+    const identified = await nextMessage(ws2);
+    assert.equal(identified.state.characterCurrentHp, 20);
+  });
+
+  test('day_advanced reaches every connected player but never echoes back to the triggering DM', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'simulate_day' });
+
+    const advanced = await nextNonRosterMessage(player.next);
+    assert.equal(advanced.type, 'day_advanced');
+
+    // The DM's own next message is the ack, not a day_advanced echo.
+    const dmMsg = await nextNonRosterMessage(dm.next);
+    assert.equal(dmMsg.type, 'simulate_day_ack');
+  });
+});

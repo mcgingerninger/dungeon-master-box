@@ -64,6 +64,11 @@
 //       -- the merchant catalog itself — see the module comment above buy_staple's handler
 //     { type: 'restock_merchant', merchantKey, maxStock }            -- DM only; resets a
 //       -- merchant's shared stock back to full for everyone
+//     { type: 'simulate_day' }                                       -- DM only (Phase 6k); a long
+//       -- rest for every OTHER player in the campaign (the DM's own client already applied it
+//       -- locally before sending this — see simulateADay's own comment in the main app),
+//       -- mutating each player's PERSISTED state directly so it reaches players who aren't even
+//       -- connected right now, same reasoning as hp_delta/gift_item/set_inventory_fields above
 //   server -> client:
 //     { type: 'identified', state, rev }             -- ack, plus whatever was already persisted for this account
 //     { type: 'push_ack', rev }                       -- confirms a push_state was actually persisted
@@ -126,6 +131,13 @@
 //       -- after identify, catch-up for whatever merchant stock already exists in this campaign
 //       -- (stock is { [merchantKey]: [...] } for every merchant with any persisted state; absent
 //       -- entirely if nothing has ever been bought from anyone yet)
+//     { type: 'simulate_day_ack' }                                  -- Phase 6k: confirms a
+//       -- simulate_day was applied to every other player's persisted state (sent to the DM)
+//     { type: 'day_advanced' }                                      -- Phase 6k: broadcast to
+//       -- every connected PLAYER (never echoed back to the triggering DM — their own client
+//       -- already did this locally) on a simulate_day; each player's own daily wares reroll
+//       -- locally in response (see the main app's window.onDayAdvanced) — their character
+//       -- long-rest itself arrives separately via the ordinary state_update above
 //     { type: 'error', message }
 //
 // The ack types matter for more than bookkeeping: the original Firestore design lets a caller
@@ -182,10 +194,11 @@
 
 import { WebSocketServer } from 'ws';
 import {
-  getCampaign, savePlayerState, loadPlayerState, deletePlayerState, createLootClaim,
+  getCampaign, savePlayerState, loadPlayerState, loadAllPlayerStates, deletePlayerState, createLootClaim,
   saveSubsystemState, loadSubsystemState,
   createAttackRequest, listAttackRequests, deleteAttackRequest,
 } from '../db/database.js';
+import { applyLongRestToPlayerState } from '../game-engine.js';
 
 // Phase 6d: real-time gambling sync, the one gap left over from the original Phase 5 audit (see
 // docs/ARCHITECTURE.md's Phase 6 section — deliberately deprioritized until now). Reuses Phase
@@ -435,6 +448,30 @@ export function createWebSocketServer(db, httpServer) {
         send(ws, { type: 'cross_write_ack', targetUid, rev: nextRev });
         broadcastRoster(identity.campaignId); // Phase 5d: the target's stats (e.g. HP) may have changed
         notifyViewers(identity.campaignId, targetUid, nextState); // Phase 6e
+        return;
+      }
+
+      // Phase 6k: "Simulate a Day" — a long rest for every player in the campaign PLUS a shop
+      // restock. The DM's own client already applied the long rest to its own local character
+      // and rerolled every merchant's daily wares before ever sending this (see simulateADay's
+      // own comment in the main app) — this only needs to reach everyone ELSE, including anyone
+      // not currently connected, which is exactly why this mutates the PERSISTED row for every
+      // player directly (loadAllPlayerStates/savePlayerState) rather than only pushing to live
+      // sockets, the same reasoning hp_delta/gift_item/set_inventory_fields above already use.
+      if (msg.type === 'simulate_day') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that.' });
+        const allStates = loadAllPlayerStates(db, identity.campaignId);
+        for (const { accountUid, state, rev } of allStates) {
+          if (accountUid === identity.accountUid) continue; // the DM's own client already rested locally
+          const nextState = applyLongRestToPlayerState(state);
+          const nextRev = rev + 1;
+          savePlayerState(db, identity.campaignId, accountUid, nextState, nextRev);
+          const target = roomFor(identity.campaignId).get(accountUid);
+          if (target) send(target.ws, { type: 'state_update', state: nextState, rev: nextRev });
+        }
+        broadcastRoster(identity.campaignId); // every player's HP just changed
+        broadcastToPlayers(identity.campaignId, { type: 'day_advanced' }); // reroll everyone's own local daily wares
+        send(ws, { type: 'simulate_day_ack' });
         return;
       }
 

@@ -203,3 +203,85 @@ describe('gambling: poker', () => {
     assert.ok(!table.hands.p1); // in-progress hand cleared once resolved
   });
 });
+
+describe('wearable vs unwearable monster parts', () => {
+  test('a Claw is a wearable Fleshmancer part; a Venom Sac and a Bone are not', () => {
+    const claw = { name: "Wolf's Claw", type: 'craftable', subcategory: 'monsterpart', partType: 'claw' };
+    const venomsac = { name: "Serpent's Venom Sac", type: 'craftable', subcategory: 'monsterpart', partType: 'venomsac' };
+    const bone = { name: "Giant's Bone", type: 'craftable', subcategory: 'monsterpart', partType: 'bone' };
+    GE.classifyItemFull(claw, 'common'); GE.classifyItemFull(venomsac, 'common'); GE.classifyItemFull(bone, 'common');
+    assert.ok(GE.canInteract(claw, 'fleshmancer_input'));
+    assert.ok(GE.canInteract(claw, 'wearable_part'));
+    assert.ok(!GE.canInteract(claw, 'unwearable_part'));
+    assert.ok(GE.canInteract(venomsac, 'fleshmancer_input')); // still usable in the Fleshmancer...
+    assert.ok(!GE.canInteract(venomsac, 'wearable_part'));    // ...just not as a worn graft
+    assert.ok(GE.canInteract(venomsac, 'unwearable_part'));
+    assert.ok(GE.canInteract(bone, 'unwearable_part'));
+    assert.ok(!GE.canInteract(bone, 'wearable_part'));
+  });
+});
+
+describe('long rest / "Simulate a Day"', () => {
+  test('isPerDayCharge recognizes /day and per-long-rest phrasing, not a flat "1 use" or "7"', () => {
+    assert.ok(GE.isPerDayCharge('3/day'));
+    assert.ok(GE.isPerDayCharge('1d4+1/day'));
+    assert.ok(GE.isPerDayCharge('Sunbeam 1/day; Call the Dawn 1/day'));
+    assert.ok(GE.isPerDayCharge('1x per long rest'));
+    assert.ok(!GE.isPerDayCharge('1 use'));
+    assert.ok(!GE.isPerDayCharge('7'));
+    assert.ok(!GE.isPerDayCharge(''));
+  });
+
+  test('refillDailyItemCharges resets a flat "/day" item back to its pristine chargesFormat', () => {
+    const wand = { name: 'Wand of Sparks', charges: '0/day', chargesFormat: '3/day' };
+    GE.refillDailyItemCharges(wand);
+    assert.equal(wand.charges, '3/day');
+  });
+
+  test('refillDailyItemCharges re-rolls a dice-based "/day" template rather than reusing a stale roll', () => {
+    const item = { name: 'Beads of Fury', charges: '0/day', chargesFormat: '1d4+1/day' };
+    GE.refillDailyItemCharges(item, () => 0.999); // rolls the die at its max
+    assert.equal(item.charges, '5/day'); // 1d4 maxes at 4, +1
+  });
+
+  test('refillDailyItemCharges leaves a non-per-day item untouched even if it has charges left', () => {
+    const potion = { name: 'Healing Potion', charges: '1 use' };
+    GE.refillDailyItemCharges(potion);
+    assert.equal(potion.charges, '1 use');
+  });
+
+  test('refillDailyItemCharges infers chargesFormat from the current charges the first time (no prior template)', () => {
+    const item = { name: 'Rod of Fire', charges: '2/day' }; // never decremented yet, no chargesFormat
+    GE.refillDailyItemCharges(item);
+    assert.equal(item.charges, '2/day');
+    assert.equal(item.chargesFormat, '2/day');
+  });
+
+  test('applyLongRestToPlayerState: full HP, cleared effects, and only per-day charges recharge', () => {
+    const state = {
+      characterCurrentHp: 4, characterMaxHp: 20, characterMaxHpEffective: 25,
+      activeTimedEffects: [{ id: 'a1', name: 'Haste' }],
+      deathSaveSuccesses: 2, deathSaveFailures: 1,
+      savedGeneratedItems: [
+        { id: 'g1', charges: '0/day', chargesFormat: '2/day' },
+        { id: 'g2', charges: '0', chargesFormat: '1 use' },
+      ],
+      characterClass: 'Wizard', // untouched fields should survive
+    };
+    const rested = GE.applyLongRestToPlayerState(state);
+    assert.equal(rested.characterCurrentHp, 25); // effective max, not the raw base
+    assert.deepEqual(rested.activeTimedEffects, []);
+    assert.equal(rested.deathSaveSuccesses, 0);
+    assert.equal(rested.deathSaveFailures, 0);
+    assert.equal(rested.savedGeneratedItems.find(i => i.id === 'g1').charges, '2/day');
+    assert.equal(rested.savedGeneratedItems.find(i => i.id === 'g2').charges, '0'); // 1-use item stays spent
+    assert.equal(rested.characterClass, 'Wizard');
+    // The input state itself is never mutated — a fresh object comes back.
+    assert.equal(state.characterCurrentHp, 4);
+  });
+
+  test('applyLongRestToPlayerState falls back to characterMaxHp when no effective max is recorded', () => {
+    const rested = GE.applyLongRestToPlayerState({ characterCurrentHp: 1, characterMaxHp: 12 });
+    assert.equal(rested.characterCurrentHp, 12);
+  });
+});

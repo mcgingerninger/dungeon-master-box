@@ -1315,6 +1315,19 @@
     display: flex; align-items: center; justify-content: center; transition: transform .15s;
   }
   .dice-roller-fab:hover { transform: scale(1.08); border-color: var(--gold-bright); }
+  /* ===== Simulate a Day (DM/solo-only long rest + shop restock) ===== */
+  .simulate-day-fab {
+    position: fixed; bottom: 4.6rem; left: 1rem; z-index: 8900;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--surface); color: #ffb74d; border: 2px solid #ffb74d;
+    font-size: 1.5rem; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center; transition: transform .15s;
+  }
+  .simulate-day-fab:hover { transform: scale(1.08); border-color: #ffd699; }
+  /* Same "DM or solo, never a real connected player" gate as every other DM-only control in
+     this app (see isRealPlayerAccount()) — multiplayer-sync.js toggles body.role-player, this
+     file's own CSS is free to react to it without that file needing to know this button exists. */
+  body.role-player .simulate-day-fab { display: none !important; }
   .dice-picker-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .dice-picker-btn {
     display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
@@ -1921,6 +1934,26 @@
   .tt-crumb-sep { color:var(--border); }
   .tt-properties, .tt-tags { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.4rem; }
   .tt-prop-chip { background:rgba(201,168,76,0.12); border:1px solid var(--gold); color:var(--gold-bright); font-size:0.68rem; padding:0.05rem 0.35rem; text-transform:uppercase; letter-spacing:0.03em; }
+  /* Per-property recoloring so "RARE / UNIQUE / MAGICAL / NECROTIC / ..." chips (see
+     deriveItemProperties in game-engine.js for the full list) read apart from each other at a
+     glance instead of all sharing the one gold box above — reuses the same tag*() keyframes the
+     synergy flavor tags (.ic-tag.t-fire etc.) already established, so this isn't a new visual
+     language, just this chip family's own share of the existing one. Background stays a low-alpha
+     tint of the same color as the border/text so each chip still reads as one coherent color. */
+  .tt-prop-chip.tp-rare      { background:rgba(91,156,246,0.14);  border-color:#5b9cf6; color:#5b9cf6; animation: tagGlowPulse 3s infinite ease-in-out; }
+  .tt-prop-chip.tp-unique    { background:rgba(196,124,245,0.16); border-color:#c47cf5; color:#c47cf5; animation: tagWarp 3.5s infinite ease-in-out; }
+  .tt-prop-chip.tp-magical   { background:rgba(128,203,196,0.16); border-color:#80cbc4; color:#80cbc4; animation: tagHueShift 3.2s infinite ease-in-out; }
+  .tt-prop-chip.tp-cursed    { background:rgba(171,71,188,0.16);  border-color:#ab47bc; color:#e8a6ff; animation: tagCrackle 4.5s infinite; }
+  .tt-prop-chip.tp-soulbound { background:rgba(77,208,225,0.14);  border-color:#4dd0e1; color:#4dd0e1; animation: tagBreathe 4s infinite ease-in-out; }
+  .tt-prop-chip.tp-heavy     { background:rgba(141,110,99,0.16);  border-color:#8d6e63; color:#bcaaa4; }
+  .tt-prop-chip.tp-durable   { background:rgba(144,164,174,0.16); border-color:#90a4ae; color:#cfd8dc; }
+  .tt-prop-chip.tp-quest     { background:rgba(240,204,106,0.16); border-color:var(--gold-bright); color:var(--gold-bright); animation: tagFlicker 2.5s infinite ease-in-out; }
+  .tt-prop-chip.tp-fire      { background:rgba(255,112,67,0.16);  border-color:#ff7043; color:#ff7043; animation: tagFlicker 2.2s infinite ease-in-out; }
+  .tt-prop-chip.tp-cold      { background:rgba(128,216,255,0.16); border-color:#80d8ff; color:#80d8ff; animation: tagGlowPulse 3.4s infinite ease-in-out; }
+  .tt-prop-chip.tp-lightning { background:rgba(255,213,79,0.18);  border-color:#ffd54f; color:#ffd54f; animation: tagCrackle 3.6s infinite; }
+  .tt-prop-chip.tp-poison    { background:rgba(156,204,101,0.16); border-color:#9ccc65; color:#9ccc65; animation: tagBreathe 3.6s infinite ease-in-out; }
+  .tt-prop-chip.tp-necrotic  { background:rgba(126,87,194,0.18);  border-color:#7e57c2; color:#b39ddb; animation: tagBreathe 4.6s infinite ease-in-out; }
+  .tt-prop-chip.tp-radiant   { background:rgba(255,249,196,0.2);  border-color:#fff9c4; color:#fff9c4; animation: tagGlowPulse 2.4s infinite ease-in-out; }
   .tt-tag-chip { background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text-dim); font-family:'Share Tech Mono',monospace; font-size:0.68rem; padding:0.05rem 0.35rem; }
   .tt-interactions { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.4rem; }
   .tt-interaction-chip { background:rgba(91,156,246,0.1); border:1px solid var(--blue,#5b9cf6); color:#8fbcf7; font-family:'Share Tech Mono',monospace; font-size:0.68rem; padding:0.05rem 0.35rem; }
@@ -3627,6 +3660,11 @@
      character-sheet-edit, anywhere), not a destination you navigate to. Bottom-left so it never
      collides with the account/guest-mode button multiplayer-sync.js already owns bottom-right. -->
 <button id="diceRollerFab" class="dice-roller-fab" onclick="openDiceRoller()" title="Dice Roller">🎲</button>
+<!-- Simulate a Day — DM/solo-only (hidden for a real Player account via body.role-player, see
+     that CSS rule). A long rest for every player plus a full shop restock, replacing the old
+     "shop reshuffles on every visit" behavior — see simulateADay()'s own comment. Stacked above
+     the Dice Roller FAB rather than sharing its corner, so both stay reachable from any tab. -->
+<button id="simulateDayFab" class="simulate-day-fab" onclick="simulateADay()" title="Simulate a Day — long rest for every player, shop restocks">🌅</button>
 <div id="diceRollerModal" class="edit-modal-overlay" onclick="if(event.target===this) closeDiceRoller()">
   <div class="edit-modal" style="width:min(560px,100%);">
     <div class="edit-modal-header"><h3>🎲 Dice Roller</h3><button class="edit-modal-close" onclick="closeDiceRoller()">×</button></div>
@@ -5887,6 +5925,16 @@ function updateChanceDisplay() {
 }
 
 // ===================== ITEMS =====================
+// Maps a deriveItemProperties() string (game-engine.js) to its .tt-prop-chip.tp-* modifier
+// class (see the CSS for the actual colors/animations) — one shared lookup so both places that
+// render property chips (the Compendium row and the full item tooltip) stay in sync.
+const PROP_CHIP_CLASS = {
+  Rare: 'tp-rare', Unique: 'tp-unique', Magical: 'tp-magical', Cursed: 'tp-cursed',
+  Soulbound: 'tp-soulbound', Heavy: 'tp-heavy', Durable: 'tp-durable', 'Quest Item': 'tp-quest',
+  Fire: 'tp-fire', Cold: 'tp-cold', Lightning: 'tp-lightning', Poison: 'tp-poison',
+  Necrotic: 'tp-necrotic', Radiant: 'tp-radiant',
+};
+function propChipClass(p) { return PROP_CHIP_CLASS[p] || ''; }
 function metaTagsFor(item, rarity){
   let tags = '';
   if (rarity) tags += `<span class="meta-tag rarity" style="color:${rarityColors[rarity]||''};border-color:${rarityColors[rarity]||''}">${rarityNames[rarity]||rarity}</span>`;
@@ -5907,7 +5955,7 @@ function classificationTagsRowHtml(item) {
   const crumb = (item.classification && item.classification.length)
     ? `<div class="tt-classification">${item.classification.map(escapeHtml).join(' <span class="tt-crumb-sep">›</span> ')}</div>` : '';
   const props = (item.properties && item.properties.length)
-    ? `<div class="tt-properties">${item.properties.map(p => `<span class="tt-prop-chip">${escapeHtml(p)}</span>`).join('')}</div>` : '';
+    ? `<div class="tt-properties">${item.properties.map(p => `<span class="tt-prop-chip ${propChipClass(p)}">${escapeHtml(p)}</span>`).join('')}</div>` : '';
   const tagsHtml = (item.tags && item.tags.length)
     ? `<div class="tt-tags">${item.tags.map(t => `<span class="tt-tag-chip">#${escapeHtml(t)}</span>`).join('')}</div>` : '';
   const interactionsHtml = (item.interactions && item.interactions.length)
@@ -8673,6 +8721,16 @@ function fleshMaterialDrop(evt) {
     flashFleshWorkshopMessage('That has to be a monster part.', true);
     return;
   }
+  // A part can be a valid Fleshmancer input (usable for something in here) without being
+  // something a body actually has a slot for — see UNWEARABLE_MONSTER_PARTS in game-engine.js
+  // (Venom Sac, Bone). This workshop only ever produces a wearable graft, so those are turned
+  // away here with their own explanation rather than silently becoming a graft that makes no
+  // anatomical sense; they're still fully usable as reagents/crafting material elsewhere.
+  if (!canInteract(entry.item, 'wearable_part')) {
+    flashManglerSlotInvalid('fleshMaterialSlot');
+    flashFleshWorkshopMessage(`${entry.item.name} can't be worn as a graft — use it as a crafting material or reagent instead.`, true);
+    return;
+  }
   fleshMaterialKey = key;
   renderFleshWorkshop();
 }
@@ -9492,6 +9550,58 @@ function rerollStoreDaily() {
   restockMerchant(currentMerchant);
   renderStoreTab();
 }
+// Merchants that don't use the daily-wares mechanic at all (see rerollStoreDaily's own identical
+// guard) — restocking one would just fill merchantDailyItems with rolled items nothing ever
+// reads, since each has its own separate wares system (rollFleshCandidates/resetManglerSlots/
+// rollBountyBoard).
+const DAILY_WARES_MERCHANT_KEYS = () => Object.keys(MERCHANTS).filter(k => !['fleshmancer', 'monstermangler', 'bountyhunter'].includes(k));
+// The DM's (or solo player's) "a day passes" action — previously the ONLY thing that ever reset
+// shop stock was the per-merchant Restock button above, and nothing stopped a PLAYER from mashing
+// it themselves at will (it had no DM gate) — which is exactly what "items refreshing every visit"
+// looked like from a player's seat. Restock is now DM-only (see its own button), and this is the
+// single deliberate "time has passed" trigger both features were missing: every merchant restocks
+// AND every player gets a long rest — full HP, every temporary effect ends, and any equipped/owned
+// item with a "3/day" or dice-based "/day" charge format recharges (see applyLongRestToPlayerState
+// in game-engine.js for exactly what "long rest" covers).
+// Local first: always applies to THIS account's own character sheet and rerolls every merchant's
+// wares right here, so solo/offline play gets the full effect with zero server involvement. Then,
+// if connected as DM, simulateDayRemote() asks the server to do the literal same long-rest
+// transform to every OTHER player's PERSISTED state — reaching players who aren't even connected
+// right now, the same reason hp_delta/gift_item mutate stored state server-side rather than only
+// pushing to a live socket — and tells every connected player's client to reroll ITS OWN local
+// daily wares too. Daily wares were deliberately never a shared/arbitrated catalog to begin with
+// (see buyStapleRemote's own comment: "each account rolls its own random daily items, no shared
+// catalog to arbitrate"), so there's no single "the shop's wares" to broadcast; only the shared
+// staple STOCK numbers really are, and those already ride along on each restockMerchant() call.
+function simulateADay() {
+  if (isRealPlayerAccount()) return;
+  if (!confirm('Simulate a day passing? Every player fully heals, every temporary effect ends, and per-day item charges recharge. Shops restock. This cannot be undone.')) return;
+  const rested = window.applyLongRestToPlayerState({
+    characterCurrentHp, characterMaxHp, characterMaxHpEffective, activeTimedEffects, savedGeneratedItems,
+  });
+  characterCurrentHp = rested.characterCurrentHp;
+  activeTimedEffects = rested.activeTimedEffects;
+  savedGeneratedItems = rested.savedGeneratedItems;
+  DAILY_WARES_MERCHANT_KEYS().forEach(key => restockMerchant(key));
+  buildTokenIndex();
+  refreshAllViewsAfterStateApply();
+  renderStoreTab();
+  renderActiveEffects();
+  scheduleSave();
+  if (typeof window.simulateDayRemote === 'function') window.simulateDayRemote();
+  flashInvMessage('🌅 A new day dawns — the party rests and the shops restock.');
+}
+// The flip side of simulateADay's local half: fired on every connected client (DM included) once
+// the server confirms a simulate_day went through, so daily wares — the one piece of "a day
+// passed" that has no shared catalog to push — reroll locally everywhere, not just for whoever
+// clicked the button. A player's own character long-rest arrives separately, via the exact same
+// state_update path hp_delta/gift_item already use (see multiplayer-sync.js's handleServerMessage
+// and applyRemoteMultiplayerState), so it's already handled with no code needed here.
+window.onDayAdvanced = function () {
+  DAILY_WARES_MERCHANT_KEYS().forEach(key => { merchantDailyItems[key] = rollMerchantDaily(key); merchantDailySold[key] = merchantDailyItems[key].map(() => false); });
+  renderStoreTab();
+  scheduleSave();
+};
 
 function storeStapleCardHtml(staple, merchantKey, idx) {
   const icon = itemPixelIcon(staple, 40, 'common');
@@ -9723,7 +9833,7 @@ function renderStoreTab() {
     <details class="collapsible"${storeDailySectionOpen ? ' open' : ''} ontoggle="storeDailySectionOpen=this.open" style="margin-top:0.6rem;">
       <summary>✨ Today's Wares</summary>
       <div class="collapsible-body">
-        <button class="ic-action-btn" style="margin-bottom:0.6rem;" onclick="rerollStoreDaily()">🔄 Restock (resets stock)</button>
+        ${isRealPlayerAccount() ? '' : `<button class="ic-action-btn" style="margin-bottom:0.6rem;" onclick="rerollStoreDaily()">🔄 Restock (resets stock)</button>`}
         <div class="store-grid">${dailyHtml}</div>
       </div>
     </details>
@@ -11363,6 +11473,19 @@ function getItemEffectText(item) {
 function setTokenSlotOverride(key, value) {
   tokenSlotOverrides[key] = value;
 }
+// Mirrors removeTokenEverywhere's own "is this actually removable" split exactly (see its final
+// comment): a 'gen:' key is a real generated instance, and a monster-part craftable still sitting
+// in lootData is a finite, individually-obtainable resource — both really do disappear. Every
+// other key is a shared, infinitely-reusable catalog template (the Token Library shows the whole
+// game's item list, not just what you own), which removeTokenEverywhere deliberately leaves
+// alone — so offering a discard button on one that flashes "discarded" while the card never
+// actually goes anywhere was a straight bug, not a design choice. tokenCardHtml only renders the
+// button when this returns true.
+function isTokenDiscardable(e) {
+  if (!e || !e.key) return false;
+  if (e.key.indexOf('gen:') === 0) return true;
+  return !!(e.item && e.item.type === 'craftable' && e.item.subcategory === 'monsterpart');
+}
 
 // showSlotSelect defaults true (Trader sell grid, Monster Mangler's "Your Items" grid both
 // still want the equip-slot-category override dropdown). The Inventory tab's own Token
@@ -11386,13 +11509,16 @@ function tokenCardHtml(e, showSlotSelect = true, rightClickAction) {
       </select>` : '';
   const safeKey = e.key.replace(/'/g,"\\'");
   const contextMenuAttr = rightClickAction ? ` oncontextmenu="handleTokenCardRightClick(event,'${safeKey}','${rightClickAction}')"` : '';
+  const discardBtnHtml = isTokenDiscardable(e)
+    ? `<button class="token-discard-btn" title="Discard" onclick="event.stopPropagation();discardTokenLibraryItem('${safeKey}')">✕</button>`
+    : '';
   return `
     <div class="token-card ${e.rarity}" draggable="true"
          ondragstart="tokenDragStart(event,'${safeKey}')"${contextMenuAttr}
          onmouseenter="showTokenTooltip(event,'${safeKey}')"
          onmousemove="moveTokenTooltip(event)"
          onmouseleave="hideTokenTooltip()">
-      <button class="token-discard-btn" title="Discard" onclick="event.stopPropagation();discardTokenLibraryItem('${safeKey}')">✕</button>
+      ${discardBtnHtml}
       <div class="token-card-head">${itemPixelIcon(item, 30, e.rarity)}<div class="token-card-name">${escapeHtml(item.name)}</div></div>
       <div class="token-card-rarity">${rarityNames[e.rarity] || e.rarity}</div>${slotSelectHtml}
       <div class="token-card-effect">${escapeHtml(shortPreview)}</div>
@@ -11989,13 +12115,14 @@ function mangerAssignItemByKey(key) {
     renderManglerTokenGrid();
   }
 }
-// Fleshmancer "work slot" routing — mirrors fleshMaterialDrop's own eligibility check exactly.
+// Fleshmancer "work slot" routing — mirrors fleshMaterialDrop's own eligibility check exactly,
+// wearable_part included (see that function's own comment for why).
 function fleshAssignMaterialByKey(key) {
   if (!TOKEN_INDEX[key]) buildTokenIndex();
   const entry = TOKEN_INDEX[key];
   if (!entry) return;
   if (!entry.item.interactions) classifyItemFull(entry.item, entry.rarity);
-  if (!canInteract(entry.item, 'fleshmancer_input')) return;
+  if (!canInteract(entry.item, 'fleshmancer_input') || !canInteract(entry.item, 'wearable_part')) return;
   fleshMaterialKey = key;
   renderFleshWorkshop();
 }
@@ -12095,7 +12222,7 @@ const INV_GRID_MIRRORS = [
   { id: 'storeInventoryGrid', prefix: 'store-', storeContext: true },
   { id: 'traderSellInvGrid', prefix: 'trader-', dimFilter: (item, rarity) => currentMerchant ? traderSellDimFilter(item, rarity) : true, storeContext: true },
   { id: 'manglerInvGrid', prefix: 'mangler-', dimFilter: (item, rarity) => manglerFocusFilter({ item, rarity }), storeContext: true },
-  { id: 'fleshInvGrid', prefix: 'flesh-', dimFilter: (item, rarity) => { if (!item.interactions) classifyItemFull(item, rarity); return canInteract(item, 'fleshmancer_input'); }, storeContext: true },
+  { id: 'fleshInvGrid', prefix: 'flesh-', dimFilter: (item, rarity) => { if (!item.interactions) classifyItemFull(item, rarity); return canInteract(item, 'wearable_part'); }, storeContext: true },
 ];
 function renderInventoryGrid() {
   INV_GRID_MIRRORS.forEach(({ id, prefix, dimFilter, storeContext }) => {
@@ -12998,7 +13125,7 @@ function buildTooltipHtml(entry) {
     ? `<div class="tt-classification">${item.classification.map(escapeHtml).join(' <span class="tt-crumb-sep">›</span> ')}</div>`
     : '';
   const propsHtml = (item.properties && item.properties.length)
-    ? `<div class="tt-properties">${item.properties.map(p => `<span class="tt-prop-chip">${escapeHtml(p)}</span>`).join('')}</div>`
+    ? `<div class="tt-properties">${item.properties.map(p => `<span class="tt-prop-chip ${propChipClass(p)}">${escapeHtml(p)}</span>`).join('')}</div>`
     : '';
   const tagsHtml = (item.tags && item.tags.length)
     ? `<div class="tt-tags">${item.tags.map(t => `<span class="tt-tag-chip">#${escapeHtml(t)}</span>`).join('')}</div>`
