@@ -1870,3 +1870,58 @@ payout banner and blocky wheel, Blackjack's inline + banner payout amounts and a
 icons rendering distinctly, Slots' pixel reel icons in both the machine and the recent-spins feed,
 Poker's cards via the same shared `bjCardHtml`, and the roulette number grid's two-digit labels
 (0-36) confirmed not to overflow their buttons at the smaller pixel-font size.
+
+### Post-6j: Healing Potions Actually Heal; Unarmed Attack
+
+**Root cause of "potions do nothing".** `handleItemActivation` (the one function behind every
+right-click-to-use and every Ability Bar click) only ever did two things: start a duration timer
+(`parseDurationMs` found something like "for 1 hour") or expend a charge. Neither path reads
+`item.hp` — the dice-formula field (`"2d4+2"`) that Healing Potion has carried since it was first
+authored, used only for its own tooltip/card display (`❤ Heals 2d4+2`). So drinking one expended
+its `charges: '1 use'` down to 0 — which made it crumble to dust per `itemShouldCrumble`, since
+any consumable with charges defaults to that interaction — and did precisely nothing else. It
+wasn't a broken roll; the roll never happened at all.
+
+Fixed by giving `handleItemActivation` a third branch: if `item.hp` is set, roll it
+(`rollDiceFormulaTotal`, a `DICE_CHARGE_RE`-based "NdM+K -> number" helper sitting next to the
+existing charge-dice roller) and apply it via the existing `updateCharacterField('characterCurrentHp',
+...)` — already the single correct way to change current HP, since it clamps to
+`characterMaxHpEffective` and handles the render + `scheduleSave` side effects on its own, so a
+heal can never overheal past max and never needed a parallel save path. The amount actually
+restored (post-clamp) is stashed in a module-level `lastActivationHealAmount` rather than changing
+`handleItemActivation`'s own boolean return shape, since both its callers (`slotContextMenu`,
+`activateAbilityFromBar`) just do `if (handleItemActivation(...))` today. Both callers now read it
+to flash "Heals N HP." (or "Already at full HP." at 0) — `slotContextMenu`'s equipped-item path had
+no flash message of any kind before this, healing or otherwise.
+
+**Audited every other potion while in there** (the user's fear was other potions might be equally
+broken): Potion of Water Breathing already works correctly as-is (its "for 1 hour" text drives the
+existing timer path, which was never in question — a duration is all that potion needs). Stamina
+Potion ("Removes one level of exhaustion") and Antidote ("Cures one poison affecting the drinker")
+are not bugged so much as inert by design gap: this app has no tracked exhaustion-level or
+poisoned-condition state on the player character sheet at all (those conditions live only in the
+DM's narration/monster stat blocks, never as a field on the player), so there is no state for
+these two to actually clear — they just quietly expend their charge and crumble, identical to
+before this pass. Left alone rather than inventing new character-sheet state the user didn't ask
+for; flagged here in case exhaustion/poison tracking is ever wanted as its own feature.
+
+**Unarmed Attack button.** Added a second, always-present ability-bar icon (👊 Unarmed) next to
+the per-weapon ⚔ Attack buttons `renderAbilityBar` already drew — previously a player with nothing
+equipped in either weapon slot had no attack button on the bar at all. `computeUnarmedAttackRoll`
+mirrors `computeWeaponAttackRoll`'s exact return shape (so it renders through the same
+`weaponAttackRollHtml` popup) with a flat `1d6` base die and STR always as the ability score (no
+finesse for bare fists). Per the request ("1d6 unless something modifies unarmed"), a new
+`findUnarmedModifiers` scans every equipped slot's effect text (not just one weapon's own — an
+unarmed strike has no single item to carry its own bonus) for phrasing that already exists in this
+project's own data, e.g. the Fleshmancer hand-graft pool's Iron Claw ("+4 damage on unarmed
+strikes.", see `FLESH_GRAFT_EFFECT_POOL`), plus a die-override pattern for any future item
+authored as "Unarmed strikes deal 1d8."
+
+**Validation performed**: full suite still 168/168 (both changes are monolith-only; no
+game-engine.js logic touched). Verified live: bought a Healing Potion from the Alchemist, damaged
+the character to 5/20 HP, equipped and activated the potion from the Ability Bar — HP went to
+11/20 (a valid 2d4+2 roll) and the flash message read "Healing Potion crumbles to dust. Heals 6
+HP."; repeated at full HP and confirmed "Already at full HP." with no HP change. Verified the
+Unarmed button opens the same attack popup as a weapon (1d6 + STR + proficiency, no finesse), and
+confirmed a synthetic Iron-Claw-worded item in an unrelated equip slot correctly added its +4 to
+`computeUnarmedAttackRoll`'s damage bonus.

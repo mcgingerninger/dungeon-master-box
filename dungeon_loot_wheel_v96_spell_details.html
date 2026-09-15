@@ -3938,6 +3938,17 @@ function rollDiceTotal(n, sides, mod) {
   for (let i = 0; i < n; i++) total += rn(1, sides);
   return total;
 }
+// Rolls a plain "NdM+K" formula (e.g. item.hp's "2d4+2") to a single number. Same regex as
+// DICE_CHARGE_RE (dice notation is dice notation whether it's charges or healing) but returns
+// the total itself instead of splicing it back into a larger string. Returns null for text with
+// no dice expression in it at all, so callers can tell "rolled to 0" apart from "wasn't a formula".
+function rollDiceFormulaTotal(text) {
+  const m = DICE_CHARGE_RE.exec(String(text || ''));
+  if (!m) return null;
+  const n = parseInt(m[1], 10), sides = parseInt(m[2], 10);
+  const mod = m[3] ? parseInt(m[3].replace(/\s+/g, ''), 10) : 0;
+  return rollDiceTotal(n, sides, mod);
+}
 // Rolls whatever dice expression appears in `text` and returns the text with that
 // expression replaced by the rolled total (e.g. "1d4+1 applications" -> "3 applications").
 // Returns null if there's no dice expression in the text at all.
@@ -4067,11 +4078,30 @@ function expendSpecificPower(item, powerText) {
   const newSeg = powerText.slice(0, m.index) + newVal + powerText.slice(m.index + m[0].length);
   item.charges = item.charges.slice(0, idx) + newSeg + item.charges.slice(idx + powerText.length);
 }
+// Set by handleItemActivation whenever it just rolled and applied an item.hp heal, so the two
+// callers (slotContextMenu, activateAbilityFromBar) can show "Healed N HP" instead of a generic
+// "used" message without handleItemActivation's own boolean return needing to change shape.
+// Cleared at the top of every call so a non-healing activation never reads a stale amount.
+let lastActivationHealAmount = null;
+// Rolls item.hp (e.g. "2d4+2") and adds it to the player's current HP via updateCharacterField,
+// which already clamps to characterMaxHpEffective and handles the render/scheduleSave side
+// effects — so a heal can never overheal past max, and never needs its own save/sync path.
+// Returns the amount actually restored (0 if already at full HP), or null if item.hp didn't
+// parse as a dice formula at all.
+function applyHealFromItem(item) {
+  const rolled = rollDiceFormulaTotal(item.hp);
+  if (rolled == null) return null;
+  const before = characterCurrentHp;
+  updateCharacterField('characterCurrentHp', characterCurrentHp + Math.max(0, rolled));
+  return characterCurrentHp - before;
+}
 // Central "right-click to use" logic shared by inventory items and equipped slots. Returns
-// true if anything happened (a charge was spent, a timer started, or a picker popup opened)
-// so the caller knows whether to preventDefault the browser's context menu and re-render.
+// true if anything happened (a charge was spent, a timer started, a heal was applied, or a
+// picker popup opened) so the caller knows whether to preventDefault the browser's context
+// menu and re-render.
 function handleItemActivation(entry, evt) {
   const item = entry.item;
+  lastActivationHealAmount = null;
   const powers = parseUsablePowers(item);
   if (powers) {
     if (evt) evt.preventDefault();
@@ -4081,10 +4111,12 @@ function handleItemActivation(entry, evt) {
   const text = getItemEffectText(item);
   const dur = parseDurationMs(text);
   const hasCharge = !!item.charges;
-  if (!dur && !hasCharge) return false;
+  const canHeal = !!item.hp;
+  if (!dur && !hasCharge && !canHeal) return false;
   if (hasCharge && !expendItemCharge(item)) return false;
   if (evt) evt.preventDefault();
   if (dur) startTimedEffect(item, entry.key, entry.rarity, text, dur);
+  if (canHeal) lastActivationHealAmount = applyHealFromItem(item);
   return true;
 }
 
@@ -4138,6 +4170,12 @@ function renderAbilityBar() {
   buildTokenIndex();
   const seenWeaponKeys = new Set();
   const html = [];
+  // Always present, next to whatever per-weapon Attack icons follow — a player is never
+  // without their own two fists, so unlike every other button on this bar this one has no
+  // "is anything equipped" precondition at all.
+  html.push(`<button class="ability-btn" onclick="rollUnarmedAttack()" title="Unarmed strike — 1d6 + STR, unless a worn item boosts it">
+    <span style="font-size:1.3rem;line-height:1.3rem;">\u{1F44A}</span><span class="ability-btn-label">Unarmed</span>
+  </button>`);
   Object.keys(SLOT_CATEGORY).forEach(slotId => {
     const key = playerSlots[slotId];
     if (!key) return;
@@ -4179,6 +4217,7 @@ function activateAbilityFromBar(slotId) {
   const entry = key && TOKEN_INDEX[key];
   if (!entry) return;
   if (handleItemActivation(entry, null)) {
+    const healSuffix = lastActivationHealAmount ? ` Heals ${lastActivationHealAmount} HP.` : lastActivationHealAmount === 0 ? ' Already at full HP.' : '';
     if (itemShouldCrumble(entry.item)) {
       const name = entry.item.name;
       clearActiveEffectsForKey(key);
@@ -4186,13 +4225,13 @@ function activateAbilityFromBar(slotId) {
       renderPlayerSlots();
       renderActiveEffects();
       updateInventorySummary();
-      flashInvMessage(`${name} crumbles to dust.`);
+      flashInvMessage(`${name} crumbles to dust.${healSuffix}`);
       return;
     }
     renderPlayerSlots();
     renderActiveEffects();
     updateInventorySummary();
-    flashInvMessage(`${entry.item.name} used.`);
+    flashInvMessage(`${entry.item.name} used.${healSuffix}`);
   }
 }
 // ---------- Power picker popup ----------
@@ -11613,6 +11652,7 @@ function slotContextMenu(evt, slotId) {
   const entry = TOKEN_INDEX[key];
   if (!entry) return;
   if (handleItemActivation(entry, evt)) {
+    const healSuffix = lastActivationHealAmount ? ` Heals ${lastActivationHealAmount} HP.` : lastActivationHealAmount === 0 ? ' Already at full HP.' : '';
     if (itemShouldCrumble(entry.item)) {
       const name = entry.item.name;
       clearActiveEffectsForKey(key);
@@ -11620,12 +11660,13 @@ function slotContextMenu(evt, slotId) {
       renderPlayerSlots();
       renderActiveEffects();
       updateInventorySummary(); // a temporary Strength effect starting/ending changes carry capacity
-      flashInvMessage(`${name} crumbles to dust.`);
+      flashInvMessage(`${name} crumbles to dust.${healSuffix}`);
       return;
     }
     renderPlayerSlots();
     renderActiveEffects();
     updateInventorySummary(); // a temporary Strength effect starting/ending changes carry capacity
+    if (healSuffix) flashInvMessage(`${entry.item.name} used.${healSuffix}`);
     showTokenTooltip(evt, key); // refresh the tooltip in place so the new count is visible immediately
     return;
   }
@@ -12375,6 +12416,55 @@ function rollEquippedWeaponAttack(slotId) {
 function closeWeaponAttackPopup() {
   const modal = document.getElementById('weaponAttackModal');
   if (modal) modal.classList.remove('open');
+}
+// An unarmed strike has no item of its own to carry a magic bonus, so any modifier to it (e.g.
+// a Fleshmancer hand graft's "Iron Claw" — "+4 damage on unarmed strikes.", see
+// FLESH_GRAFT_EFFECT_POOL) has to be found by scanning every currently equipped item's effect
+// text instead of reading one weapon's .effect like computeWeaponAttackRoll does. Also honors an
+// item that overrides the die itself (e.g. "Unarmed strikes deal 1d8") if one is ever authored.
+function findUnarmedModifiers() {
+  buildTokenIndex();
+  let dmgBonus = 0, atkBonus = 0, dieOverride = null;
+  Object.keys(SLOT_CATEGORY).forEach(slotId => {
+    const key = playerSlots[slotId];
+    const entry = key && TOKEN_INDEX[key];
+    if (!entry) return;
+    const text = getItemEffectText(entry.item);
+    const dieMatch = text.match(/unarmed strikes?[^.]*?(\d+d\d+(?:\s*[+-]\s*\d+)?)/i);
+    if (dieMatch) dieOverride = dieMatch[1].replace(/\s+/g, '');
+    const dmgMatch = text.match(/\+(\d+)\s+damage on unarmed strikes?/i);
+    if (dmgMatch) dmgBonus += parseInt(dmgMatch[1], 10);
+    const atkMatch = text.match(/\+(\d+)\s+to unarmed (?:attack|strike)s?/i);
+    if (atkMatch) atkBonus += parseInt(atkMatch[1], 10);
+  });
+  return { dmgBonus, atkBonus, dieOverride };
+}
+// Same shape as computeWeaponAttackRoll's return value (weaponAttackRollHtml renders both
+// identically) — base die is 1d6 per table rule, always STR (no finesse for bare fists), plus
+// whatever findUnarmedModifiers found on the player's other equipped gear.
+function computeUnarmedAttackRoll(sheet) {
+  const { dmgBonus, atkBonus, dieOverride } = findUnarmedModifiers();
+  const dice = dieOverride || '1d6';
+  const strMod = sheet.abilities.str.mod;
+  const d20 = rn(1, 20);
+  const isCrit = d20 === 20;
+  const isFumble = d20 === 1;
+  const toHitTotal = d20 + strMod + sheet.profBonus + atkBonus;
+  const dmgResult = battleRollDamage(dice, isCrit);
+  const dmgTotal = dmgResult ? dmgResult.total + strMod + dmgBonus : null;
+  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+}
+// The ability bar's always-present "Unarmed" icon — unlike rollEquippedWeaponAttack this never
+// needs an equipped weapon (that's the whole point), so it has no "nothing equipped there" guard.
+function rollUnarmedAttack() {
+  const sheet = computeCharacterSheet();
+  const roll = computeUnarmedAttackRoll(sheet);
+  const titleEl = document.getElementById('weaponAttackTitle');
+  if (titleEl) titleEl.textContent = `👊 Unarmed Strike`;
+  const bodyEl = document.getElementById('weaponAttackBody');
+  if (bodyEl) bodyEl.innerHTML = weaponAttackRollHtml(roll);
+  const modal = document.getElementById('weaponAttackModal');
+  if (modal) modal.classList.add('open');
 }
 
 // ===================== DICE ROLLER =====================
