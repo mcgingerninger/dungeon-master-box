@@ -1758,3 +1758,70 @@ changes, including that it re-reads Strength through the effective (potion-inclu
 total. The potion fix and the monster-description synthesis were both verified against real data
 (the actual game-engine.js function for the former; the actual live 5etools-mirror-3 fetch for
 the latter) before and after, not just unit-level.
+
+### Post-6j: Drag Freeze (Likely Cause Found), Inventory Ability Bar, Fleshmancer Attach, Terrain Removed
+
+**Likely real cause of the drag-and-drop freeze, found after two failed reproduction attempts.**
+Every earlier attempt to reproduce "dragging an item freezes the app" via synthetic `DragEvent`
+dispatch found nothing — every handler measured under 10ms even against an 80-item inventory.
+That approach could never have caught the actual suspect: `itemPixelIcon`'s `icon-fx-legendary`/
+`icon-fx-celestial` frame classes run TWO to FOUR simultaneous animated `box-shadow`/`filter`
+effects (a pulsing glow plus two ember-particle pseudo-elements) on every legendary/celestial
+item's icon, continuously, the whole time it's on screen — equipped or just sitting in the
+inventory grid. A native HTML5 drag forces the browser to keep rasterizing/compositing the page
+for as long as the drag is held, and doing that alongside several actively-animating blurred
+box-shadows is a well-known freeze source on weaker/integrated GPUs (exactly what a Mini PC
+has) — and it's invisible to any synthetic-event test, since those never touch real drag-image
+compositing at all. Fixed by pausing every `icon-fx-*` animation for the duration of any drag
+(`body.dragging-item`, toggled by the two existing document-level `dragstart`/`dragend`
+listeners that already existed for the tooltip cleanup) — cosmetic only, confirmed via
+`getComputedStyle` that the animation and box-shadow are fully suppressed while dragging and
+restored immediately after. Not confirmed as THE fix (no Mini PC reachable from this session),
+but the most concrete, well-reasoned lead found across two separate investigation passes.
+
+**Inventory ability bar — players can now actually use granted item abilities.** Previously, an
+equipped item granting a spell/power/natural-attack ability (anything with charges or a
+duration — the exact set `handleItemActivation` already recognized) was only usable by
+right-clicking its tiny equip-slot icon, something nothing in the UI ever hinted was possible.
+New `#inventoryAbilityBar` on the Inventory tab (`renderAbilityBar`, called everywhere
+`renderPlayerSlots` already is, plus every second alongside the existing Active Effects
+countdown tick) shows one icon per equipped weapon (an Attack button, reusing the existing
+`rollEquippedWeaponAttack` self-roll popup) and one per equipped item with a usable ability —
+each using the item's own existing pixel icon (no new art system needed) so it reads as
+"generic, hover for details" automatically via the same shared tooltip every other icon in this
+app already has. Clicking a granted ability calls `handleItemActivation` — the exact same
+function a right-click already ran, so there's only ever one implementation of "what does using
+this item do" — and grays out (with a reason in its `title`) once its charges hit 0 or its own
+timer (`activeTimedEffects`) is still running, showing a live "1m"/"45s"-style countdown badge
+that clears the instant the effect actually expires. Verified live: a 3-charge ring correctly
+grays out after the 3rd use and stays grayed on a 4th attempt; a duration-based amulet grays out
+with a ticking cooldown badge and re-enables the instant `expiresAt` passes; the weapon Attack
+icon opens the same roll popup as before.
+
+**Fleshmancer's "Loot" button renamed "Attach," equips directly.** A grafted limb only ever has
+one sensible destination — worn — so treating it like ordinary loot (drop it in the inventory
+grid, make the player equip it as a separate step) was pure friction. `lootItemDirectly` gained
+an optional `preferEquip` argument that tries `equipTokenToFirstOpenSlot` before falling back to
+its existing inventory-placement logic (never lost, just not attached, if e.g. all 5 limb slots
+are already full); the new `attachFleshItem` (replacing `lootFleshItem`) passes it. Verified
+live: a test graft equipped straight to `limbArm1` with a "✓ ... attached." confirmation.
+
+**Removed 'terrain' as a modifier type for weapons and generated items.** Per direct request —
+not balanced against the catalog's other modifier types. Removed from `MOD_WEIGHT_DEFAULTS` (so
+it can never be selected at all, not just weighted to zero) and the `generateModifierOfType`
+branch that rolled it; `SYNERGY_RULES`' terrain boost/suppress entries and the storm/nature/void
+flavor text that promised terrain effects were cleaned up to match. A save from before this
+change gets its stale `modWeights.terrain` stripped on load. The Fleshmancer's own, entirely
+separate terrain-alteration system (its own independent weight table) is untouched — this was
+scoped to weapons/generated items specifically, per the request.
+
+**Player HP added to the persistent name banner.** The "🧑 PlayerName" badge (visible on every
+tab) now shows the player's own current/max HP alongside their name, color-coded the same
+full/hurt/low scheme as the DM's roster strip and the Players tab — updated everywhere
+`renderCharacterSheet` already runs, so it stays live through equipment changes, DM cross-writes,
+and potion effects alike.
+
+**Validation performed**: full suite still 168/168 (every change this pass is client-side only).
+The ability bar, Fleshmancer attach, terrain removal, and HP banner were all verified live in a
+running browser session against real equipped items and real generation output, not just read
+through.

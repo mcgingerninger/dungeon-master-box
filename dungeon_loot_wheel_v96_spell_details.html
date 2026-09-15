@@ -757,6 +757,24 @@
   }
   .icon-fx-legendary::before { animation: emberRiseA 2.1s ease-in infinite; }
   .icon-fx-legendary::after  { animation: emberRiseB 2.1s ease-in infinite 1.05s; }
+  /* Real bug found in testing: a reported "dragging an item freezes the app" that never showed
+     up as a slow synchronous function anywhere (every drag/drop handler measured well under 10ms
+     even against a heavily populated inventory) — the remaining, unreproducible-via-script
+     suspect is these two continuous, compositor-heavy animations (animated box-shadow blur +
+     filter:brightness, plus two more box-shadow-based pseudo-element animations on top) running
+     simultaneously on every legendary/celestial item's icon at once. A native HTML5 drag forces
+     the browser to repeatedly rasterize/composite the page for as long as the drag is in
+     progress, and doing that alongside several actively-animating blurred box-shadows is a
+     known source of exactly this kind of freeze on weaker/integrated GPUs. Paused for the
+     duration of any drag (dragging-item toggled on <body> by the two document-level
+     dragstart/dragend listeners just below) — cosmetic only, items simply stop shimmering for
+     the fraction of a second a drag is in progress. */
+  body.dragging-item .icon-fx-celestial,
+  body.dragging-item .icon-fx-legendary,
+  body.dragging-item .icon-fx-legendary::before,
+  body.dragging-item .icon-fx-legendary::after {
+    animation: none !important; box-shadow: none !important; filter: none !important;
+  }
 
   @keyframes textCelestialPulse {
     0%,100% { text-shadow:0 0 6px rgba(125,231,255,0.5), 0 0 12px rgba(125,231,255,0.25); }
@@ -1500,6 +1518,13 @@
   .sheet-ac-value { font-size:1.05rem; cursor:default; }
   .sheet-hp-bonus-note { font-size:0.68rem; font-weight:400; text-transform:none; letter-spacing:0; margin-left:0.2rem; }
   .equip-ac-readout { display:inline-block; background:var(--surface); border:1px solid var(--border); padding:0.4rem 0.8rem; margin-bottom:0.6rem; font-size:0.95rem; cursor:default; }
+  .ability-bar { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem; min-height:1px; }
+  .ability-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; width:52px; height:52px; background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:1.4rem; position:relative; padding:0; }
+  .ability-btn:hover { border-color:var(--gold); }
+  .ability-btn-label { font-size:0.55rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.02em; margin-top:1px; }
+  .ability-btn.ability-btn-disabled { opacity:0.4; cursor:not-allowed; filter:grayscale(1); }
+  .ability-btn.ability-btn-disabled:hover { border-color:var(--border); }
+  .ability-btn-cooldown { position:absolute; bottom:2px; right:3px; font-size:0.55rem; color:var(--gold); background:rgba(0,0,0,0.6); border-radius:3px; padding:0 2px; }
   .sheet-abilities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:0.5rem; margin-bottom:0.8rem; }
   .sheet-ability-box { background:var(--surface); border:1px solid var(--border); padding:0.45rem; text-align:center; }
   .sheet-ability-box label { display:block; font-size:0.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem; }
@@ -2287,7 +2312,7 @@
      multiplayer-sync.js's connectAsRole/logOut once an account is connected — see
      updatePlayerNameDisplay() there. -->
 <div class="inv-summary-bar" id="globalInvSummaryBar" style="margin-bottom:1rem;">
-  <span id="invPlayerNameWrap" style="display:none;">🧑 <strong id="invPlayerName"></strong></span>
+  <span id="invPlayerNameWrap" style="display:none;">🧑 <strong id="invPlayerName"></strong> <strong id="invPlayerHp"></strong></span>
   <span>💰 Inventory Value: <strong id="rollInvGp">0 gp</strong></span>
   <span>🎒 Inventory Slots: <strong id="rollInvSlots">0 / 90</strong></span>
   <span class="inv-weight-wrap">⚖ Inventory Weight: <strong id="rollInvWeight">0 lbs</strong>
@@ -2772,15 +2797,6 @@
           </div>
         </div>
         <div class="mw-card">
-          <h3>🗺 Terrain</h3>
-          <p class="mw-desc">Alters the physical environment. Radius and permanence scale with rarity.</p>
-          <div class="mw-row">
-            <label>Weight</label>
-            <input type="range" id="mw-terrain" min="0" max="20" value="2" oninput="updateMWDisplay('terrain')">
-            <span class="mw-val" id="mv-terrain">2</span>
-          </div>
-        </div>
-        <div class="mw-card">
           <h3>🗡 Skill</h3>
           <p class="mw-desc">Grants mastery of a combat or utility skill with a proficiency bonus.</p>
           <div class="mw-row">
@@ -2802,7 +2818,7 @@
 
       <div class="mw-total-row">
         <span>Total weight pool:</span>
-        <span class="mw-total-val" id="mw-total">40</span>
+        <span class="mw-total-val" id="mw-total">38</span>
         <span style="color:var(--text-dim);font-size:0.85rem;">· Relative, not percentages</span>
         <button class="mw-reset-btn" onclick="resetModWeights()">Reset Defaults</button>
       </div>
@@ -3405,6 +3421,14 @@
   <div class="equip-ac-readout" title="Computed from your ability scores and equipped gear — hover when green/red to see which item is affecting it.">
     🛡 Armor Class: <strong id="invEquipAcValue" class="sheet-ac-value">10</strong>
   </div>
+  <!-- Every equipped weapon (an Attack icon) and every equipped item with a usable granted
+       ability (a spell/power, a natural attack like a graft's bite, anything with charges or a
+       duration) gets a clickable icon here — see renderAbilityBar(). Hovering one reuses the
+       same shared item tooltip every other icon in this app already uses; clicking either opens
+       the weapon attack roll popup or activates the ability exactly like right-clicking its
+       equip slot always could, just surfaced somewhere players actually look. Grays out (and
+       shows why, via its own title) once its charges hit 0 or its own timer is still running. -->
+  <div class="ability-bar" id="inventoryAbilityBar"></div>
   <div class="player-top-row" ondragover="slotDragOver(event)" ondrop="smartEquipDrop(event)">
     <div class="player-board">
       <div class="player-doll">
@@ -4045,6 +4069,114 @@ function handleItemActivation(entry, evt) {
   if (evt) evt.preventDefault();
   if (dur) startTimedEffect(item, entry.key, entry.rarity, text, dur);
   return true;
+}
+
+// ===================== INVENTORY ABILITY BAR =====================
+// Per direct request: an equipped item granting a usable power (a spell, a natural attack like
+// a graft's bite, anything with charges or a duration — the exact same "would this do anything
+// on right-click" set handleItemActivation above already recognizes) previously had NO visible
+// way to actually use it beyond right-clicking its tiny equip-slot icon, which nothing in the UI
+// ever hinted was even possible — a player who equipped an item granting "Seal Bite" had no way
+// to discover, let alone use, that ability. This surfaces every one of those, plus a plain
+// Attack icon per equipped weapon, as a row of clickable icons on the Inventory tab itself.
+// Same-shaped non-mutating check as handleItemActivation's own precondition, so "does this item
+// show up in the bar at all" can never drift out of sync with "does right-clicking it do
+// anything" — one is just the read-only version of the other.
+function itemHasUsableAbility(item) {
+  if (!item) return false;
+  if (parseUsablePowers(item)) return true;
+  const text = getItemEffectText(item);
+  return !!parseDurationMs(text) || !!item.charges;
+}
+function itemChargesLeft(item) {
+  if (!item || !item.charges) return null;
+  const m = FLAT_CHARGE_RE.exec(item.charges);
+  return m ? parseInt(m[0], 10) : null;
+}
+// A duration-based ability that's currently running (see startTimedEffect) reads as "on
+// cooldown" here — the item did something and that something is still in effect, so activating
+// it again right away would just restart the same timer pointlessly. Returns the remaining ms
+// (for the countdown label) or null if it isn't running.
+function abilityCooldownMsLeft(key, text) {
+  const running = activeTimedEffects.find(e => e.key === key && e.text === text);
+  if (!running) return null;
+  const left = running.expiresAt - Date.now();
+  return left > 0 ? left : null;
+}
+// Short "2m 14s"-style label for the bar's cooldown badge — deliberately terser than
+// formatRemainingTime's own "2h 14m" (this badge has maybe 4 characters of room).
+function abilityCooldownLabel(ms) {
+  const totalSec = Math.ceil(ms / 1000);
+  if (totalSec >= 3600) return Math.ceil(totalSec / 3600) + 'h';
+  if (totalSec >= 60) return Math.ceil(totalSec / 60) + 'm';
+  return totalSec + 's';
+}
+// One icon per equipped weapon slot (an Attack action, reusing the exact same self-roll popup
+// the Character Sheet/Inventory's own weapon info section already offers) plus one icon per
+// equipped item with a usable granted ability. weapon1/weapon2 are deduped exactly like
+// uniqueEquippedSlotEntries does for a two-hander occupying both.
+function renderAbilityBar() {
+  const bar = document.getElementById('inventoryAbilityBar');
+  if (!bar) return;
+  buildTokenIndex();
+  const seenWeaponKeys = new Set();
+  const html = [];
+  Object.keys(SLOT_CATEGORY).forEach(slotId => {
+    const key = playerSlots[slotId];
+    if (!key) return;
+    const entry = TOKEN_INDEX[key];
+    if (!entry) return;
+    const item = entry.item;
+    const isWeapon = (slotId === 'weapon1' || slotId === 'weapon2') && String(item.dmg || '').trim();
+    if (isWeapon) {
+      if (seenWeaponKeys.has(key)) return; // two-handed weapon occupies both slots
+      seenWeaponKeys.add(key);
+      html.push(`<button class="ability-btn" onclick="rollEquippedWeaponAttack('${slotId}')"
+        onmouseenter="showTokenTooltip(event,'${key.replace(/'/g, "\\'")}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">
+        ${itemPixelIcon(item, 26, entry.rarity)}<span class="ability-btn-label">Attack</span>
+      </button>`);
+      return;
+    }
+    if (!itemHasUsableAbility(item)) return;
+    const text = getItemEffectText(item);
+    const chargesLeft = itemChargesLeft(item);
+    const cooldownMs = abilityCooldownMsLeft(key, text);
+    const outOfCharges = chargesLeft === 0;
+    const disabled = outOfCharges || cooldownMs != null;
+    const reason = outOfCharges ? 'No charges left' : cooldownMs != null ? `Recharging — ${abilityCooldownLabel(cooldownMs)} left` : '';
+    html.push(`<button class="ability-btn${disabled ? ' ability-btn-disabled' : ''}" ${disabled ? 'disabled' : `onclick="activateAbilityFromBar('${slotId}')"`}
+      onmouseenter="showTokenTooltip(event,'${key.replace(/'/g, "\\'")}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()"
+      ${reason ? `title="${escapeHtml(reason)}"` : ''}>
+      ${itemPixelIcon(item, 26, entry.rarity)}<span class="ability-btn-label">${escapeHtml(item.name.split(',')[0].split(' of ')[0].slice(0, 10))}</span>
+      ${cooldownMs != null ? `<span class="ability-btn-cooldown">${abilityCooldownLabel(cooldownMs)}</span>` : ''}
+    </button>`);
+  });
+  bar.innerHTML = html.join('');
+}
+// Click handler for a granted-ability icon on the bar — reuses handleItemActivation (the exact
+// same logic a right-click on the equip slot already ran) so activating it here spends the same
+// charge / starts the same timer / opens the same multi-power picker, never a second, parallel
+// implementation of "what does using this item actually do."
+function activateAbilityFromBar(slotId) {
+  const key = playerSlots[slotId];
+  const entry = key && TOKEN_INDEX[key];
+  if (!entry) return;
+  if (handleItemActivation(entry, null)) {
+    if (itemShouldCrumble(entry.item)) {
+      const name = entry.item.name;
+      clearActiveEffectsForKey(key);
+      removeTokenEverywhere(key);
+      renderPlayerSlots();
+      renderActiveEffects();
+      updateInventorySummary();
+      flashInvMessage(`${name} crumbles to dust.`);
+      return;
+    }
+    renderPlayerSlots();
+    renderActiveEffects();
+    updateInventorySummary();
+    flashInvMessage(`${entry.item.name} used.`);
+  }
 }
 // ---------- Power picker popup ----------
 let _powerPickerEntry = null;
@@ -7380,13 +7512,12 @@ function generateModifierOfType(type, rarity, usedKeys = []) {
     const summonDur = pickSummonDuration(rarity);
     return { type:'Summon', key:'summon:'+entity, text:`Summons <strong>${formatSummonLabel(entity, count)}</strong> for <strong>${summonDur}</strong>. ${count>1?'They follow':'It follows'} reasonable commands and ${count>1?'vanish':'vanishes'} when the duration ends.` };
   }
-  if (type === 'terrain') {
-    const alts = GEN.terrainAlterations.filter(a => !usedKeys.includes('terrain:'+a));
-    if (!alts.length) return null;
-    const alt = pickTier(alts, rarity);
-    const radius = ['20 feet','60 feet','150 feet','500 feet','1 mile','5 miles'][idx];
-    return { type:'Terrain', key:'terrain:'+alt, text:`<strong>${alt.charAt(0).toUpperCase()+alt.slice(1)}</strong> within a <strong>${radius}</strong> area. ${dur==='permanently'?'The alteration is permanent.':`The change lasts for ${dur}.`}` };
-  }
+  // 'terrain' (permanent/temporary area terrain alterations) was removed from this generator
+  // per direct request — not balanced against the other modifier types weapons and generated
+  // items can roll. Also removed from MOD_WEIGHT_DEFAULTS/SYNERGY_RULES below, so it can never
+  // be selected in the first place, not just silently no-op here if it somehow still were. The
+  // Fleshmancer's own, entirely separate terrain-alteration branch (further down this file) is
+  // untouched — this removal is scoped to weapons/generated items specifically, per the request.
   return null;
 }
 
@@ -7462,7 +7593,14 @@ function flashRecentlyLootedMessage(msg, isError) {
 // way skipping the pen entirely could have caused. Returns { item: saved, placed, viaFallback }
 // so callers that don't pass a button (Fleshmancer's saveFleshItem, for one) can still tell the
 // player exactly where the item ended up.
-function lootItemDirectly(item, btn) {
+// preferEquip (Fleshmancer's "Attach" button — see attachFleshItem below): tries equipping the
+// item straight to its matching body slot BEFORE falling back to the normal inventory-placement
+// path below. A grafted limb sitting loose in the inventory grid does nothing — the whole point
+// of the Fleshmancer is wearing the thing — so "loot it like any other item" was real friction
+// for something that only ever has one obviously-correct destination. Falls through to the
+// ordinary placement logic if there's no open matching slot (e.g. all 5 limb slots already
+// full), so nothing is ever lost just because attaching wasn't possible right now.
+function lootItemDirectly(item, btn, preferEquip) {
   if (!item) return { item: null, placed: false, viaFallback: false };
   const saved = { ...item, id: Date.now() + Math.random() };
   inferItemMetadata(saved);
@@ -7470,6 +7608,11 @@ function lootItemDirectly(item, btn) {
   if (typeof renderSavedItems === 'function') renderSavedItems();
   buildTokenIndex();
   const key = 'gen:' + saved.id;
+  if (preferEquip && equipTokenToFirstOpenSlot(key)) {
+    renderInventoryTokenGrid();
+    if (btn) { btn.textContent = '✓ Attached'; btn.disabled = true; btn.classList.add('saved'); }
+    return { item: saved, placed: true, viaFallback: false, equipped: true };
+  }
   const w = Math.min(3, Math.max(1, saved.slotSize || 1));
   const spot = findFirstOpenInventorySpot(w);
   if (spot && placeNewInventoryItem(key, spot.row, spot.col)) {
@@ -8507,8 +8650,8 @@ function renderFleshWorkshop() {
   }
 }
 // The actual commit — deterministic, no roll, no rejection chance (unlike attemptFleshAttach
-// below). Shares the exact same _pendingFleshItem / #fleshResult / Save-Loot-Discard commit
-// pattern the random-roll flow uses (see saveFleshItem/lootFleshItem/discardFleshItem), so
+// below). Shares the exact same _pendingFleshItem / #fleshResult / Save-Attach-Discard commit
+// pattern the random-roll flow uses (see saveFleshItem/attachFleshItem/discardFleshItem), so
 // both paths end the same way regardless of how the graft was produced.
 function reworkPartIntoGraft() {
   buildTokenIndex();
@@ -8568,7 +8711,7 @@ function reworkPartIntoGraft() {
       </div>
       <div class="item-card-actions" id="fleshSaveActions">
         ${isRealPlayerAccount() ? '' : '<button class="ic-action-btn" onclick="saveFleshItem()">💾 Save</button>'}
-        <button class="ic-action-btn" onclick="lootFleshItem()">🎒 Loot</button>
+        <button class="ic-action-btn" onclick="attachFleshItem()">🩹 Attach</button>
         <button class="ic-action-btn" onclick="discardFleshItem()">🗑 Discard</button>
       </div>
     </div>
@@ -8664,7 +8807,7 @@ function attemptFleshAttach() {
       </div>
       <div class="item-card-actions" id="fleshSaveActions">
         ${isRealPlayerAccount() ? '' : '<button class="ic-action-btn" onclick="saveFleshItem()">💾 Save</button>'}
-        <button class="ic-action-btn" onclick="lootFleshItem()">🎒 Loot</button>
+        <button class="ic-action-btn" onclick="attachFleshItem()">🩹 Attach</button>
         <button class="ic-action-btn" onclick="discardFleshItem()">🗑 Discard</button>
       </div>
     </div>
@@ -8685,17 +8828,24 @@ function saveFleshItem() {
   if (actionsEl) actionsEl.innerHTML = `<span style="color:var(--uncommon);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} saved to your Token Library.</span>`;
   _pendingFleshItem = null;
 }
-function lootFleshItem() {
+// Per direct request: a grafted limb only ever has one obviously-correct destination (worn),
+// so this equips it straight to its matching Limb slot instead of just dropping it loose in the
+// inventory grid the way every other "Loot" button in the app does. Falls back to the normal
+// inventory-placement path (see lootItemDirectly's preferEquip) only if there's no open slot for
+// it right now (e.g. all 5 limb slots already full) — never lost, just not attached yet.
+function attachFleshItem() {
   if (!_pendingFleshItem) return;
   const item = _pendingFleshItem;
   const actionsEl = document.getElementById('fleshSaveActions');
-  const { placed, viaFallback } = lootItemDirectly(item, null);
+  const { placed, viaFallback, equipped } = lootItemDirectly(item, null, true);
   if (actionsEl) {
-    actionsEl.innerHTML = placed
-      ? (viaFallback
-        ? `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} sent to Recently Looted — your inventory is full.</span>`
-        : `<span style="color:var(--uncommon);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} added to your inventory.</span>`)
-      : `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} saved — inventory and Recently Looted are both full, so it's waiting in the Token Library instead.</span>`;
+    actionsEl.innerHTML = equipped
+      ? `<span style="color:var(--uncommon);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} attached.</span>`
+      : placed
+        ? (viaFallback
+          ? `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} sent to Recently Looted — no open limb slot and your inventory is full.</span>`
+          : `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} added to your inventory — no open limb slot to attach it to right now.</span>`)
+        : `<span style="color:var(--gold);font-size:0.85rem;align-self:center;">✓ ${escapeHtml(item.name)} saved — inventory and Recently Looted are both full, so it's waiting in the Token Library instead.</span>`;
   }
   _pendingFleshItem = null;
 }
@@ -9981,6 +10131,11 @@ setInterval(() => {
   } else if (typeof renderActiveEffectsDisplay === 'function') {
     renderActiveEffectsDisplay();
   }
+  // The ability bar's own cooldown badge (see renderAbilityBar) needs the same live per-second
+  // countdown, and needs to un-gray the button the instant its timer actually expires — every
+  // tick, not just the ones where something expired, since the badge text itself changes every
+  // second regardless.
+  if (typeof renderAbilityBar === 'function') renderAbilityBar();
 }, 1000);
 
 // Double-click detection using native dblclick event.
@@ -10006,8 +10161,10 @@ document.getElementById('spinBtn').addEventListener('dblclick', (e) => {
 });
 
 // ===================== MODIFIER WEIGHTS =====================
-// Default weights — spells and buffs heavier than others
-const MOD_WEIGHT_DEFAULTS = { power:8, buff:7, debuff:5, trait:4, skill:4, monsterskill:4, transform:3, summon:3, terrain:2 };
+// Default weights — spells and buffs heavier than others. No 'terrain' entry (removed per
+// direct request — see generateModifierOfType's own comment on why) — a key simply absent here
+// never enters modWeights at all, so it can never be picked by pickWeightedType below.
+const MOD_WEIGHT_DEFAULTS = { power:8, buff:7, debuff:5, trait:4, skill:4, monsterskill:4, transform:3, summon:3 };
 let modWeights = { ...MOD_WEIGHT_DEFAULTS };
 
 function updateMWDisplay(key) {
@@ -10074,17 +10231,20 @@ function detectTags(name) {
 }
 
 // Synergy rules: tag → which modifier categories get boosted and which get suppressed
+// terrain boost/suppress entries removed (see MOD_WEIGHT_DEFAULTS' own comment) — storm/
+// nature/void's flavor text no longer promises terrain effects specifically, since that type
+// can no longer roll at all; their other boosted types still apply exactly as before.
 const SYNERGY_RULES = {
-  fire:   { boost: { power:2.5, buff:1.5 }, suppress: { terrain:0.5 }, flavor:'fire-attuned; spell power and combat buffs are amplified' },
-  cold:   { boost: { power:2.5, debuff:1.8 }, suppress: { terrain:0.5 }, flavor:'cold-attuned; spells and debuffs carry frost\'s chilling edge' },
-  storm:  { boost: { power:2.0, terrain:1.8 }, suppress: {}, flavor:'storm-attuned; spells and terrain effects crackle with electricity' },
+  fire:   { boost: { power:2.5, buff:1.5 }, suppress: {}, flavor:'fire-attuned; spell power and combat buffs are amplified' },
+  cold:   { boost: { power:2.5, debuff:1.8 }, suppress: {}, flavor:'cold-attuned; spells and debuffs carry frost\'s chilling edge' },
+  storm:  { boost: { power:2.0 }, suppress: {}, flavor:'storm-attuned; spells crackle with electricity' },
   shadow: { boost: { transform:2.0, debuff:2.0, power:1.5 }, suppress: { summon:0.4 }, flavor:'shadow-attuned; transforms and debuffs draw from the dark' },
   holy:   { boost: { buff:2.5, power:2.0, summon:1.5 }, suppress: { transform:0.3, debuff:0.6 }, flavor:'holy-attuned; buffs and divine spells shine brightest' },
-  arcane: { boost: { power:3.0, skill:1.5, buff:1.3 }, suppress: { terrain:0.5 }, flavor:'arcane-attuned; spell power is strongly favored across all rolls' },
-  nature: { boost: { transform:2.5, terrain:2.5, buff:1.5 }, suppress: { void:0.3 }, flavor:'nature-attuned; terrain reshaping and wild form transforms dominate' },
-  void:   { boost: { summon:2.5, terrain:2.0, debuff:1.8 }, suppress: { holy:0.2, buff:0.7 }, flavor:'void-attuned; summons, terrain tears, and curses pull from the abyss' },
-  melee:  { boost: { buff:2.0, skill:2.0, debuff:1.3 }, suppress: { terrain:0.5 }, flavor:'melee weapon; close-combat skills and stat buffs are prioritized' },
-  ranged: { boost: { skill:2.0, buff:1.8, power:1.5 }, suppress: { terrain:0.5 }, flavor:'ranged weapon; precision skills and spell riders are favored' },
+  arcane: { boost: { power:3.0, skill:1.5, buff:1.3 }, suppress: {}, flavor:'arcane-attuned; spell power is strongly favored across all rolls' },
+  nature: { boost: { transform:2.5, buff:1.5 }, suppress: { void:0.3 }, flavor:'nature-attuned; wild form transforms dominate' },
+  void:   { boost: { summon:2.5, debuff:1.8 }, suppress: { holy:0.2, buff:0.7 }, flavor:'void-attuned; summons and curses pull from the abyss' },
+  melee:  { boost: { buff:2.0, skill:2.0, debuff:1.3 }, suppress: {}, flavor:'melee weapon; close-combat skills and stat buffs are prioritized' },
+  ranged: { boost: { skill:2.0, buff:1.8, power:1.5 }, suppress: {}, flavor:'ranged weapon; precision skills and spell riders are favored' },
 };
 
 function buildWeightedModPool(tags) {
@@ -12456,6 +12616,15 @@ function renderCharacterSheet() {
   const sheet = computeCharacterSheet();
   syncCharacterAc(sheet);
   syncCharacterMaxHp(sheet);
+  // The persistent "🧑 PlayerName" badge (visible on every tab, not just the Character Sheet)
+  // gets the player's own current HP alongside their name, color-coded the same way the DM's
+  // roster strip and the Players tab already are — a player glancing at any other tab shouldn't
+  // have to flip back to the Character Sheet just to check how hurt they are.
+  const hpBannerEl = document.getElementById('invPlayerHp');
+  if (hpBannerEl) {
+    hpBannerEl.textContent = `${characterCurrentHp}/${sheet.maxHp.total} HP`;
+    hpBannerEl.className = hpColorClass(characterCurrentHp, sheet.maxHp.total);
+  }
   const profBonusEl = document.getElementById('sheetProfBonus');
   if (profBonusEl) profBonusEl.textContent = fmtMod(sheet.profBonus);
 
@@ -12592,6 +12761,7 @@ function renderPlayerSlots() {
   // the Inventory tab's own live AC readout, and characterAc for multiplayer/DM targeting)
   // in sync immediately, even while the Sheet sub-view isn't the one currently visible.
   if (typeof renderCharacterSheet === 'function') renderCharacterSheet();
+  if (typeof renderAbilityBar === 'function') renderAbilityBar();
   if (typeof scheduleSave === 'function') scheduleSave();
 }
 
@@ -12828,12 +12998,17 @@ document.addEventListener('dragend', () => {
   _draggedTokenKey = null;
   _draggedInvPlacement = null;
   _draggedSlotId = null;
+  document.body.classList.remove('dragging-item');
 }, true);
 // The tooltip is shown by onmouseenter/onmousemove on the card being dragged — starting a
 // drag doesn't fire a mouseleave on it in every browser, so without this it stayed visible,
 // fixed in place at wherever the cursor was when the drag began, floating over the drop
 // target and the rest of the screen for the whole drag instead of getting out of the way.
 document.addEventListener('dragstart', hideTokenTooltip, true);
+// See the .dragging-item CSS override up near icon-fx-legendary/icon-fx-celestial for why this
+// exists — pauses every legendary/celestial item's continuous glow animation for as long as any
+// drag is in progress, app-wide, regardless of what's actually being dragged.
+document.addEventListener('dragstart', () => document.body.classList.add('dragging-item'), true);
 window.addEventListener('scroll', hideTokenTooltip, true);
 // Same tooltip as the Token Library/Inventory (buildTooltipHtml), but for an item that isn't
 // in TOKEN_INDEX at all — combat loot (entry.loot.items) is generated fresh per kill and never
@@ -21333,7 +21508,13 @@ function applyStateBlob(data) {
   if (data.combatLootSettings) combatLootSettings = data.combatLootSettings;
   if (data.chestLootSettings) chestLootSettings = data.chestLootSettings;
   if (data.corpseLootSettings) corpseLootSettings = data.corpseLootSettings;
-  if (data.modWeights) modWeights = data.modWeights;
+  if (data.modWeights) {
+    modWeights = data.modWeights;
+    // A save from before 'terrain' was removed as a modifier type (see MOD_WEIGHT_DEFAULTS'
+    // own comment) could still carry a stale terrain weight — strip it so an old save can't
+    // keep rolling it after the fact.
+    delete modWeights.terrain;
+  }
   if (data.fleshModWeights) fleshModWeights = data.fleshModWeights;
   if (data.characterAbilityScores) characterAbilityScores = data.characterAbilityScores;
   if (typeof data.characterLevel === 'number') characterLevel = data.characterLevel;
