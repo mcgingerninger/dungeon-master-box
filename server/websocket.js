@@ -268,7 +268,10 @@ export function createWebSocketServer(db, httpServer) {
       const maxHp = typeof s.characterMaxHpEffective === 'number' ? s.characterMaxHpEffective : s.characterMaxHp;
       const currentHp = typeof s.characterCurrentHp === 'number' && typeof maxHp === 'number'
         ? Math.max(0, Math.min(s.characterCurrentHp, maxHp)) : s.characterCurrentHp;
-      roster.push({ uid: accountUid, username: entry.username || 'Unnamed', role: 'player', currentHp, maxHp, ac: s.characterAc });
+      roster.push({
+        uid: accountUid, username: entry.username || 'Unnamed', role: 'player', currentHp, maxHp, ac: s.characterAc,
+        characterClass: s.characterClass, characterRace: s.characterRace, characterAffinity: s.characterAffinity,
+      });
     }
     return roster;
   }

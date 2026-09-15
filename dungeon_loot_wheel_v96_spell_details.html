@@ -1469,6 +1469,23 @@
   /* ===================== INVENTORY TAB ===================== */
   .inv-summary-bar { display:flex; align-items:center; gap:1.5rem; background:var(--surface); border:1px solid var(--border); padding:0.8rem 1rem; margin-bottom:1rem; flex-wrap:wrap; font-size:0.92rem; color:var(--text-dim); }
   .inv-summary-bar strong { color:var(--gold); }
+  .inv-weight-wrap { display:inline-flex; align-items:center; gap:0.5rem; }
+  .inv-weight-bar-outer { display:inline-block; width:90px; height:8px; background:var(--bg); border:1px solid var(--border); vertical-align:middle; cursor:help; }
+  .inv-weight-bar-inner { display:block; height:100%; background:var(--uncommon); transition:width 0.2s, background 0.2s; }
+  .inv-weight-bar-inner.weight-encumbered { background:var(--gold); }
+  .inv-weight-bar-inner.weight-overloaded { background:var(--danger); }
+
+  /* ---- DM-only persistent player roster strip (above the inventory summary bar) ---- */
+  .dm-roster-bar { display:flex; align-items:center; gap:0.6rem; background:var(--surface); border:1px solid var(--border); padding:0.6rem 1rem; margin-bottom:0.7rem; flex-wrap:wrap; font-size:0.88rem; }
+  .dm-roster-chip { display:flex; align-items:center; gap:0.4rem; background:var(--bg); border:1px solid var(--border); border-radius:5px; padding:0.3rem 0.6rem; cursor:help; }
+  .dm-roster-chip-name { color:var(--gold); font-weight:600; }
+  .dm-roster-empty { color:var(--text-dim); font-style:italic; }
+  /* Shared HP color-coding — the DM roster strip chips, the Players tab list, and the DM edit
+     modal's HP field all use these same three classes so "full/hurt/low" reads identically
+     everywhere a player's current HP is shown. */
+  .hp-color-full { color:var(--uncommon); font-weight:600; }
+  .hp-color-hurt { color:var(--gold); font-weight:600; }
+  .hp-color-low { color:var(--danger); font-weight:700; }
 
   /* ---- Character Sheet sub-tab (shares the Inventory tab) ---- */
   .sheet-top-row { display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.7rem; align-items:flex-end; }
@@ -2253,6 +2270,16 @@
   <button class="tab-btn" id="battlefieldTabBtn" style="display:none;" onclick="showTab('battlefield',this)">🗺 Battlefield</button>
 </div>
 
+<!-- DM-only persistent roster strip — same "sibling of the tabs, outside every .tab-content"
+     placement as globalInvSummaryBar below (and deliberately ABOVE it, so it reads as the DM's
+     own always-visible "who's at the table" line before anything inventory-related). Hidden
+     entirely for a connected player (toggled alongside body.role-player — see
+     renderDmPlayerRosterBar) and for solo/guest play with nobody connected. Each chip's hover
+     tooltip (showPlayerRosterTooltip, reusing the same shared #itemTooltip element every other
+     hover tooltip in this app already uses) carries the fuller AC/Race/Class/Affinity detail
+     that doesn't fit in the compact chip itself. -->
+<div class="dm-roster-bar" id="dmRosterBar" style="display:none;"></div>
+
 <!-- Persistent inventory summary — deliberately OUTSIDE every .tab-content div (a sibling of
      the tabs themselves, not nested in any one of them) so it stays visible no matter which
      tab is active, instead of only showing up on the Loot and Inventory tabs. The player-name
@@ -2263,7 +2290,11 @@
   <span id="invPlayerNameWrap" style="display:none;">🧑 <strong id="invPlayerName"></strong></span>
   <span>💰 Inventory Value: <strong id="rollInvGp">0 gp</strong></span>
   <span>🎒 Inventory Slots: <strong id="rollInvSlots">0 / 90</strong></span>
-  <span>⚖ Inventory Weight: <strong id="rollInvWeight">0 lbs</strong></span>
+  <span class="inv-weight-wrap">⚖ Inventory Weight: <strong id="rollInvWeight">0 lbs</strong>
+    <span class="inv-weight-bar-outer" id="invWeightBarOuter" title="Carrying capacity (5e rule: Strength score × 15 lbs)">
+      <span class="inv-weight-bar-inner" id="invWeightBarInner"></span>
+    </span>
+  </span>
   <span>🪙 Gold: <strong id="globalGoldDisplay">0 gp</strong></span>
 </div>
 
@@ -2897,7 +2928,7 @@
   </div>
   <div class="spells-controls">
     <input id="spellSearch" type="text" placeholder="Search spell name, source, damage, condition, description…" oninput="renderSpellTable()">
-    <select id="spellRuleset" onchange="loadSpellDatabase(true)"><option value="2014">2014 5e + supplements</option><option value="2024">2024 rules</option><option value="both" selected>Both rulesets</option></select>
+    <select id="spellRuleset" onchange="loadSpellDatabase(true)"><option value="2014" selected>2014 5e + supplements</option><option value="2024">2024 rules</option><option value="both">Both rulesets</option></select>
     <select id="spellLevelFilter" onchange="renderSpellTable()"><option value="all">All Levels</option><option value="0">Cantrip</option><option value="1">1st</option><option value="2">2nd</option><option value="3">3rd</option><option value="4">4th</option><option value="5">5th</option><option value="6">6th</option><option value="7">7th</option><option value="8">8th</option><option value="9">9th</option></select>
     <select id="spellSchoolFilter" onchange="renderSpellTable()"><option value="all">All Schools</option><option>Abjuration</option><option>Conjuration</option><option>Divination</option><option>Enchantment</option><option>Evocation</option><option>Illusion</option><option>Necromancy</option><option>Transmutation</option><option>Psionic</option></select>
     <select id="spellCastFilter" onchange="renderSpellTable()"><option value="all">All Casting Times</option><option>Action</option><option>Bonus Action</option><option>Reaction</option><option>Minute</option><option>10 Minutes</option><option>Hour</option><option>8 Hours</option><option>12 Hours</option><option>24 Hours</option></select>
@@ -3197,7 +3228,9 @@
     <div class="edit-modal-header"><h3>✎ Edit <span id="dmEditPlayerName"></span>'s Character</h3><button class="edit-modal-close" onclick="closeDmEditPlayerModal()">×</button></div>
     <div class="edit-modal-body">
       <div class="sheet-top-row">
+        <div class="sheet-field"><label>Race</label><input type="text" id="dmEditRace" placeholder="e.g. Human"></div>
         <div class="sheet-field"><label>Class</label><input type="text" id="dmEditClass" placeholder="e.g. Fighter"></div>
+        <div class="sheet-field"><label>Affinity</label><input type="text" id="dmEditAffinity" placeholder="e.g. Fire"></div>
         <div class="sheet-field"><label>Level</label><input type="number" id="dmEditLevel" min="1" max="20"></div>
         <div class="sheet-field"><label>Hit Dice <span class="sheet-hp-bonus-note">(short rest healing)</span></label><input type="text" id="dmEditHitDice" placeholder="e.g. 3d8" title="Class hit die × level (e.g. 3d8 for a level-3 Fighter) — for reference when the player spends Hit Dice on a short rest."></div>
       </div>
@@ -3441,8 +3474,16 @@
     </div>
     <div class="sheet-top-row">
       <div class="sheet-field">
+        <label>Race</label>
+        <input type="text" id="sheetRace" placeholder="e.g. Human" oninput="updateCharacterField('characterRace', this.value)">
+      </div>
+      <div class="sheet-field">
         <label>Class</label>
         <input type="text" id="sheetClass" placeholder="e.g. Fighter" oninput="updateCharacterField('characterClass', this.value)">
+      </div>
+      <div class="sheet-field">
+        <label>Affinity</label>
+        <input type="text" id="sheetAffinity" placeholder="e.g. Fire" oninput="updateCharacterField('characterAffinity', this.value)">
       </div>
       <div class="sheet-field sheet-field-narrow">
         <label>Level</label>
@@ -9934,6 +9975,9 @@ setInterval(() => {
   activeTimedEffects = activeTimedEffects.filter(e => e.expiresAt > now);
   if (activeTimedEffects.length !== before) {
     if (typeof renderActiveEffects === 'function') renderActiveEffects();
+    // A Strength-affecting potion (or any stat-affecting effect) wearing off changes carrying
+    // capacity — see updateInventoryWeightBar's use of the effective, not just base, score.
+    if (typeof updateInventorySummary === 'function') updateInventorySummary();
   } else if (typeof renderActiveEffectsDisplay === 'function') {
     renderActiveEffectsDisplay();
   }
@@ -11395,11 +11439,13 @@ function slotContextMenu(evt, slotId) {
       removeTokenEverywhere(key);
       renderPlayerSlots();
       renderActiveEffects();
+      updateInventorySummary(); // a temporary Strength effect starting/ending changes carry capacity
       flashInvMessage(`${name} crumbles to dust.`);
       return;
     }
     renderPlayerSlots();
     renderActiveEffects();
+    updateInventorySummary(); // a temporary Strength effect starting/ending changes carry capacity
     showTokenTooltip(evt, key); // refresh the tooltip in place so the new count is visible immediately
     return;
   }
@@ -11890,6 +11936,41 @@ function updateInventorySummary() {
   if (rollGpEl) rollGpEl.textContent = gpText;
   if (rollSlotsEl) rollSlotsEl.textContent = slotsText;
   if (rollWeightEl) rollWeightEl.textContent = weightText;
+  updateInventoryWeightBar(totalWeight);
+}
+// 5e's carrying-capacity rule (PHB): a character can carry up to Strength score x 15 lbs.
+// The optional Variant Encumbrance rule most tables actually use alongside it splits that
+// range into three bands — this reuses those exact thresholds (Str x5 / x10 / x15) as the
+// bar's three color tiers rather than inventing new numbers, since a DM already familiar with
+// the rule reads the color the same way they'd read the raw math: green (unencumbered) up to
+// Str x5, gold (Encumbered, -10 ft. speed) up to Str x10, red (Heavily Encumbered, -20 ft.
+// speed, disadvantage on Strength/Dexterity/Constitution checks, saves, and attacks) up to the
+// Str x15 hard cap — and stays red, maxed out, if something ever pushes total weight past that
+// cap outright (this app doesn't block adding an item by weight, so that's reachable).
+function carryCapacityTiers(strScore) {
+  const str = strScore != null ? strScore : 10;
+  return { encumbered: str * 5, heavy: str * 10, max: str * 15 };
+}
+function updateInventoryWeightBar(totalWeight) {
+  const outer = document.getElementById('invWeightBarOuter');
+  const inner = document.getElementById('invWeightBarInner');
+  if (!outer || !inner) return;
+  // Effective Strength (base + gear + any active potion/effect override — see
+  // computeCharacterSheetFor's set-value override support), not just the raw typed base: a
+  // Potion of Storm Giant Strength raising Strength to 29 should raise carrying capacity right
+  // along with it, same as it would at the table.
+  const str = typeof computeCharacterSheet === 'function' ? computeCharacterSheet().abilities.str.total
+    : ((typeof characterAbilityScores !== 'undefined' && characterAbilityScores) ? characterAbilityScores.str : 10);
+  const tiers = carryCapacityTiers(str);
+  const pct = tiers.max > 0 ? Math.min(100, (totalWeight / tiers.max) * 100) : 0;
+  inner.style.width = pct + '%';
+  inner.classList.remove('weight-encumbered', 'weight-overloaded');
+  if (totalWeight > tiers.heavy) inner.classList.add('weight-overloaded');
+  else if (totalWeight > tiers.encumbered) inner.classList.add('weight-encumbered');
+  const statusText = totalWeight > tiers.heavy ? 'Heavily Encumbered (-20 ft. speed, disadvantage on STR/DEX/CON checks, saves, and attacks)'
+    : totalWeight > tiers.encumbered ? 'Encumbered (-10 ft. speed)'
+    : 'Unencumbered';
+  outer.title = `${statusText} — carrying ${totalWeight} / ${tiers.max} lbs max (Strength ${str} × 15). Encumbered past ${tiers.encumbered} lbs, Heavily Encumbered past ${tiers.heavy} lbs.`;
 }
 
 // ---------- Saved loadouts ----------
@@ -11987,6 +12068,8 @@ let characterAc = 10;
 // synced fields rather than recomputing a full sheet, see the correct number too.
 let characterMaxHpEffective = 10;
 let characterClass = '';
+let characterRace = '';
+let characterAffinity = '';
 
 // Extracted to game-engine.js in Phase 1 of the architecture migration (see
 // docs/ARCHITECTURE.md): ABILITY_NAMES, SKILL_ABILITY_MAP, SHEET_STAT_ALIASES,
@@ -12255,7 +12338,7 @@ function closeDiceRoller() {
 // where the rest of its dependency chain was removed for the full explanation.
 function computeCharacterSheet() {
   buildTokenIndex();
-  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp);
+  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, activeTimedEffects);
 }
 // Not a dynamic window[field] = value assignment — these are `let` bindings in a classic
 // script, which (unlike `var` or function declarations) never attach to `window`, so that
@@ -12263,6 +12346,8 @@ function computeCharacterSheet() {
 // variable at all.
 function updateCharacterField(field, value) {
   if (field === 'characterClass') characterClass = value;
+  else if (field === 'characterRace') characterRace = value;
+  else if (field === 'characterAffinity') characterAffinity = value;
   else if (field === 'characterLevel') characterLevel = value;
   else if (field === 'characterHitDice') characterHitDice = value;
   // Clamped against the gear-inclusive effective ceiling, not the raw typed base — otherwise a
@@ -12284,6 +12369,9 @@ function updateCharacterField(field, value) {
 function updateAbilityScore(abbr, value) {
   characterAbilityScores[abbr] = parseInt(value, 10) || 10;
   renderCharacterSheet();
+  // Carrying capacity scales off Strength specifically — a change to it needs the weight bar
+  // re-evaluated even though nothing in the inventory itself changed.
+  if (abbr === 'str' && typeof updateInventorySummary === 'function') updateInventorySummary();
   if (typeof scheduleSave === 'function') scheduleSave();
 }
 function toggleSkillProficiency(skill) {
@@ -12347,7 +12435,9 @@ function statValueHtml(value, stat) {
   return `<span class="sheet-line-val${cls}"${title}>${value}</span>`;
 }
 function renderCharacterSheet() {
+  const raceEl = document.getElementById('sheetRace');
   const classEl = document.getElementById('sheetClass');
+  const affinityEl = document.getElementById('sheetAffinity');
   const levelEl = document.getElementById('sheetLevel');
   const hitDiceEl = document.getElementById('sheetHitDice');
   const curHpEl = document.getElementById('sheetCurHp');
@@ -12355,7 +12445,9 @@ function renderCharacterSheet() {
   if (!classEl) return; // sheet panel not in the DOM yet (shouldn't happen, but stay defensive)
   // Only overwrite an input's value when it's not the one currently focused — otherwise every
   // keystroke into e.g. Level would fight the render triggered by that same keystroke.
+  if (raceEl && document.activeElement !== raceEl) raceEl.value = characterRace || '';
   if (document.activeElement !== classEl) classEl.value = characterClass || '';
+  if (affinityEl && document.activeElement !== affinityEl) affinityEl.value = characterAffinity || '';
   if (document.activeElement !== levelEl) levelEl.value = characterLevel || 1;
   if (document.activeElement !== hitDiceEl) hitDiceEl.value = characterHitDice || '';
   if (document.activeElement !== curHpEl) curHpEl.value = characterCurrentHp;
@@ -13175,6 +13267,37 @@ const MUNDANE_ANIMAL_DESC_FALLBACK = {
   'Giant Wasp': "A stinger the length of a dagger and a temperament to match — territorial, aggressive, and rarely alone.",
   'Wolf': "Rarely hunts alone, and rarely needs to — a lone wolf is a rare sight precisely because the pack is so much more effective.",
 };
+// Real gap found in testing: the two fallbacks above (real fluff text, then the ~64-entry
+// mundane-animal list) still left 511 of the bestiary's 1,907 creatures — over a quarter of the
+// whole Compendium, spread across every source including the core Monster Manual, nowhere near
+// just a rare handful — with a completely blank description. Two of the 19 source books
+// (Xanathar's Guide, Rise of Tiamat) have no fluff file on the mirror this app fetches from at
+// all; the rest is simply the official fluff files never covering every single stat-block entry
+// (dragon age variants, one-off named NPCs, environmental hazards, etc.) even for sources that
+// mostly do. Rather than hand-author hundreds more one-liners (impractical, and this app has no
+// way to fetch a monster's real published lore text at all if the source data doesn't have it),
+// this synthesizes a short, honest description from fields the monster's own stat block already
+// provides — size/type/alignment plus its first named trait or action, e.g. "A Large fiend,
+// typically chaotic evil. Notable for its Magic Resistance." Deliberately generic and never
+// meant to substitute for real lore — it's the LAST resort, after both fallbacks above.
+const MONSTER_ALIGNMENT_WORDS = { L: 'lawful', N: 'neutral', C: 'chaotic', G: 'good', E: 'evil', A: 'any alignment', U: 'unaligned' };
+function monsterAlignmentPhrase(alignment) {
+  if (!alignment || alignment === '—') return '';
+  const words = alignment.split(/\s+/).map(tok => MONSTER_ALIGNMENT_WORDS[tok]).filter(Boolean);
+  // A monster with a genuinely mixed/chance-based alignment spread (e.g. "50% neutral good, 50%
+  // neutral evil") produces extra tokens (NX/NY, duplicate axis letters) this simple per-letter
+  // lookup can't cleanly reconstruct — safer to just omit the alignment clause than guess wrong.
+  return words.length === 2 ? words.join(' ') : (words.length === 1 ? words[0] : '');
+}
+function synthesizeMonsterDesc(m) {
+  const sizeWord = m.size && m.size !== '—' ? m.size : null;
+  const typeWord = m.type && m.type !== 'Unknown' ? m.type : 'creature';
+  const alignPhrase = monsterAlignmentPhrase(m.alignment);
+  let sentence = `A ${sizeWord ? sizeWord + ' ' : ''}${typeWord}${alignPhrase ? `, typically ${alignPhrase}` : ''}.`;
+  const standout = (m.traits && m.traits.find(t => t.name)) || (m.actions && m.actions.find(a => a.name && a.name !== 'Multiattack'));
+  if (standout) sentence += ` Notable for its ${standout.name}.`;
+  return sentence;
+}
 // Pulls just the opening descriptive paragraph out of a fluff entry's deeply nested
 // {type,entries,items} tree (same shape spellFlattenEntries already knows how to fully
 // flatten for actions/traits) — the first plain string found in document order, before any
@@ -13210,16 +13333,20 @@ function monsterNormalize(raw, fluffByKey) {
   const immune = monsterDamageListText(raw.immune) || '—';
   const vulnerable = monsterDamageListText(raw.vulnerable) || '—';
   const conditionImmune = monsterDamageListText(raw.conditionImmune) || '—';
+  const traits = monsterActionList(raw.trait);
+  const actions = monsterActionList(raw.action);
   const fluffEntry = fluffByKey && fluffByKey.get(raw.name + '|' + raw.source);
-  const desc = (fluffEntry && spellCleanTags(firstFluffText(fluffEntry.entries) || '')) || MUNDANE_ANIMAL_DESC_FALLBACK[raw.name] || undefined;
+  const desc = (fluffEntry && spellCleanTags(firstFluffText(fluffEntry.entries) || ''))
+    || MUNDANE_ANIMAL_DESC_FALLBACK[raw.name]
+    || synthesizeMonsterDesc({ size, type, alignment, traits, actions });
   return {
     name: raw.name, source: raw.source, page: raw.page,
     size, type, alignment, ac, acFrom, hp, speed, cr,
     str: raw.str, dex: raw.dex, con: raw.con, int: raw.int, wis: raw.wis, cha: raw.cha,
     skills, saves, senses, languages,
     resist, immune, vulnerable, conditionImmune,
-    traits: monsterActionList(raw.trait),
-    actions: monsterActionList(raw.action),
+    traits,
+    actions,
     bonusActions: monsterActionList(raw.bonus),
     reactions: monsterActionList(raw.reaction),
     legendary: monsterActionList(raw.legendary),
@@ -15983,7 +16110,7 @@ function buildForeignCharacterSheetHtml(s) {
   const saveProfs = s.saveProficiencies || [];
   const slots = s.playerSlots || {};
   const baseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp);
+  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, s.activeTimedEffects);
   const abilitiesHtml = Object.keys(ABILITY_NAMES).map(abbr => {
     const a = sheet.abilities[abbr];
     const cls = a.status ? ' stat-' + a.status : '';
@@ -16019,7 +16146,9 @@ function buildForeignCharacterSheetHtml(s) {
   const deathSavesHtml = curHp != null && curHp <= 0 ? buildDeathSavesHtml(s) : '';
   return `
     <div class="players-sheet-toprow">
+      <div class="players-sheet-field"><label>Race</label><div>${escapeHtml(s.characterRace || '—')}</div></div>
       <div class="players-sheet-field"><label>Class</label><div>${escapeHtml(s.characterClass || '—')}</div></div>
+      <div class="players-sheet-field"><label>Affinity</label><div>${escapeHtml(s.characterAffinity || '—')}</div></div>
       <div class="players-sheet-field"><label>Level</label><div>${level}</div></div>
       <div class="players-sheet-field"><label>Prof. Bonus</label><div>${fmtMod(sheet.profBonus)}</div></div>
       <div class="players-sheet-field"><label>HP</label><div>${curHp != null ? curHp : '—'} / ${maxHp != null ? maxHp : '—'}</div></div>
@@ -16238,7 +16367,9 @@ function openDmEditPlayerModal() {
   const meta = (connectedPlayers || []).find(p => p.uid === viewedPlayerUid);
   const nameEl = document.getElementById('dmEditPlayerName');
   if (nameEl) nameEl.textContent = meta ? meta.username : 'Player';
+  document.getElementById('dmEditRace').value = s.characterRace || '';
   document.getElementById('dmEditClass').value = s.characterClass || '';
+  document.getElementById('dmEditAffinity').value = s.characterAffinity || '';
   document.getElementById('dmEditLevel').value = s.characterLevel || 1;
   document.getElementById('dmEditHitDice').value = s.characterHitDice || '';
   document.getElementById('dmEditCurHp').value = s.characterCurrentHp != null ? s.characterCurrentHp : 10;
@@ -16250,7 +16381,7 @@ function openDmEditPlayerModal() {
   // modal itself has no way to change equipment. Max HP's gear bonus gets the same "computed
   // fresh, shown alongside the editable base" treatment as AC — see characterMaxHpEffective.
   const dmEditBaseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp);
+  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, s.activeTimedEffects);
   const dmAcEl = document.getElementById('dmEditAcValue');
   if (dmAcEl) dmAcEl.textContent = acSheet.ac.total;
   const dmMaxHpBonusEl = document.getElementById('dmEditMaxHpBonus');
@@ -16302,10 +16433,12 @@ function saveDmEditPlayerModal() {
   // is clamped against the gear-inclusive total, not the raw typed base, so a buffed player's
   // headroom the DM just saw in the modal doesn't get silently clipped back off on save.
   const s = viewedPlayerState || {};
-  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp);
+  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, s.activeTimedEffects);
   curHp = Math.max(0, Math.min(curHp, acSheet.maxHp.total));
   const fields = {
+    characterRace: document.getElementById('dmEditRace').value,
     characterClass: document.getElementById('dmEditClass').value,
+    characterAffinity: document.getElementById('dmEditAffinity').value,
     characterLevel: level,
     characterHitDice: document.getElementById('dmEditHitDice').value,
     characterCurrentHp: curHp,
@@ -16389,6 +16522,58 @@ function buildForeignDollHtml(foreignSlots, savedGeneratedItems) {
     </div>
   `;
 }
+// full/hurt/low HP color-coding — shared by the DM roster strip below, the Players tab list,
+// and anywhere else a player's current HP needs to read at a glance rather than requiring the
+// DM to do the arithmetic themselves. 100% = full (green); down to 25% = hurt (gold); at or
+// below 25% = low (red) — same quartile-style "bloodied" threshold as the player-facing monster
+// condition icon elsewhere in this file, just expressed as text color instead of pixel art.
+function hpColorClass(cur, max) {
+  if (cur == null || max == null || !max) return '';
+  const pct = cur / max;
+  if (pct <= 0.25) return 'hp-color-low';
+  if (pct < 1) return 'hp-color-hurt';
+  return 'hp-color-full';
+}
+// Always-visible DM strip (a sibling of the tabs, never inside any one .tab-content — see its
+// markup comment) showing every connected player at a glance regardless of which tab the DM
+// currently has open, per direct request: previously the only way to see who's connected and
+// their HP/AC was to switch to the Players tab specifically. Hidden entirely for a connected
+// player account, and for solo/guest play (no separate "player" to show a roster of).
+function renderDmPlayerRosterBar() {
+  const bar = document.getElementById('dmRosterBar');
+  if (!bar) return;
+  const self = typeof window.getMultiplayerSelf === 'function' ? window.getMultiplayerSelf() : null;
+  if (!self || self.role !== 'dm') { bar.style.display = 'none'; return; }
+  bar.style.display = '';
+  const players = (connectedPlayers || []).filter(p => p.role === 'player');
+  bar.innerHTML = players.length ? players.map(p => `
+    <div class="dm-roster-chip" onmouseenter="showPlayerRosterTooltip(event,'${p.uid}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">
+      <span class="dm-roster-chip-name">${escapeHtml(p.username)}</span>
+      ${p.currentHp != null ? `<span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span>` : '<span style="color:var(--text-dim);font-style:italic;">no sheet yet</span>'}
+    </div>
+  `).join('') : '<span class="dm-roster-empty">👥 No players connected</span>';
+}
+// Hover detail for one roster chip — reuses the same shared #itemTooltip element (and its
+// show/move/hide plumbing) every other hover tooltip in this app already uses, rather than
+// inventing a second tooltip system just for this.
+function showPlayerRosterTooltip(evt, uid) {
+  const p = (connectedPlayers || []).find(x => x.uid === uid);
+  const tt = document.getElementById('itemTooltip');
+  if (!p || !tt) return;
+  const hpText = p.currentHp != null ? `${p.currentHp} / ${p.maxHp}` : '—';
+  const hpCls = hpColorClass(p.currentHp, p.maxHp);
+  const rows = [
+    ['Race', p.characterRace || '—'],
+    ['Class', p.characterClass || '—'],
+    ['Affinity', p.characterAffinity || '—'],
+    ['AC', p.ac != null ? p.ac : '—'],
+  ];
+  tt.innerHTML = `<div class="tt-header"><span>${escapeHtml(p.username)}</span></div>
+    <div class="tt-stats"><span class="${hpCls}">❤ ${escapeHtml(hpText)}</span></div>
+    <div class="tt-classification">${rows.map(([k, v]) => `${k}: ${escapeHtml(String(v))}`).join(' · ')}</div>`;
+  tt.style.display = 'block';
+  moveTokenTooltip(evt);
+}
 function renderPlayersTab() {
   buildTokenIndex();
   const listEl = document.getElementById('playersListEl');
@@ -16399,7 +16584,7 @@ function renderPlayersTab() {
     <div class="players-list-row${p.uid === viewedPlayerUid ? ' active' : ''}">
       <div class="players-list-main" onclick="selectViewedPlayer('${p.uid}')">
         <div class="players-list-name">${escapeHtml(p.username)}</div>
-        <div class="players-list-stats">${p.currentHp != null ? `HP ${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))} · AC ${escapeHtml(String(p.ac))}` : 'No character sheet yet'}</div>
+        <div class="players-list-stats">${p.currentHp != null ? `HP <span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span> · AC ${escapeHtml(String(p.ac))}` : 'No character sheet yet'}</div>
       </div>
       ${p.currentHp != null ? `<div class="players-hp-adjust" onclick="event.stopPropagation()">
         <input type="number" class="players-hp-input" id="hpDelta_${p.uid}" placeholder="±HP" onkeydown="if(event.key==='Enter')applyManualHpDelta('${p.uid}')">
@@ -21087,6 +21272,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
+      characterRace, characterAffinity,
       appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
@@ -21172,6 +21358,8 @@ function applyStateBlob(data) {
   if (data.characterHitDice !== undefined) characterHitDice = data.characterHitDice;
   if (typeof data.characterAc === 'number') characterAc = data.characterAc;
   if (data.characterClass !== undefined) characterClass = data.characterClass;
+  if (data.characterRace !== undefined) characterRace = data.characterRace;
+  if (data.characterAffinity !== undefined) characterAffinity = data.characterAffinity;
   if (data.appliedGamblingPayoutIds) appliedGamblingPayoutIds = data.appliedGamblingPayoutIds;
   if (data.journeySetting) journeySetting = data.journeySetting;
   if (Array.isArray(data.journeyLog)) journeyLog = data.journeyLog;
@@ -21242,6 +21430,8 @@ window.resetMainAppStateToBlank = function () {
   characterHitDice = '';
   characterAc = 10;
   characterClass = '';
+  characterRace = '';
+  characterAffinity = '';
   battlefieldRoster = [];
   battlefieldLog = [];
   viewedPlayerUid = null;
@@ -21276,6 +21466,7 @@ window.onConnectedPlayersChanged = function (players) {
   // version saves the DM's own state and re-pushes battlefield data every single time).
   if (typeof renderCombatRosterDisplay === 'function' && document.getElementById('combatRoster')) renderCombatRosterDisplay();
   if (typeof renderPlayersTab === 'function' && document.getElementById('playersListEl')) renderPlayersTab();
+  if (typeof renderDmPlayerRosterBar === 'function') renderDmPlayerRosterBar();
 };
 // Deferred to DOMContentLoaded — refreshAllViewsAfterStateApply() transitively reaches
 // computeCharacterSheetFor (via renderPlayerSlots -> renderCharacterSheet ->

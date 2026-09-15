@@ -1666,3 +1666,95 @@ WebSocket heartbeat fix earlier in this document — a connection mid-reconnect 
 of a drop wouldn't itself freeze anything, but is worth ruling out once that fix is confirmed live.
 Needs the user's own reproduction details (browser, whether it recovers or needs a reload, whether
 it's every item or specific ones) to make further progress.
+
+### Post-6j: DM Roster Strip, Weight/Encumbrance, Consumable Stat Effects, Compendium Gaps
+
+Six requests in one pass — a new persistent DM UI element, a new game-rule feature, and three
+investigate-and-fix bug reports.
+
+**Always-visible DM player roster strip.** New `#dmRosterBar` div, a sibling of the tabs (same
+placement pattern as the existing `#globalInvSummaryBar`) so it's visible on every tab, not just
+Players — per direct request, since previously the only way to see who's connected was to switch
+tabs. Each chip shows the player's name and HP (color-coded — see below); hovering one reuses the
+same shared `#itemTooltip` element every other hover tooltip already uses to show Race/Class/
+Affinity/AC. Hidden entirely for a connected player account and for solo/guest play (gated on
+`getMultiplayerSelf()?.role === 'dm'`, re-checked in `enforceRoleRestrictions` on every identify
+since a player's own identify never triggers the `roster_update` that would otherwise refresh it).
+`characterRace` and `characterAffinity` are two brand new character-sheet fields (free text, no
+validation, mirroring how `characterClass` already works end to end — sheet input, DM-edit modal,
+save/load, the DM's read-only viewed-player panel) added specifically because the requested
+tooltip needed them and neither existed anywhere in the app before now. The server's `buildRoster`
+now includes `characterClass`/`characterRace`/`characterAffinity` in its broadcast alongside the
+existing HP/AC fields.
+
+**HP color-coding.** `hpColorClass(cur, max)` — green (`hp-color-full`) at 100%, gold
+(`hp-color-hurt`) below that, red (`hp-color-low`) at or below 25% — reused by the new roster
+strip, the Players tab list, and the shared tooltip, so "full/hurt/low" reads identically
+everywhere a player's current HP appears. Same quartile-style threshold as the player-facing
+monster condition icon elsewhere in this file, just as text color instead of pixel art.
+
+**Weight/encumbrance bar, scaled off Strength per 5e's actual rule.** A small bar under the
+existing "Inventory Weight" readout, filled to `current / (Strength × 15)` — the core carrying-
+capacity rule — colored using the optional Variant Encumbrance thresholds most tables actually
+pair with it: green (unencumbered) to Str×5, gold (Encumbered, -10 ft. speed) to Str×10, red
+(Heavily Encumbered, -20 ft. speed + disadvantage) to the Str×15 cap. Uses the character's
+*effective* Strength (base + gear + any active potion override — see below), not just the raw
+typed base, so a Strength-boosting potion correctly raises carrying capacity too; refreshed
+wherever the inventory, ability scores, or active effects change.
+
+**Real bug: a Potion of Storm Giant Strength did nothing.** Root cause, found in
+`game-engine.js`: `extractStatDeltasFromText` (the function that lets equipped gear give a "+2
+Strength"-style bonus) only ever recognizes a leading +/- sign — it had no idea what to do with
+"Strength set to 29 (Storm Giant) for 1 hour," an ABSOLUTE-value phrasing every Belt/Potion of
+Giant Strength item in the catalog uses. Worse, and more consequential: **`activeTimedEffects`
+(what drinking any potion or using any timed power actually creates) was never read by the
+character sheet computation at all** — only equipped gear was. So even a hypothetical "+2
+Strength for 1 hour" potion using the delta phrasing that already worked for gear would have been
+just as inert. Fixed both: added `extractStatSetValuesFromText` (recognizes "is/becomes/set to N"
+phrasing) and `collectStatSetOverrides`/`addActiveEffectDeltas`, wired into
+`computeCharacterSheetFor` via a new optional `activeEffects` parameter (backward compatible —
+existing callers/tests that don't pass it are unaffected) at all 4 call sites in the monolith. A
+set-value effect only ever raises a score up to its stated value, matching every one of these
+items' own "no effect if already at or above N" wording (`Math.max`, never a blind overwrite).
+Verified: the exact reported potion now correctly sets Strength to 29; a character already at 30
+Strength is correctly left untouched; a plain "+N Stat" temporary buff (previously also silently
+inert) now works too.
+
+**Real bug: hundreds of Compendium monsters had no description at all.** Quantified with the
+actual 19-source bestiary the Compendium fetches from at runtime: 511 of 1,907 creatures — over a
+quarter of the entire bestiary, spread across every source including the core Monster Manual, not
+a rare handful — had no fluff text and weren't covered by the existing ~64-entry hand-written
+mundane-animal fallback either. Two sources (Xanathar's Guide, Rise of Tiamat) have no fluff file
+at all on the 5etools-mirror-3 GitHub mirror this app reads from; the rest is simply official
+fluff never covering every single stat-block entry (dragon age variants, one-off named NPCs,
+environmental hazards). Not a leftover from the Firebase migration — this app has always fetched
+monster/spell data live from that external mirror, never bundled it. Rather than hand-author
+hundreds more one-liners, added `synthesizeMonsterDesc` — a last-resort fallback (after real fluff
+text and the mundane-animal list, in that order) that builds a short, honest sentence from fields
+the stat block already provides: size, type, alignment (with a small alignment-code-to-word table,
+deliberately conservative — a monster's genuinely mixed/chance-based alignment spread is left
+blank rather than rendered wrong), plus its first named trait or action, e.g. "A Large fiend,
+typically chaotic evil. Notable for its Magic Resistance." Verified against the live external
+data: 0 of 1,907 monsters now come back with a blank description (was 511).
+
+**Real bug: the spell Compendium defaulted to showing every spell twice.** Not a stale/regressed
+fix from an earlier session — verified there was never a commit addressing this specifically, in
+this repo or its predecessor. Root cause: `<select id="spellRuleset">` defaulted to `"both"`,
+which fetches the 2014 AND 2024 rulebooks and shows every spell that exists in both as two
+separate rows. Confirmed with real data (fetched both official sources directly) that even a
+spell as stable as Fireball has different wording between the two editions — a byte-equality
+dedup would essentially never fire, since the 2024 refresh deliberately rewrote most spell text —
+so the fix is the default itself, not the dedup logic: changed to default to `"2014 5e +
+supplements"` (most tables run one edition at a time), with "Both rulesets" still available as an
+explicit, opt-in comparison view for anyone who wants it.
+
+**Validation performed**: full suite still 168/168 after every change above (the roster-broadcast
+field addition, the character-sheet signature change, and the weight-bar/HP-color work are all
+additive or client-side-only). The DM roster strip, HP coloring, and Race/Class/Affinity fields
+were verified live end-to-end with a real DM + a real connected player (a live-set "Half-Orc
+Barbarian, Frost affinity, 8/32 HP" correctly appeared in both the roster chip — colored red — and
+its hover tooltip). The weight bar was verified against real ability-score and equipped-item
+changes, including that it re-reads Strength through the effective (potion-inclusive) sheet
+total. The potion fix and the monster-description synthesis were both verified against real data
+(the actual game-engine.js function for the former; the actual live 5etools-mirror-3 fetch for
+the latter) before and after, not just unit-level.

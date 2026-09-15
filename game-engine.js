@@ -487,6 +487,39 @@ export function extractStatDeltasFromText(text) {
   return out;
 }
 
+// Real bug found in testing: a Potion of Storm Giant Strength ("Strength set to 29 (Storm
+// Giant) for 1 hour. No effect if Strength already 29+.") produced no stat change at all when
+// drunk. Two compounding gaps, both fixed here and in computeCharacterSheetFor below: (1) every
+// "Belt/Potion of Giant Strength" item (and any other item phrased as an ABSOLUTE score rather
+// than a "+N Stat" delta — "Strength score is 27", "Strength score becomes 23", "Strength set to
+// 29") was invisible to extractStatDeltasFromText above, which only ever recognizes a leading
+// +/- sign; (2) activeTimedEffects (what a consumable's duration actually creates — see
+// startTimedEffect in the monolith) was never read by the character sheet computation at all,
+// equipped gear only — so even a "+2 Strength" TEMPORARY buff from a potion would have been just
+// as inert as this one, not only the absolute-value phrasing. This only ever raises a score
+// up to its stated value (never lowers one already higher), matching every one of these items'
+// own "no effect if already at or above N" wording.
+let _sheetStatSetVocabRegex = null;
+export function extractStatSetValuesFromText(text) {
+  if (!text) return [];
+  if (!_sheetStatSetVocabRegex) {
+    const alt = Object.values(ABILITY_NAMES).sort((a, b) => b.length - a.length).join('|');
+    _sheetStatSetVocabRegex = new RegExp(`\\b(${alt})\\b(?:\\s+score)?\\s+(?:is|becomes|set to)\\s+(\\d+)`, 'gi');
+  }
+  const plain = String(text).replace(/<[^>]+>/g, ' ');
+  const out = [];
+  let m;
+  _sheetStatSetVocabRegex.lastIndex = 0;
+  while ((m = _sheetStatSetVocabRegex.exec(plain))) {
+    // Matches ABILITY_NAMES values case-insensitively but ABILITY_NAMES itself is canonically
+    // capitalized ("Strength") — normalize m[1]'s casing back to that canonical form so callers
+    // can key off it the same way extractStatDeltasFromText's `stat` field already does.
+    const canonical = Object.values(ABILITY_NAMES).find(n => n.toLowerCase() === m[1].toLowerCase()) || m[1];
+    out.push({ stat: canonical, value: parseInt(m[2], 10) });
+  }
+  return out;
+}
+
 export function uniqueEquippedSlotEntries(slots) {
   const seen = new Set();
   const out = [];
@@ -509,6 +542,42 @@ export function collectEquippedStatBreakdown(slots, resolveItem) {
     });
   });
   return breakdown;
+}
+// Temporary buffs (a potion, a power with a duration — see startTimedEffect in the monolith)
+// live in activeTimedEffects, completely separate from equipped gear, but use the exact same
+// "+N Stat" effect-text phrasing. Folds their deltas into the same breakdown equipped gear
+// produces so a currently-active "+2 Strength" buff shows up in the character sheet exactly
+// like a worn item's would — see the module comment on extractStatSetValuesFromText above for
+// the real bug this (and its set-value counterpart below) fixes.
+export function addActiveEffectDeltas(breakdown, activeEffects) {
+  (activeEffects || []).forEach(effect => {
+    extractStatDeltasFromText(effect.text).forEach(({ stat, amount }) => {
+      (breakdown[stat] = breakdown[stat] || []).push({ itemName: effect.name, amount });
+    });
+  });
+  return breakdown;
+}
+// Ability scores an item/effect sets to an ABSOLUTE value rather than a delta — "Strength score
+// is 27", "Strength set to 29 (Storm Giant) for 1 hour" — collected from both equipped gear and
+// active timed effects the same way addActiveEffectDeltas mirrors collectEquippedStatBreakdown.
+// Every one of these items is worded "no effect if [stat] already N+", so the caller applies
+// this as a floor (Math.max against the already-computed total), never a blind overwrite that
+// could lower a score some OTHER source already pushed higher.
+export function collectStatSetOverrides(slots, resolveItem, activeEffects) {
+  const overrides = {};
+  uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
+    const entry = resolveItem(key);
+    if (!entry) return;
+    extractStatSetValuesFromText(entry.item.effect).forEach(({ stat, value }) => {
+      (overrides[stat] = overrides[stat] || []).push({ itemName: entry.item.name, value });
+    });
+  });
+  (activeEffects || []).forEach(effect => {
+    extractStatSetValuesFromText(effect.text).forEach(({ stat, value }) => {
+      (overrides[stat] = overrides[stat] || []).push({ itemName: effect.name, value });
+    });
+  });
+  return overrides;
 }
 export function sumBreakdown(sources) { return (sources || []).reduce((a, s) => a + s.amount, 0); }
 export function statusFor(net) { return net > 0 ? 'buff' : net < 0 ? 'debuff' : ''; }
@@ -534,15 +603,24 @@ export function collectEquippedAcBreakdown(slots, resolveItem) {
   return { base, baseSource, flatSources };
 }
 
-export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, resolveItem, baseMaxHp) {
-  const breakdown = collectEquippedStatBreakdown(slots, resolveItem);
+export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, resolveItem, baseMaxHp, activeEffects) {
+  const breakdown = addActiveEffectDeltas(collectEquippedStatBreakdown(slots, resolveItem), activeEffects);
+  const setOverrides = collectStatSetOverrides(slots, resolveItem, activeEffects);
   const abilities = {};
   Object.keys(ABILITY_NAMES).forEach(abbr => {
     const full = ABILITY_NAMES[abbr];
     const base = abilityScores[abbr] != null ? abilityScores[abbr] : 10;
-    const sources = breakdown[full] || [];
-    const bonus = sumBreakdown(sources);
-    const total = base + bonus;
+    let sources = breakdown[full] || [];
+    let total = base + sumBreakdown(sources);
+    // A set-value item/effect ("Strength set to 29") only ever raises the score up to its
+    // stated value, matching its own "no effect if already N+" wording — never applied if the
+    // current total (base + every "+N" source already summed) is already at or above it.
+    const winningOverride = (setOverrides[full] || []).reduce((best, o) => (!best || o.value > best.value) ? o : best, null);
+    if (winningOverride && winningOverride.value > total) {
+      total = winningOverride.value;
+      sources = [...sources, { itemName: winningOverride.itemName, amount: winningOverride.value - 10, isBaseOverride: true }];
+    }
+    const bonus = total - base;
     const mod = abilityModifier(total);
     const modDelta = mod - abilityModifier(base);
     abilities[abbr] = { base, bonus, total, mod, modDelta, sources, status: statusFor(bonus), tooltip: describeStatSources(sources) };

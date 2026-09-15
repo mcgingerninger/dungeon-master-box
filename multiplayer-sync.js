@@ -516,6 +516,11 @@ function enforceRoleRestrictions(role) {
   document.body.classList.toggle('role-player', role === 'player');
   const battlefieldBtn = document.getElementById('battlefieldTabBtn');
   if (battlefieldBtn) battlefieldBtn.style.display = role === 'player' ? '' : 'none';
+  // A player's own identify never triggers a roster_update (the server only ever sends that to
+  // the DM connection), so nothing else would re-evaluate the DM roster strip's visibility if a
+  // player ever connects on a tab that was previously showing it as the DM — re-checking here,
+  // on every identify regardless of role, keeps it from getting stuck stale.
+  if (typeof window.renderDmPlayerRosterBar === 'function') window.renderDmPlayerRosterBar();
   if (role !== 'player') return;
   const activeBtn = document.querySelector('.tab-btn.active');
   const restricted = ['spin', 'combat', 'players', 'compendium', 'journey', 'puzzles'];
