@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dungeon Loot Wheel</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&family=Press+Start+2P&display=swap');
 
   :root {
     --bg: #0d0a07;
@@ -1808,15 +1808,16 @@
   .gambling-host-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0.7rem; max-width:640px; margin:0 auto; }
   .gambling-host-btn {
     background:var(--surface2); border:2px solid var(--border); color:var(--gold);
-    font-family:'Crimson Text',serif; font-size:1.05rem; padding:1rem 0.8rem; cursor:pointer;
-    transition:all 0.15s; letter-spacing:0.02em;
+    font-family:'Press Start 2P',monospace; font-size:0.75rem; padding:1rem 0.8rem; cursor:pointer;
+    transition:background 0.15s, border-color 0.15s; letter-spacing:0.02em; box-shadow:3px 3px 0 #000;
   }
   .gambling-host-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.1); }
+  .gambling-host-btn:active { box-shadow:0 0 0 #000; transform:translate(3px,3px); }
   .gambling-table-header {
     display:flex; align-items:center; justify-content:space-between; background:var(--surface2);
     border:2px solid var(--gold); padding:0.7rem 1rem; margin-bottom:1rem;
   }
-  .gambling-table-title { font-family:'Crimson Text',serif; font-size:1.15rem; color:var(--gold-bright); letter-spacing:0.04em; }
+  .gambling-table-title { font-family:'Press Start 2P',monospace; font-size:0.85rem; color:var(--gold-bright); letter-spacing:0.02em; }
   .gambling-felt { background:radial-gradient(ellipse at center, #1a3a2a 0%, #0d2418 100%); border:3px solid #3a2a18; padding:1.2rem; box-shadow:inset 0 0 30px rgba(0,0,0,0.5); }
   .gambling-chip {
     display:inline-flex; align-items:center; justify-content:center; width:2.2rem; height:2.2rem;
@@ -1825,8 +1826,9 @@
   }
   .gambling-bet-row { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.6rem; }
   .gambling-bet-input { width:100px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Share Tech Mono',monospace; padding:0.4rem 0.5rem; }
-  .gambling-action-btn { background:var(--surface2); border:1px solid var(--gold); color:var(--gold); font-family:'Crimson Text',serif; font-size:0.9rem; padding:0.4rem 0.9rem; cursor:pointer; transition:all 0.15s; }
-  .gambling-action-btn:hover { background:rgba(201,168,76,0.12); }
+  .gambling-action-btn { background:var(--surface2); border:2px solid var(--gold); color:var(--gold); font-family:'Press Start 2P',monospace; font-size:0.68rem; padding:0.5rem 0.9rem; cursor:pointer; transition:background 0.15s; box-shadow:2px 2px 0 #000; }
+  .gambling-action-btn:hover:not(:disabled) { background:rgba(201,168,76,0.12); }
+  .gambling-action-btn:active:not(:disabled) { box-shadow:0 0 0 #000; transform:translate(2px,2px); }
   .gambling-action-btn:disabled { opacity:0.4; cursor:not-allowed; }
   .gambling-seat-list { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.8rem; }
   .gambling-seat { background:rgba(0,0,0,0.25); border:1px solid var(--border); padding:0.5rem 0.7rem; display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; }
@@ -1834,11 +1836,16 @@
   .gambling-result-banner { text-align:center; font-family:'Crimson Text',serif; font-size:1.1rem; padding:0.6rem; margin-bottom:0.8rem; }
   .gambling-result-banner.win { color:var(--uncommon); }
   .gambling-result-banner.lose { color:var(--danger); }
+  /* Explicit "who won how much" line, shown separately from the result banner above (which just
+     says what happened — the winning number, the dealer's total) so the actual payout amount
+     never has to be inferred from a status tag alone. */
+  .gambling-payout-banner { text-align:center; font-family:'Crimson Text',serif; font-size:1rem; color:var(--gold-bright); background:rgba(201,168,76,0.1); border:1px solid var(--gold); padding:0.5rem; margin-bottom:0.8rem; line-height:1.6; }
+  .gambling-payout-banner.lose { color:var(--text-dim); background:transparent; border-color:var(--border); font-style:italic; }
   .gambling-msg { min-height:1.3em; color:var(--danger); font-size:0.85rem; font-style:italic; margin-bottom:0.4rem; }
   /* ---- Roulette ---- */
   .roulette-wheel-wrap { display:flex; justify-content:center; margin-bottom:0.8rem; }
   .roulette-number-grid { display:grid; grid-template-columns:repeat(9,1fr); gap:3px; margin-bottom:0.8rem; }
-  .roulette-number-btn { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-family:'Share Tech Mono',monospace; font-size:0.72rem; font-weight:700; color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,0.2); }
+  .roulette-number-btn { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-family:'Press Start 2P',monospace; font-size:0.6rem; color:#fff; cursor:pointer; border:1px solid rgba(255,255,255,0.2); }
   .roulette-number-btn.red { background:#8a2020; }
   .roulette-number-btn.black { background:#1a1a1a; }
   .roulette-number-btn.green { background:#1a5c34; }
@@ -1850,20 +1857,30 @@
   /* ---- Blackjack ---- */
   .bj-hand-row { margin-bottom:0.7rem; }
   .bj-hand-label { display:block; font-family:'Crimson Text',serif; color:var(--text); margin-bottom:0.3rem; font-size:0.9rem; }
-  .bj-status { font-family:'Share Tech Mono',monospace; font-size:0.7rem; padding:0.1rem 0.35rem; border:1px solid var(--border); margin-left:0.3rem; }
+  .bj-status { font-family:'Press Start 2P',monospace; font-size:0.55rem; padding:0.2rem 0.35rem; border:1px solid var(--border); margin-left:0.3rem; line-height:1.6; }
   .bj-status.win { color:var(--uncommon); border-color:var(--uncommon); }
   .bj-status.lose { color:var(--danger); border-color:var(--danger); }
+  /* 8-bit playing card — see cardSuitIconSvg's own comment for the pixel-art suit pip this
+     encloses. Press Start 2P (loaded up top alongside this app's other two fonts) for the rank
+     so the card itself reads as retro/pixelated, not just the suit icon; a hard, unblurred
+     drop-shadow (no blur radius) instead of the app's usual soft shadows, matching an 8-bit
+     sprite's flat drop-shadow convention rather than a smooth modern card's soft one.  */
   .bj-card {
-    display:inline-flex; align-items:center; justify-content:center; width:2.3rem; height:3.3rem;
-    background:#f0ead6; color:#111; border:2px solid #222; font-family:'Share Tech Mono',monospace;
-    font-size:0.9rem; font-weight:700; margin-right:0.3rem; box-shadow:2px 2px 0 rgba(0,0,0,0.4);
+    display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    width:2.6rem; height:3.6rem; background:#f0ead6; color:#111; border:2px solid #1a1a1a;
+    font-family:'Press Start 2P',monospace; margin-right:0.3rem; box-shadow:3px 3px 0 #000;
+    image-rendering:pixelated;
   }
-  .bj-card.bj-red { color:#a52020; }
-  .bj-card-back { background:repeating-linear-gradient(45deg,#3a2a6a,#3a2a6a 4px,#2a1a5a 4px,#2a1a5a 8px); }
+  .bj-card-rank { font-size:0.62rem; line-height:1; }
+  .bj-card.bj-red .bj-card-rank { color:#c0392b; }
+  .bj-card-back {
+    background:repeating-linear-gradient(45deg,#3a2a6a,#3a2a6a 4px,#2a1a5a 4px,#2a1a5a 8px);
+    border:2px solid #1a1a1a; box-shadow:3px 3px 0 #000;
+  }
   /* ---- Slots ---- */
   .slots-machine { display:flex; justify-content:center; margin-bottom:0.8rem; }
   .slots-reel-row { display:flex; gap:0.6rem; background:#1a1410; border:3px solid #3a2a18; padding:1rem 1.4rem; box-shadow:inset 0 0 20px rgba(0,0,0,0.6); }
-  .slots-reel { display:flex; align-items:center; justify-content:center; width:3rem; height:3rem; background:var(--surface2); border:2px solid var(--gold); font-size:1.7rem; }
+  .slots-reel { display:flex; align-items:center; justify-content:center; width:3rem; height:3rem; background:var(--surface2); border:2px solid var(--gold); box-shadow:2px 2px 0 #000; }
   /* ---- Poker ---- */
   .poker-hand-row { display:flex; gap:0.5rem; margin-bottom:0.6rem; flex-wrap:wrap; }
   .poker-card-slot { display:flex; flex-direction:column; align-items:center; gap:0.3rem; }
@@ -8878,6 +8895,9 @@ const STORE_ICONS = {
   scroll: { viewBox:'0 0 10 6', rects:[[0,0,2,6],[8,0,2,6],[2,1,6,4]] },
   gem:    { viewBox:'0 0 8 8',  rects:[[2,0,4,2],[0,2,8,2],[1,4,6,2],[2,6,4,1],[3,7,2,1]] },
   paw:    { viewBox:'0 0 8 8',  rects:[[1,0,2,2],[5,0,2,2],[0,2,2,2],[6,2,2,2],[2,3,4,4]] },
+  // Solid octagonal disc — same silhouette as `ring` above but with the middle band filled in
+  // instead of hollow, for the Slots reel's "gold" symbol (see SLOTS_SYMBOL_ICON_KEYS below).
+  coin:   { viewBox:'0 0 8 8',  rects:[[2,0,4,2],[0,2,8,4],[2,6,4,2]] },
   limb:   { viewBox:'0 0 10 6', rects:[[0,0,3,2],[0,4,3,2],[3,2,4,2],[7,0,3,2],[7,4,3,2]] },
   helm:   { viewBox:'0 0 10 9', rects:[[2,0,6,2],[1,2,8,4],[0,6,2,2],[8,6,2,2],[3,6,4,2]] },
   gloves: { viewBox:'0 0 8 10', rects:[[2,4,4,4],[0,0,2,5],[3,0,2,5],[6,0,2,5],[2,8,4,2]] },
@@ -20412,22 +20432,40 @@ function roulettePlaceBet() {
 // Pixel-dot wheel — same hand-placed-shape technique as the rest of the app's pixel art, just
 // circles-on-a-ring via trig instead of a rect grid, since an actual wheel has no natural grid
 // alignment. The winning pocket (if any) is drawn larger with a gold ring around it.
+// Per direct request: blocky squares on a stepped-octagon rim instead of smooth circles on a
+// perfect circle — same trig-based ring layout as before (still one pocket per
+// ROULETTE_WHEEL_ORDER entry, still highlights the winning number the same way), just every
+// curve replaced with crisp, unblurred edges so it reads as pixel art instead of a vector wheel.
+// shape-rendering="crispEdges" on the whole SVG keeps even the outer rim's octagon facets sharp
+// rather than antialiased.
 function rouletteWheelSvg(highlightNumber) {
-  const cx = 70, cy = 70, r = 58;
+  const cx = 70, cy = 70, r = 56;
   const n = ROULETTE_WHEEL_ORDER.length;
-  const dots = ROULETTE_WHEEL_ORDER.map((num, i) => {
+  const pocketSize = 11, hiSize = 15;
+  const pockets = ROULETTE_WHEEL_ORDER.map((num, i) => {
     const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-    const x = (cx + r * Math.cos(angle)).toFixed(1);
-    const y = (cy + r * Math.sin(angle)).toFixed(1);
-    const fill = rouletteColor(num) === 'red' ? '#a83232' : rouletteColor(num) === 'black' ? '#222' : '#1f7a44';
     const hi = highlightNumber === num;
-    return `<circle cx="${x}" cy="${y}" r="${hi ? 9 : 7}" fill="${fill}" stroke="${hi ? '#e8c84c' : '#000'}" stroke-width="${hi ? 2 : 1}"/>`;
+    const size = hi ? hiSize : pocketSize;
+    const x = (cx + r * Math.cos(angle) - size / 2).toFixed(1);
+    const y = (cy + r * Math.sin(angle) - size / 2).toFixed(1);
+    const fill = rouletteColor(num) === 'red' ? '#a83232' : rouletteColor(num) === 'black' ? '#222' : '#1f7a44';
+    return `<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="${fill}" stroke="${hi ? '#e8c84c' : '#000'}" stroke-width="${hi ? 2 : 1}"/>`;
   }).join('');
-  return `<svg viewBox="0 0 140 140" width="140" height="140" class="roulette-wheel">
-    <circle cx="70" cy="70" r="66" fill="#0d2418" stroke="#3a2a18" stroke-width="3"/>
-    ${dots}
-    <circle cx="70" cy="70" r="22" fill="#3a2a18"/>
-    ${highlightNumber != null ? `<text x="70" y="76" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="18" fill="#e8c84c">${highlightNumber}</text>` : ''}
+  // A blocky 8-sided rim instead of a perfect circle — an octagon is the natural "round" shape
+  // once every edge has to be a straight pixel-grid line.
+  const rimPts = Array.from({ length: 8 }, (_, i) => {
+    const a = (i / 8) * 2 * Math.PI - Math.PI / 2 - Math.PI / 8;
+    return `${(cx + 66 * Math.cos(a)).toFixed(1)},${(cy + 66 * Math.sin(a)).toFixed(1)}`;
+  }).join(' ');
+  const hubPts = Array.from({ length: 8 }, (_, i) => {
+    const a = (i / 8) * 2 * Math.PI - Math.PI / 2 - Math.PI / 8;
+    return `${(cx + 22 * Math.cos(a)).toFixed(1)},${(cy + 22 * Math.sin(a)).toFixed(1)}`;
+  }).join(' ');
+  return `<svg viewBox="0 0 140 140" width="140" height="140" class="roulette-wheel" shape-rendering="crispEdges">
+    <polygon points="${rimPts}" fill="#0d2418" stroke="#3a2a18" stroke-width="3"/>
+    ${pockets}
+    <polygon points="${hubPts}" fill="#3a2a18" stroke="#1a1410" stroke-width="2"/>
+    ${highlightNumber != null ? `<text x="70" y="76" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="14" fill="#e8c84c">${highlightNumber}</text>` : ''}
   </svg>`;
 }
 function rouletteNumberGridHtml() {
@@ -20446,6 +20484,22 @@ function renderRouletteHtml(table) {
   const resultBanner = result
     ? `<div class="gambling-result-banner" style="color:${result.color === 'red' ? 'var(--danger)' : result.color === 'green' ? 'var(--uncommon)' : 'var(--text)'}">🎡 Landed on <strong>${result.number}</strong> (${result.color})</div>`
     : '';
+  // Per direct request: an explicit "who won how much" line, not just the winning number —
+  // reads result.bets (the snapshot resolveRouletteSpin took before clearing table.bets for the
+  // next round) rather than the live table.bets, which is already empty again by the time this
+  // renders. Every uid in result.payouts is a winner (resolveRouletteSpin only ever adds an
+  // entry there for a mult > 0 bet); a round with real bets but no winners gets its own explicit
+  // "no winners" line instead of just silently showing nothing.
+  const payoutBanner = result ? (() => {
+    const winners = Object.entries(result.payouts || {});
+    if (winners.length) {
+      return `<div class="gambling-payout-banner">${winners.map(([uid, amt]) => {
+        const name = (result.bets[uid] && result.bets[uid].username) || 'Someone';
+        return `🎉 <strong>${escapeHtml(name)}</strong> won <strong>${amt.toLocaleString()} gp</strong>!`;
+      }).join('<br>')}</div>`;
+    }
+    return Object.keys(result.bets || {}).length ? `<div class="gambling-payout-banner lose">No winners this round.</div>` : '';
+  })() : '';
   const betEntries = Object.entries(table.bets);
   const betsListHtml = betEntries.length
     ? `<div class="gambling-seat-list">${betEntries.map(([uid, b]) => `<div class="gambling-seat${uid === selfUid ? ' is-self' : ''}"><span>${escapeHtml(b.username)}</span><span>${b.amount.toLocaleString()} gp on ${escapeHtml(b.betType === 'straight' ? ('#' + b.betValue) : b.betType)}</span></div>`).join('')}</div>`
@@ -20472,6 +20526,7 @@ function renderRouletteHtml(table) {
     <div class="gambling-felt">
       <div class="roulette-wheel-wrap">${rouletteWheelSvg(result ? result.number : null)}</div>
       ${resultBanner}
+      ${payoutBanner}
       ${dmControls}
       ${playerControls}
       <h4 style="color:var(--gold);margin:0.8rem 0 0.4rem;font-size:0.9rem;">This Round's Bets</h4>
@@ -20538,10 +20593,39 @@ function blackjackPlaceBet() {
 }
 function blackjackHit() { submitGamblingAction({ type: 'hit' }); }
 function blackjackStand() { submitGamblingAction({ type: 'stand' }); }
+// ---------- 8-bit playing card suit icons (Blackjack + Poker share bjCardHtml) ----------
+// Per direct request: reskins every card both games deal in blocky pixel art instead of a plain
+// Unicode suit glyph in a text span — same hand-placed-pixel-grid technique as the monster
+// condition icons and item icons elsewhere in this file, just a 8x8 grid sized for a tiny suit
+// pip rather than a full creature. Spade/heart/diamond are built the same half-plus-mirrorRow
+// shortcut the monster icons use (all three are naturally left-right symmetric); club is written
+// out as full 8-char rows instead since its three-lobed silhouette doesn't reduce to one clean
+// mirrored half as cleanly as the other three.
+const CARD_SUIT_ICON_GRIDS = {
+  '♠': buildIconGrid(['...X', '..XX', '.XXX', 'XXXX', 'XXXX', 'XXXX', '..X.', '..X.']),
+  '♥': buildIconGrid(['.X.X', 'XXXX', 'XXXX', '.XXX', '..XX', '...X', '....', '....']),
+  '♦': buildIconGrid(['...X', '..XX', '.XXX', 'XXXX', 'XXXX', '.XXX', '..XX', '...X']),
+  '♣': ['..XX.XX.', '.XXXXXX.', 'XXXXXXXX', 'XXXXXXXX', '.XXXXXX.', '...XX...', '...XX...', '...XX...'],
+};
+function cardSuitIconSvg(suit, color, px = 14) {
+  const grid = CARD_SUIT_ICON_GRIDS[suit];
+  if (!grid) return '';
+  const cell = px / grid.length;
+  let rects = '';
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y];
+    for (let x = 0; x < row.length; x++) {
+      if (row[x] !== 'X') continue;
+      rects += `<rect x="${(x * cell).toFixed(2)}" y="${(y * cell).toFixed(2)}" width="${cell.toFixed(2)}" height="${cell.toFixed(2)}" fill="${color}"/>`;
+    }
+  }
+  return `<svg width="${px}" height="${px}" viewBox="0 0 ${px} ${px}" shape-rendering="crispEdges" style="display:block;">${rects}</svg>`;
+}
 function bjCardHtml(card, faceDown) {
   if (faceDown) return `<span class="bj-card bj-card-back"></span>`;
   const red = card.s === '♥' || card.s === '♦';
-  return `<span class="bj-card${red ? ' bj-red' : ''}">${card.r}${card.s}</span>`;
+  const color = red ? '#c0392b' : '#1a1a1a';
+  return `<span class="bj-card${red ? ' bj-red' : ''}"><span class="bj-card-rank">${card.r}</span>${cardSuitIconSvg(card.s, color, 16)}</span>`;
 }
 function bjHandHtml(cards, faceDownLast) { return cards.map((c, i) => bjCardHtml(c, faceDownLast && i === cards.length - 1)).join(''); }
 function renderBlackjackHtml(table) {
@@ -20555,14 +20639,25 @@ function renderBlackjackHtml(table) {
     ? `<div class="bj-hand-row"><span class="bj-hand-label">Dealer (${dealerTotalText})</span>${bjHandHtml(table.dealerHand, dealerHidden)}</div>`
     : '';
   const resultBanner = result ? `<div class="gambling-result-banner">Dealer ${result.dealerTotal > 21 ? `busts at ${result.dealerTotal}` : `stands at ${result.dealerTotal}`}</div>` : '';
+  // Per direct request: an explicit "who won how much" line, same treatment as Roulette above —
+  // a WIN/PUSH tag alone doesn't say how much actually landed in anyone's pocket.
+  const payoutBanner = result ? (() => {
+    const winners = Object.entries(result.payouts || {});
+    if (!winners.length) return `<div class="gambling-payout-banner lose">No winners this hand.</div>`;
+    return `<div class="gambling-payout-banner">${winners.map(([uid, amt]) => {
+      const name = (table.players[uid] && table.players[uid].username) || 'Someone';
+      return `🎉 <strong>${escapeHtml(name)}</strong> won <strong>${amt.toLocaleString()} gp</strong>!`;
+    }).join('<br>')}</div>`;
+  })() : '';
   const playerEntries = Object.entries(table.players);
   const playersHtml = playerEntries.length ? `<div class="gambling-seat-list">${playerEntries.map(([uid, p]) => {
     const outcome = result && result.outcomes[uid];
     const total = blackjackHandValue(p.hand);
     const statusText = outcome ? outcome.result.toUpperCase() : (p.status !== 'playing' && p.status !== 'betting' ? p.status.toUpperCase() : '');
+    const payoutAmt = result && result.payouts[uid];
     const cls = outcome ? (outcome.result === 'win' || outcome.result === 'blackjack' ? 'win' : outcome.result === 'lose' ? 'lose' : '') : '';
     return `<div class="bj-hand-row${uid === selfUid ? ' is-self' : ''}">
-      <span class="bj-hand-label">${escapeHtml(p.username)} (${total})${statusText ? ` <span class="bj-status ${cls}">${statusText}</span>` : ''}</span>
+      <span class="bj-hand-label">${escapeHtml(p.username)} (${total})${statusText ? ` <span class="bj-status ${cls}">${statusText}${payoutAmt ? ` +${payoutAmt.toLocaleString()} gp` : ''}</span>` : ''}</span>
       ${bjHandHtml(p.hand, false)}
     </div>`;
   }).join('')}</div>` : '<div class="empty-results">No hands dealt yet.</div>';
@@ -20592,6 +20687,7 @@ function renderBlackjackHtml(table) {
   return `<div class="gambling-felt">
     ${dealerHtml}
     ${resultBanner}
+    ${payoutBanner}
     ${dmControls}
     ${playerControls}
     <h4 style="color:var(--gold);margin:0.8rem 0 0.4rem;font-size:0.9rem;">Hands at the Table</h4>
@@ -20614,6 +20710,27 @@ document.addEventListener('DOMContentLoaded', () => {
 // phase, no dealer decision — a spin resolves completely inside applyAction), so this one
 // needed no pure/impure split, just a straight move.
 function slotsSymbolIcon(key) { return (SLOTS_SYMBOLS.find(s => s.key === key) || {}).icon || '❔'; }
+// Per direct request: reskins the reel symbols as blocky pixel art instead of plain emoji,
+// reusing STORE_ICONS shapes that already exist for exactly these concepts (a slots "weapon"
+// reads the same as a shop's sword icon) rather than drawing a second, parallel icon set —
+// `coin` is the one new shape STORE_ICONS didn't already have (see its own comment there), and
+// `paw` (already used for Companion goods) doubles as "monster" here, since a clawed print
+// reads as "beast" just as well on a tiny reel as a full creature silhouette would.
+const SLOTS_SYMBOL_ICON = {
+  potion: { icon: 'potion', color: '#4caf7d' },
+  gold: { icon: 'coin', color: '#e0a83a' },
+  weapon: { icon: 'sword', color: '#a0a8b0' },
+  gem: { icon: 'gem', color: '#7de7ff' },
+  monster: { icon: 'paw', color: '#e05252' },
+};
+function slotsSymbolPixelIcon(key, px = 30) {
+  const def = SLOTS_SYMBOL_ICON[key];
+  if (!def) return slotsSymbolIcon(key);
+  // pixel-svg's shared class defaults to display:block (correct for every OTHER icon in this
+  // app, always its own flex/grid cell) — wrapped here in an inline-block span so it can also
+  // sit mid-sentence in the "Triple [icon]! Won..." result banner without forcing a line break.
+  return `<span style="display:inline-block;vertical-align:middle;">${pixelIconSvg(STORE_ICONS[def.icon], def.color, px)}</span>`;
+}
 function slotsPullLever() {
   const msgEl = document.getElementById('gamblingMsg');
   const amount = parseFloat(document.getElementById('slotsBetAmount')?.value) || 0;
@@ -20627,10 +20744,10 @@ function renderSlotsHtml(table) {
   const selfUid = gamblingSelfUid();
   const results = table.results || [];
   const myLast = results.find(r => r.uid === selfUid);
-  const reelIcons = myLast ? myLast.reels.map(slotsSymbolIcon) : ['❔','❔','❔'];
+  const reelIcons = myLast ? myLast.reels.map(k => slotsSymbolPixelIcon(k)) : ['❔','❔','❔'];
   const reelsHtml = `<div class="slots-reel-row">${reelIcons.map(ic => `<span class="slots-reel">${ic}</span>`).join('')}</div>`;
   const myOutcome = !myLast ? '' :
-    myLast.mult >= 3 ? `<div class="gambling-result-banner win">🎉 Triple ${slotsSymbolIcon(myLast.reels[0])}! Won ${(myLast.payouts[selfUid]||0).toLocaleString()} gp</div>`
+    myLast.mult >= 3 ? `<div class="gambling-result-banner win">🎉 Triple ${slotsSymbolPixelIcon(myLast.reels[0], 20)}! Won ${(myLast.payouts[selfUid]||0).toLocaleString()} gp</div>`
     : myLast.mult === 1 ? `<div class="gambling-result-banner">Pair — stake returned (${(myLast.payouts[selfUid]||0).toLocaleString()} gp).</div>`
     : `<div class="gambling-result-banner lose">No match — better luck next pull.</div>`;
   const playerControls = isPlayer ? `
@@ -20641,7 +20758,7 @@ function renderSlotsHtml(table) {
     <div id="gamblingMsg" class="gambling-msg"></div>`
     : '<div class="empty-results">Players can pull the lever anytime — nothing for the dealer to run here.</div>';
   const feedHtml = results.length
-    ? `<div class="gambling-seat-list">${results.slice(0, 10).map(r => `<div class="gambling-seat${r.uid === selfUid ? ' is-self' : ''}"><span>${escapeHtml(r.username)}: ${r.reels.map(slotsSymbolIcon).join(' ')}</span><span>${r.mult > 0 ? '+' + Math.round(r.amount * r.mult).toLocaleString() + ' gp' : '—'}</span></div>`).join('')}</div>`
+    ? `<div class="gambling-seat-list">${results.slice(0, 10).map(r => `<div class="gambling-seat${r.uid === selfUid ? ' is-self' : ''}"><span>${escapeHtml(r.username)}: ${r.reels.map(k => slotsSymbolPixelIcon(k, 16)).join(' ')}</span><span>${r.mult > 0 ? '+' + Math.round(r.amount * r.mult).toLocaleString() + ' gp' : '—'}</span></div>`).join('')}</div>`
     : '<div class="empty-results">No spins yet.</div>';
   return `<div class="gambling-felt">
     <div class="slots-machine">${reelsHtml}</div>

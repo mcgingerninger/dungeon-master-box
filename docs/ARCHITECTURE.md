@@ -1825,3 +1825,48 @@ and potion effects alike.
 The ability bar, Fleshmancer attach, terrain removal, and HP banner were all verified live in a
 running browser session against real equipped items and real generation output, not just read
 through.
+
+### Post-6j: Gambling Payout Messages, 8-bit Casino Reskin
+
+**Payout messages.** Slots and Poker already showed "Won N gp" on a win (per-player independent
+result queues, so "my own last result" was always the right thing to show). Roulette and
+Blackjack — round-based, potentially several simultaneous winners — only ever showed what
+happened (the winning number, the dealer's total), never who actually won or how much. Both now
+get an explicit `gambling-payout-banner` line built from `result.payouts` (winners only, already
+computed by `resolveRouletteSpin`/`resolveBlackjackDealerPlay` in game-engine.js — the DM's own
+client is the dealer/authority for these two games, same as everywhere else in this system)
+cross-referenced against `result.bets`/`table.players` for usernames: "🎉 PlayerName won 1,800
+gp!" per winner, or an explicit "No winners this round" when there were real bets but nobody hit. Blackjack's per-seat status tag also gets the amount inline
+("BLACKJACK +125 gp"), not just a bare result tag.
+
+**8-bit casino reskin.** Added Google's "Press Start 2P" pixel font (alongside this file's
+existing two fonts, same `@import`) for every gambling header/button/label. Three concrete visual
+changes, all reusing techniques already established elsewhere in this file rather than inventing
+new ones:
+- **Cards** (`bjCardHtml`, shared by Blackjack and Poker): the plain Unicode suit character is
+  replaced by a small hand-pixeled suit icon (`cardSuitIconSvg`/`CARD_SUIT_ICON_GRIDS` — spade/
+  heart/diamond built via the same half-row-plus-`mirrorRow` shortcut the monster condition icons
+  established, club as hand-authored full rows since its three-lobed shape doesn't reduce to one
+  clean mirrored half). The card frame itself gets a hard, unblurred drop-shadow and the rank in
+  Press Start 2P instead of a soft shadow and a plain serif/mono digit.
+- **Slots reels**: the reel symbols were plain emoji; `slotsSymbolPixelIcon` now renders them via
+  `pixelIconSvg` reusing existing `STORE_ICONS` shapes that already matched the concept (potion,
+  sword for "weapon", gem, and `paw` — already used for Companion goods — doubling as "monster").
+  One genuinely new shape, `coin` (a solid disc, literally `ring`'s silhouette with the hollow
+  center filled in), for "gold."
+- **Roulette wheel** (`rouletteWheelSvg`): every circle became a square/octagon — pocket dots are
+  now small `<rect>`s on the same trig-computed ring positions as before, the outer rim and hub
+  are 8-sided polygons instead of perfect circles, and the whole SVG sets
+  `shape-rendering="crispEdges"` so every edge stays sharp instead of antialiased. The winning
+  number's highlight is now in Press Start 2P.
+
+Buttons (`gambling-action-btn`, `gambling-host-btn`) got a hard drop-shadow that flattens to
+nothing on `:active` (shifting the button by the shadow's own offset) — a classic 8-bit
+"press-down" micro-interaction — alongside the font change.
+
+**Validation performed**: full suite still 168/168 (every change this pass is client-side
+rendering only, no game-engine.js logic touched). Verified live for all four games — Roulette's
+payout banner and blocky wheel, Blackjack's inline + banner payout amounts and all 4 pixel suit
+icons rendering distinctly, Slots' pixel reel icons in both the machine and the recent-spins feed,
+Poker's cards via the same shared `bjCardHtml`, and the roulette number grid's two-digit labels
+(0-36) confirmed not to overflow their buttons at the smaller pixel-font size.
