@@ -518,7 +518,7 @@ function enforceRoleRestrictions(role) {
   if (battlefieldBtn) battlefieldBtn.style.display = role === 'player' ? '' : 'none';
   if (role !== 'player') return;
   const activeBtn = document.querySelector('.tab-btn.active');
-  const restricted = ['spin', 'combat'];
+  const restricted = ['spin', 'combat', 'players', 'compendium', 'journey', 'puzzles'];
   const onRestricted = activeBtn && restricted.some((t) => activeBtn.getAttribute('onclick') === `showTab('${t}',this)`);
   if (onRestricted && typeof window.showTab === 'function') {
     const invBtn = document.querySelector(`[onclick="showTab('inventory',this)"]`);
@@ -549,8 +549,14 @@ function injectStyles() {
   const style = document.createElement('style');
   style.textContent = `
     body.role-player [onclick="showTab('spin',this)"],
-    body.role-player [onclick="showTab('combat',this)"] { display: none !important; }
-    body.role-player #spin, body.role-player #combat { display: none !important; }
+    body.role-player [onclick="showTab('combat',this)"],
+    body.role-player [onclick="showTab('players',this)"],
+    body.role-player [onclick="showTab('compendium',this)"],
+    body.role-player [onclick="showTab('journey',this)"],
+    body.role-player [onclick="showTab('puzzles',this)"] { display: none !important; }
+    body.role-player #tab-spin, body.role-player #tab-combat,
+    body.role-player #tab-players, body.role-player #tab-compendium,
+    body.role-player #tab-journey, body.role-player #tab-puzzles { display: none !important; }
 
     #mpGateOverlay { position: fixed; inset: 0; background: rgba(10,8,6,0.85); z-index: 9999;
       display: flex; align-items: center; justify-content: center; }

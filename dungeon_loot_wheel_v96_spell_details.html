@@ -3687,7 +3687,7 @@ function miscTierSubcategory(rarity) {
   if (rarity === 'legendary' || rarity === 'celestial') return 'wondrousMisc';
   return 'commonMisc';
 }
-function classifySubcategory(name, type, rarity) {
+function classifySubcategory(name, type, rarity, desc) {
   const n = (name || '').toLowerCase();
   if (type === 'armor') {
     if (/shield/.test(n)) return 'offhand';
@@ -3698,6 +3698,21 @@ function classifySubcategory(name, type, rarity) {
     if (/boots|sandals|slippers/.test(n)) return 'boots';
     if (/leggings|pants|greaves/.test(n)) return 'leggings';
     if (/gauntlet|glove|bracer|handwrap/.test(n)) return 'handwear';
+    // The name alone doesn't say what body slot this is — before defaulting to generic chest
+    // armor, give the description (when the caller has one) the same look inferSlotType's own
+    // 'chest' recheck already gives a stored item: some items (a hand-authored "legendary" piece
+    // named after a person, e.g. "Keland Silith, the Bellower") only reveal what they actually
+    // are — "...who first made this gauntlets..." — in flavor text, never in the name.
+    if (desc) {
+      const d = desc.toLowerCase();
+      if (/\bcape\b/.test(d)) return 'cloak';
+      if (/\bhood\b/.test(d)) return 'head';
+      if (/\bmask\b/.test(d)) return 'facewear';
+      if (/gauntlet|glove|bracer|handwrap/.test(d)) return 'handwear';
+      if (/boots|sandals|slippers/.test(d)) return 'boots';
+      if (/leggings|pants|greaves/.test(d)) return 'leggings';
+      if (/belt|girdle|sash/.test(d)) return 'belt';
+    }
     return 'chest';
   }
   if (type === 'weapon') {
@@ -4051,7 +4066,7 @@ function inferItemMetadata(item, rarity){
     else if(/\bpotion\b|\boil\b|\brations\b|\bherbs\b|\bantitoxin\b|\bdust\b|\bscroll\b|\bfire\b|\btanglefoot\b|\bsmokestick\b/.test(n)) item.type='consumable';
     else item.type='misc';
   }
-  if(!item.subcategory) item.subcategory=classifySubcategory(item.name, item.type, rarity);
+  if(!item.subcategory) item.subcategory=classifySubcategory(item.name, item.type, rarity, item.desc);
   if(!item.slotSize) item.slotSize=SUBCATEGORY_SLOT_SIZE[item.subcategory]||1;
   if(item.type==='consumable' && !item.charges) item.charges=rollConsumableCharges(item.subcategory);
   if(item.weight===undefined || item.weight===null) item.weight=computeItemWeight(item);
@@ -5774,7 +5789,7 @@ function addItem() {
   // slot immediately, without waiting for a later pass to infer it. Rarity is passed through
   // so a misc item lands in the correct Common/Rare/Wondrous Misc bucket immediately, instead
   // of always defaulting to Common Misc.
-  const item={name,desc,type,slotSize,subcategory:classifySubcategory(name,type,rarity)};
+  const item={name,desc,type,slotSize,subcategory:classifySubcategory(name,type,rarity,desc)};
   const dmg=document.getElementById('newItemDmg').value.trim();
   const ac=document.getElementById('newItemAc').value.trim();
   const hp=document.getElementById('newItemHp').value.trim();
@@ -5948,7 +5963,7 @@ function saveEditedItem() {
   // Re-derive subcategory from the (possibly just-changed) name/type — e.g. switching an
   // item to Companion needs to pick pet vs. mount, and switching type in general shouldn't
   // leave a stale subcategory pointing at the wrong equip slot.
-  item.subcategory = classifySubcategory(item.name, type, editingItemRarity);
+  item.subcategory = classifySubcategory(item.name, type, editingItemRarity, item.desc);
   item.slotSize = parseInt(document.getElementById('editItemSlot').value) || 1;
   ['dmg','ac','hp','charges'].forEach(k => delete item[k]);
   const gp      = document.getElementById('editItemGp').value.trim();
@@ -10958,15 +10973,42 @@ function buildTokenIndex() {
   return TOKEN_INDEX;
 }
 
+// A hand-authored loot-data.js item's own classification[0]/[1] (e.g. ["Accessory","Feet",
+// "Boots"]) is a much more reliable slot signal than guessing from words in its name/desc — it's
+// literally hand-tagged ground truth, not an inference. Real bug found in testing: every item
+// classified this way is `type:"misc"` (not "armor"), and classifySubcategory's 'misc' branch
+// only ever checks for ring/amulet before dumping everything else into a generic Common/Rare/
+// Wondrous Misc bucket (-> the catch-all 'charm' slot) — so 95 real wearable accessories across
+// the catalog, several of them iconic named items (Boots of Elvenkind, Cloak of Elvenkind, Hat of
+// Disguise, Winged Boots, Gloves of the Thief, Eyes of Minute Seeing…), were all equipping into
+// the generic trinket slot instead of their real Feet/Back/Hands/Waist/Face/Head slot.
+const ACCESSORY_CLASSIFICATION_TO_SLOT = {
+  Feet: 'boots', Back: 'cloak', Hands: 'handwear', Waist: 'beltwaist', Face: 'facewear', Head: 'helmet',
+};
 // Guess an equipment slot category from an item's name/type. The person can override
 // this per-token from the dropdown on its card in the Tokens tab.
 function inferSlotType(item) {
+  if (item.classification && item.classification[0] === 'Accessory') {
+    const bySlot = ACCESSORY_CLASSIFICATION_TO_SLOT[item.classification[1]];
+    if (bySlot) return bySlot;
+  }
   // Canonical path: every item generated anywhere in the app now carries a `subcategory`
   // (see classifySubcategory/inferItemMetadata), which maps directly to a slot category.
-  // Only items that somehow lack one fall through to the legacy name-sniffing below.
-  if (item.subcategory && SUBCATEGORY_TO_SLOT_CATEGORY[item.subcategory]) {
+  // Only items that somehow lack one fall through to the legacy name-sniffing below —
+  // EXCEPT 'chest', which gets a second look first (see the comment just below it).
+  if (item.subcategory && SUBCATEGORY_TO_SLOT_CATEGORY[item.subcategory] && item.subcategory !== 'chest') {
     return SUBCATEGORY_TO_SLOT_CATEGORY[item.subcategory];
   }
+  // 'chest' is classifySubcategory's catch-all for any armor item whose NAME didn't say what it
+  // actually is — and classifySubcategory only ever sees the name, never the description (a real
+  // bug found in testing: a batch of hand-authored "legendary" armor pieces are named after a
+  // person, e.g. "Keland Silith, the Bellower", and only reveal what they actually are —
+  // "...who first made this gauntlets...", "...this cape was carried...", etc — in the
+  // description's opening line). Rather than trust a stored 'chest' unconditionally, it falls
+  // through into the exact same description-aware detection below that a subcategory-less item
+  // already gets, so a genuinely generic chest piece still ends up back at 'armor' (the legacy
+  // path's own final fallback) while a mislabeled one gets caught. A subcategory that already
+  // says something more specific than 'chest' is never second-guessed.
 
   const name = (item.name || '').toLowerCase();
   // Also scan the description — some items (e.g. "Eyes of Minute Seeing", which is
@@ -10974,46 +11016,68 @@ function inferSlotType(item) {
   const text = name + ' ' + (item.desc || '').toLowerCase();
   const type = item.type || item.cat || '';
 
-  // Off-hand: shields and held-but-not-swung implements (orbs, tomes, spellbooks)
+  // Off-hand: shields and held-but-not-swung implements (orbs, tomes, spellbooks). `orb` scans
+  // with a word boundary rather than plain text.includes — unlike the categories below, "orb" is
+  // a real substring of ordinary English words (absorb, orbit) that legitimately show up in
+  // flavor text, so a bare includes() would misfire far more often than it would ever help.
   if (name.includes('shield')) return 'offhand';
-  if (name.includes('orb') || name.includes('crystal ball') || name.includes('tome') ||
-      name.includes('spellbook') || name.includes('grimoire')) return 'offhand';
+  if (/\borb\b/.test(text) || text.includes('crystal ball') || text.includes('tome') ||
+      text.includes('spellbook') || text.includes('grimoire')) return 'offhand';
 
   // Held/wielded implements — weapons, staves, wands, and rods all count as "weapon" slot items
   if (/\bwand\b/.test(name)) return 'weapon';
   if (/\brod\b/.test(name)) return 'weapon';
 
   // Waist
-  if (name.includes('belt') || name.includes('girdle') || name.includes('sash')) return 'beltwaist';
+  if (text.includes('belt') || text.includes('girdle') || text.includes('sash')) return 'beltwaist';
 
-  // Jewelry
+  // Jewelry: name-only, deliberately not extended to the description like the categories below.
+  // "ring" in particular is a real substring of unrelated armor flavor text ("this ring mail was
+  // carried..." is chainmail, not a finger ring) — scanning the full description for it would
+  // misclassify body armor as jewelry far more often than it would ever catch a real ring whose
+  // name doesn't already say so.
   if (name.includes('ring')) return 'ring';
   if (name.includes('amulet') || name.includes('necklace') || name.includes('pendant') ||
       name.includes('periapt') || name.includes('torc') || name.includes('gorget') ||
       name.includes('holy symbol')) return 'amulet';
 
-  // Face-worn items (goggles, lenses, masks) vs. head-worn items (helms, crowns)
+  // Face-worn items (goggles, lenses, masks) vs. head-worn items (helms, crowns). `mask` and
+  // `hood` scan with word boundaries — plain includes() on the full description (rather than
+  // just the name) makes common unrelated words a real risk here: "mask" alone still won't hit
+  // "masks"/"unmask", and \bhood\b won't hit "childhood"/"brotherhood"/"neighborhood", all of
+  // which are exactly the kind of narrative flavor word these generated descriptions use.
   if (text.includes('goggles') || text.includes('lens') || text.includes('spectacles') ||
       text.includes('monocle') || text.includes('eyepatch') || text.includes('blindfold') ||
-      text.includes('veil') || name.includes('mask')) return 'facewear';
-  if (name.includes('helm') || name.includes('crown') || name.includes('circlet') ||
-      name.includes('hood') || name.includes('diadem') || name.includes('tiara') ||
-      name.includes('coronet') || /\bcap\b/.test(name)) return 'helmet';
+      text.includes('veil') || /\bmask\b/.test(text)) return 'facewear';
+  if (text.includes('helm') || text.includes('crown') || text.includes('circlet') ||
+      /\bhood\b/.test(text) || text.includes('diadem') || text.includes('tiara') ||
+      text.includes('coronet') || /\bcap\b/.test(text)) return 'helmet';
 
-  // Hand-worn items
-  if (name.includes('gauntlet') || name.includes('glove') || name.includes('bracer') ||
-      name.includes('handwrap')) return 'handwear';
+  // Hand-worn items. Real bug found in testing: a hand-authored "legendary" armor piece whose
+  // NAME is just a person's name (e.g. "Keland Silith, the Bellower") only reveals what it
+  // actually is ("...who first made this gauntlets...") in the description's opening line —
+  // checking name-only here, like every one of these categories used to, silently fell through
+  // to the generic 'armor' (chest) slot for every item in this pattern. Same class of bug the
+  // facewear check above was already patched for once (see its own comment) — extended to every
+  // remaining worn-armor category below for the same reason, now that a second instance of it
+  // showed up in the wild.
+  if (text.includes('gauntlet') || text.includes('glove') || text.includes('bracer') ||
+      text.includes('handwrap')) return 'handwear';
 
   // Legs and feet
-  if (name.includes('boots') || name.includes('sandals') || name.includes('slippers')) return 'boots';
-  if (name.includes('leggings') || name.includes('pants') || name.includes('greaves')) return 'leggings';
+  if (text.includes('boots') || text.includes('sandals') || text.includes('slippers')) return 'boots';
+  if (text.includes('leggings') || text.includes('pants') || text.includes('greaves')) return 'leggings';
 
-  // Back/shoulders — worn over armor, not instead of it
-  if (name.includes('cloak') || name.includes('cape') || name.includes('mantle') ||
-      name.includes('wings')) return 'cloak';
+  // Back/shoulders — worn over armor, not instead of it. `cape`, `mantle`, and `wings` all scan
+  // with word boundaries for the same reason as mask/hood above: "cape" is a real substring of
+  // "escape" (an extremely common item-flavor word), "mantle" of "dismantle", and "wings" of
+  // "drawings" — none of which have anything to do with what the item is worn as.
+  if (text.includes('cloak') || /\bcape\b/.test(text) || /\bmantle\b/.test(text) ||
+      /\bwings\b/.test(text)) return 'cloak';
 
-  // Robes/vestments replace body armor rather than layering over it, so they stay "armor"
-  if (name.includes('robe') || name.includes('vestment')) return 'armor';
+  // Robes/vestments replace body armor rather than layering over it, so they stay "armor".
+  // `robe` is word-boundaried too — "wardrobe" is a real word this would otherwise catch.
+  if (/\brobe\b/.test(text) || text.includes('vestment')) return 'armor';
 
   if (type === 'weapon') return 'weapon';
   if (type === 'armor') return 'armor';
@@ -15678,7 +15742,14 @@ window.markLootClaimOnRoster = function (claimId, claim) {
   const entry = battleRoster.find(e => e.uid === monsterUid);
   const item = entry && entry.loot && entry.loot.items.find(it => it.id === itemId);
   if (!item || item.claimedBy) return;
-  item.claimedBy = claim.claimedBy;
+  // Real bug found in testing: multiplayer-sync.js's own caller sends { claimedByUid,
+  // claimedByUsername } (matching the server's loot_claim_update shape) — this used to read
+  // `claim.claimedBy`, a key that was never actually present, so item.claimedBy was silently set
+  // to undefined every time a player self-looted. Every other claimedBy check in this file
+  // (combatLootItemRowHtml's claimedTag, the "Give to…" picker, etc.) treats a falsy claimedBy as
+  // "still up for grabs" — so the DM's own card kept showing Reserve/Save/Loot/Discard/Give-to
+  // controls on an item a player had already taken, with nothing ever indicating it was gone.
+  item.claimedBy = claim.claimedByUid;
   item.claimedByUsername = claim.claimedByUsername;
   renderCombatRoster();
 };
@@ -19784,7 +19855,23 @@ function gamblingSelfName() {
 // combat calls window.pushBattlefieldState(battleRoster, battleLog) at each mutation point —
 // that bridge function is a no-op unless this account is actually the connected DM, and does
 // its own debouncing internally, so nothing here needs to duplicate that.
-function pushGamblingState() {
+//
+// Deliberately NOT named pushGamblingState like the battlefield/puzzle-log call sites just call
+// window.pushBattlefieldState/window.pushPuzzleLog directly instead of wrapping them. A real bug
+// found in testing: this file is a classic (non-module) <script>, so a top-level `function
+// pushGamblingState(){...}` attaches to `window.pushGamblingState` same as any other global —
+// and multiplayer-sync.js (a `<script type="module">`, which per spec always finishes loading
+// and executing after every classic script on the page, regardless of tag order) then runs
+// `window.pushGamblingState = function(state){...}` and silently OVERWRITES it. Every bare
+// `pushGamblingState()` call below was therefore actually calling the BRIDGE function with zero
+// arguments — its `state` parameter came out `undefined`, which JSON.stringify drops entirely,
+// so the server's `push_gambling_state` handler always fell back to its own `state || {game:
+// null, table:null}` default. Net effect: hosting a table, dealing, spinning, and every gambling
+// action ever sent a player nothing but "no table is open" — the entire feature was silently
+// inert for every connected player, confirmed live (a real DM + a real player, host/close both
+// sent, host alone came through as {game:null,table:null} every single time). Renamed so this
+// can never collide with the bridge again.
+function pushGamblingStateToServer() {
   if (typeof scheduleSave === 'function') scheduleSave();
   if (typeof window.pushGamblingState === 'function') window.pushGamblingState(gamblingState);
 }
@@ -19801,13 +19888,13 @@ function hostGamblingGame(gameId) {
   if (!handler) return;
   gamblingState = { game: gameId, table: handler.newTable() };
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 function closeGamblingTable() {
   if (isRealPlayerAccount()) return;
   gamblingState = { game: null, table: null };
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 // One entry point for every player action across all four games. Connected players go through
 // the DM-review request queue (matching submitBattlefieldAttack); solo/Guest play (no
@@ -19821,7 +19908,7 @@ function submitGamblingAction(action) {
   }
   applyGamblingAction({ ...action, playerUid: gamblingSelfUid(), playerUsername: gamblingSelfName() });
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 // The one place gamblingState.table actually changes. A request for a game that isn't running
 // anymore (DM closed the table between the click and this arriving) is silently dropped rather
@@ -19841,7 +19928,7 @@ window.applyIncomingGamblingActions = function (list) {
     if (typeof window.resolveGamblingActionRemote === 'function') window.resolveGamblingActionRemote(req.id);
   });
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 };
 
 function renderGamblingShell() {
@@ -19934,7 +20021,7 @@ function spinRouletteWheel() {
   if (!table || table.phase !== 'betting' || !Object.keys(table.bets).length) return;
   resolveRouletteSpin(table);
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 function rouletteNewRound() {
   if (isRealPlayerAccount() || gamblingState.game !== 'roulette') return;
@@ -19943,7 +20030,7 @@ function rouletteNewRound() {
   table.phase = 'betting';
   table.lastResult = null;
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 let rouletteSelectedBet = null; // {type, value} — which-bet-to-place UI state, local only, never synced
 function rouletteSelectOutside(type) { rouletteSelectedBet = { type, value: null }; renderGamblingTab(); }
@@ -20060,7 +20147,7 @@ function blackjackDeal() {
   if (!table || table.phase !== 'betting' || !Object.keys(table.players).length) return;
   resolveBlackjackDeal(table);
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 function blackjackDealerPlay() {
   if (isRealPlayerAccount() || gamblingState.game !== 'blackjack') return;
@@ -20068,7 +20155,7 @@ function blackjackDealerPlay() {
   if (!table || table.phase !== 'playing' || !blackjackAllDone(table)) return;
   resolveBlackjackDealerPlay(table);
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 function blackjackNewRound() {
   if (isRealPlayerAccount() || gamblingState.game !== 'blackjack') return;
@@ -20079,7 +20166,7 @@ function blackjackNewRound() {
   table.dealerHand = [];
   table.lastResult = null;
   renderGamblingTab();
-  pushGamblingState();
+  pushGamblingStateToServer();
 }
 function blackjackPlaceBet() {
   const msgEl = document.getElementById('gamblingMsg');

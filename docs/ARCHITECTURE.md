@@ -1585,3 +1585,84 @@ through each threshold; a wolf (beast) and a zombie (undead) render visibly dist
 the DM's own card is unaffected throughout (still shows exact `AC 13` and a live `10/14` slider).
 Full suite still 168/168 (this change has no server-side code, so this just confirms nothing else
 broke).
+
+### Post-6j: Item Equip Slots, Gambling Sync, and DM-Side Loot Display (Real Bugs Found in Testing)
+
+A single round of user-reported issues turned up four independent, previously-undiscovered bugs —
+none related to each other, all confirmed live with a real DM + a real connected player before and
+after the fix. Also removed the Players/Compendium/Journey/Puzzles tabs from a connected player's
+account entirely (added to `enforceRoleRestrictions`'s CSS and redirect-away list in
+multiplayer-sync.js, alongside the pre-existing Loot/Combat restriction), per direct request — a
+player's usable surface is now just Inventory, Store, Gambling, and Battlefield.
+
+**1. Armor items whose name doesn't say what they are.** `inferSlotType`/`classifySubcategory`
+only ever looked at an item's NAME to decide its equip slot. Every hand-authored "legendary" item
+in loot-data.js (named after a person — "Keland Silith, the Bellower" — never the item itself) only
+reveals what it actually is ("...who first made this gauntlets...") in the description's opening
+line, so every one of them silently defaulted to generic chest armor. Fixed in two places:
+`inferSlotType` now gives its own `'chest'` result a second look through the same description-aware
+text scan an item with no subcategory at all already got (word-boundaried where a bare `includes`
+risked colliding with ordinary English — `cape`/`escape`, `hood`/`childhood`, `mantle`/`dismantle`,
+`robe`/`wardrobe`, `mask`/`masks`, `orb`/`absorb`); `classifySubcategory` gained an optional 4th
+`desc` parameter for the same fallback, wired into the two DM-facing call sites that actually have
+a description at classification time (Add Item, Edit Item) plus the generic metadata-inference
+pass, so this self-heals for the whole catalog on every page load without a data migration.
+
+**2. A much bigger version of the same bug, for `type:"misc"` items.** classifySubcategory's misc
+branch only ever checked for ring/amulet, dumping everything else (including real wearables) into
+the generic Common/Rare/Wondrous Misc "charm" bucket. 95 real accessories across the catalog —
+several genuinely iconic named items (**Boots of Elvenkind, Cloak of Elvenkind, Hat of Disguise,
+Winged Boots, Gloves of the Thief, Eyes of Minute Seeing**, Boots of Speed, and more) — were all
+equipping into the generic trinket slot instead of Feet/Back/Hands/Waist/Face/Head. Each of these
+items already carries a hand-tagged `classification` array (`["Accessory","Feet","Boots"]`) that's
+strictly more reliable than guessing from words — `inferSlotType` now checks
+`classification[0] === 'Accessory'` first and maps `classification[1]` directly via a 6-entry
+lookup table, before falling through to anything else. Verified: all 95 previously-miscategorized
+items now resolve correctly; the 249 genuinely-mundane misc items (torches, rope, keys, bedrolls —
+anything not tagged `Accessory`) are untouched.
+
+**3. Gambling was completely, unconditionally broken for every connected player.** Root cause: a
+naming collision. This file (a classic, non-module `<script>`) declares its own top-level
+`function pushGamblingState()` — which, being a global function declaration, attaches to
+`window.pushGamblingState` same as any other global. `multiplayer-sync.js` (a `<script
+type="module">`, always finishing execution after every classic script on the page regardless of
+tag order) then runs `window.pushGamblingState = function(state){...}` — the real bridge — silently
+**overwriting** the monolith's own function under the same name. Every one of the 9 bare
+`pushGamblingState()` calls throughout the gambling code (host, close, bet/hit/stand/spin, deal,
+dealer-plays, new round) was therefore actually invoking the bridge with zero arguments; its
+`state` parameter came out `undefined`, which `JSON.stringify` drops entirely, so the server's own
+`state || {game:null,table:null}` fallback silently collapsed every single push down to "no table."
+A player's Gambling tab could never show anything but "wait for the DM," and the DM's Deal/Spin
+buttons stayed permanently disabled ("no players") because no bet could ever reach the table either
+— confirmed live: hosting sent literally `{"type":"push_gambling_state"}` with no `state` key at
+all. Fixed by renaming the monolith's own wrapper to `pushGamblingStateToServer` (matching the
+established pattern battlefield/puzzle-log already use — they call `window.pushBattlefieldState`/
+`window.pushPuzzleLog` directly with no same-named local wrapper at all, which is exactly why they
+never collided) and updating all 9 call sites. Verified end-to-end after the fix: DM hosts
+Blackjack, player's tab receives the table live, player places a bet, DM sees the seated player,
+DM deals, player sees cards appear — the entire loop, working, for the first time.
+
+**4. A player looting a defeated monster's item never showed as taken on the DM's own card.**
+`window.markLootClaimOnRoster(claimId, claim)` read `claim.claimedBy` — but its one caller
+(multiplayer-sync.js, matching the server's own `loot_claim_update` message shape) sends
+`claim.claimedByUid`. `item.claimedBy` was therefore always set to `undefined`, and every other
+`claimedBy` check in the file (the claimed-tag label, the Reserve/Save/Loot/Discard/Give-to
+controls) treats a falsy `claimedBy` as "still up for grabs" — so a DM's card kept offering full
+controls on an item a player had already taken, with no visible sign it was gone. One-line fix
+(`claim.claimedBy` → `claim.claimedByUid`); verified live — a player looting a Goblin's dropped
+item now immediately shows `"Beasts Heartstone → LootTestPlayer"` on the DM's own card.
+
+**Investigated, not resolved — the reported drag-and-drop freeze**: extensive attempts to reproduce
+a report of "dragging an item off my character freezes the app pretty bad" — synthetic
+`DragEvent`(dragstart/dragover/drop) sequences dispatched directly at the doll slot and the
+inventory remove-zone, in both solo play and a real two-account multiplayer session — every
+attempt completed in 1-2ms with no error and the correct end state (item unequipped/moved). No
+infinite loop, no obviously expensive per-dragover work, and no evidence in the code of anything
+that would block synchronously. Two real possibilities neither confirmed nor ruled out: (a) native
+HTML5 drag-image compositing can genuinely freeze a page on lower-powered hardware regardless of
+application code, which browser automation can't reproduce since it never triggers real drag-image
+rasterization; (b) this may be a downstream symptom of the Mini PC not yet having pulled the
+WebSocket heartbeat fix earlier in this document — a connection mid-reconnect at the exact moment
+of a drop wouldn't itself freeze anything, but is worth ruling out once that fix is confirmed live.
+Needs the user's own reproduction details (browser, whether it recovers or needs a reload, whether
+it's every item or specific ones) to make further progress.
