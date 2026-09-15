@@ -2015,3 +2015,52 @@ read `3/day` again, and Alchemist stock returned to its full `[200,150,150,40,60
 synthetic Claw is accepted into the Fleshmancer workshop while a Venom Sac and a Bone are rejected
 (with the drag path's explanatory message confirmed), and that both remain classified with
 `fleshmancer_input` (still usable for other purposes) despite carrying `unwearable_part`.
+
+### Post-6j: Puzzle Library — Action-Oriented Rework, Lore/Meta Removed
+
+Per direct request: the Puzzles tab's 15 categories (puzzle-data.js) were, without exception, pure
+"DM reads text aloud, players talk it out, click reveal" cards — zero mechanical involvement, no
+roll with real stakes, no combat, no loot tied to the puzzle itself. Reworked four categories
+toward "the players have to actually do something" (combat, destroying something, finding
+something, looting something), and removed two entirely.
+
+**Riddles (51 entries)** had no mechanical hook field at all — just `{q, a, tier}`. Rather than
+re-embedding narrative into `q` itself (a previous pass already tried wrapping riddles in NPC/scene
+framing and deliberately stripped it back out as monotonous — see the file's own header comment),
+added a new `hook` field to every entry: a short, tier-scaled in-dungeon stake describing what's
+actually guarding the riddle and what a right/wrong answer DOES, deliberately rotating across
+combat ("a stone toad attacks on a wrong guess"), destruction ("smash the heavier egg to find a
+key"), search ("flip the bed to reveal a strongbox"), and loot payoffs rather than leaning on one
+formula for all 51. Rendered always-visible on the riddle card (styled as a DM note, above the
+reveal button) via `renderPuzzleCategory`.
+
+**Logic (21), Ciphers (20), Anti-Puzzle (19)** already had `note` fields, but nearly every one
+ended the same way: "a wrong answer just resets/does nothing, no penalty — reward: whatever fits
+your scene." Rewrote all 21 Logic notes and all 19 Anti-Puzzle notes (11 of the 19 — the other 8
+already had real stakes) to replace the no-consequence wrong-answer language with an actual
+mechanical result (a real if fair fight, a real trap, a forced alternate/harder path) and replaced
+vague rewards with concrete loot. Anti-Puzzle's inherent fairness constraint (these exist
+specifically to subvert a pattern the DM must have established first — see each entry's own "use
+sparingly" guidance) was preserved: three genuinely roleplay/curiosity-driven entries (Guardian's
+Question, Whispered Answer, Unbalanced Scale) were left low-stakes on purpose rather than punishing
+a reasonable good-faith guess with combat.
+
+**Ciphers** got an additional pass beyond stakes: 5 of the 20 were set somewhere that had nothing
+to do with a dungeon at all (a tavern sing-along, a noble's writing desk, an overland trade road, a
+harbor full of ships, a town notice board) — reframed into dungeon/ruin/stronghold scenes instead
+(an abandoned mine shaft, a dead king's tomb-fortress, underground tunnel forks, a fortress
+garrison hall, a prison guard post), keeping each cipher's actual letter-math intact (new location
+names were chosen to preserve the exact same first-letter/count/position encoding, just renamed —
+e.g. Duskhollow/Ironvein/Gravedeep/Nightcairn/Oreshaft/Ravengate/Tombwell/Hollowmere still spells
+D-I-G-N-O-R-T-H for "Tunnel Forks," same trick the original "Trade Road Map" used for RIDE EAST).
+
+**Lore/Continuity and Meta removed entirely** (`LORE_PUZZLES`/`META_PUZZLES` deleted from
+puzzle-data.js, their tabs removed from `PUZZLE_CATEGORIES` and `puzzleCategoryData`'s switch in
+the main file) — per direct request, out of scope for now rather than reworked.
+
+**Validation**: full suite still 180/180 (puzzle-data.js is pure content with no test coverage of
+its own). Verified live: riddle cards show their hook above the reveal button; entry counts confirm
+51/21/20/19 preserved exactly (only content changed, nothing added or dropped) and Lore/Meta are
+gone from both the tab bar and `puzzleCategoryData`; the five reframed cipher titles (The Tunnel
+Chant, The Fallen King's Elegy, The Tunnel Forks, The Garrison Banners, The Warden's Proclamation)
+render correctly in place of their originals.

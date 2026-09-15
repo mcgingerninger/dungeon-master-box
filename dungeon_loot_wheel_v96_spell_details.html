@@ -20229,8 +20229,6 @@ const PUZZLE_CATEGORIES = [
   { id: 'timeloop',     label: '🔁 Time-Loop' },
   { id: 'antipuzzle',   label: '🔀 Anti-Puzzle' },
   { id: 'resource',     label: '💰 Resource-Cost' },
-  { id: 'lore',         label: '📜 Lore / Continuity' },
-  { id: 'meta',         label: '🧵 Meta' },
 ];
 // Resolved lazily (not stored on the registry object above) since puzzle-data.js's consts don't
 // exist yet at the moment PUZZLE_CATEGORIES itself is declared — this file loads before it.
@@ -20249,8 +20247,6 @@ function puzzleCategoryData(id) {
     case 'timeloop': return typeof TIMELOOP_PUZZLES !== 'undefined' ? TIMELOOP_PUZZLES : [];
     case 'antipuzzle': return typeof ANTIPUZZLE_PUZZLES !== 'undefined' ? ANTIPUZZLE_PUZZLES : [];
     case 'resource': return typeof RESOURCE_PUZZLES !== 'undefined' ? RESOURCE_PUZZLES : [];
-    case 'lore': return typeof LORE_PUZZLES !== 'undefined' ? LORE_PUZZLES : [];
-    case 'meta': return typeof META_PUZZLES !== 'undefined' ? META_PUZZLES : [];
     default: return [];
   }
 }
@@ -20285,6 +20281,7 @@ function renderPuzzleCategory() {
   listEl.innerHTML = filtered.map(({ it, idx }) => cat.isRiddle ? `
     <div class="riddle-card">
       <div class="riddle-q">${escapeHtml(it.q)}${it.tier ? `<span class="riddle-tier tier-${it.tier}">${escapeHtml(it.tier)}</span>` : ''}</div>
+      ${it.hook ? `<div class="puzzle-dm-note">🎲 ${escapeHtml(it.hook)}</div>` : ''}
       <div class="riddle-answer-wrap" id="puzzleAnswerWrap${idx}">
         <button class="riddle-reveal-btn" onclick="revealPuzzleCategoryAnswer(${idx})">👁 Reveal Answer</button>
       </div>
