@@ -2143,10 +2143,7 @@
   .players-list-name{color:var(--text);font-weight:600}
   .players-list-stats{color:var(--text-dim);font-size:.78rem;font-family:'Share Tech Mono',monospace}
   .players-list-main{cursor:pointer}
-  .players-hp-adjust{display:flex;align-items:center;gap:.35rem;margin-top:.4rem}
-  .players-hp-input{width:4.2rem;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.78rem;padding:.15rem .3rem}
-  .players-hp-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-family:'Crimson Text',serif;font-size:.78rem;padding:.15rem .5rem;cursor:pointer}
-  .players-hp-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .players-hp-adjust{display:flex;align-items:center;gap:.35rem;margin-top:.4rem;flex-wrap:wrap}
   .players-detail{background:var(--surface);border:1px solid var(--border);padding:1rem;min-height:200px}
   .players-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem}
   .players-detail-header h3{margin:0;color:var(--gold);letter-spacing:.03em}
@@ -12233,15 +12230,27 @@ function renderInventoryGrid() {
   if (typeof scheduleSave === 'function') scheduleSave();
 }
 
+// Capped and gated behind an actual search term -- rendering the whole catalog (1,200+ hand-
+// authored items, plus every generated monster-part item) into the DOM on each keystroke was the
+// main cause of Token Library slowness, compounded by legendary/celestial icons' own infinite CSS
+// animations running on however many of those nodes happened to be high-tier. Mirrors the same
+// .slice(0, 60) cap renderPlayersSendResults already uses for its own item search.
 function renderInventoryTokenGrid() {
   buildTokenIndex();
   const searchEl = document.getElementById('invTokenSearch');
   const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
-  const entries = Object.values(TOKEN_INDEX).filter(e => !search || e.item.name.toLowerCase().includes(search));
   const grid = document.getElementById('invTokenGrid');
   const countEl = document.getElementById('invTokenCount');
-  if (countEl) countEl.textContent = entries.length + ' item' + (entries.length !== 1 ? 's' : '');
   if (!grid) return;
+  if (!search) {
+    if (countEl) countEl.textContent = '';
+    grid.innerHTML = '<div class="empty-results" style="grid-column:1/-1;">Type to search the item catalog.</div>';
+    return;
+  }
+  const matches = Object.values(TOKEN_INDEX).filter(e => e.item.name.toLowerCase().includes(search));
+  const entries = matches.slice(0, 60);
+  if (countEl) countEl.textContent = matches.length + ' item' + (matches.length !== 1 ? 's' : '') +
+    (matches.length > entries.length ? ` (showing first ${entries.length} — keep typing to narrow)` : '');
   if (!entries.length) {
     grid.innerHTML = '<div class="empty-results" style="grid-column:1/-1;">No items match your search.</div>';
     return;
@@ -16999,8 +17008,13 @@ function renderPlayersTab() {
         <div class="players-list-stats">${p.currentHp != null ? `HP <span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span> · AC ${escapeHtml(String(p.ac))}` : 'No character sheet yet'}</div>
       </div>
       ${p.currentHp != null ? `<div class="players-hp-adjust" onclick="event.stopPropagation()">
-        <input type="number" class="players-hp-input" id="hpDelta_${p.uid}" placeholder="±HP" onkeydown="if(event.key==='Enter')applyManualHpDelta('${p.uid}')">
-        <button class="players-hp-btn" onclick="applyManualHpDelta('${p.uid}')" title="Apply a monster attack, a heal, or any other manual HP change">Apply</button>
+        <button class="hp-nudge-btn hp-nudge-down" onclick="nudgePlayerHp('${p.uid}',-10)" title="-10 HP">«</button>
+        <button class="hp-nudge-btn hp-nudge-down" onclick="nudgePlayerHp('${p.uid}',-1)" title="-1 HP">‹</button>
+        <input type="range" class="combat-hp-slider" min="0" max="${p.maxHp}" value="${p.currentHp}" data-original="${p.currentHp}"
+         oninput="updatePlayerHpSliderPreview('${p.uid}', this.value)" onchange="commitPlayerHpSlider('${p.uid}', this)">
+        <span id="playerHpNum${p.uid}">${escapeHtml(String(p.currentHp))}</span>/${escapeHtml(String(p.maxHp))}
+        <button class="hp-nudge-btn" onclick="nudgePlayerHp('${p.uid}',1)" title="+1 HP">›</button>
+        <button class="hp-nudge-btn" onclick="nudgePlayerHp('${p.uid}',10)" title="+10 HP">»</button>
       </div>` : ''}
     </div>
   `).join('') : '<div class="empty-results">No players have joined yet.</div>';
@@ -17080,14 +17094,29 @@ function renderPlayersTab() {
 // any other on-the-fly HP ruling. Same underlying bridge function skipping the fixed monster-
 // attack path already uses — a negative number damages, a positive number heals, clamped
 // server-side exactly like every other HP change.
-function applyManualHpDelta(uid) {
-  const input = document.getElementById('hpDelta_' + uid);
-  if (!input) return;
-  const delta = parseInt(input.value, 10);
-  if (!delta || typeof window.applyHpDeltaToPlayer !== 'function') return;
-  window.applyHpDeltaToPlayer(uid, delta);
-  input.value = '';
-  flashInvMessage(`${delta > 0 ? '+' : ''}${delta} HP applied.`);
+// Live drag preview only -- deliberately doesn't touch connectedPlayers or send anything mid-drag
+// (that data is server-authoritative, unlike combat's local battleRoster), just like the combat
+// slider's own updateBattleHp keeps the number readout smooth until release.
+function updatePlayerHpSliderPreview(uid, value) {
+  const numEl = document.getElementById('playerHpNum' + uid);
+  if (numEl) numEl.textContent = value;
+}
+// Fires once, on release. Computes the delta from the value the slider started at (captured in
+// data-original at render time, not re-read from connectedPlayers, so a roster push arriving
+// mid-drag can't skew the math) and sends it through the same hp_delta bridge every other manual
+// HP change already uses.
+function commitPlayerHpSlider(uid, sliderEl) {
+  const original = parseInt(sliderEl.dataset.original, 10);
+  const next = parseInt(sliderEl.value, 10);
+  if (Number.isNaN(original) || Number.isNaN(next) || typeof window.applyHpDeltaToPlayer !== 'function') return;
+  const delta = next - original;
+  if (delta) window.applyHpDeltaToPlayer(uid, delta);
+}
+// Arrow-button alternative to the slider -- mirrors nudgeBattleHp's step sizes (±1/±10) but has
+// no local roster to clamp against, so it just fires the delta and waits for the next roster push
+// to reflect the server-clamped result, same as the old Apply button did.
+function nudgePlayerHp(uid, delta) {
+  if (typeof window.applyHpDeltaToPlayer === 'function') window.applyHpDeltaToPlayer(uid, delta);
 }
 // The DM's own searchable Token Library, filtered live — separate from the Inventory tab's
 // own token grid (renderInventoryTokenGrid) since this one needs a "Send to <viewed player>"
