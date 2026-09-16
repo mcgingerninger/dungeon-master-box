@@ -29,6 +29,7 @@ describe('classifyItemFull', () => {
     GE.classifyItemFull(potion, 'common');
     assert.deepEqual(potion.classification, ['Consumable', 'Potion', 'Healing']);
     assert.ok(potion.interactions.includes('consume'));
+    assert.ok(potion.interactions.includes('apply')); // broadened beyond just named oils/salves
   });
 
   test('idempotent: does not overwrite an existing classification', () => {
@@ -42,6 +43,7 @@ describe('classifyItemFull', () => {
     GE.classifyItemFull(ring, 'legendary');
     assert.deepEqual(ring.classification, ['Accessory', 'Ring', 'Signet Ring']);
     assert.ok(GE.canInteract(ring, 'attune'));
+    assert.ok(GE.canInteract(ring, 'socket')); // rings/amulets, not just weapon/armor
   });
 });
 
@@ -283,5 +285,53 @@ describe('long rest / "Simulate a Day"', () => {
   test('applyLongRestToPlayerState falls back to characterMaxHp when no effective max is recorded', () => {
     const rested = GE.applyLongRestToPlayerState({ characterCurrentHp: 1, characterMaxHp: 12 });
     assert.equal(rested.characterCurrentHp, 12);
+  });
+});
+
+describe('applyItemEffectToState', () => {
+  test('rolls item.hp and heals, clamped to the effective max', () => {
+    const state = { characterCurrentHp: 3, characterMaxHpEffective: 10 };
+    const potion = { name: 'Potion of Healing', hp: '2d4+2' };
+    const next = GE.applyItemEffectToState(state, potion, () => 0); // lowest possible roll: 1+1+2=4
+    assert.equal(next.characterCurrentHp, 7);
+    assert.equal(state.characterCurrentHp, 3); // input state untouched
+  });
+
+  test('clamps healing at the effective max instead of overhealing', () => {
+    const state = { characterCurrentHp: 9, characterMaxHpEffective: 10 };
+    const potion = { name: 'Potion of Healing', hp: '2d4+2' };
+    const next = GE.applyItemEffectToState(state, potion, () => 0.99); // highest roll: 4+4+2=10
+    assert.equal(next.characterCurrentHp, 10);
+  });
+
+  test('a sub-day duration ("for 10 minutes") starts a normal expiring timed effect', () => {
+    const state = { characterCurrentHp: 10, activeTimedEffects: [] };
+    const item = { name: 'Potion of Giant Strength', effect: '+4 Strength for 10 minutes.' };
+    const next = GE.applyItemEffectToState(state, item);
+    assert.equal(next.activeTimedEffects.length, 1);
+    const effect = next.activeTimedEffects[0];
+    assert.equal(effect.permanent, false);
+    assert.equal(effect.durationMs, 10 * 60 * 1000);
+    assert.ok(effect.expiresAt > Date.now());
+    assert.equal(effect.text, '+4 Strength for 10 minutes.');
+  });
+
+  test('a day-or-longer duration ("for 7 days") is flagged permanent instead of getting a wall-clock expiry', () => {
+    const state = { characterCurrentHp: 10, activeTimedEffects: [] };
+    const item = { name: 'Ointment of Insight', effect: '+1 Insight for 7 days.' };
+    const next = GE.applyItemEffectToState(state, item);
+    assert.equal(next.activeTimedEffects.length, 1);
+    const effect = next.activeTimedEffects[0];
+    assert.equal(effect.permanent, true);
+    assert.equal(effect.durationMs, undefined);
+    assert.equal(effect.expiresAt, undefined);
+  });
+
+  test('an item with no duration/heal text is a no-op on activeTimedEffects', () => {
+    const state = { characterCurrentHp: 10, activeTimedEffects: [{ id: 'a1' }] };
+    const item = { name: 'Plain Rock', effect: 'It is a rock.' };
+    const next = GE.applyItemEffectToState(state, item);
+    assert.deepEqual(next.activeTimedEffects, [{ id: 'a1' }]);
+    assert.equal(next.characterCurrentHp, 10);
   });
 });

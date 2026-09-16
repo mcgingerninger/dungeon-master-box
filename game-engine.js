@@ -70,7 +70,7 @@ export const INTERACTIONS = {
   reagent:          { cat: 'Crafting',    label: 'Reagent',            default: it => (it.type === 'craftable' && REAGENT_PARTS.has(it.partType)) || (it.classification || []).includes('Alchemical') },
   component:        { cat: 'Crafting',    label: 'Component',          default: it => (it.classification || [])[0] === 'Material' && (it.classification || []).includes('Mineral') },
   enchant:          { cat: 'Modification', label: 'Enchant',           default: it => ['weapon', 'armor'].includes(it.type) || (it.type === 'misc' && ['ring', 'amulet'].includes(it.subcategory)) },
-  socket:           { cat: 'Modification', label: 'Socket',            default: it => ['weapon', 'armor'].includes(it.type) },
+  socket:           { cat: 'Modification', label: 'Socket',            default: it => ['weapon', 'armor'].includes(it.type) || (it.type === 'misc' && ['ring', 'amulet'].includes(it.subcategory)) },
   repair:           { cat: 'Modification', label: 'Repair',            default: it => ['weapon', 'armor'].includes(it.type) },
   spell_focus:      { cat: 'Magic',       label: 'Spell Focus',        default: it => /spellcasting focus|holy symbol|arcane focus|druidic focus/i.test(it.effect || '') },
   ritual_component: { cat: 'Magic',       label: 'Ritual Component',   default: it => it.type === 'craftable' && RITUAL_PARTS.has(it.partType) },
@@ -83,7 +83,10 @@ export const INTERACTIONS = {
   salvage:          { cat: 'Processing',  label: 'Salvage',            default: it => ['weapon', 'armor'].includes(it.type) },
   harvest:          { cat: 'Processing',  label: 'Harvest',            default: it => it.type !== 'craftable' && (it.classification || [])[0] === 'Material' },
   consume:          { cat: 'Consumable',  label: 'Consume',            default: it => it.type === 'consumable' && ['potion', 'food'].includes(it.subcategory) },
-  apply:            { cat: 'Consumable',  label: 'Apply',              default: it => it.type === 'consumable' && /\boil\b|ointment|salve|balm/i.test(it.name || '') },
+  // Broadened beyond just topical items (oil/ointment/salve/balm) so any potion/food a bearer
+  // could drink themselves (see `consume` above) can also be administered to someone else --
+  // e.g. the DM's "Apply to Player" tool feeding a healing potion to a downed ally.
+  apply:            { cat: 'Consumable',  label: 'Apply',              default: it => it.type === 'consumable' && (['potion', 'food'].includes(it.subcategory) || /\boil\b|ointment|salve|balm/i.test(it.name || '')) },
   crumble:          { cat: 'Consumable',  label: 'Crumbles When Spent', default: it => it.type === 'consumable' && !!it.charges },
   throw:            { cat: 'Combat',      label: 'Throw',              default: it => it.subcategory === 'throwable' },
   weapon_coating:   { cat: 'Combat',      label: 'Weapon Coating',     default: it => it.type === 'consumable' && /poison/i.test(it.name || '') },
@@ -997,6 +1000,73 @@ export function applyLongRestToPlayerState(state, rand = Math.random) {
     deathSaveFailures: 0,
     savedGeneratedItems,
   };
+}
+
+// ===================== ITEM EFFECT APPLICATION =====================
+// Single source of truth for "what happens when this item's effect text is triggered" -- built
+// for the DM's "Apply to Player" tool (server/websocket.js), which must work even when the
+// target isn't connected, so it can't call into the browser-only handleItemActivation flow the
+// monolith's own right-click-to-use path already has. NOT exported: `parseDurationMs`/
+// `DURATION_UNIT_SECONDS`/`rollDiceFormulaTotal` below are deliberately private (unlike
+// everything else in this file) because the monolith already declares its own globals with these
+// exact names, and every export here gets auto-bridged onto `window` -- exporting these would
+// silently clobber the monolith's own copies depending on script load order. Only the one new
+// function callers actually need, `applyItemEffectToState`, is public.
+const ITEM_EFFECT_DURATION_UNIT_SECONDS = { round: 6, rounds: 6, minute: 60, minutes: 60, min: 60, hour: 3600, hours: 3600, day: 86400, days: 86400 };
+function parseItemEffectDurationMs(text) {
+  if (!text) return null;
+  const m = /(\d+)\s*(round|rounds|minute|minutes|min|hour|hours|day|days)\b/i.exec(text);
+  if (!m) return null;
+  const seconds = ITEM_EFFECT_DURATION_UNIT_SECONDS[m[2].toLowerCase()];
+  if (!seconds) return null;
+  return parseInt(m[1], 10) * seconds * 1000;
+}
+const ITEM_EFFECT_HP_DICE_RE = /(\d+)\s*d\s*(\d+)\s*([+-]\s*\d+)?/i;
+function rollItemEffectDiceTotal(text, rand) {
+  const m = ITEM_EFFECT_HP_DICE_RE.exec(String(text || ''));
+  if (!m) return null;
+  const n = parseInt(m[1], 10), sides = parseInt(m[2], 10);
+  const mod = m[3] ? parseInt(m[3].replace(/\s+/g, ''), 10) : 0;
+  let total = mod;
+  for (let i = 0; i < n; i++) total += rn(1, sides, rand);
+  return total;
+}
+// Applies one item's effect (an item.hp heal, plus a timed/permanent stat buff parsed from its
+// effect text) onto a plain state object, returning a NEW state -- same immutable-state
+// convention as applyLongRestToPlayerState. A day-or-longer duration is flagged `permanent: true`
+// instead of getting a real expiresAt, so it lasts until the next Simulate a Day / day roll (the
+// monolith's real-time prune skips permanent entries) rather than a wall-clock countdown --
+// sub-day durations behave exactly like every other timed effect already does.
+export function applyItemEffectToState(state, item, rand = Math.random) {
+  if (!state || !item) return state;
+  const maxHp = typeof state.characterMaxHpEffective === 'number' ? state.characterMaxHpEffective
+    : (typeof state.characterMaxHp === 'number' ? state.characterMaxHp : undefined);
+  let characterCurrentHp = state.characterCurrentHp;
+  if (item.hp) {
+    const rolled = rollItemEffectDiceTotal(item.hp, rand);
+    if (rolled != null) {
+      const healed = (typeof characterCurrentHp === 'number' ? characterCurrentHp : 0) + Math.max(0, rolled);
+      characterCurrentHp = maxHp != null ? Math.min(healed, maxHp) : healed;
+    }
+  }
+  const text = String(item.effect || item.desc || '').replace(/<[^>]+>/g, ' ');
+  const durationMs = parseItemEffectDurationMs(text);
+  let activeTimedEffects = state.activeTimedEffects;
+  if (durationMs) {
+    const permanent = durationMs >= ITEM_EFFECT_DURATION_UNIT_SECONDS.day * 1000;
+    const entry = {
+      id: 'aeff' + Date.now() + '_' + Math.floor(rand() * 1e6),
+      key: item.id || item.key || item.name,
+      name: item.name,
+      rarity: item.rarity,
+      text,
+      startedAt: Date.now(),
+      permanent,
+    };
+    if (!permanent) { entry.durationMs = durationMs; entry.expiresAt = Date.now() + durationMs; }
+    activeTimedEffects = [...(state.activeTimedEffects || []), entry];
+  }
+  return { ...state, characterCurrentHp, activeTimedEffects };
 }
 
 export function newPokerTable() { return { hands: {}, results: [], roundCounter: 0 }; }
