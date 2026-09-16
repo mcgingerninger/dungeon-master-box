@@ -198,7 +198,7 @@ import {
   saveSubsystemState, loadSubsystemState,
   createAttackRequest, listAttackRequests, deleteAttackRequest,
 } from '../db/database.js';
-import { applyLongRestToPlayerState } from '../game-engine.js';
+import { applyLongRestToPlayerState, applyItemEffectToState } from '../game-engine.js';
 
 // Phase 6d: real-time gambling sync, the one gap left over from the original Phase 5 audit (see
 // docs/ARCHITECTURE.md's Phase 6 section — deliberately deprioritized until now). Reuses Phase
@@ -417,11 +417,11 @@ export function createWebSocketServer(db, httpServer) {
         return;
       }
 
-      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields') {
+      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect') {
         if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that' });
         const targetUid = msg.targetUid;
         const existing = loadPlayerState(db, identity.campaignId, targetUid) || { state: {}, rev: 0 };
-        const nextState = { ...existing.state };
+        let nextState = { ...existing.state };
 
         if (msg.type === 'hp_delta') {
           const current = typeof nextState.characterCurrentHp === 'number' ? nextState.characterCurrentHp : 0;
@@ -435,6 +435,12 @@ export function createWebSocketServer(db, httpServer) {
           nextState.recentlyLooted = [...(nextState.recentlyLooted || []), 'gen:' + saved.id];
         } else if (msg.type === 'set_inventory_fields') {
           Object.assign(nextState, msg.fields || {});
+        } else if (msg.type === 'apply_item_effect') {
+          // DM administers an item's effect directly to a player's persisted state -- must work
+          // even if they're offline, same reasoning hp_delta/gift_item/simulate_day already use.
+          // Uses the same shared, tested effect-application function the client's own use/drink
+          // flow will eventually be able to reuse, rather than re-deriving HP/duration parsing here.
+          nextState = applyItemEffectToState(nextState, msg.item || {});
         }
 
         const nextRev = existing.rev + 1;

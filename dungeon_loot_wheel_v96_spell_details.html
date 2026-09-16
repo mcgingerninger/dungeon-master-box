@@ -2193,6 +2193,7 @@
   .players-send-row input{flex:1;min-width:160px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Crimson Text',serif;font-size:.9rem;padding:.4rem .5rem}
   .players-send-results{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:.3rem}
   .players-send-item-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:var(--bg);border:1px solid var(--border);padding:.35rem .5rem;font-size:.82rem}
+  .players-send-item-actions{display:flex;gap:.35rem;flex-shrink:0}
   .players-send-msg{min-height:1.1rem;font-size:.82rem;color:var(--uncommon);margin-top:.4rem}
   /* Bounty-saved creatures — flags a saved bounty target so it's never confused with a
      same-named stock bestiary entry (e.g. a bounty that happened to roll the "Ancient"
@@ -17295,12 +17296,17 @@ function renderPlayersSendResults() {
   const searchEl = document.getElementById('playersSendSearch');
   const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
   const entries = Object.values(TOKEN_INDEX).filter(e => !search || e.item.name.toLowerCase().includes(search)).slice(0, 60);
-  resultsEl.innerHTML = entries.length ? entries.map(e => `
-    <div class="players-send-item-row">
+  resultsEl.innerHTML = entries.length ? entries.map(e => {
+    if (!e.item.interactions) classifyItemFull(e.item, e.rarity);
+    const canApply = canInteract(e.item, 'apply');
+    return `<div class="players-send-item-row">
       <span>${itemPixelIcon(e.item, 20, e.rarity)} ${escapeHtml(e.item.name)}</span>
-      <button class="loot-save-btn" onclick="sendItemToViewedPlayer('${e.key.replace(/'/g, "\\'")}', this)">🎁 Send</button>
-    </div>
-  `).join('') : '<div class="empty-results">No items match.</div>';
+      <div class="players-send-item-actions">
+        ${canApply ? `<button class="loot-save-btn" onclick="applyItemToViewedPlayer('${e.key.replace(/'/g, "\\'")}', this)" title="Administer this item's effect directly, without giving them the item">💊 Apply</button>` : ''}
+        <button class="loot-save-btn" onclick="sendItemToViewedPlayer('${e.key.replace(/'/g, "\\'")}', this)">🎁 Send</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty-results">No items match.</div>';
 }
 function sendItemToViewedPlayer(key, btn) {
   if (!viewedPlayerUid) return;
@@ -17315,6 +17321,24 @@ function sendItemToViewedPlayer(key, btn) {
     const msgEl = document.getElementById('playersSendMsg');
     if (msgEl) { msgEl.textContent = `Failed to send ${entry.item.name} — try again.`; msgEl.style.color = 'var(--danger)'; }
     if (btn) { btn.disabled = false; btn.textContent = '🎁 Send'; }
+  });
+}
+// DM-only: administers the item's effect (HP heal / timed or permanent buff) directly to the
+// viewed player's persisted state, without putting the item itself in their inventory -- for
+// "feed them a healing potion" without also handing over an item they'd have to use themselves.
+function applyItemToViewedPlayer(key, btn) {
+  if (!viewedPlayerUid) return;
+  const entry = TOKEN_INDEX[key];
+  if (!entry || typeof window.applyItemEffectToPlayerUid !== 'function') return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Applying…'; }
+  window.applyItemEffectToPlayerUid(viewedPlayerUid, entry.item).then(() => {
+    const msgEl = document.getElementById('playersSendMsg');
+    if (msgEl) { msgEl.textContent = `✓ Applied ${entry.item.name}.`; msgEl.style.color = ''; }
+    if (btn) { btn.disabled = false; btn.textContent = '💊 Apply'; }
+  }).catch(() => {
+    const msgEl = document.getElementById('playersSendMsg');
+    if (msgEl) { msgEl.textContent = `Failed to apply ${entry.item.name} — try again.`; msgEl.style.color = 'var(--danger)'; }
+    if (btn) { btn.disabled = false; btn.textContent = '💊 Apply'; }
   });
 }
 

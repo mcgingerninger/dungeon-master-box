@@ -341,6 +341,12 @@ function setPlayerInventoryFields(targetUid, fields) {
     throw err;
   });
 }
+function applyItemEffectToPlayer(targetUid, item) {
+  return crossWrite('apply_item_effect', targetUid, { item }).catch((err) => {
+    console.error('[multiplayer-sync] applyItemEffectToPlayer failed:', err);
+    throw err;
+  });
+}
 window.applyHpDeltaToPlayer = function (targetUid, delta) {
   if (!mp.connected) return;
   applyHpDelta(targetUid, delta);
@@ -348,6 +354,10 @@ window.applyHpDeltaToPlayer = function (targetUid, delta) {
 window.giftArbitraryItemToPlayer = function (targetUid, item) {
   if (!mp.connected) return Promise.reject(new Error('Not connected'));
   return giftItemToPlayer(targetUid, item);
+};
+window.applyItemEffectToPlayerUid = function (targetUid, item) {
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  return applyItemEffectToPlayer(targetUid, item);
 };
 window.dmSetPlayerInventoryFields = function (targetUid, fields) {
   if (!mp.connected) return Promise.reject(new Error('Not connected'));

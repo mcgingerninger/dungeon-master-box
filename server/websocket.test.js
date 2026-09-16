@@ -278,6 +278,30 @@ describe('cross-player writes (DM -> player)', () => {
     assert.match(update.state.recentlyLooted[0], /^gen:/);
   });
 
+  test('apply_item_effect heals the target via item.hp, using the shared applyItemEffectToState', async () => {
+    const player = await connectAs('uid-player', 'player');
+    await pushState(player, 1, { characterCurrentHp: 3, characterMaxHpEffective: 10 });
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'apply_item_effect', targetUid: 'uid-player', item: { name: 'Potion of Healing', hp: '2d4+2' } });
+    const update = await nextMessage(player);
+    assert.equal(update.type, 'state_update');
+    assert.ok(update.state.characterCurrentHp > 3); // healed by at least the flat +2
+    assert.ok(update.state.characterCurrentHp <= 10); // never past the effective max
+  });
+
+  test('apply_item_effect works on a target with no live connection (delivered on next identify)', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'apply_item_effect', targetUid: 'uid-offline-player', item: { name: 'Potion of Healing', hp: '2d4+2' } });
+    const ack = await dm.next();
+    assert.equal(ack.type, 'cross_write_ack');
+
+    const ws2 = await connect();
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-offline-player', role: 'player' });
+    const identified = await nextMessage(ws2);
+    assert.ok(identified.state.characterCurrentHp > 0);
+  });
+
   test('set_inventory_fields overwrites only the fields provided', async () => {
     const player = await connectAs('uid-player', 'player');
     await pushState(player, 1, { characterCurrentHp: 20, characterClass: 'Ranger' });
