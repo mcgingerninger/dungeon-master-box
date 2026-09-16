@@ -573,6 +573,7 @@
   .add-item-area select { background:var(--bg); border:1px solid var(--border); color:var(--text); font-family:'Crimson Text',serif; font-size:1rem; padding:0.4rem 0.7rem; }
   .item-form-meta { display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; }
   .add-item-area input:focus, .add-item-area textarea:focus { outline: none; border-color: var(--gold); }
+  .add-item-hint { font-size:0.75rem; color:var(--text-dim); font-style:italic; line-height:1.4; margin-top:-0.2rem; }
 
   .add-btn {
     background: var(--surface2);
@@ -2978,6 +2979,7 @@
         <input type="text" id="newItemHp" class="type-field" data-for="consumable" placeholder="Healing dice (e.g. 2d4+2) — leave blank if non-healing" style="display:none;">
         <input type="text" id="newItemCharges" placeholder="Charges (optional — e.g. 7, 3/dawn, 1 use)">
         <textarea id="newItemEffect" placeholder="Effect / special ability (optional — for any item type)"></textarea>
+        <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
         <button class="add-btn" onclick="addItem()">+ Add Item</button>
       </div>
       <div class="items-list" id="itemsList"></div>
@@ -3245,6 +3247,7 @@
       <div id="editConsumableField"><label>Healing Dice</label><input id="editItemHp" type="text" placeholder="e.g. 2d4+2"></div>
       <label>Charges (optional)</label><input id="editItemCharges" type="text" placeholder="e.g. 7, 3/day, 1 use">
       <label>Effect / Special Ability</label><textarea id="editItemEffect" style="min-height:70px"></textarea>
+      <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
       <!-- Unlock tiers editor -->
       <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.7rem;">
         <div class="unlock-editor-header">
@@ -4077,16 +4080,21 @@ function parseUsablePowers(item) {
   return powers.length >= 2 ? powers : null;
 }
 // Starts (or refreshes, if the exact same power on the exact same item is already running)
-// a countdown entry in the Active Effects panel.
+// a countdown entry in the Active Effects panel. A day-or-longer duration is flagged `permanent`
+// instead of getting a real expiresAt -- it's exempt from the real-time prune below and only
+// clears on the next Simulate a Day / day roll (applyLongRestToPlayerState already wipes
+// activeTimedEffects wholesale, so nothing else needs to change for that to "just work").
 function startTimedEffect(item, key, rarity, text, durationMs) {
+  const permanent = durationMs >= DURATION_UNIT_SECONDS.day * 1000;
   const existing = activeTimedEffects.find(e => e.key === key && e.text === text);
-  const expiresAt = Date.now() + durationMs;
+  const expiresAt = permanent ? undefined : Date.now() + durationMs;
   if (existing) {
     existing.startedAt = Date.now();
-    existing.durationMs = durationMs;
+    existing.durationMs = permanent ? undefined : durationMs;
     existing.expiresAt = expiresAt;
+    existing.permanent = permanent;
   } else {
-    activeTimedEffects.push({ id: 'aeff' + (++activeEffectCounter), key, name: item.name, rarity, text, startedAt: Date.now(), durationMs, expiresAt });
+    activeTimedEffects.push({ id: 'aeff' + (++activeEffectCounter), key, name: item.name, rarity, text, startedAt: Date.now(), durationMs: permanent ? undefined : durationMs, expiresAt, permanent });
   }
 }
 function dismissTimedEffect(id) {
@@ -10288,7 +10296,9 @@ setInterval(() => {
   if (typeof activeTimedEffects === 'undefined' || !activeTimedEffects.length) return;
   const now = Date.now();
   const before = activeTimedEffects.length;
-  activeTimedEffects = activeTimedEffects.filter(e => e.expiresAt > now);
+  // Permanent (day+) entries are exempt from this real-time prune -- they only clear on the
+  // next Simulate a Day / day roll, via applyLongRestToPlayerState wiping the whole array.
+  activeTimedEffects = activeTimedEffects.filter(e => e.permanent || e.expiresAt > now);
   if (activeTimedEffects.length !== before) {
     if (typeof renderActiveEffects === 'function') renderActiveEffects();
     // A Strength-affecting potion (or any stat-affecting effect) wearing off changes carrying
@@ -13057,7 +13067,7 @@ function renderActiveEffectsDisplay() {
         <div class="ae-row-header">
           <span class="ae-dot" style="background:var(--${e.rarity})"></span>
           <span class="ae-name">${escapeHtml(e.name)}</span>
-          <span class="ae-timer">⏱ ${formatRemainingTime(e.expiresAt - Date.now())}</span>
+          <span class="ae-timer">${e.permanent ? '♾ Until next day roll' : '⏱ ' + formatRemainingTime(e.expiresAt - Date.now())}</span>
           <button class="ae-dismiss-btn" onclick="dismissTimedEffect('${e.id}')" title="End this effect early">✕</button>
         </div>
         <div class="ae-effect">${escapeHtml(e.text)}</div>
