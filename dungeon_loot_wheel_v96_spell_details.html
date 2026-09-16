@@ -574,6 +574,12 @@
   .item-form-meta { display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; }
   .add-item-area input:focus, .add-item-area textarea:focus { outline: none; border-color: var(--gold); }
   .add-item-hint { font-size:0.75rem; color:var(--text-dim); font-style:italic; line-height:1.4; margin-top:-0.2rem; }
+  .interactions-field-head { display:flex; align-items:center; justify-content:space-between; color:var(--gold); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; }
+  .interactions-refresh-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); font-size:0.72rem; padding:0.1rem 0.4rem; cursor:pointer; text-transform:none; letter-spacing:normal; }
+  .interactions-refresh-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .interactions-checklist { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:0.25rem 0.6rem; max-height:180px; overflow-y:auto; padding:0.5rem; background:var(--bg); border:1px solid var(--border); }
+  .interactions-check { display:flex; align-items:center; gap:0.35rem; font-size:0.8rem; color:var(--text-dim); cursor:pointer; }
+  .interactions-check input { cursor:pointer; }
 
   .add-btn {
     background: var(--surface2);
@@ -2988,6 +2994,10 @@
         <input type="text" id="newItemCharges" placeholder="Charges (optional — e.g. 7, 3/dawn, 1 use)">
         <textarea id="newItemEffect" placeholder="Effect / special ability (optional — for any item type)"></textarea>
         <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
+        <div class="interactions-field">
+          <div class="interactions-field-head">Interactions <button type="button" class="interactions-refresh-btn" onclick="renderInteractionsChecklist('new')" title="Recompute from the fields above">🔄 Recompute</button></div>
+          <div id="newItemInteractions" class="interactions-checklist"></div>
+        </div>
         <button class="add-btn" onclick="addItem()">+ Add Item</button>
       </div>
       <div class="items-list" id="itemsList"></div>
@@ -3270,6 +3280,10 @@
       <label>Charges (optional)</label><input id="editItemCharges" type="text" placeholder="e.g. 7, 3/day, 1 use">
       <label>Effect / Special Ability</label><textarea id="editItemEffect" style="min-height:70px"></textarea>
       <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
+      <div class="interactions-field">
+        <div class="interactions-field-head">Interactions <button type="button" class="interactions-refresh-btn" onclick="renderInteractionsChecklist('edit')" title="Recompute from the fields above">🔄 Recompute</button></div>
+        <div id="editItemInteractions" class="interactions-checklist"></div>
+      </div>
       <!-- Unlock tiers editor -->
       <div style="margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.7rem;">
         <div class="unlock-editor-header">
@@ -6128,6 +6142,56 @@ function updateAddFormFields() {
     // field is relevant to both armor and mount-type companions).
     el.style.display = (el.dataset.for || '').split(' ').includes(type) ? 'block' : 'none';
   });
+  renderInteractionsChecklist('new');
+}
+
+// Shared by both the Add form and Edit modal (their fields share the `<prefix>Item<Field>` id
+// pattern, e.g. newItemName/editItemName) -- builds a throwaway item from whatever's currently
+// in the form and classifies it, purely to preview which INTERACTIONS the registry's own
+// default() rules would grant. Never touches the real item/lootData.
+function computeInteractionDefaults(prefix) {
+  const val = field => { const el = document.getElementById(prefix + 'Item' + field); return el ? el.value.trim() : ''; };
+  const rarity = val('Rarity') || 'common';
+  const draft = { name: val('Name'), desc: val('Desc'), type: val('Type'), dmg: val('Dmg'), ac: val('Ac'), hp: val('Hp'), charges: val('Charges'), effect: val('Effect') };
+  draft.subcategory = classifySubcategory(draft.name, draft.type, rarity, draft.desc);
+  classifyItemFull(draft, rarity);
+  return draft.interactions || [];
+}
+// Renders the checkbox grid. `existingItem` (edit only) seeds the initial checked state from
+// that item's actual current interactions (which may already carry extraInteractions/
+// blockedInteractions overrides) rather than the freshly recomputed defaults -- but
+// `dataset.defaults` always stores the fresh defaults, since that's what the save step diffs
+// the checked boxes against to produce a NEW extraInteractions/blockedInteractions pair.
+function renderInteractionsChecklist(prefix, existingItem) {
+  const container = document.getElementById(prefix + 'ItemInteractions');
+  if (!container) return;
+  // classifyItemFull/INTERACTIONS come from the game-engine.js module bridge (a <script
+  // type="module">), which loads deferred relative to this classic script -- updateAddFormFields
+  // is called once at this script's own top-level init (see "===== INIT =====" below), which can
+  // run before that module has finished loading. Same guard pattern this codebase already uses
+  // elsewhere (e.g. invalidateLootTokenIndexCache's own typeof check) rather than letting an
+  // uncaught ReferenceError here halt the rest of this script's top-level execution.
+  if (typeof classifyItemFull !== 'function' || typeof INTERACTIONS !== 'object') return;
+  const defaults = computeInteractionDefaults(prefix);
+  container.dataset.defaults = JSON.stringify(defaults);
+  const checkedSet = new Set(existingItem && existingItem.interactions ? existingItem.interactions : defaults);
+  container.innerHTML = Object.keys(INTERACTIONS).map(key => `
+    <label class="interactions-check"><input type="checkbox" value="${key}"${checkedSet.has(key) ? ' checked' : ''}> ${escapeHtml(INTERACTIONS[key].label)}</label>
+  `).join('');
+}
+// Diffs the checked boxes against the defaults captured at render time -- only the DIFFERENCE
+// from what the registry would have computed anyway is stored on the item, consistent with how
+// computeItemInteractions itself already unions/subtracts extraInteractions/blockedInteractions
+// (game-engine.js) rather than storing a full recomputed list on every item.
+function readInteractionsChecklistDiff(prefix) {
+  const container = document.getElementById(prefix + 'ItemInteractions');
+  if (!container) return { extraInteractions: [], blockedInteractions: [] };
+  const defaults = JSON.parse(container.dataset.defaults || '[]');
+  const checked = Array.from(container.querySelectorAll('input:checked')).map(cb => cb.value);
+  return {
+    extraInteractions: checked.filter(k => !defaults.includes(k)),
+    blockedInteractions: defaults.filter(k => !checked.includes(k)),
+  };
 }
 
 function addItem() {
@@ -6159,6 +6223,9 @@ function addItem() {
   if(charges) item.charges=charges;
   if(gp) item.gp=gp;
   if(effect) item.effect=effect;
+  const { extraInteractions, blockedInteractions } = readInteractionsChecklistDiff('new');
+  if (extraInteractions.length) item.extraInteractions = extraInteractions;
+  if (blockedInteractions.length) item.blockedInteractions = blockedInteractions;
   lootData[rarity].push(item);
   document.getElementById('newItemName').value='';
   document.getElementById('newItemDesc').value='';
@@ -6168,6 +6235,7 @@ function addItem() {
   document.getElementById('newItemHp').value='';
   document.getElementById('newItemCharges').value='';
   document.getElementById('newItemEffect').value='';
+  renderInteractionsChecklist('new');
   renderItemsList();
 }
 
@@ -6289,6 +6357,11 @@ function editItem(rarity, index) {
   document.getElementById('editItemEffect').value  = item.effect  || '';
   renderUnlockEditor(item.unlocks || []);
   updateEditFormFields();
+  // Seeded from the item's actual current interactions (post updateEditFormFields' own fresh-
+  // defaults render above) so opening Edit shows what's really true of it right now, including
+  // any prior extraInteractions/blockedInteractions overrides -- not just a fresh type-only guess.
+  if (!item.interactions) classifyItemFull(item, rarity);
+  renderInteractionsChecklist('edit', item);
   document.getElementById('editItemModal').classList.add('open');
 }
 
@@ -6298,6 +6371,10 @@ function updateEditFormFields() {
   // AC field doubles as a mount's Armor Class for the Companion type — pets can just leave it blank.
   document.getElementById('editArmorField').style.display      = (t === 'armor' || t === 'companion') ? 'block' : 'none';
   document.getElementById('editConsumableField').style.display = t === 'consumable' ? 'block' : 'none';
+  // Deliberately fresh defaults here (not the item's prior interactions) -- changing type
+  // invalidates whatever was true under the old one, same reasoning as subcategory re-deriving
+  // on type change in saveEditedItem below.
+  renderInteractionsChecklist('edit');
 }
 
 function closeEditItemModal() {
@@ -6338,6 +6415,16 @@ function saveEditedItem() {
   if (charges) item.charges  = charges; else delete item.charges;
   if (effect)  item.effect   = effect;  else delete item.effect;
   if (unlocks.length) item.unlocks = unlocks; else delete item.unlocks;
+  const { extraInteractions, blockedInteractions } = readInteractionsChecklistDiff('edit');
+  if (extraInteractions.length) item.extraInteractions = extraInteractions; else delete item.extraInteractions;
+  if (blockedInteractions.length) item.blockedInteractions = blockedInteractions; else delete item.blockedInteractions;
+  // classifyItemFull short-circuits once classification/interactions are already cached (see its
+  // own idempotent-by-design guard) -- clear both so an edited type/interactions actually take
+  // effect the next time anything reads them, instead of silently keeping stale pre-edit values.
+  delete item.classification;
+  delete item.properties;
+  delete item.tags;
+  delete item.interactions;
 
   const newRarity = document.getElementById('editItemRarity').value;
   if (newRarity !== editingItemRarity) {
