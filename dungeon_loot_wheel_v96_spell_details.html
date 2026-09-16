@@ -1427,6 +1427,13 @@
     font-family:'Crimson Text',serif; font-size:0.9rem; padding:0.5rem 0.6rem;
   }
   .token-count { color:var(--text-dim); font-size:0.85rem; font-style:italic; margin-left:auto; }
+  .interactions-reference { display:flex; flex-direction:column; gap:0.7rem; }
+  .interactions-ref-cat { color:var(--gold); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; font-family:'Share Tech Mono',monospace; }
+  .interactions-ref-chips, .interactions-item-chips { display:flex; flex-wrap:wrap; gap:0.3rem; }
+  .interactions-results { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.6rem; }
+  .interactions-item-row { background:var(--surface); border:1px solid var(--border); padding:0.5rem 0.7rem; display:flex; flex-direction:column; gap:0.35rem; }
+  .interactions-item-name { display:flex; align-items:center; gap:0.4rem; color:var(--text); }
+  .interactions-none { color:var(--text-dim); font-size:0.78rem; font-style:italic; }
 
   .token-grid {
     display:grid;
@@ -2918,6 +2925,7 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('monsters',this)">🐉 Monsters</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('effects',this)">🎲 Effects &amp; Traits</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('monsterparts',this)">🦴 Monster Parts</button>
+    <button class="compendium-subtab-btn" onclick="showCompendiumSub('interactions',this)">⚙ Interactions</button>
   </div>
 
   <div id="compendium-items" class="compendium-subpanel active">
@@ -3039,6 +3047,20 @@
 
   <div id="compendium-monsterparts" class="compendium-subpanel">
   <div id="monsterPartsCompendiumWrap"></div>
+  </div>
+
+  <!-- Reference list of every INTERACTIONS entry (game-engine.js), grouped by category, plus a
+       searchable item browser showing each match's computed interactions as chips -- gives the
+       cat/label metadata on INTERACTIONS an actual place to be seen, and lets a DM check "what
+       can this item do" without digging through code. -->
+  <div id="compendium-interactions" class="compendium-subpanel">
+    <div id="interactionsReference" class="interactions-reference"></div>
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.2rem 0 0.6rem;">Look up an item</h3>
+    <div class="token-toolbar">
+      <input type="text" id="interactionsSearch" class="token-search" placeholder="Search items…" oninput="renderInteractionsItemResults()">
+      <span class="token-count" id="interactionsCount"></span>
+    </div>
+    <div id="interactionsResults" class="interactions-results"></div>
   </div>
 </div>
 
@@ -4401,6 +4423,7 @@ function initCompendiumSub(sub) {
   else if (sub === 'monsters') loadMonsterDatabase(false);
   else if (sub === 'effects') renderEffectsCompendium();
   else if (sub === 'monsterparts') renderMonsterPartsCompendium();
+  else if (sub === 'interactions') renderInteractionsCompendium();
 }
 function showCompendiumSub(sub, btn) {
   activeCompendiumSub = sub;
@@ -4420,6 +4443,54 @@ function showCombatSub(sub, btn) {
   document.getElementById('combat-' + sub).classList.add('active');
   btn.classList.add('active');
   if (sub === 'presets') renderCombatLootSettings();
+}
+
+// Static reference (grouped by INTERACTIONS' own `cat` field) plus the searchable item browser
+// below it -- rendered together since both live in the same sub-tab and the reference itself
+// never changes while the tab is open, so re-rendering it each time the tab is opened is cheap.
+function renderInteractionsCompendium() {
+  const refEl = document.getElementById('interactionsReference');
+  if (refEl) {
+    const groups = {};
+    Object.values(INTERACTIONS).forEach(def => { (groups[def.cat] = groups[def.cat] || []).push(def.label); });
+    refEl.innerHTML = Object.keys(groups).map(cat => `
+      <div class="interactions-ref-group">
+        <div class="interactions-ref-cat">${escapeHtml(cat)}</div>
+        <div class="interactions-ref-chips">${groups[cat].map(l => `<span class="tt-prop-chip">${escapeHtml(l)}</span>`).join('')}</div>
+      </div>
+    `).join('');
+  }
+  renderInteractionsItemResults();
+}
+// Same capped-search pattern as renderInventoryTokenGrid (60-item cap, gated behind an actual
+// search term) -- this browses the same full catalog, so it needs the same guard against
+// dumping thousands of items into the DOM on every keystroke.
+function renderInteractionsItemResults() {
+  const resultsEl = document.getElementById('interactionsResults');
+  if (!resultsEl) return;
+  const searchEl = document.getElementById('interactionsSearch');
+  const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  const countEl = document.getElementById('interactionsCount');
+  if (!search) {
+    if (countEl) countEl.textContent = '';
+    resultsEl.innerHTML = '<div class="empty-results">Type to search the item catalog.</div>';
+    return;
+  }
+  buildTokenIndex();
+  const matches = Object.values(TOKEN_INDEX).filter(e => e.item.name.toLowerCase().includes(search));
+  const entries = matches.slice(0, 60);
+  if (countEl) countEl.textContent = matches.length + ' item' + (matches.length !== 1 ? 's' : '') +
+    (matches.length > entries.length ? ` (showing first ${entries.length} — keep typing to narrow)` : '');
+  resultsEl.innerHTML = entries.length ? entries.map(e => {
+    if (!e.item.interactions) classifyItemFull(e.item, e.rarity);
+    const chips = e.item.interactions.length
+      ? e.item.interactions.map(k => `<span class="tt-prop-chip">${escapeHtml((INTERACTIONS[k] || {}).label || k)}</span>`).join('')
+      : '<span class="interactions-none">No interactions</span>';
+    return `<div class="interactions-item-row">
+      <span class="interactions-item-name">${itemPixelIcon(e.item, 20, e.rarity)} ${escapeHtml(e.item.name)}</span>
+      <div class="interactions-item-chips">${chips}</div>
+    </div>`;
+  }).join('') : '<div class="empty-results">No items match.</div>';
 }
 
 // Renders the full buff/debuff/condition/named-trait reference pools (GEN.buffsSelf,
