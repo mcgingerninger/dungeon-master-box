@@ -11727,6 +11727,19 @@ function getDragPayload(evt) {
 // underlying token key, regardless of whether it came from the library, the inventory
 // grid, or another equip slot — for drop targets that just need "which item is this"
 // rather than the full placement bookkeeping (e.g. the refill zone).
+// A native HTML5 drag isn't actually over just because 'drop' fired -- the browser still needs
+// to dispatch 'dragend' on the ORIGINAL dragged element afterward to release its own internal
+// drag state (and the "still holding something" cursor). If a drop handler synchronously
+// destroys/replaces that source element -- e.g. re-rendering the panel it lived in -- before the
+// browser gets to do that, the browser can lose track of it and never fire 'dragend' at all,
+// leaving the drag cursor stuck and clicks swallowed for several seconds. This is the actual
+// cause of the long-reported "dragging an item freezes the app" (a prior fix, see the
+// icon-fx-legendary/celestial animation pause elsewhere in this file, guessed at compositor cost
+// instead and didn't fully address it). Deferring the destructive re-render by one tick lets
+// 'dragend' fire on the still-intact original element first.
+function deferPostDragRender(fn) {
+  setTimeout(fn, 0);
+}
 function dragPayloadKey(raw) {
   if (!raw) return null;
   if (raw.indexOf('invplace:') === 0) {
@@ -11776,7 +11789,10 @@ function slotDrop(evt, slotId) {
     const placementId = raw.slice('invplace:'.length);
     const p = inventoryPlacements[placementId];
     if (!p) return;
-    if (placeTokenInSlot(p.key, slotId)) removeFromInventory(placementId);
+    // Deferred: removeFromInventory re-renders the inventory grid, which would destroy the
+    // dragged-from inventory cell (the native drag's own source element) before the browser
+    // fires 'dragend' on it -- see deferPostDragRender's own comment for what that breaks.
+    if (placeTokenInSlot(p.key, slotId)) deferPostDragRender(() => removeFromInventory(placementId));
     return;
   }
   if (raw.indexOf('slotitem:') === 0) {
@@ -11791,8 +11807,9 @@ function slotDrop(evt, slotId) {
     if (pairedWeaponSlot(fromSlotId) === slotId && playerSlots[slotId] === key) return;
     if (placeTokenInSlot(key, slotId)) {
       playerSlots[fromSlotId] = null;
-      renderPlayerSlots();
-      renderActiveEffects();
+      // Deferred -- see deferPostDragRender: this rebuilds the whole slots panel, which would
+      // otherwise destroy the FROM slot's element mid-drag.
+      deferPostDragRender(() => { renderPlayerSlots(); renderActiveEffects(); });
     }
     return;
   }
@@ -12135,7 +12152,9 @@ function inventoryCellDrop(evt, row, col) {
     for (let c = p.col; c < p.col + p.w; c++) inventoryGrid[p.row][c] = null;
     p.row = row; p.col = col;
     for (let c = col; c < col + p.w; c++) inventoryGrid[row][c] = placementId;
-    renderInventoryGrid();
+    // Deferred -- see deferPostDragRender: this repositioning drag's own source cell lives in
+    // the grid this rebuilds.
+    deferPostDragRender(renderInventoryGrid);
     return;
   }
 
@@ -12154,9 +12173,10 @@ function inventoryCellDrop(evt, row, col) {
     const pairSlot = pairedWeaponSlot(slotId);
     if (pairSlot && playerSlots[pairSlot] === key) playerSlots[pairSlot] = null;
     clearActiveEffectsForKey(key);
-    renderInventoryGrid();
-    renderPlayerSlots();
-    renderActiveEffects();
+    // Deferred -- see deferPostDragRender: renderPlayerSlots would destroy the FROM slot (this
+    // drag's own source element) before the browser's native drag-end cleanup runs on it, which
+    // is what left the drag cursor stuck and clicks blocked -- the actual "app freezes" bug.
+    deferPostDragRender(() => { renderInventoryGrid(); renderPlayerSlots(); renderActiveEffects(); });
     return;
   }
 
@@ -12221,8 +12241,10 @@ function inventoryRemoveDrop(evt) {
   evt.preventDefault();
   const raw = getDragPayload(evt);
   if (!raw) return;
-  if (raw.indexOf('invplace:') === 0) { removeFromInventory(raw.slice('invplace:'.length)); return; }
-  if (raw.indexOf('slotitem:') === 0) { unequipSlot(raw.slice('slotitem:'.length)); return; }
+  // Both deferred -- see deferPostDragRender: removeFromInventory/unequipSlot each re-render the
+  // panel this drag's own source element (an inventory cell or an equip slot) lives in.
+  if (raw.indexOf('invplace:') === 0) { deferPostDragRender(() => removeFromInventory(raw.slice('invplace:'.length))); return; }
+  if (raw.indexOf('slotitem:') === 0) { deferPostDragRender(() => unequipSlot(raw.slice('slotitem:'.length))); return; }
 }
 
 // Right-click a stored item to equip it straight to the first open slot that fits it —
