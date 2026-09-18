@@ -1625,6 +1625,10 @@
   .deck-panel-log { display:flex; flex-direction:column; gap:0.25rem; max-height:130px; overflow-y:auto; }
   .deck-log-row { font-size:0.8rem; color:var(--text-dim); }
   .deck-log-row strong { color:var(--text); }
+  .elder-runes-panel { background:var(--surface); border:1px solid #5fa8d0; padding:0.6rem 0.7rem; margin-bottom:0.8rem; }
+  .elder-runes-panel .deck-panel-head { color:#8fc8e8; }
+  .elder-runes-panel .deck-draw-btn { border-color:#5fa8d0; color:#8fc8e8; }
+  .elder-runes-panel .deck-draw-btn:hover { background:#5fa8d0; color:#0b1620; }
   .sheet-abilities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:0.5rem; margin-bottom:0.8rem; }
   .sheet-ability-box { background:var(--surface); border:1px solid var(--border); padding:0.45rem; text-align:center; }
   .sheet-ability-box label { display:block; font-size:0.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem; }
@@ -3454,6 +3458,16 @@
   </div>
 </div>
 
+<!-- Result of casting an Elder Rune — same shape as deckDrawModal above, kept separate since the
+     two decks are conceptually different (one-time permanent fate vs. a repeatable temporary
+     boon) even though the modal chrome is identical. -->
+<div id="runeCastModal" class="edit-modal-overlay" onclick="if(event.target===this) closeRuneCastModal()">
+  <div class="edit-modal" style="width:min(460px,100%);">
+    <div class="edit-modal-header"><h3 id="runeCastTitle">🔮 A Rune is Cast</h3><button class="edit-modal-close" onclick="closeRuneCastModal()">×</button></div>
+    <div class="edit-modal-body" id="runeCastBody"></div>
+  </div>
+</div>
+
 <!-- DM: full edit access to a viewed player's character sheet (Players tab). A modal rather
      than inline fields on the sheet panel itself — that panel's innerHTML gets rebuilt on every
      live snapshot of the viewed player (any of their own actions, or just the periodic autosave
@@ -3673,6 +3687,9 @@
   <!-- Only ever visible while the player actually owns a Deck of Many Things -- see
        renderDeckOfManyThingsPanel(), which blanks and hides this whenever they don't. -->
   <div class="deck-of-many-things-panel" id="deckOfManyThingsPanel" style="display:none;"></div>
+  <!-- Only ever visible while the player actually owns an Elder Runes Deck -- see
+       renderElderRunesPanel(), which blanks and hides this whenever they don't. -->
+  <div class="elder-runes-panel" id="elderRunesPanel" style="display:none;"></div>
   <div class="player-top-row" ondragover="slotDragOver(event)" ondrop="smartEquipDrop(event)">
     <div class="player-board">
       <div class="player-doll">
@@ -4410,6 +4427,7 @@ function abilityCooldownLabel(ms) {
 // uniqueEquippedSlotEntries does for a two-hander occupying both.
 function renderAbilityBar() {
   if (typeof renderDeckOfManyThingsPanel === 'function') renderDeckOfManyThingsPanel();
+  if (typeof renderElderRunesPanel === 'function') renderElderRunesPanel();
   const bar = document.getElementById('inventoryAbilityBar');
   if (!bar) return;
   buildTokenIndex();
@@ -4608,6 +4626,68 @@ function renderDeckOfManyThingsPanel() {
     <div class="deck-panel-head">
       <span>🎴 Deck of Many Things</span>
       <button class="deck-draw-btn" onclick="drawDeckOfManyThingsCard()">Draw a Card</button>
+    </div>
+    <div class="deck-panel-log">${log}</div>
+  `;
+}
+// ---------- Elder Runes Deck ----------
+// Unlike the Deck of Many Things above (one-time, permanent, destructible), casting a rune is
+// a repeatable ritual that grants a temporary boon through the SAME activeTimedEffects/
+// startTimedEffect pipeline an equipped item's own timed ability already uses -- so its bonus
+// shows up in the Active Effects panel and feeds computeCharacterSheetFor exactly like a potion's
+// would, and simply expires on its own rather than needing any bespoke cleanup. Each rune keys
+// on its own name ('rune:Bear' etc.) so multiple runes can be active at once without clobbering
+// each other, and re-casting the same rune just refreshes its own timer.
+const ELDER_RUNES_CARDS = [
+  { name: 'Rune of the Bear', flavor: 'Your footing turns to bedrock.', text: '+2 Constitution for 1 hour.' },
+  { name: 'Rune of the Fox', flavor: 'Your joints loosen like a held breath let go.', text: '+2 Dexterity for 1 hour.' },
+  { name: 'Rune of the Owl', flavor: 'The edges of the room sharpen into focus.', text: '+3 Perception for 1 hour.' },
+  { name: 'Rune of the Stag', flavor: 'The ground itself seems to whisper where to step.', text: '+3 Survival for 1 hour.' },
+  { name: 'Rune of the Ember', flavor: 'Heat gathers in your arms, patient and coiled.', text: '+2 Strength for 1 hour.' },
+  { name: 'Rune of the Tide', flavor: 'A calm settles over you, deep and unhurried.', text: '+2 Wisdom for 1 hour.' },
+  { name: 'Rune of the Raven', flavor: 'Half-formed thoughts suddenly finish themselves.', text: '+3 Insight for 1 hour.' },
+  { name: 'Rune of the Serpent', flavor: 'Your shadow seems to fall a little quieter than it should.', text: '+3 Stealth for 1 hour.' },
+  { name: 'Rune of the Oak', flavor: 'Something old and patient lends you its endurance.', text: '+3 Maximum Hit Points for 1 hour.' },
+  { name: 'Rune of the Moth', flavor: 'Your words find a warmth they didn\'t have a moment ago.', text: '+2 Charisma for 1 hour.' },
+  { name: 'Rune of the Ash', flavor: 'A faint ringing lingers behind your eyes, not unpleasant.', text: '+3 Arcana for 1 hour.' },
+  { name: 'Rune of the Hollow', flavor: 'You feel, for a while, a little harder to truly touch.', text: '+1 Saving Throws for 1 hour.' },
+];
+function castElderRune() {
+  const key = playerOwnsItemNamed('Elder Runes Deck');
+  if (!key) return;
+  const rune = ELDER_RUNES_CARDS[Math.floor(Math.random() * ELDER_RUNES_CARDS.length)];
+  const durationMs = parseDurationMs(rune.text);
+  startTimedEffect({ name: 'Elder Runes Deck' }, 'rune:' + rune.name, TOKEN_INDEX[key].rarity, rune.text, durationMs);
+  renderCharacterSheet();
+  renderActiveEffects();
+  if (typeof renderElderRunesPanel === 'function') renderElderRunesPanel();
+  scheduleSave();
+  const title = document.getElementById('runeCastTitle');
+  const body = document.getElementById('runeCastBody');
+  if (title) title.textContent = `🔮 ${rune.name}`;
+  if (body) body.innerHTML = `<p style="font-style:italic;color:var(--text-dim);margin-bottom:0.6rem;">${escapeHtml(rune.flavor)}</p><p>${escapeHtml(rune.text)}</p>`;
+  const modal = document.getElementById('runeCastModal');
+  if (modal) modal.classList.add('open');
+}
+function closeRuneCastModal() {
+  const modal = document.getElementById('runeCastModal');
+  if (modal) modal.classList.remove('open');
+}
+function renderElderRunesPanel() {
+  const wrap = document.getElementById('elderRunesPanel');
+  if (!wrap) return;
+  if (!playerOwnsItemNamed('Elder Runes Deck')) { wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  const active = (activeTimedEffects || []).filter(e => e.key && e.key.startsWith('rune:'));
+  const log = active.map(e => {
+    const msLeft = e.permanent ? null : e.expiresAt - Date.now();
+    const label = msLeft != null && msLeft > 0 ? abilityCooldownLabel(msLeft) + ' left' : 'active';
+    return `<div class="deck-log-row"><strong>${escapeHtml(e.key.slice(5))}</strong> — ${escapeHtml(e.text)} (${label})</div>`;
+  }).join('') || '<p style="color:var(--text-dim);font-size:0.82rem;font-style:italic;">No runes currently active.</p>';
+  wrap.innerHTML = `
+    <div class="deck-panel-head">
+      <span>🔮 Elder Runes Deck</span>
+      <button class="deck-draw-btn" onclick="castElderRune()">Cast a Rune</button>
     </div>
     <div class="deck-panel-log">${log}</div>
   `;
