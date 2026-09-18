@@ -180,3 +180,18 @@ const VEHICLE_LIBRARY = [
   { name: "Skyrunner Balloon", category: "Air", size: "Huge", speed: "3 mph (wind-assisted, pilot-steerable within limits)", ac: 12, hp: 80, damageThreshold: null, crew: "1 (up to 3 passengers)", cargo: "300 lbs.", description: "A hot-air balloon with a reinforced wicker gondola and a small enchanted brazier for reliable lift — slow, vulnerable to strong winds, but the cheapest way to get a small party genuinely airborne." },
   { name: "Windcutter Skiff", category: "Air", size: "Large", speed: "6 mph", ac: 14, hp: 120, damageThreshold: 5, crew: "2 (up to 6 passengers)", cargo: "1 ton", description: "A rigid-hulled airship kept aloft by a set of enchanted levitation crystals along its keel, sailed with conventional canvas for propulsion. Rare and expensive, but a genuine aerial vehicle rather than a slow drifting balloon." },
 ];
+
+// Original content -- see this file's header. The mechanical summary of each "Fragment of
+// Suffering" legendary/celestial item (full flavor text and unlock tiers live on the items
+// themselves in loot-data.js) -- this is the quick-reference version: what it grants, what it
+// costs, at a glance, without having to open each item's own card.
+const FRAGMENT_LIBRARY = [
+  { name: "Fragment of Grief", emotion: "Grief", rarity: "Legendary", benefit: "+2 Wisdom while attuned. Once per long rest, cast Revivify on a dying creature within 30 ft. for free.", drawback: "On finishing a long rest, DC 13 Wisdom save or regain no Hit Dice from that rest at all." },
+  { name: "Fragment of Rage", emotion: "Rage", rarity: "Legendary", benefit: "+2 Strength while attuned. Once per turn on a melee hit, deal an extra 2d6 damage.", drawback: "Below half HP, cannot willingly end your turn without attacking or advancing on the nearest enemy." },
+  { name: "Fragment of Dread", emotion: "Fear", rarity: "Legendary", benefit: "+2 Charisma while attuned. Once per short rest, Frighten one creature within 30 ft. (DC 15 Wisdom).", drawback: "Once per day, a secret DC 13 Wisdom save or you must spend your next turn fleeing the nearest threat, real or not." },
+  { name: "Fragment of Envy", emotion: "Envy", rarity: "Legendary", benefit: "+2 Dexterity while attuned. Once per long rest, swap your last d20 roll for a nearby creature's natural 20.", drawback: "Disadvantage on Persuasion checks toward anyone wielding a magic item you don't also own." },
+  { name: "Fragment of Despair", emotion: "Despair", rarity: "Celestial", benefit: "+3 Constitution while attuned. Resistance to all damage while below half HP.", drawback: "Whenever a nearby ally drops to 0 HP, DC 16 Wisdom save or become Poisoned until your next turn ends." },
+  { name: "Fragment of Ecstasy", emotion: "Ecstasy", rarity: "Celestial", benefit: "+3 Charisma while attuned. Once per long rest, cast Mass Cure Wounds for free.", drawback: "Cannot willingly harm a creature that isn't currently attacking you or an ally." },
+  { name: "Fragment of Guilt", emotion: "Guilt", rarity: "Celestial", benefit: "+3 Wisdom while attuned. Once per day, turn a failed save into a success by passing it to a nearby ally instead.", drawback: "Knowingly harming an innocent grants a level of Exhaustion no rest can remove — only atonement can." },
+  { name: "Fragment of the Hollow", emotion: "Emotional Void", rarity: "Celestial", benefit: "+3 to saves against Charmed/Frightened/Possessed while attuned. Immune to divination detection.", drawback: "Immune to morale-based buffs (Bardic Inspiration and the like); disadvantage on Charisma checks requiring genuine emotion." },
+];

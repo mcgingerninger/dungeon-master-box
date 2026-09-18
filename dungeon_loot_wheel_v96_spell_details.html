@@ -3206,6 +3206,7 @@
       <button class="reference-subtab-btn" onclick="showReferenceSection('gifts',this)">Gifts &amp; Rewards</button>
       <button class="reference-subtab-btn" onclick="showReferenceSection('vehicles',this)">Vehicles</button>
       <button class="reference-subtab-btn" onclick="showReferenceSection('feats',this)">Feats</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('fragments',this)">Fragments of Suffering</button>
     </div>
     <div class="token-toolbar">
       <input type="text" id="referenceSearch" class="token-search" placeholder="Search this section…" oninput="renderReferenceSection()">
@@ -5134,6 +5135,7 @@ function referenceSectionData(section) {
   if (section === 'gifts') return GIFT_LIBRARY;
   if (section === 'vehicles') return VEHICLE_LIBRARY;
   if (section === 'feats') return FEAT_LIBRARY;
+  if (section === 'fragments') return FRAGMENT_LIBRARY;
   return [];
 }
 // Flattens whatever string/array-of-string fields an entry has into one searchable blob, rather
@@ -5181,6 +5183,13 @@ function referenceCardHtml(section, item) {
       <div class="ref-card-mech">AC ${item.ac} · HP ${item.hp}${item.damageThreshold ? ' (threshold ' + item.damageThreshold + ')' : ''} · Speed ${escapeHtml(item.speed)} · Size ${escapeHtml(item.size)}</div>
       <div class="ref-card-field"><strong>Crew:</strong> ${escapeHtml(item.crew)} · <strong>Cargo:</strong> ${escapeHtml(item.cargo)} · <strong>Cost:</strong> ${escapeHtml(item.cost)}</div>
       <div class="ref-card-desc">${escapeHtml(item.description)}</div>
+    </div>`;
+  }
+  if (section === 'fragments') {
+    return `<div class="ref-card">
+      <div class="ref-card-name">${escapeHtml(item.name)} <span class="ref-card-tag">${escapeHtml(item.rarity)} · ${escapeHtml(item.emotion)}</span></div>
+      <div class="ref-card-field ref-card-benefit"><strong>Benefit:</strong> ${escapeHtml(item.benefit)}</div>
+      <div class="ref-card-field ref-card-drawback"><strong>Drawback:</strong> ${escapeHtml(item.drawback)}</div>
     </div>`;
   }
   return '';
