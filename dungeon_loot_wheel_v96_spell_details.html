@@ -1618,6 +1618,13 @@
   .ability-btn.ability-btn-disabled { opacity:0.4; cursor:not-allowed; filter:grayscale(1); }
   .ability-btn.ability-btn-disabled:hover { border-color:var(--border); }
   .ability-btn-cooldown { position:absolute; bottom:2px; right:3px; font-size:0.55rem; color:var(--gold); background:rgba(0,0,0,0.6); border-radius:3px; padding:0 2px; }
+  .deck-of-many-things-panel { background:var(--surface); border:1px solid var(--gold); padding:0.6rem 0.7rem; margin-bottom:0.8rem; }
+  .deck-panel-head { display:flex; align-items:center; justify-content:space-between; gap:0.6rem; color:var(--gold-bright); font-weight:600; margin-bottom:0.4rem; }
+  .deck-draw-btn { background:var(--surface2); border:1px solid var(--gold); color:var(--gold-bright); font-family:'Crimson Text',serif; font-size:0.85rem; padding:0.35rem 0.7rem; cursor:pointer; }
+  .deck-draw-btn:hover { background:var(--gold); color:#1a1409; }
+  .deck-panel-log { display:flex; flex-direction:column; gap:0.25rem; max-height:130px; overflow-y:auto; }
+  .deck-log-row { font-size:0.8rem; color:var(--text-dim); }
+  .deck-log-row strong { color:var(--text); }
   .sheet-abilities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:0.5rem; margin-bottom:0.8rem; }
   .sheet-ability-box { background:var(--surface); border:1px solid var(--border); padding:0.45rem; text-align:center; }
   .sheet-ability-box label { display:block; font-size:0.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem; }
@@ -3438,6 +3445,15 @@
   </div>
 </div>
 
+<!-- Result of drawing from a mystic card deck (Deck of Many Things, and any future decks) — a
+     single card's flavor + effect text, shown the instant the draw is resolved and applied. -->
+<div id="deckDrawModal" class="edit-modal-overlay" onclick="if(event.target===this) closeDeckDrawModal()">
+  <div class="edit-modal" style="width:min(460px,100%);">
+    <div class="edit-modal-header"><h3 id="deckDrawTitle">🎴 A Card is Drawn</h3><button class="edit-modal-close" onclick="closeDeckDrawModal()">×</button></div>
+    <div class="edit-modal-body" id="deckDrawBody"></div>
+  </div>
+</div>
+
 <!-- DM: full edit access to a viewed player's character sheet (Players tab). A modal rather
      than inline fields on the sheet panel itself — that panel's innerHTML gets rebuilt on every
      live snapshot of the viewed player (any of their own actions, or just the periodic autosave
@@ -3654,6 +3670,9 @@
        equip slot always could, just surfaced somewhere players actually look. Grays out (and
        shows why, via its own title) once its charges hit 0 or its own timer is still running. -->
   <div class="ability-bar" id="inventoryAbilityBar"></div>
+  <!-- Only ever visible while the player actually owns a Deck of Many Things -- see
+       renderDeckOfManyThingsPanel(), which blanks and hides this whenever they don't. -->
+  <div class="deck-of-many-things-panel" id="deckOfManyThingsPanel" style="display:none;"></div>
   <div class="player-top-row" ondragover="slotDragOver(event)" ondrop="smartEquipDrop(event)">
     <div class="player-board">
       <div class="player-doll">
@@ -4390,6 +4409,7 @@ function abilityCooldownLabel(ms) {
 // equipped item with a usable granted ability. weapon1/weapon2 are deduped exactly like
 // uniqueEquippedSlotEntries does for a two-hander occupying both.
 function renderAbilityBar() {
+  if (typeof renderDeckOfManyThingsPanel === 'function') renderDeckOfManyThingsPanel();
   const bar = document.getElementById('inventoryAbilityBar');
   if (!bar) return;
   buildTokenIndex();
@@ -4458,6 +4478,139 @@ function activateAbilityFromBar(slotId) {
     updateInventorySummary();
     flashInvMessage(`${entry.item.name} used.${healSuffix}`);
   }
+}
+// ---------- Deck of Many Things ----------
+// A player-triggered, self-contained fate-card mechanic — deliberately separate from
+// handleItemActivation's charge/duration system above, since a card's consequence is usually a
+// permanent change to the character itself (an ability score, a level, gold, an owned item)
+// rather than a temporary buff/debuff that fits activeTimedEffects. Original card list — same
+// "high-risk, high-reward fate deck" territory as the classic trope, but its own names/effects.
+function playerOwnsItemNamed(name) {
+  buildTokenIndex();
+  const keys = [
+    ...Object.values(playerSlots || {}),
+    ...Object.values(inventoryPlacements || {}).map(p => p.key),
+    ...(recentlyLooted || []),
+  ].filter(Boolean);
+  return keys.find(k => TOKEN_INDEX[k] && TOKEN_INDEX[k].item && TOKEN_INDEX[k].item.name === name) || null;
+}
+// Picks and removes one random OTHER owned item (never the deck itself) for cards that destroy
+// something you're carrying. Returns the destroyed item's name, or null if nothing else to lose.
+function destroyRandomOwnedItem(excludeName) {
+  buildTokenIndex();
+  const keys = [
+    ...Object.values(playerSlots || {}),
+    ...Object.values(inventoryPlacements || {}).map(p => p.key),
+  ].filter(k => k && TOKEN_INDEX[k] && TOKEN_INDEX[k].item && TOKEN_INDEX[k].item.name !== excludeName);
+  if (!keys.length) return null;
+  const key = keys[Math.floor(Math.random() * keys.length)];
+  const name = TOKEN_INDEX[key].item.name;
+  removeTokenEverywhere(key);
+  return name;
+}
+const DECK_OF_MANY_THINGS_CARDS = [
+  { name: 'The Anchor', flavor: 'A weight settles into your bones, steady and certain.', apply: () => {
+    const stat = ri(['str','dex','con','int','wis','cha']);
+    characterAbilityScores[stat] = Math.min(24, (characterAbilityScores[stat] || 10) + 1);
+    return `Your ${stat.toUpperCase()} permanently increases by 1 (now ${characterAbilityScores[stat]}).`;
+  }},
+  { name: 'The Ember', flavor: 'Warmth floods every vein, then settles into something that stays.', apply: () => {
+    characterMaxHp = (characterMaxHp || 10) + 2;
+    characterMaxHpEffective = (characterMaxHpEffective || characterMaxHp) + 2;
+    characterCurrentHp = characterMaxHpEffective;
+    return `Your maximum HP permanently increases by 2 (now ${characterMaxHp} base), and you are healed to full.`;
+  }},
+  { name: 'The Tide', flavor: 'Coins spill from nowhere, ringing against the floor.', apply: () => {
+    const amount = 500 + Math.floor(Math.random() * 1501);
+    syncCurrencyTokens(getPlayerGold() + amount);
+    refreshGoldDisplays();
+    return `${amount} gp materializes in your pack.`;
+  }},
+  { name: 'The Rising Star', flavor: 'You remember, all at once, a hundred hard-won lessons you never actually learned.', apply: () => {
+    characterLevel = Math.min(20, (characterLevel || 1) + 1);
+    return `You permanently gain a level (now level ${characterLevel}).`;
+  }},
+  { name: "The Keeper's Vault", flavor: 'A door that was never there creaks open just long enough.', apply: () => {
+    const pool = (typeof lootData !== 'undefined' && lootData.legendary) || [];
+    if (!pool.length) return 'The vault door creaks... and reveals nothing. (No legendary items are loaded.)';
+    const picked = { ...pool[Math.floor(Math.random() * pool.length)], rarity: 'legendary' };
+    const { item, placed } = placeItemIntoInventory(picked);
+    return placed ? `A vault yields up <strong>${item.name}</strong>, now in your pack.` : `A vault yields up <strong>${item.name}</strong>, but your pack has no room — find it in the Token Library.`;
+  }},
+  { name: "The Steady Hand", flavor: 'Your grip finds a certainty it will not lose again.', apply: () => 'You gain advantage on your next 3 saving throws of your choice — tell your DM when you use each one.' },
+  { name: "The Guardian's Ward", flavor: 'Something old and protective takes an interest in you.', apply: () => 'You gain resistance to one damage type of your choice, permanently — work out which with your DM.' },
+  { name: 'The Splinter', flavor: 'A hairline crack runs through something you cannot see.', apply: () => {
+    const stat = ri(['str','dex','con','int','wis','cha']);
+    characterAbilityScores[stat] = Math.max(3, (characterAbilityScores[stat] || 10) - 1);
+    return `Your ${stat.toUpperCase()} permanently decreases by 1 (now ${characterAbilityScores[stat]}).`;
+  }},
+  { name: 'The Undertow', flavor: 'Your coin pouch feels lighter before you even hear it happen.', apply: () => {
+    const current = getPlayerGold();
+    const lost = Math.round(current / 2);
+    syncCurrencyTokens(current - lost);
+    refreshGoldDisplays();
+    return lost > 0 ? `You lose ${lost} gp, swept away to nowhere.` : 'You had nothing to lose — the card passes without effect.';
+  }},
+  { name: 'The Fading', flavor: 'A hard-won memory slips out of reach and will not come back.', apply: () => {
+    characterLevel = Math.max(1, (characterLevel || 1) - 1);
+    return `You permanently lose a level (now level ${characterLevel}).`;
+  }},
+  { name: 'The Hollow Mark', flavor: 'Something in your pack has already begun to crumble.', apply: () => {
+    const destroyed = destroyRandomOwnedItem('Deck of Many Things');
+    return destroyed ? `<strong>${destroyed}</strong> crumbles to ash and is gone.` : 'You reach for something to lose, and find you own nothing else worth taking. The card passes without effect.';
+  }},
+  { name: 'The Long Sleep', flavor: 'The world goes dark for what feels like a moment.', apply: () => {
+    characterCurrentHp = 1;
+    return 'You black out and wake at 1 HP. A full day has passed for everyone else, whether you meant it to or not.';
+  }},
+  { name: 'The Watched', flavor: 'You feel, suddenly and certainly, that you have been noticed.', apply: () => 'A dangerous rival now takes an active interest in you — your DM decides who, and when they make themselves known.' },
+  { name: 'The Debt', flavor: 'A voice with no source thanks you for an agreement you do not remember making.', apply: () => 'You owe an unknown power a favor, to be collected at a time of its choosing — your DM will decide what it wants.' },
+  { name: 'The Mirror', flavor: 'The card shows you your own face, then someone else\'s.', apply: () => {
+    const rest = DECK_OF_MANY_THINGS_CARDS.filter(c => c.name !== 'The Mirror');
+    const second = rest[Math.floor(Math.random() * rest.length)];
+    const secondResult = second.apply();
+    return `Fate isn't finished with you. A second card turns over: <strong>${second.name}</strong> — ${secondResult}`;
+  }},
+  { name: 'The Blank Page', flavor: 'The card is empty. It stays empty.', apply: () => 'Nothing happens... yet. You could swear the blank card remembers your name.' },
+];
+function drawDeckOfManyThingsCard() {
+  if (!playerOwnsItemNamed('Deck of Many Things')) return;
+  const card = DECK_OF_MANY_THINGS_CARDS[Math.floor(Math.random() * DECK_OF_MANY_THINGS_CARDS.length)];
+  const resultText = card.apply();
+  deckOfManyThingsLog.unshift({ name: card.name, text: resultText, ts: Date.now() });
+  renderCharacterSheet();
+  renderPlayerSlots();
+  updateInventorySummary();
+  if (typeof renderDeckOfManyThingsPanel === 'function') renderDeckOfManyThingsPanel();
+  scheduleSave();
+  const title = document.getElementById('deckDrawTitle');
+  const body = document.getElementById('deckDrawBody');
+  if (title) title.textContent = `🎴 ${card.name}`;
+  if (body) body.innerHTML = `<p style="font-style:italic;color:var(--text-dim);margin-bottom:0.6rem;">${escapeHtml(card.flavor)}</p><p>${resultText}</p>`;
+  const modal = document.getElementById('deckDrawModal');
+  if (modal) modal.classList.add('open');
+}
+function closeDeckDrawModal() {
+  const modal = document.getElementById('deckDrawModal');
+  if (modal) modal.classList.remove('open');
+}
+// Small panel on the Inventory tab, only shown at all while the player actually owns the deck —
+// see renderInventorySummaryExtras' call site for where this gets invoked.
+function renderDeckOfManyThingsPanel() {
+  const wrap = document.getElementById('deckOfManyThingsPanel');
+  if (!wrap) return;
+  if (!playerOwnsItemNamed('Deck of Many Things')) { wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  const log = (deckOfManyThingsLog || []).slice(0, 8).map(e =>
+    `<div class="deck-log-row"><strong>${escapeHtml(e.name)}</strong> — ${e.text}</div>`
+  ).join('') || '<p style="color:var(--text-dim);font-size:0.82rem;font-style:italic;">No cards drawn yet.</p>';
+  wrap.innerHTML = `
+    <div class="deck-panel-head">
+      <span>🎴 Deck of Many Things</span>
+      <button class="deck-draw-btn" onclick="drawDeckOfManyThingsCard()">Draw a Card</button>
+    </div>
+    <div class="deck-panel-log">${log}</div>
+  `;
 }
 // ---------- Power picker popup ----------
 let _powerPickerEntry = null;
@@ -13108,6 +13261,11 @@ function setGenerationToggle(key, value) {
   renderDmControlsTab();
 }
 loadGenerationToggles();
+
+// Draw history for the Deck of Many Things (see DECK_OF_MANY_THINGS_CARDS/drawDeckOfManyThingsCard
+// further below) -- one entry per card ever drawn by this character, newest first. Synced like
+// any other character state so the DM sees a viewed player's draws too.
+let deckOfManyThingsLog = [];
 
 // Extracted to game-engine.js in Phase 1 of the architecture migration (see
 // docs/ARCHITECTURE.md): ABILITY_NAMES, SKILL_ABILITY_MAP, SHEET_STAT_ALIASES,
@@ -22678,7 +22836,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
-      characterRace, characterAffinity, characterInitiative,
+      characterRace, characterAffinity, characterInitiative, deckOfManyThingsLog,
       appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
@@ -22752,6 +22910,7 @@ function applyStateBlob(data) {
   if (data.skillProficiencies) skillProficiencies = data.skillProficiencies;
   if (data.saveProficiencies) saveProficiencies = data.saveProficiencies;
   if (data.feats) feats = data.feats;
+  if (data.deckOfManyThingsLog) deckOfManyThingsLog = data.deckOfManyThingsLog;
   if (typeof data.characterCurrentHp === 'number') characterCurrentHp = data.characterCurrentHp;
   if (typeof data.characterMaxHp === 'number') characterMaxHp = data.characterMaxHp;
   // Restored provisionally here (a stale/absent value from before this field existed falls back
@@ -22839,6 +22998,7 @@ window.resetMainAppStateToBlank = function () {
   skillProficiencies = [];
   saveProficiencies = [];
   feats = [];
+  deckOfManyThingsLog = [];
   characterCurrentHp = 10;
   characterMaxHp = 10;
   characterMaxHpEffective = 10;
