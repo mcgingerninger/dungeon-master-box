@@ -14115,16 +14115,56 @@ async function fetchMonsterFluff(file) {
     return map;
   } catch (e) { console.warn('Monster fluff source failed', fluffFile, e); return new Map(); }
 }
+// Real bug found in testing: ~20% of creatures (skewed heavily toward exactly the named/unique
+// reskins the user was reporting -- "Venomfang", "Gundren Rockseeker", a whole family of
+// "Drow Acolyte/Bandit/Commoner/..." variants) rendered with completely blank ac/hp/actions.
+// Cause: the 5etools schema represents "this is basically that OTHER monster with a new name"
+// via a `_copy: {name, source}` pointer instead of repeating the full stat block -- e.g.
+// Venomfang|LMoP carries no ac/hp/action of its own at all, just a pointer at
+// Young Green Dragon|MM. monsterNormalize() only ever read a monster's own top-level fields, so
+// every one of these normalized to the '—'/[] fallbacks. There's already a _copy resolver for
+// FLUFF text (fetchMonsterFluff's resolve(), above) -- this mirrors that same depth-bounded-
+// recursion approach for the actual stat-block fields, which needed a bigger structural change
+// than fluff's did: the copy target can live in a completely DIFFERENT source file (Venomfang is
+// in the LMoP file, its base is in the MM file), so every source's raw monster list has to be
+// fetched and assembled into one global lookup BEFORE any normalization can run, rather than
+// normalizing each file's monsters independently as they arrive.
+function resolveMonsterCopy(raw, rawByKey, depth) {
+  if (!raw._copy || depth > 5) return raw;
+  // Lowercased lookup -- found a real upstream data inconsistency while verifying this: OotA's
+  // Ougalop/Shuushar _copy pointers reference "Kuo-Toa" (capital T) while the MM source's own
+  // entry is actually named "Kuo-toa". Case-insensitive matching absorbs that kind of upstream
+  // typo instead of silently failing to resolve.
+  const base = rawByKey.get((raw._copy.name + '|' + raw._copy.source).toLowerCase());
+  if (!base) return raw;
+  const resolvedBase = resolveMonsterCopy(base, rawByKey, depth + 1);
+  // Base's stat fields first, then the copy's own fields override -- a _copy entry still
+  // specifies its own name/source/page (and occasionally a genuine override field of its own),
+  // it just never repeats the fields that come from the base. Deliberately NOT applying 5etools'
+  // `_mod` text-replacement rules (targeted edits some _copy entries carry, e.g. a resized breath
+  // weapon) -- that's a real schema with its own array-splice/replace operations, and getting a
+  // hand-rolled implementation subtly wrong could silently corrupt combat math. Inheriting the
+  // base's exact stat block is a large, safe improvement over the current blank stats; it just
+  // won't reflect small flavor-specific tweaks a handful of reskins define via `_mod`.
+  return { ...resolvedBase, ...raw, _copy: undefined };
+}
 async function fetchMonsterSet() {
-  const results = await Promise.all(Object.entries(MONSTER_SOURCE_FILES).map(async ([code, file]) => {
+  const perSource = await Promise.all(Object.entries(MONSTER_SOURCE_FILES).map(async ([code, file]) => {
     try {
       const [j, fluffMap] = await Promise.all([
         fetch(MONSTER_DATA_ROOT + file, { cache:'no-store' }).then(r => { if (!r.ok) throw new Error('Could not load ' + file); return r.json(); }),
         fetchMonsterFluff(file),
       ]);
-      return (j.monster || []).map(m => monsterNormalize(m, fluffMap));
-    } catch (e) { console.warn('Monster source failed', code, e); return []; }
+      return { monsters: j.monster || [], fluffMap };
+    } catch (e) { console.warn('Monster source failed', code, e); return { monsters: [], fluffMap: new Map() }; }
   }));
+  // Global raw registry across every source, built before any normalization -- a _copy pointer
+  // needs to resolve against the whole loaded bestiary, not just the file it appears in.
+  const rawByKey = new Map();
+  perSource.forEach(({ monsters }) => monsters.forEach(m => rawByKey.set((m.name + '|' + m.source).toLowerCase(), m)));
+  const results = perSource.map(({ monsters, fluffMap }) =>
+    monsters.map(m => monsterNormalize(resolveMonsterCopy(m, rawByKey, 0), fluffMap))
+  );
   // Promise.all resolves in the SAME order as the input array regardless of which fetch
   // actually finished first, so `results` is already in MONSTER_SOURCE_FILES's own declared
   // order — first-seen-wins dedup here means MM (listed first) stays canonical over a later
