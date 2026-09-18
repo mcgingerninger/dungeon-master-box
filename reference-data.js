@@ -141,6 +141,31 @@ const GIFT_LIBRARY = [
   { name: "The Last Word", trigger: "Granted to a creature present at the true, final death of something ancient (not merely old — something that had genuinely earned the word 'ancient'), who spoke to it with respect rather than fear.", benefit: "Once per long rest, the creature can reroll one failed saving throw.", drawback: "The creature occasionally speaks a sentence in a language it doesn't know, at seemingly random moments, always something the dying ancient thing might plausibly have wanted said — the DM decides the content and timing." },
 ];
 
+// Original content -- see this file's header. Feats beyond the SRD's bare ability-score-
+// improvement rule are PHB/sourcebook content, not SRD; written fresh here. Effect text follows
+// the same "+N Stat"/"+N Skill" phrasing the rest of the app already scans for (equipped-item
+// effects, active timed effects) so a selected feat's numeric bonus is picked up automatically by
+// the character sheet -- see FEAT_LIBRARY's consumers in the main file (toggleFeat, the
+// computeCharacterSheetFor call sites that fold selected feats' text into the same
+// addActiveEffectDeltas pass equipped gear already goes through).
+const FEAT_LIBRARY = [
+  { name: "Battle-Hardened Reflexes", description: "+1 Dexterity. You have advantage on initiative rolls." },
+  { name: "Iron Constitution", description: "+1 Constitution. You have advantage on saving throws against poison, and resistance to poison damage." },
+  { name: "Keen Senses", description: "+2 Perception. You can't be surprised while conscious, unless you're incapacitated." },
+  { name: "Silver Tongue", description: "+1 Charisma. You have advantage on Persuasion checks against a creature that has never met you before." },
+  { name: "Unshakeable Resolve", description: "+2 to saving throws against being frightened. Once per long rest, you can end the frightened condition on yourself as a bonus action." },
+  { name: "Warded Mind", description: "+1 Wisdom. You have resistance to psychic damage, and advantage on saving throws against being charmed." },
+  { name: "Scarred Survivor", description: "+1 Constitution. Once per long rest, when an attack would reduce you to 0 hit points but not kill you outright, you can choose to drop to 1 hit point instead." },
+  { name: "Diplomat's Instinct", description: "+2 Insight. Once per short rest, you can tell with certainty whether a creature you can see is being deliberately deceptive in what it's currently saying." },
+  { name: "Hardened Grip", description: "+1 Strength. You have advantage on checks and saving throws made to avoid being disarmed, grappled, or shoved." },
+  { name: "Lucky Break", description: "Once per long rest, when you fail a saving throw, you can reroll it and must use the new result." },
+  { name: "Swift Runner", description: "Your walking speed increases by 10 feet. Difficult terrain no longer costs you extra movement when you Dash." },
+  { name: "Steady Aim", description: "If you haven't moved yet on your turn, your first attack roll that turn has advantage." },
+  { name: "Arcane Aptitude", description: "+1 Intelligence. You learn one cantrip of your choice from any spell list (DM's discretion on how it's cast if your character has no other spellcasting)." },
+  { name: "Precise Striker", description: "Choose one weapon type you're proficient with. You have a +1 bonus to attack rolls made with that weapon type." },
+  { name: "Battlefield Coordinator", description: "Once per combat as a bonus action, you can direct up to two allies within 30 feet who can hear you; each gains a +2 bonus to their next initiative-order action's attack roll or ability check." },
+];
+
 // Original content -- see this file's header. Vehicle stat blocks beyond generic mundane objects
 // are DMG-style content, not SRD; written fresh here.
 const VEHICLE_LIBRARY = [

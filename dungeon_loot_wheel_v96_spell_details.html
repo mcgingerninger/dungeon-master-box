@@ -1607,6 +1607,8 @@
   @media (max-width:700px) { .sheet-columns { grid-template-columns:1fr; } }
   .sheet-section-title { color:var(--gold); font-size:0.9rem; letter-spacing:0.04em; margin:0 0 0.3rem; padding-bottom:0.2rem; border-bottom:1px solid var(--border); }
   .sheet-line-row { display:flex; justify-content:space-between; align-items:center; padding:0.18rem 0; border-bottom:1px solid var(--border); font-size:0.84rem; }
+  .sheet-feats-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:0.3rem 0.8rem; }
+  .sheet-feat-row { display:flex; align-items:center; gap:0.4rem; font-size:0.84rem; padding:0.15rem 0; cursor:help; }
   .sheet-line-row label { display:flex; align-items:center; gap:0.4rem; cursor:pointer; }
   .sheet-line-val { color:var(--gold); font-family:'Share Tech Mono',monospace; }
   /* Buff/debuff coloring shared by every computed stat readout — abilities, saves, skills, AC,
@@ -3160,6 +3162,7 @@
       <button class="reference-subtab-btn" onclick="showReferenceSection('deities',this)">Deities</button>
       <button class="reference-subtab-btn" onclick="showReferenceSection('gifts',this)">Gifts &amp; Rewards</button>
       <button class="reference-subtab-btn" onclick="showReferenceSection('vehicles',this)">Vehicles</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('feats',this)">Feats</button>
     </div>
     <div class="token-toolbar">
       <input type="text" id="referenceSearch" class="token-search" placeholder="Search this section…" oninput="renderReferenceSection()">
@@ -3733,6 +3736,10 @@
       </div>
     </div>
     <p class="sheet-note">Armor Class, saving throws, and skills are computed automatically from your ability scores and equipped gear — hover a green/red value to see which item is affecting it. Item bonuses are picked up by scanning each item's effect text for patterns like "+2 Strength" or "+1 AC" — a best-effort match, not a guaranteed-complete rules engine.</p>
+
+    <h3 class="sheet-section-title">Feats</h3>
+    <div id="sheetFeatsList" class="sheet-feats-list"></div>
+    <p class="sheet-note">A feat's numeric bonus (e.g. "+1 Constitution") is picked up automatically the same way an item's effect text is — see the Compendium's Reference tab for the full list and what each one does.</p>
   </div>
 
   <details class="collapsible loadouts-collapsible">
@@ -4738,6 +4745,7 @@ function referenceSectionData(section) {
   if (section === 'deities') return DEITY_LIBRARY;
   if (section === 'gifts') return GIFT_LIBRARY;
   if (section === 'vehicles') return VEHICLE_LIBRARY;
+  if (section === 'feats') return FEAT_LIBRARY;
   return [];
 }
 // Flattens whatever string/array-of-string fields an entry has into one searchable blob, rather
@@ -4747,7 +4755,7 @@ function referenceMatchText(item) {
   return Object.values(item).flat(2).filter(v => typeof v === 'string').join(' ').toLowerCase();
 }
 function referenceCardHtml(section, item) {
-  if (section === 'actions') {
+  if (section === 'actions' || section === 'feats') {
     return `<div class="ref-card"><div class="ref-card-name">${escapeHtml(item.name)}</div><div class="ref-card-desc">${escapeHtml(item.description)}</div></div>`;
   }
   if (section === 'conditions') {
@@ -13033,6 +13041,11 @@ let characterAffinity = '';
 // DM-only combat initiative counter -- the DM sets/adjusts it (see the Players tab's nudge
 // buttons and the initiative_delta wire message), the player's own client only ever displays it.
 let characterInitiative = 0;
+// Selected feat names (FEAT_LIBRARY, reference-data.js) -- same flat-array-of-strings shape as
+// skillProficiencies/saveProficiencies, toggled the same way. See featEffectEntries() for how a
+// selected feat's effect text feeds into the same stat-breakdown pass equipped gear/active
+// effects already go through.
+let feats = [];
 
 // Extracted to game-engine.js in Phase 1 of the architecture migration (see
 // docs/ARCHITECTURE.md): ABILITY_NAMES, SKILL_ABILITY_MAP, SHEET_STAT_ALIASES,
@@ -13350,7 +13363,7 @@ function closeDiceRoller() {
 // where the rest of its dependency chain was removed for the full explanation.
 function computeCharacterSheet() {
   buildTokenIndex();
-  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, activeTimedEffects);
+  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, [...(activeTimedEffects || []), ...featEffectEntries(feats)]);
 }
 // Not a dynamic window[field] = value assignment — these are `let` bindings in a classic
 // script, which (unlike `var` or function declarations) never attach to `window`, so that
@@ -13397,6 +13410,22 @@ function toggleSaveProficiency(abilityName) {
   if (idx === -1) saveProficiencies.push(abilityName); else saveProficiencies.splice(idx, 1);
   renderCharacterSheet();
   if (typeof scheduleSave === 'function') scheduleSave();
+}
+function toggleFeat(name) {
+  const idx = feats.indexOf(name);
+  if (idx === -1) feats.push(name); else feats.splice(idx, 1);
+  renderCharacterSheet();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+// Turns a list of selected feat names into the same {name, text} shape activeTimedEffects
+// entries already have, so their effect text (e.g. "+1 Constitution...") flows through
+// addActiveEffectDeltas exactly like an active potion buff would, picking up any numeric bonus
+// automatically. Works for ANY feats array (own or a foreign player's), not just the local one.
+function featEffectEntries(featNames) {
+  return (featNames || []).map(name => {
+    const def = (typeof FEAT_LIBRARY !== 'undefined' ? FEAT_LIBRARY : []).find(f => f.name === name);
+    return def ? { name: def.name, text: def.description } : null;
+  }).filter(Boolean);
 }
 // AC is fully derived now (ability scores + equipped gear, exactly like Saves/Skills already
 // were) rather than a manually-typed field the player had to remember to sync — see
@@ -13554,6 +13583,13 @@ function renderCharacterSheet() {
     skillsEl.innerHTML = Object.keys(SKILL_ABILITY_MAP).map(skill => {
       const proficient = skillProficiencies.includes(skill);
       return `<div class="sheet-line-row"><label><input type="checkbox" ${proficient ? 'checked' : ''} onchange="toggleSkillProficiency('${skill.replace(/'/g, "\\'")}')"> ${escapeHtml(skill)}</label>${statValueHtml(fmtMod(sheet.skills[skill].total), sheet.skills[skill])}</div>`;
+    }).join('');
+  }
+  const featsEl = document.getElementById('sheetFeatsList');
+  if (featsEl && typeof FEAT_LIBRARY !== 'undefined') {
+    featsEl.innerHTML = FEAT_LIBRARY.map(f => {
+      const selected = feats.includes(f.name);
+      return `<label class="sheet-feat-row" title="${escapeHtml(f.description)}"><input type="checkbox" ${selected ? 'checked' : ''} onchange="toggleFeat('${f.name.replace(/'/g, "\\'")}')"> ${escapeHtml(f.name)}</label>`;
     }).join('');
   }
 }
@@ -17182,7 +17218,7 @@ function buildForeignCharacterSheetHtml(s) {
   const saveProfs = s.saveProficiencies || [];
   const slots = s.playerSlots || {};
   const baseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, s.activeTimedEffects);
+  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats)]);
   const abilitiesHtml = Object.keys(ABILITY_NAMES).map(abbr => {
     const a = sheet.abilities[abbr];
     const cls = a.status ? ' stat-' + a.status : '';
@@ -17453,7 +17489,7 @@ function openDmEditPlayerModal() {
   // modal itself has no way to change equipment. Max HP's gear bonus gets the same "computed
   // fresh, shown alongside the editable base" treatment as AC — see characterMaxHpEffective.
   const dmEditBaseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, s.activeTimedEffects);
+  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats)]);
   const dmAcEl = document.getElementById('dmEditAcValue');
   if (dmAcEl) dmAcEl.textContent = acSheet.ac.total;
   const dmMaxHpBonusEl = document.getElementById('dmEditMaxHpBonus');
@@ -17505,7 +17541,7 @@ function saveDmEditPlayerModal() {
   // is clamped against the gear-inclusive total, not the raw typed base, so a buffed player's
   // headroom the DM just saw in the modal doesn't get silently clipped back off on save.
   const s = viewedPlayerState || {};
-  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, s.activeTimedEffects);
+  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats)]);
   curHp = Math.max(0, Math.min(curHp, acSheet.maxHp.total));
   const fields = {
     characterRace: document.getElementById('dmEditRace').value,
@@ -22492,7 +22528,7 @@ function saveAppState() {
       activeBounties, bountyCounter,
       manglerFinishedWork, manglerPartKey, manglerItemKey, manglerFocus,
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
-      characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies,
+      characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
       characterRace, characterAffinity, characterInitiative,
       appliedGamblingPayoutIds,
@@ -22567,6 +22603,7 @@ function applyStateBlob(data) {
   if (typeof data.characterLevel === 'number') characterLevel = data.characterLevel;
   if (data.skillProficiencies) skillProficiencies = data.skillProficiencies;
   if (data.saveProficiencies) saveProficiencies = data.saveProficiencies;
+  if (data.feats) feats = data.feats;
   if (typeof data.characterCurrentHp === 'number') characterCurrentHp = data.characterCurrentHp;
   if (typeof data.characterMaxHp === 'number') characterMaxHp = data.characterMaxHp;
   // Restored provisionally here (a stale/absent value from before this field existed falls back
@@ -22653,6 +22690,7 @@ window.resetMainAppStateToBlank = function () {
   characterLevel = 1;
   skillProficiencies = [];
   saveProficiencies = [];
+  feats = [];
   characterCurrentHp = 10;
   characterMaxHp = 10;
   characterMaxHpEffective = 10;
