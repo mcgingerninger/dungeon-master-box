@@ -324,6 +324,9 @@ async function pushOwnState(stateOverride) {
 function applyHpDelta(targetUid, delta) {
   send({ type: 'hp_delta', targetUid, delta }); // fire-and-forget, matching the original's own bridge
 }
+function applyInitiativeDelta(targetUid, delta) {
+  send({ type: 'initiative_delta', targetUid, delta }); // fire-and-forget, same as applyHpDelta
+}
 function crossWrite(type, targetUid, extra) {
   send({ type, targetUid, ...extra });
   return waitForNext((m) => (m.type === 'cross_write_ack' && m.targetUid === targetUid) || m.type === 'error')
@@ -356,6 +359,10 @@ function applyTrapEffectToPlayer(targetUid, trap, saved) {
 window.applyHpDeltaToPlayer = function (targetUid, delta) {
   if (!mp.connected) return;
   applyHpDelta(targetUid, delta);
+};
+window.applyInitiativeDeltaToPlayer = function (targetUid, delta) {
+  if (!mp.connected) return;
+  applyInitiativeDelta(targetUid, delta);
 };
 window.giftArbitraryItemToPlayer = function (targetUid, item) {
   if (!mp.connected) return Promise.reject(new Error('Not connected'));

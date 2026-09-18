@@ -284,6 +284,7 @@ export function createWebSocketServer(db, httpServer) {
       roster.push({
         uid: accountUid, username: entry.username || 'Unnamed', role: 'player', currentHp, maxHp, ac: s.characterAc,
         characterClass: s.characterClass, characterRace: s.characterRace, characterAffinity: s.characterAffinity,
+        initiative: typeof s.characterInitiative === 'number' ? s.characterInitiative : 0,
       });
     }
     return roster;
@@ -417,7 +418,7 @@ export function createWebSocketServer(db, httpServer) {
         return;
       }
 
-      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect') {
+      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect' || msg.type === 'initiative_delta') {
         if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that' });
         const targetUid = msg.targetUid;
         const existing = loadPlayerState(db, identity.campaignId, targetUid) || { state: {}, rev: 0 };
@@ -446,6 +447,11 @@ export function createWebSocketServer(db, httpServer) {
           // "Apply to Player" tool -- msg.saved reflects a saving throw the DM already resolved
           // at the table (or true for an effect with no save at all).
           nextState = applyTrapEffectToState(nextState, msg.trap || {}, !!msg.saved);
+        } else if (msg.type === 'initiative_delta') {
+          // DM-only counter, unlike hp_delta -- no clamp, since initiative has no natural min/max
+          // (a heavily-penalized roll can legitimately go negative).
+          const current = typeof nextState.characterInitiative === 'number' ? nextState.characterInitiative : 0;
+          nextState.characterInitiative = current + (Number(msg.delta) || 0);
         }
 
         const nextRev = existing.rev + 1;

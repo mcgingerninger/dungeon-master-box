@@ -1568,6 +1568,7 @@
   /* ---- DM-only persistent player roster strip (above the inventory summary bar) ---- */
   .dm-roster-bar { display:flex; align-items:center; gap:0.6rem; background:var(--surface); border:1px solid var(--border); padding:0.6rem 1rem; margin-bottom:0.7rem; flex-wrap:wrap; font-size:0.88rem; }
   .dm-roster-chip { display:flex; align-items:center; gap:0.4rem; background:var(--bg); border:1px solid var(--border); border-radius:5px; padding:0.3rem 0.6rem; cursor:help; }
+  .dm-roster-chip-init { color:var(--gold); font-family:'Share Tech Mono',monospace; font-size:0.72rem; border-left:1px solid var(--border); padding-left:0.4rem; }
   .dm-roster-chip-name { color:var(--gold); font-weight:600; }
   .dm-roster-empty { color:var(--text-dim); font-style:italic; }
   /* Shared HP color-coding — the DM roster strip chips, the Players tab list, and the DM edit
@@ -2207,6 +2208,9 @@
   .players-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem}
   .players-detail-header h3{margin:0;color:var(--gold);letter-spacing:.03em}
   .players-detail-stats{font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--text-dim)}
+  .players-init-adjust{display:flex;align-items:center;gap:.35rem;margin-top:.4rem;font-family:'Share Tech Mono',monospace;font-size:.85rem;color:var(--text-dim)}
+  .players-init-adjust strong{color:var(--gold)}
+  .player-initiative-badge{color:var(--gold);font-size:0.85em;}
   .players-section-title{color:var(--gold);font-size:.92rem;letter-spacing:.03em;margin:.9rem 0 .5rem}
   .inv-item.foreign-takeable{cursor:pointer}
   .inv-item.foreign-takeable:hover{outline:2px solid var(--gold);outline-offset:-2px}
@@ -2419,7 +2423,7 @@
      multiplayer-sync.js's connectAsRole/logOut once an account is connected — see
      updatePlayerNameDisplay() there. -->
 <div class="inv-summary-bar" id="globalInvSummaryBar" style="margin-bottom:1rem;">
-  <span id="invPlayerNameWrap" style="display:none;">🧑 <strong id="invPlayerName"></strong> <strong id="invPlayerHp"></strong></span>
+  <span id="invPlayerNameWrap" style="display:none;">🧑 <strong id="invPlayerName"></strong> <strong id="invPlayerHp"></strong> <strong id="invPlayerInitiative" class="player-initiative-badge" title="Initiative — set by the DM"></strong></span>
   <span>💰 Inventory Value: <strong id="rollInvGp">0 gp</strong></span>
   <span>🎒 Inventory Slots: <strong id="rollInvSlots">0 / 90</strong></span>
   <span class="inv-weight-wrap">⚖ Inventory Weight: <strong id="rollInvWeight">0 lbs</strong>
@@ -13026,6 +13030,9 @@ let characterMaxHpEffective = 10;
 let characterClass = '';
 let characterRace = '';
 let characterAffinity = '';
+// DM-only combat initiative counter -- the DM sets/adjusts it (see the Players tab's nudge
+// buttons and the initiative_delta wire message), the player's own client only ever displays it.
+let characterInitiative = 0;
 
 // Extracted to game-engine.js in Phase 1 of the architecture migration (see
 // docs/ARCHITECTURE.md): ABILITY_NAMES, SKILL_ABILITY_MAP, SHEET_STAT_ALIASES,
@@ -13470,6 +13477,11 @@ function renderCharacterSheet() {
     hpBannerEl.textContent = `${characterCurrentHp}/${sheet.maxHp.total} HP`;
     hpBannerEl.className = hpColorClass(characterCurrentHp, sheet.maxHp.total);
   }
+  // Read-only for the player -- DM-set-only, per direct request. Shown next to their name
+  // wherever the HP badge already is, same reasoning: don't make them flip to a specific tab
+  // just to see it.
+  const initBannerEl = document.getElementById('invPlayerInitiative');
+  if (initBannerEl) initBannerEl.textContent = `Init ${fmtMod(characterInitiative || 0)}`;
   const profBonusEl = document.getElementById('sheetProfBonus');
   if (profBonusEl) profBonusEl.textContent = fmtMod(sheet.profBonus);
 
@@ -17610,6 +17622,7 @@ function renderDmPlayerRosterBar() {
     <div class="dm-roster-chip" onmouseenter="showPlayerRosterTooltip(event,'${p.uid}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">
       <span class="dm-roster-chip-name">${escapeHtml(p.username)}</span>
       ${p.currentHp != null ? `<span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span>` : '<span style="color:var(--text-dim);font-style:italic;">no sheet yet</span>'}
+      <span class="dm-roster-chip-init" title="Initiative">${escapeHtml(fmtMod(p.initiative || 0))}</span>
     </div>
   `).join('') : '<span class="dm-roster-empty">👥 No players connected</span>';
 }
@@ -17644,7 +17657,7 @@ function renderPlayersTab() {
     <div class="players-list-row${p.uid === viewedPlayerUid ? ' active' : ''}">
       <div class="players-list-main" onclick="selectViewedPlayer('${p.uid}')">
         <div class="players-list-name">${escapeHtml(p.username)}</div>
-        <div class="players-list-stats">${p.currentHp != null ? `HP <span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span> · AC ${escapeHtml(String(p.ac))}` : 'No character sheet yet'}</div>
+        <div class="players-list-stats">${p.currentHp != null ? `HP <span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span> · AC ${escapeHtml(String(p.ac))} · Init ${escapeHtml(fmtMod(p.initiative || 0))}` : 'No character sheet yet'}</div>
       </div>
       ${p.currentHp != null ? `<div class="players-hp-adjust" onclick="event.stopPropagation()">
         <button class="hp-nudge-btn hp-nudge-down" onclick="nudgePlayerHp('${p.uid}',-10)" title="-10 HP">«</button>
@@ -17687,6 +17700,11 @@ function renderPlayersTab() {
       <div class="players-detail-header">
         <h3 id="playersDetailName"></h3>
         <div class="players-detail-stats" id="playersDetailStatsLine"></div>
+        <div class="players-init-adjust" title="Combat initiative — DM-only, the player can only see it">
+          <button class="hp-nudge-btn hp-nudge-down" onclick="nudgePlayerInitiative('${viewedPlayerUid}',-1)" title="-1 Initiative">‹</button>
+          <span>Init <strong id="playersDetailInitiative">0</strong></span>
+          <button class="hp-nudge-btn" onclick="nudgePlayerInitiative('${viewedPlayerUid}',1)" title="+1 Initiative">›</button>
+        </div>
       </div>
       <details class="collapsible" open>
         <summary>🧾 Character Sheet</summary>
@@ -17711,6 +17729,8 @@ function renderPlayersTab() {
   if (nameEl) nameEl.textContent = viewedMeta.username;
   const statsEl = document.getElementById('playersDetailStatsLine');
   if (statsEl) statsEl.textContent = viewedMeta.currentHp != null ? `HP ${viewedMeta.currentHp}/${viewedMeta.maxHp} · AC ${viewedMeta.ac}` : 'No character sheet yet';
+  const initEl = document.getElementById('playersDetailInitiative');
+  if (initEl) initEl.textContent = fmtMod(viewedMeta.initiative || 0);
 
   const sheetEl = document.getElementById('playersSheetSection');
   if (sheetEl) sheetEl.innerHTML = buildForeignCharacterSheetHtml(s);
@@ -17756,6 +17776,11 @@ function commitPlayerHpSlider(uid, sliderEl) {
 // to reflect the server-clamped result, same as the old Apply button did.
 function nudgePlayerHp(uid, delta) {
   if (typeof window.applyHpDeltaToPlayer === 'function') window.applyHpDeltaToPlayer(uid, delta);
+}
+// DM-only combat initiative counter -- no local optimistic update (same fire-and-forget reasoning
+// as nudgePlayerHp), no slider since there's no natural min/max to clamp a range input to.
+function nudgePlayerInitiative(uid, delta) {
+  if (typeof window.applyInitiativeDeltaToPlayer === 'function') window.applyInitiativeDeltaToPlayer(uid, delta);
 }
 // The DM's own searchable Token Library, filtered live — separate from the Inventory tab's
 // own token grid (renderInventoryTokenGrid) since this one needs a "Send to <viewed player>"
@@ -22469,7 +22494,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
-      characterRace, characterAffinity,
+      characterRace, characterAffinity, characterInitiative,
       appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
@@ -22563,6 +22588,7 @@ function applyStateBlob(data) {
   if (data.characterClass !== undefined) characterClass = data.characterClass;
   if (data.characterRace !== undefined) characterRace = data.characterRace;
   if (data.characterAffinity !== undefined) characterAffinity = data.characterAffinity;
+  if (typeof data.characterInitiative === 'number') characterInitiative = data.characterInitiative;
   if (data.appliedGamblingPayoutIds) appliedGamblingPayoutIds = data.appliedGamblingPayoutIds;
   if (data.journeySetting) journeySetting = data.journeySetting;
   if (Array.isArray(data.journeyLog)) journeyLog = data.journeyLog;
@@ -22635,6 +22661,7 @@ window.resetMainAppStateToBlank = function () {
   characterClass = '';
   characterRace = '';
   characterAffinity = '';
+  characterInitiative = 0;
   battlefieldRoster = [];
   battlefieldLog = [];
   viewedPlayerUid = null;
