@@ -1459,6 +1459,18 @@
   .trap-card-apply { display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:0.6rem; }
   .trap-apply-saved { display:flex; align-items:center; gap:0.35rem; font-size:0.8rem; color:var(--text-dim); cursor:pointer; }
   .trap-apply-hint { font-size:0.8rem; color:var(--text-dim); font-style:italic; }
+  .cults-list { display:flex; flex-direction:column; gap:0.9rem; margin-top:0.8rem; }
+  .cult-card { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--superrare); padding:0.9rem 1.1rem; }
+  .cult-card-head { display:flex; align-items:baseline; gap:0.7rem; flex-wrap:wrap; margin-bottom:0.5rem; }
+  .cult-card-name { color:var(--gold-bright); font-weight:600; font-size:1.05rem; }
+  .cult-card-alignment { color:var(--superrare); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; }
+  .cult-card-field { font-size:0.86rem; line-height:1.45; margin-bottom:0.4rem; color:var(--text); }
+  .cult-card-field strong { color:var(--gold); }
+  .cult-card-secret { font-size:0.86rem; line-height:1.45; margin:0.6rem 0; padding:0.5rem 0.7rem; background:rgba(224,82,82,0.08); border-left:2px solid var(--danger); color:var(--text-dim); }
+  .cult-card-secret strong { color:var(--danger); }
+  .cult-card-hooks { font-size:0.86rem; line-height:1.45; margin-bottom:0.5rem; color:var(--text-dim); }
+  .cult-card-hooks strong { color:var(--gold); }
+  .cult-card-figure { font-size:0.82rem; line-height:1.4; font-style:italic; color:var(--text-dim); border-top:1px solid var(--border); padding-top:0.5rem; }
 
   .token-grid {
     display:grid;
@@ -2953,6 +2965,7 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('monsterparts',this)">🦴 Monster Parts</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('interactions',this)">⚙ Interactions</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('traps',this)">💀 Traps &amp; Hazards</button>
+    <button class="compendium-subtab-btn" onclick="showCompendiumSub('cults',this)">🩸 Cults</button>
   </div>
 
   <div id="compendium-items" class="compendium-subpanel active">
@@ -3105,6 +3118,17 @@
       <span class="token-count" id="trapsCount"></span>
     </div>
     <div id="trapsListWrap" class="traps-list"></div>
+  </div>
+
+  <!-- Original content (see cult-data.js's own header) covering the same functional ground as a
+       published "cult" writeup -- not transcribed from any published sourcebook. Pure reference
+       material, no apply-to-player mechanic (unlike Traps & Hazards). -->
+  <div id="compendium-cults" class="compendium-subpanel">
+    <div class="token-toolbar">
+      <input type="text" id="cultsSearch" class="token-search" placeholder="Search cults…" oninput="renderCultsCompendium()">
+      <span class="token-count" id="cultsCount"></span>
+    </div>
+    <div id="cultsListWrap" class="cults-list"></div>
   </div>
 </div>
 
@@ -3780,6 +3804,7 @@ const APP_VERSION = 'v96';
 <script src="loot-data.js"></script>
 <script src="puzzle-data.js"></script>
 <script src="trap-data.js"></script>
+<script src="cult-data.js"></script>
 <script>
 
 let spinResults = [];
@@ -4476,6 +4501,7 @@ function initCompendiumSub(sub) {
   else if (sub === 'monsterparts') renderMonsterPartsCompendium();
   else if (sub === 'interactions') renderInteractionsCompendium();
   else if (sub === 'traps') renderTrapsCompendium();
+  else if (sub === 'cults') renderCultsCompendium();
 }
 function showCompendiumSub(sub, btn) {
   activeCompendiumSub = sub;
@@ -4621,6 +4647,40 @@ function applyTrapToViewedPlayer(name, btn) {
     btn.textContent = 'Failed — retry';
     btn.disabled = false;
   });
+}
+
+function cultCardHtml(c) {
+  const fig = c.notableFigure;
+  return `<div class="cult-card">
+    <div class="cult-card-head">
+      <span class="cult-card-name">${escapeHtml(c.name)}</span>
+      <span class="cult-card-alignment">${escapeHtml(c.alignment)}</span>
+    </div>
+    <div class="cult-card-field"><strong>Patron:</strong> ${escapeHtml(c.patron)}</div>
+    <div class="cult-card-field"><strong>Goal:</strong> ${escapeHtml(c.goal)}</div>
+    <div class="cult-card-field"><strong>Symbol:</strong> ${escapeHtml(c.symbol)}</div>
+    <div class="cult-card-field"><strong>Structure:</strong> ${escapeHtml(c.structure)}</div>
+    <div class="cult-card-field"><strong>Membership:</strong> ${escapeHtml(c.membership)}</div>
+    <div class="cult-card-field"><strong>Practices:</strong> ${escapeHtml(c.practices)}</div>
+    <div class="cult-card-secret"><strong>DM Secret:</strong> ${escapeHtml(c.secret)}</div>
+    <div class="cult-card-hooks"><strong>Hooks:</strong> ${escapeHtml(c.hooks)}</div>
+    ${fig ? `<div class="cult-card-figure"><strong>${escapeHtml(fig.name)}</strong> <em>(${escapeHtml(fig.role)})</em> — ${escapeHtml(fig.description)}</div>` : ''}
+  </div>`;
+}
+function renderCultsCompendium() {
+  const wrap = document.getElementById('cultsListWrap');
+  if (!wrap) return;
+  const searchEl = document.getElementById('cultsSearch');
+  const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  const matches = CULT_LIBRARY.filter(c => !search
+    || c.name.toLowerCase().includes(search)
+    || c.goal.toLowerCase().includes(search)
+    || c.patron.toLowerCase().includes(search));
+  const countEl = document.getElementById('cultsCount');
+  if (countEl) countEl.textContent = matches.length + ' cult' + (matches.length !== 1 ? 's' : '');
+  wrap.innerHTML = matches.length
+    ? matches.map(cultCardHtml).join('')
+    : '<div class="empty-results">No cults match your search.</div>';
 }
 
 // Renders the full buff/debuff/condition/named-trait reference pools (GEN.buffsSelf,
