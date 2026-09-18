@@ -1629,6 +1629,16 @@
   .elder-runes-panel .deck-panel-head { color:#8fc8e8; }
   .elder-runes-panel .deck-draw-btn { border-color:#5fa8d0; color:#8fc8e8; }
   .elder-runes-panel .deck-draw-btn:hover { background:#5fa8d0; color:#0b1620; }
+  .geomorph-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.7rem; margin-top:0.7rem; }
+  .geomorph-card { position:relative; background:var(--surface); border:1px solid var(--border); padding:0.4rem; }
+  .geomorph-thumb { cursor:pointer; }
+  .geomorph-thumb svg { width:100%; height:auto; display:block; border:1px solid var(--border); }
+  .geomorph-thumb:hover svg { border-color:var(--gold); }
+  .geomorph-reroll-btn {
+    position:absolute; top:0.55rem; right:0.55rem; background:rgba(10,8,6,0.75); border:1px solid var(--border);
+    color:var(--text); font-size:0.8rem; width:24px; height:24px; line-height:1; cursor:pointer; border-radius:3px;
+  }
+  .geomorph-reroll-btn:hover { border-color:var(--gold); color:var(--gold); }
   .sheet-abilities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:0.5rem; margin-bottom:0.8rem; }
   .sheet-ability-box { background:var(--surface); border:1px solid var(--border); padding:0.45rem; text-align:center; }
   .sheet-ability-box label { display:block; font-size:0.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem; }
@@ -3019,6 +3029,7 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('traps',this)">💀 Traps &amp; Hazards</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('cults',this)">🩸 Cults</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('reference',this)">📜 Reference</button>
+    <button class="compendium-subtab-btn" onclick="showCompendiumSub('geomorphs',this)">🗺 Geomorphs</button>
   </div>
 
   <div id="compendium-items" class="compendium-subpanel active">
@@ -3201,6 +3212,17 @@
       <span class="token-count" id="referenceCount"></span>
     </div>
     <div id="referenceListWrap" class="reference-list"></div>
+  </div>
+
+  <!-- Procedurally-generated pixel-art dungeon tiles, in the same low-fi rect/SVG style as the
+       app's own item icons -- see generateGeomorphGrid/geomorphTileSvg. Click a card to open it
+       large; each tile can be individually rerolled, or all of them at once. -->
+  <div id="compendium-geomorphs" class="compendium-subpanel">
+    <div class="token-toolbar">
+      <span style="color:var(--text-dim);font-size:0.85rem;">Procedurally-generated dungeon-tile cards — click one to view it large. Rerolling a tile replaces it with a freshly generated layout.</span>
+      <button class="deck-draw-btn" style="margin-left:auto;" onclick="rerollAllGeomorphTiles()">🔄 Reroll All</button>
+    </div>
+    <div id="geomorphGrid" class="geomorph-grid"></div>
   </div>
 </div>
 
@@ -3465,6 +3487,14 @@
   <div class="edit-modal" style="width:min(460px,100%);">
     <div class="edit-modal-header"><h3 id="runeCastTitle">🔮 A Rune is Cast</h3><button class="edit-modal-close" onclick="closeRuneCastModal()">×</button></div>
     <div class="edit-modal-body" id="runeCastBody"></div>
+  </div>
+</div>
+
+<!-- Large view of a single geomorph tile — see renderGeomorphsPanel/openGeomorphLarge. -->
+<div id="geomorphViewModal" class="edit-modal-overlay" onclick="if(event.target===this) closeGeomorphLarge()">
+  <div class="edit-modal" style="width:min(560px,100%);">
+    <div class="edit-modal-header"><h3 id="geomorphViewTitle">🗺 Geomorph Tile</h3><button class="edit-modal-close" onclick="closeGeomorphLarge()">×</button></div>
+    <div class="edit-modal-body" id="geomorphViewBody" style="display:flex;justify-content:center;"></div>
   </div>
 </div>
 
@@ -4692,6 +4722,90 @@ function renderElderRunesPanel() {
     <div class="deck-panel-log">${log}</div>
   `;
 }
+// ---------- Geomorph cards ----------
+// Procedurally-generated dungeon-tile maps, drawn as flat-color SVG rects -- the same low-fi
+// style as the app's own pixel item icons (see STORE_ICONS/itemPixelIcon), just at a much larger
+// grid than any single icon needs. A "carve a few rooms, then connect them" approach rather than
+// a full maze algorithm -- simple, always terminates, and always produces a single connected
+// layout, which is all a geomorph card actually needs to look like a plausible dungeon fragment.
+const GEOMORPH_GRID_SIZE = 10;
+const GEOMORPH_TILE_COUNT = 12;
+let geomorphTiles = [];
+function generateGeomorphGrid() {
+  const size = GEOMORPH_GRID_SIZE;
+  const grid = Array.from({ length: size }, () => Array(size).fill(0));
+  const carveRoom = (cx, cy, w, h) => {
+    const x0 = Math.max(0, Math.min(size - w, cx - Math.floor(w / 2)));
+    const y0 = Math.max(0, Math.min(size - h, cy - Math.floor(h / 2)));
+    for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) grid[y][x] = 1;
+  };
+  const numRooms = 3 + Math.floor(Math.random() * 3);
+  const centers = [];
+  for (let i = 0; i < numRooms; i++) {
+    const cx = 1 + Math.floor(Math.random() * (size - 2));
+    const cy = 1 + Math.floor(Math.random() * (size - 2));
+    const w = 2 + Math.floor(Math.random() * 3);
+    const h = 2 + Math.floor(Math.random() * 3);
+    carveRoom(cx, cy, w, h);
+    centers.push([cx, cy]);
+  }
+  for (let i = 1; i < centers.length; i++) {
+    let [x, y] = centers[i - 1];
+    const [x1, y1] = centers[i];
+    while (x !== x1) { grid[y][x] = 1; x += x1 > x ? 1 : -1; }
+    while (y !== y1) { grid[y][x] = 1; y += y1 > y ? 1 : -1; }
+    grid[y][x] = 1;
+  }
+  return grid;
+}
+function geomorphTileSvg(grid, cellPx) {
+  cellPx = cellPx || 8;
+  const size = grid.length;
+  const viewSize = size * cellPx;
+  let cells = '';
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    if (grid[y][x]) cells += `<rect x="${x * cellPx}" y="${y * cellPx}" width="${cellPx}" height="${cellPx}" fill="var(--gold)" opacity="0.85"/>`;
+  }
+  return `<svg viewBox="0 0 ${viewSize} ${viewSize}" xmlns="http://www.w3.org/2000/svg" style="background:#120d08;">
+    <rect width="${viewSize}" height="${viewSize}" fill="#120d08"/>${cells}
+  </svg>`;
+}
+function ensureGeomorphTiles() {
+  while (geomorphTiles.length < GEOMORPH_TILE_COUNT) geomorphTiles.push(generateGeomorphGrid());
+}
+function renderGeomorphsPanel() {
+  ensureGeomorphTiles();
+  const wrap = document.getElementById('geomorphGrid');
+  if (!wrap) return;
+  wrap.innerHTML = geomorphTiles.map((grid, i) => `
+    <div class="geomorph-card">
+      <div class="geomorph-thumb" onclick="openGeomorphLarge(${i})">${geomorphTileSvg(grid, 8)}</div>
+      <button class="geomorph-reroll-btn" onclick="rerollGeomorphTile(${i})" title="Generate a new layout for this tile">🔄</button>
+    </div>
+  `).join('');
+}
+function rerollGeomorphTile(i) {
+  geomorphTiles[i] = generateGeomorphGrid();
+  renderGeomorphsPanel();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+function rerollAllGeomorphTiles() {
+  geomorphTiles = Array.from({ length: GEOMORPH_TILE_COUNT }, generateGeomorphGrid);
+  renderGeomorphsPanel();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+function openGeomorphLarge(i) {
+  const body = document.getElementById('geomorphViewBody');
+  const title = document.getElementById('geomorphViewTitle');
+  if (title) title.textContent = `🗺 Geomorph Tile ${i + 1}`;
+  if (body) body.innerHTML = geomorphTileSvg(geomorphTiles[i], 32);
+  const modal = document.getElementById('geomorphViewModal');
+  if (modal) modal.classList.add('open');
+}
+function closeGeomorphLarge() {
+  const modal = document.getElementById('geomorphViewModal');
+  if (modal) modal.classList.remove('open');
+}
 // ---------- Power picker popup ----------
 let _powerPickerEntry = null;
 let _powerPickerOptions = [];
@@ -4821,6 +4935,7 @@ function initCompendiumSub(sub) {
   else if (sub === 'traps') renderTrapsCompendium();
   else if (sub === 'cults') renderCultsCompendium();
   else if (sub === 'reference') renderReferenceSection();
+  else if (sub === 'geomorphs') renderGeomorphsPanel();
 }
 function showCompendiumSub(sub, btn) {
   activeCompendiumSub = sub;
@@ -22916,7 +23031,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
-      characterRace, characterAffinity, characterInitiative, deckOfManyThingsLog,
+      characterRace, characterAffinity, characterInitiative, deckOfManyThingsLog, geomorphTiles,
       appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
@@ -22991,6 +23106,7 @@ function applyStateBlob(data) {
   if (data.saveProficiencies) saveProficiencies = data.saveProficiencies;
   if (data.feats) feats = data.feats;
   if (data.deckOfManyThingsLog) deckOfManyThingsLog = data.deckOfManyThingsLog;
+  if (data.geomorphTiles) geomorphTiles = data.geomorphTiles;
   if (typeof data.characterCurrentHp === 'number') characterCurrentHp = data.characterCurrentHp;
   if (typeof data.characterMaxHp === 'number') characterMaxHp = data.characterMaxHp;
   // Restored provisionally here (a stale/absent value from before this field existed falls back
@@ -23079,6 +23195,7 @@ window.resetMainAppStateToBlank = function () {
   saveProficiencies = [];
   feats = [];
   deckOfManyThingsLog = [];
+  geomorphTiles = [];
   characterCurrentHp = 10;
   characterMaxHp = 10;
   characterMaxHpEffective = 10;
