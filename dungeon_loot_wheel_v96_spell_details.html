@@ -1471,6 +1471,20 @@
   .cult-card-hooks { font-size:0.86rem; line-height:1.45; margin-bottom:0.5rem; color:var(--text-dim); }
   .cult-card-hooks strong { color:var(--gold); }
   .cult-card-figure { font-size:0.82rem; line-height:1.4; font-style:italic; color:var(--text-dim); border-top:1px solid var(--border); padding-top:0.5rem; }
+  .reference-subtabs { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .reference-subtab-btn { background:var(--surface); border:1px solid var(--border); color:var(--text-dim); font-family:'Crimson Text',serif; font-size:0.85rem; padding:0.35rem 0.8rem; cursor:pointer; transition:border-color .15s,color .15s; }
+  .reference-subtab-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .reference-subtab-btn.active { background:var(--surface2); border-color:var(--gold); color:var(--gold-bright); }
+  .reference-list { display:flex; flex-direction:column; gap:0.7rem; margin-top:0.8rem; }
+  .ref-card { background:var(--surface); border:1px solid var(--border); padding:0.7rem 0.9rem; }
+  .ref-card-name { color:var(--gold-bright); font-weight:600; margin-bottom:0.3rem; }
+  .ref-card-tag { color:var(--text-dim); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; border:1px solid var(--border); padding:0.05rem 0.35rem; margin-left:0.4rem; vertical-align:middle; }
+  .ref-card-desc { font-size:0.85rem; line-height:1.45; color:var(--text); }
+  .ref-card-field { font-size:0.83rem; line-height:1.4; margin-bottom:0.3rem; color:var(--text); }
+  .ref-card-field strong { color:var(--gold); }
+  .ref-card-mech { font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--gold-bright); margin-bottom:0.4rem; }
+  .ref-card-benefit strong { color:var(--uncommon); }
+  .ref-card-drawback strong { color:var(--danger); }
 
   .token-grid {
     display:grid;
@@ -2966,6 +2980,7 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('interactions',this)">⚙ Interactions</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('traps',this)">💀 Traps &amp; Hazards</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('cults',this)">🩸 Cults</button>
+    <button class="compendium-subtab-btn" onclick="showCompendiumSub('reference',this)">📜 Reference</button>
   </div>
 
   <div id="compendium-items" class="compendium-subpanel active">
@@ -3129,6 +3144,24 @@
       <span class="token-count" id="cultsCount"></span>
     </div>
     <div id="cultsListWrap" class="cults-list"></div>
+  </div>
+
+  <!-- Actions/Conditions closely follow core 5e SRD rules text (legitimately free to reuse
+       closely). Diseases/Deities/Gifts & Rewards/Vehicles are original content covering the same
+       functional ground as specific-sourcebook material -- see reference-data.js's own header. -->
+  <div id="compendium-reference" class="compendium-subpanel">
+    <div class="reference-subtabs">
+      <button class="reference-subtab-btn active" onclick="showReferenceSection('actions',this)">Actions</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('conditions',this)">Conditions &amp; Diseases</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('deities',this)">Deities</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('gifts',this)">Gifts &amp; Rewards</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('vehicles',this)">Vehicles</button>
+    </div>
+    <div class="token-toolbar">
+      <input type="text" id="referenceSearch" class="token-search" placeholder="Search this section…" oninput="renderReferenceSection()">
+      <span class="token-count" id="referenceCount"></span>
+    </div>
+    <div id="referenceListWrap" class="reference-list"></div>
   </div>
 </div>
 
@@ -3805,6 +3838,7 @@ const APP_VERSION = 'v96';
 <script src="puzzle-data.js"></script>
 <script src="trap-data.js"></script>
 <script src="cult-data.js"></script>
+<script src="reference-data.js"></script>
 <script>
 
 let spinResults = [];
@@ -4502,6 +4536,7 @@ function initCompendiumSub(sub) {
   else if (sub === 'interactions') renderInteractionsCompendium();
   else if (sub === 'traps') renderTrapsCompendium();
   else if (sub === 'cults') renderCultsCompendium();
+  else if (sub === 'reference') renderReferenceSection();
 }
 function showCompendiumSub(sub, btn) {
   activeCompendiumSub = sub;
@@ -4681,6 +4716,87 @@ function renderCultsCompendium() {
   wrap.innerHTML = matches.length
     ? matches.map(cultCardHtml).join('')
     : '<div class="empty-results">No cults match your search.</div>';
+}
+
+// ---------- References sub-tab: Actions / Conditions & Diseases / Deities / Gifts / Vehicles ----------
+let activeReferenceSection = 'actions';
+function showReferenceSection(section, btn) {
+  activeReferenceSection = section;
+  document.querySelectorAll('.reference-subtab-btn').forEach(el => el.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const searchEl = document.getElementById('referenceSearch');
+  if (searchEl) searchEl.value = '';
+  renderReferenceSection();
+}
+function referenceSectionData(section) {
+  if (section === 'actions') return ACTIONS_LIBRARY;
+  if (section === 'conditions') return [...CONDITIONS_LIBRARY, ...DISEASE_LIBRARY.map(d => ({ ...d, __kind: 'disease' }))];
+  if (section === 'deities') return DEITY_LIBRARY;
+  if (section === 'gifts') return GIFT_LIBRARY;
+  if (section === 'vehicles') return VEHICLE_LIBRARY;
+  return [];
+}
+// Flattens whatever string/array-of-string fields an entry has into one searchable blob, rather
+// than hardcoding a field list per section -- every section's shape is different enough that a
+// shared search still needs to just look at everything.
+function referenceMatchText(item) {
+  return Object.values(item).flat(2).filter(v => typeof v === 'string').join(' ').toLowerCase();
+}
+function referenceCardHtml(section, item) {
+  if (section === 'actions') {
+    return `<div class="ref-card"><div class="ref-card-name">${escapeHtml(item.name)}</div><div class="ref-card-desc">${escapeHtml(item.description)}</div></div>`;
+  }
+  if (section === 'conditions') {
+    if (item.__kind === 'disease') {
+      return `<div class="ref-card">
+        <div class="ref-card-name">${escapeHtml(item.name)} <span class="ref-card-tag">Disease</span></div>
+        <div class="ref-card-field"><strong>Vector:</strong> ${escapeHtml(item.vector)}</div>
+        <div class="ref-card-field"><strong>Save:</strong> DC ${item.saveDC} ${escapeHtml(item.saveAbility)} · <strong>Onset:</strong> ${escapeHtml(item.onset)}</div>
+        <div class="ref-card-field"><strong>Effect:</strong> ${escapeHtml(item.effect)}</div>
+        <div class="ref-card-field"><strong>Cure:</strong> ${escapeHtml(item.cure)}</div>
+      </div>`;
+    }
+    return `<div class="ref-card"><div class="ref-card-name">${escapeHtml(item.name)} <span class="ref-card-tag">Condition</span></div><div class="ref-card-desc">${escapeHtml(item.description)}</div></div>`;
+  }
+  if (section === 'deities') {
+    return `<div class="ref-card">
+      <div class="ref-card-name">${escapeHtml(item.name)}, ${escapeHtml(item.title)}</div>
+      <div class="ref-card-field"><strong>Alignment:</strong> ${escapeHtml(item.alignment)} · <strong>Domains:</strong> ${escapeHtml(item.domains.join(', '))}</div>
+      <div class="ref-card-field"><strong>Symbol:</strong> ${escapeHtml(item.symbol)}</div>
+      <div class="ref-card-field"><strong>Portfolio:</strong> ${escapeHtml(item.portfolio)}</div>
+      <div class="ref-card-desc"><em>${escapeHtml(item.dogma)}</em></div>
+    </div>`;
+  }
+  if (section === 'gifts') {
+    return `<div class="ref-card">
+      <div class="ref-card-name">${escapeHtml(item.name)}</div>
+      <div class="ref-card-field"><strong>Trigger:</strong> ${escapeHtml(item.trigger)}</div>
+      <div class="ref-card-field ref-card-benefit"><strong>Benefit:</strong> ${escapeHtml(item.benefit)}</div>
+      <div class="ref-card-field ref-card-drawback"><strong>Drawback:</strong> ${escapeHtml(item.drawback)}</div>
+    </div>`;
+  }
+  if (section === 'vehicles') {
+    return `<div class="ref-card">
+      <div class="ref-card-name">${escapeHtml(item.name)} <span class="ref-card-tag">${escapeHtml(item.category)}</span></div>
+      <div class="ref-card-mech">AC ${item.ac} · HP ${item.hp}${item.damageThreshold ? ' (threshold ' + item.damageThreshold + ')' : ''} · Speed ${escapeHtml(item.speed)} · Size ${escapeHtml(item.size)}</div>
+      <div class="ref-card-field"><strong>Crew:</strong> ${escapeHtml(item.crew)} · <strong>Cargo:</strong> ${escapeHtml(item.cargo)} · <strong>Cost:</strong> ${escapeHtml(item.cost)}</div>
+      <div class="ref-card-desc">${escapeHtml(item.description)}</div>
+    </div>`;
+  }
+  return '';
+}
+function renderReferenceSection() {
+  const wrap = document.getElementById('referenceListWrap');
+  if (!wrap) return;
+  const searchEl = document.getElementById('referenceSearch');
+  const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  const data = referenceSectionData(activeReferenceSection);
+  const matches = data.filter(item => !search || referenceMatchText(item).includes(search));
+  const countEl = document.getElementById('referenceCount');
+  if (countEl) countEl.textContent = matches.length + ' entr' + (matches.length !== 1 ? 'ies' : 'y');
+  wrap.innerHTML = matches.length
+    ? matches.map(item => referenceCardHtml(activeReferenceSection, item)).join('')
+    : '<div class="empty-results">No entries match your search.</div>';
 }
 
 // Renders the full buff/debuff/condition/named-trait reference pools (GEN.buffsSelf,
