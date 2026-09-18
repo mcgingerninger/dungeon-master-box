@@ -2995,6 +2995,7 @@
         <input type="text" id="newItemCharges" placeholder="Charges (optional — e.g. 7, 3/dawn, 1 use)">
         <textarea id="newItemEffect" placeholder="Effect / special ability (optional — for any item type)"></textarea>
         <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
+        <select id="newItemIcon" title="Icon override — leave on Auto-detect unless the guessed icon doesn't fit"></select>
         <div class="interactions-field">
           <div class="interactions-field-head">Interactions <button type="button" class="interactions-refresh-btn" onclick="renderInteractionsChecklist('new')" title="Recompute from the fields above">🔄 Recompute</button></div>
           <div id="newItemInteractions" class="interactions-checklist"></div>
@@ -3281,6 +3282,8 @@
       <label>Charges (optional)</label><input id="editItemCharges" type="text" placeholder="e.g. 7, 3/day, 1 use">
       <label>Effect / Special Ability</label><textarea id="editItemEffect" style="min-height:70px"></textarea>
       <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
+      <label>Icon override</label>
+      <select id="editItemIcon" title="Icon override — leave on Auto-detect unless the guessed icon doesn't fit"></select>
       <div class="interactions-field">
         <div class="interactions-field-head">Interactions <button type="button" class="interactions-refresh-btn" onclick="renderInteractionsChecklist('edit')" title="Recompute from the fields above">🔄 Recompute</button></div>
         <div id="editItemInteractions" class="interactions-checklist"></div>
@@ -6144,6 +6147,17 @@ function updateAddFormFields() {
     el.style.display = (el.dataset.for || '').split(' ').includes(type) ? 'block' : 'none';
   });
   renderInteractionsChecklist('new');
+  populateIconSelect('newItemIcon');
+}
+
+// Fills an icon-override <select> with every STORE_ICONS shape name, "Auto-detect" first. Only
+// runs once per element (guarded by option count) so re-populating on every type change doesn't
+// blow away whatever the DM already picked.
+function populateIconSelect(id) {
+  const select = document.getElementById(id);
+  if (!select || select.options.length > 1) return;
+  select.appendChild(new Option('Auto-detect', ''));
+  Object.keys(STORE_ICONS).sort().forEach(key => select.appendChild(new Option(key, key)));
 }
 
 // Shared by both the Add form and Edit modal (their fields share the `<prefix>Item<Field>` id
@@ -6224,6 +6238,8 @@ function addItem() {
   if(charges) item.charges=charges;
   if(gp) item.gp=gp;
   if(effect) item.effect=effect;
+  const iconOverride = document.getElementById('newItemIcon') ? document.getElementById('newItemIcon').value : '';
+  if (iconOverride) item.icon = iconOverride;
   const { extraInteractions, blockedInteractions } = readInteractionsChecklistDiff('new');
   if (extraInteractions.length) item.extraInteractions = extraInteractions;
   if (blockedInteractions.length) item.blockedInteractions = blockedInteractions;
@@ -6236,6 +6252,7 @@ function addItem() {
   document.getElementById('newItemHp').value='';
   document.getElementById('newItemCharges').value='';
   document.getElementById('newItemEffect').value='';
+  if (document.getElementById('newItemIcon')) document.getElementById('newItemIcon').value='';
   renderInteractionsChecklist('new');
   renderItemsList();
 }
@@ -6358,6 +6375,7 @@ function editItem(rarity, index) {
   document.getElementById('editItemEffect').value  = item.effect  || '';
   renderUnlockEditor(item.unlocks || []);
   updateEditFormFields();
+  document.getElementById('editItemIcon').value = item.icon || '';
   // Seeded from the item's actual current interactions (post updateEditFormFields' own fresh-
   // defaults render above) so opening Edit shows what's really true of it right now, including
   // any prior extraInteractions/blockedInteractions overrides -- not just a fresh type-only guess.
@@ -6376,6 +6394,7 @@ function updateEditFormFields() {
   // invalidates whatever was true under the old one, same reasoning as subcategory re-deriving
   // on type change in saveEditedItem below.
   renderInteractionsChecklist('edit');
+  populateIconSelect('editItemIcon');
 }
 
 function closeEditItemModal() {
@@ -6416,6 +6435,8 @@ function saveEditedItem() {
   if (charges) item.charges  = charges; else delete item.charges;
   if (effect)  item.effect   = effect;  else delete item.effect;
   if (unlocks.length) item.unlocks = unlocks; else delete item.unlocks;
+  const iconOverride = document.getElementById('editItemIcon').value;
+  if (iconOverride) item.icon = iconOverride; else delete item.icon;
   const { extraInteractions, blockedInteractions } = readInteractionsChecklistDiff('edit');
   if (extraInteractions.length) item.extraInteractions = extraInteractions; else delete item.extraInteractions;
   if (blockedInteractions.length) item.blockedInteractions = blockedInteractions; else delete item.blockedInteractions;
@@ -9165,6 +9186,27 @@ const STORE_ICONS = {
   cloak:  { viewBox:'0 0 10 12', rects:[[3,0,4,2],[1,2,8,3],[0,5,10,7]] },
   belt:   { viewBox:'0 0 10 6',  rects:[[0,1,10,3],[3,2,4,2]] },
   book:   { viewBox:'0 0 10 8',  rects:[[0,0,10,1],[0,7,10,1],[0,0,1,8],[9,0,1,8],[5,0,1,8],[2,2,2,1],[6,2,2,1],[2,4,2,1],[6,4,2,1]] },
+  // Added for the misc/mundane-gear icon gap (Phase H): these were previously falling into the
+  // random CHARM_SHAPES hash-pick alongside genuinely unclassifiable items, purely because
+  // storeIconCategory had no keyword for them at all -- not because CHARM_SHAPES' bone/fang/claw
+  // silhouettes were ever meant to represent a torch or a coil of rope.
+  key:        { viewBox:'0 0 8 8', rects:[[0,1,3,3],[1,2,1,1],[3,2,5,1],[5,3,1,1],[7,3,1,1]] },
+  rope:       { viewBox:'0 0 8 8', rects:[[1,0,6,1],[0,1,1,2],[7,1,1,2],[1,3,6,1],[0,4,1,2],[7,4,1,2],[1,6,6,1]] },
+  waterskin:  { viewBox:'0 0 8 8', rects:[[3,0,2,2],[1,2,6,5],[2,7,4,1]] },
+  torch:      { viewBox:'0 0 6 10', rects:[[2,4,2,6],[1,2,4,2],[2,0,2,2],[1,1,1,1],[4,1,1,1]] },
+  candle:     { viewBox:'0 0 4 10', rects:[[1,2,2,8],[1,0,2,2]] },
+  sack:       { viewBox:'0 0 8 8', rects:[[3,0,2,1],[2,1,4,1],[1,2,6,6]] },
+  crowbar:    { viewBox:'0 0 8 8', rects:[[1,0,2,6],[1,6,6,2]] },
+  mirror:     { viewBox:'0 0 6 10', rects:[[1,0,4,4],[0,1,1,2],[5,1,1,2],[2,4,2,6]] },
+  bandage:    { viewBox:'0 0 8 6', rects:[[0,1,8,4],[1,0,6,1],[1,5,6,1]] },
+  tool:       { viewBox:'0 0 8 8', rects:[[0,0,3,3],[3,3,2,2],[5,5,3,3]] },
+  instrument: { viewBox:'0 0 6 10', rects:[[2,0,2,4],[1,4,4,5],[2,9,2,1]] },
+  hook:       { viewBox:'0 0 8 8', rects:[[3,0,2,4],[1,4,2,2],[5,4,2,2],[0,6,2,2],[6,6,2,2]] },
+  // For MONSTER_PARTS_V2's "Scale"/"Wing Membrane" labels (see MONSTER_PART_ICON_MAP below) --
+  // no existing shape fit either well enough to reuse.
+  scale:      { viewBox:'0 0 6 6', rects:[[2,0,2,2],[1,2,4,2],[2,4,2,2]] },
+  wing:       { viewBox:'0 0 8 6', rects:[[6,0,2,1],[4,1,3,1],[2,2,4,1],[0,3,4,1],[2,4,3,1],[4,5,2,1]] },
+  food:       { viewBox:'0 0 8 6', rects:[[2,0,4,1],[1,1,6,4],[2,5,4,1]] },
 };
 function storeIconSvg(category, color) {
   return pixelIconSvg(STORE_ICONS[category] || STORE_ICONS.gem, color);
@@ -9188,13 +9230,39 @@ function storeIconCategory(item) {
   if (/robe|vestment/.test(n)) return 'robe';
   if (/boots|sandals|slippers|greaves/.test(n)) return 'boots';
   if (/\bring\b/.test(n)) return 'ring';
-  if (/amulet|necklace|pendant|periapt|torc|gorget/.test(n)) return 'amulet';
+  // \btorc\b, not the bare substring "torc" -- that alone matched inside "Torch" as a plain
+  // substring (no word boundary), which was silently classifying every Torch item as an amulet.
+  if (/amulet|necklace|pendant|periapt|\btorc\b|gorget/.test(n)) return 'amulet';
   if (/potion|draught|elixir|tonic|vial/.test(n)) return 'potion';
-  if (/scroll/.test(n)) return 'scroll';
+  if (/scroll|\bmap\b/.test(n)) return 'scroll';
   if (item.type === 'document' || /\btome\b|\bbook\b|journal|ledger|grimoire/.test(n)) return 'book';
+  // Added for the misc/mundane-gear icon gap (Phase H) -- see STORE_ICONS' own comment on the
+  // new shapes above. Placed before the broad sword/armor catch-alls below so these specific
+  // nouns win first.
+  if (/\bkey\b/.test(n)) return 'key';
+  if (/\brope\b|\bcord\b|\btwine\b/.test(n)) return 'rope';
+  if (/waterskin|\bflask\b|canteen/.test(n)) return 'waterskin';
+  if (/torch|tinderbox|lantern/.test(n)) return 'torch';
+  if (/candle/.test(n)) return 'candle';
+  if (/\bsack\b|pouch|satchel|\bbag\b/.test(n)) return 'sack';
+  if (/crowbar|pry bar/.test(n)) return 'crowbar';
+  if (/mirror|looking glass/.test(n)) return 'mirror';
+  if (/bandage|gauze|dressing/.test(n)) return 'bandage';
+  if (/tool kit|thieves.? tools|artisan|tinker.?s tools|supplies/.test(n)) return 'tool';
+  if (/\blute\b|\blyre\b|\bflute\b|\bdrum\b|instrument|\bfiddle\b|\bharp\b|\bpipes\b/.test(n)) return 'instrument';
+  if (/grappling hook|\bhook\b/.test(n)) return 'hook';
+  if (/\bletter\b|\bnote\b|\bposter\b|tally stick/.test(n)) return 'scroll';
+  if (/\blocket\b/.test(n)) return 'amulet';
+  if (/\bclothes\b|clothing|garb\b/.test(n)) return 'robe';
+  if (/\bquiver\b/.test(n)) return 'sack';
   if (/sword|blade|rapier|saber|falchion|scythe|glaive|halberd|spear|trident|pike|whip/.test(n)) return 'sword';
   if (item.cat === 'armor' || /armor|mail|plate|cuirass|breastplate|vest|pauldron/.test(n)) return 'armor';
   if (item.cat === 'weapon') return 'sword';
+  // Keyed off item.type rather than item.subcategory -- subcategory for a static catalog item is
+  // usually never actually stored on the object (only computed on the fly elsewhere), so it's
+  // unreliable to branch on here. type is always present. Anything consumable that didn't match
+  // potion/scroll by name above (rations, dried herbs, mushrooms...) is food-like by elimination.
+  if (item.type === 'consumable') return 'food';
   return 'gem';
 }
 
@@ -9363,6 +9431,34 @@ function hslLighten(hslStr, deltaL) {
   const l = Math.max(8, Math.min(92, parseInt(m[3], 10) + deltaL));
   return `hsl(${m[1]}, ${m[2]}%, ${l}%)`;
 }
+// Every MONSTER_PARTS_V2-generated item is named literally "<Creature> <Label>", where Label is
+// always one of this fixed, known set of 20 -- these generated parts vastly outnumber the
+// hand-authored catalog (roughly half the live item count once a bestiary's worth have been
+// generated), so this one small table is by far the highest-leverage fix for the "random icon"
+// problem, well beyond anything a per-item audit of the hand-authored catalog alone could reach.
+// Reuses an existing dedicated shape wherever one already fits -- Eye/Heartstone route to the
+// FLESH_LIMB_ICONS shapes originally built for the old grafted-limb system, Claw/Fang/Horn/Bone/
+// Feather to their matching CHARM_SHAPES -- instead of leaving every one of them to a random
+// per-name hash pick.
+const MONSTER_PART_ICON_MAP = {
+  heartstone: 'limb:heart', 'soul fragment': 'charm:0', essence: 'gem', core: 'gem',
+  eye: 'limb:eye', feather: 'charm:2', tooth: 'charm:13', scale: 'scale',
+  'wing membrane': 'wing', antler: 'charm:6', claw: 'charm:9', fang: 'charm:13',
+  talon: 'charm:9', horn: 'charm:6', bone: 'charm:1', tendon: 'rope',
+  'venom sac': 'potion', hide: 'cloak', blood: 'potion', marrow: 'charm:1',
+};
+// Scoped to items actually shaped like a MONSTER_PARTS_V2 output (craftable + a partType) rather
+// than matching these words against any item's name -- several of these labels (Eye, Claw, Horn)
+// are common enough English words that a hand-authored item could coincidentally contain one
+// without being a monster part at all, and this must not repaint those.
+function monsterPartIconCategory(item) {
+  if (!item || item.type !== 'craftable' || !item.partType) return null;
+  const name = (item.name || '').toLowerCase();
+  for (const label in MONSTER_PART_ICON_MAP) {
+    if (name.endsWith(label)) return MONSTER_PART_ICON_MAP[label];
+  }
+  return null;
+}
 // storeIconCategory() only checks item.cat (set by the procedural Store/Generate Item
 // generators) for its armor/weapon fallback — lootData items use item.type instead, so
 // this catches those before they fall through to the generic gem icon. Anything that still
@@ -9371,6 +9467,17 @@ function hslLighten(hslStr, deltaL) {
 // CHARM_SHAPES instead of a single shared gem for every one of them.
 function itemIconCategory(item) {
   if (!item) return 'gem';
+  // Explicit per-item override, for the poetically-named items keyword-matching can never get
+  // right (a "Red Dragon Heartstone" doesn't contain any recognizable object noun at all) --
+  // set during the item audit, or from the Add/Edit item forms' own icon-override field. Reuses
+  // the `icon:` field name already present (but unused for rendering) on the MERCHANTS staples,
+  // rather than inventing a new one. Checked before every other rule, including limb/companion.
+  // Any resolveIconShape-compatible key works -- a plain STORE_ICONS name ('sword'), or a
+  // prefixed one to reach the richer limb/animal/charm sets ('limb:heart', 'animal:dragon',
+  // 'charm:3') -- resolveIconShape's own existing fallback handles a bad/typo'd value gracefully.
+  if (item.icon) return item.icon;
+  const partIcon = monsterPartIconCategory(item);
+  if (partIcon) return partIcon;
   if (item.type === 'limb') {
     const sub = item.subcategory;
     return (sub && FLESH_LIMB_ICONS[sub]) ? ('limb:' + sub) : 'limb';
