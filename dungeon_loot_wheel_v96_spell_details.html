@@ -1440,6 +1440,25 @@
   .interactions-item-row { background:var(--surface); border:1px solid var(--border); padding:0.5rem 0.7rem; display:flex; flex-direction:column; gap:0.35rem; }
   .interactions-item-name { display:flex; align-items:center; gap:0.4rem; color:var(--text); }
   .interactions-none { color:var(--text-dim); font-size:0.78rem; font-style:italic; }
+  .traps-list { display:flex; flex-direction:column; gap:0.8rem; margin-top:0.8rem; }
+  .trap-card { background:var(--surface); border:1px solid var(--border); border-left-width:4px; padding:0.8rem 1rem; }
+  .trap-card.tier-setback { border-left-color:var(--uncommon); }
+  .trap-card.tier-dangerous { border-left-color:var(--gold); }
+  .trap-card.tier-deadly { border-left-color:var(--danger); }
+  .trap-card-head { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.4rem; }
+  .trap-card-name { color:var(--gold-bright); font-weight:600; font-size:1rem; }
+  .trap-card-kind { color:var(--text-dim); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; border:1px solid var(--border); padding:0.05rem 0.4rem; }
+  .trap-card-tier { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; margin-left:auto; }
+  .trap-card.tier-setback .trap-card-tier { color:var(--uncommon); }
+  .trap-card.tier-dangerous .trap-card-tier { color:var(--gold); }
+  .trap-card.tier-deadly .trap-card-tier { color:var(--danger); }
+  .trap-card-trigger { font-size:0.85rem; color:var(--text-dim); margin-bottom:0.4rem; }
+  .trap-card-desc { font-style:italic; margin-bottom:0.5rem; line-height:1.4; }
+  .trap-card-mech { font-family:'Share Tech Mono',monospace; font-size:0.8rem; color:var(--gold-bright); margin-bottom:0.5rem; }
+  .trap-card-note { font-size:0.8rem; color:var(--text-dim); margin-bottom:0.6rem; line-height:1.4; }
+  .trap-card-apply { display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:0.6rem; }
+  .trap-apply-saved { display:flex; align-items:center; gap:0.35rem; font-size:0.8rem; color:var(--text-dim); cursor:pointer; }
+  .trap-apply-hint { font-size:0.8rem; color:var(--text-dim); font-style:italic; }
 
   .token-grid {
     display:grid;
@@ -2933,6 +2952,7 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('effects',this)">🎲 Effects &amp; Traits</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('monsterparts',this)">🦴 Monster Parts</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('interactions',this)">⚙ Interactions</button>
+    <button class="compendium-subtab-btn" onclick="showCompendiumSub('traps',this)">💀 Traps &amp; Hazards</button>
   </div>
 
   <div id="compendium-items" class="compendium-subpanel active">
@@ -3073,6 +3093,18 @@
       <span class="token-count" id="interactionsCount"></span>
     </div>
     <div id="interactionsResults" class="interactions-results"></div>
+  </div>
+
+  <!-- Original content (see trap-data.js's own header) covering the same functional ground as
+       classic trap/hazard archetypes -- not transcribed from any published sourcebook. Cards
+       double as the DM's "Apply to Player" tool: pick a player in the Players tab first, then
+       come here and apply a trap's damage/condition straight to their persisted state. -->
+  <div id="compendium-traps" class="compendium-subpanel">
+    <div class="token-toolbar">
+      <input type="text" id="trapsSearch" class="token-search" placeholder="Search traps &amp; hazards…" oninput="renderTrapsCompendium()">
+      <span class="token-count" id="trapsCount"></span>
+    </div>
+    <div id="trapsListWrap" class="traps-list"></div>
   </div>
 </div>
 
@@ -3747,6 +3779,7 @@ const APP_VERSION = 'v96';
 </script>
 <script src="loot-data.js"></script>
 <script src="puzzle-data.js"></script>
+<script src="trap-data.js"></script>
 <script>
 
 let spinResults = [];
@@ -4442,6 +4475,7 @@ function initCompendiumSub(sub) {
   else if (sub === 'effects') renderEffectsCompendium();
   else if (sub === 'monsterparts') renderMonsterPartsCompendium();
   else if (sub === 'interactions') renderInteractionsCompendium();
+  else if (sub === 'traps') renderTrapsCompendium();
 }
 function showCompendiumSub(sub, btn) {
   activeCompendiumSub = sub;
@@ -4509,6 +4543,84 @@ function renderInteractionsItemResults() {
       <div class="interactions-item-chips">${chips}</div>
     </div>`;
   }).join('') : '<div class="empty-results">No items match.</div>';
+}
+
+// Turns a trap/hazard name into a safe HTML id fragment (names contain spaces/apostrophes) --
+// used to find its own "saved?" checkbox back on Apply, without needing a separate id scheme.
+function trapSlug(name) {
+  return String(name).replace(/[^a-zA-Z0-9]/g, '_');
+}
+function trapMechanicsLine(t) {
+  const parts = [];
+  if (t.saveAbility) parts.push(`DC ${t.saveDC} ${t.saveAbility} save`);
+  if (t.damage) parts.push(`${t.damage}${t.damageType ? ' ' + t.damageType : ''} damage`);
+  if (t.condition) parts.push(`${t.condition}${t.conditionDuration ? ' (' + t.conditionDuration + ')' : ''} on a failed save`);
+  return parts.length ? parts.join(' · ') : 'No save, no damage — narrative/utility only';
+}
+function trapCardHtml(t, viewedName) {
+  const slug = trapSlug(t.name);
+  const nameArg = t.name.replace(/'/g, "\\'");
+  return `<div class="trap-card tier-${t.tier}">
+    <div class="trap-card-head">
+      <span class="trap-card-name">${escapeHtml(t.name)}</span>
+      <span class="trap-card-kind">${escapeHtml(t.kind)}</span>
+      <span class="trap-card-tier">${escapeHtml(t.tier)}</span>
+    </div>
+    <div class="trap-card-trigger"><strong>Trigger:</strong> ${escapeHtml(t.trigger)}</div>
+    <div class="trap-card-desc">${escapeHtml(t.description)}</div>
+    <div class="trap-card-mech">${escapeHtml(trapMechanicsLine(t))}</div>
+    <div class="trap-card-note">${escapeHtml(t.note)}</div>
+    <div class="trap-card-apply">
+      ${viewedName
+        ? `<label class="trap-apply-saved"><input type="checkbox" id="trapSaved_${slug}"> ${escapeHtml(viewedName)} made the save</label>
+           <button class="loot-save-btn" onclick="applyTrapToViewedPlayer('${nameArg}', this)">⚠ Apply to ${escapeHtml(viewedName)}</button>`
+        : `<span class="trap-apply-hint">Select a player in the Players tab to apply this.</span>`}
+    </div>
+  </div>`;
+}
+function renderTrapsCompendium() {
+  const wrap = document.getElementById('trapsListWrap');
+  if (!wrap) return;
+  const searchEl = document.getElementById('trapsSearch');
+  const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  const all = [
+    ...TRAP_LIBRARY.map(t => ({ ...t, kind: 'Trap' })),
+    ...HAZARD_LIBRARY.map(t => ({ ...t, kind: 'Hazard' })),
+  ];
+  const matches = all.filter(t => !search
+    || t.name.toLowerCase().includes(search)
+    || t.description.toLowerCase().includes(search)
+    || t.trigger.toLowerCase().includes(search));
+  const countEl = document.getElementById('trapsCount');
+  if (countEl) countEl.textContent = matches.length + ' entr' + (matches.length !== 1 ? 'ies' : 'y');
+  const viewedPlayer = (typeof viewedPlayerUid !== 'undefined' && viewedPlayerUid)
+    ? (connectedPlayers || []).find(p => p.uid === viewedPlayerUid) : null;
+  const viewedName = viewedPlayer ? viewedPlayer.username : null;
+  wrap.innerHTML = matches.length
+    ? matches.map(t => trapCardHtml(t, viewedName)).join('')
+    : '<div class="empty-results">No traps or hazards match your search.</div>';
+}
+// DM-only: rolls (via the shared, tested applyTrapEffectToState) and applies a trap's damage
+// and/or condition directly to the currently-viewed player's persisted state -- same cross-write
+// pattern as applyItemToViewedPlayer, just reading from TRAP_LIBRARY/HAZARD_LIBRARY instead of
+// the item catalog. The "made the save" checkbox reflects a saving throw the DM has already
+// resolved at the table (standard half-damage-and-no-condition-on-a-save, per each entry's note).
+function applyTrapToViewedPlayer(name, btn) {
+  if (typeof viewedPlayerUid === 'undefined' || !viewedPlayerUid) return;
+  const trap = [...TRAP_LIBRARY, ...HAZARD_LIBRARY].find(t => t.name === name);
+  if (!trap || typeof window.applyTrapEffectToPlayerUid !== 'function') return;
+  const checkbox = document.getElementById('trapSaved_' + trapSlug(name));
+  const saved = checkbox ? checkbox.checked : false;
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Applying…';
+  window.applyTrapEffectToPlayerUid(viewedPlayerUid, trap, saved).then(() => {
+    btn.textContent = '✓ Applied';
+    setTimeout(() => { btn.disabled = false; btn.textContent = original; }, 1400);
+  }).catch(() => {
+    btn.textContent = 'Failed — retry';
+    btn.disabled = false;
+  });
 }
 
 // Renders the full buff/debuff/condition/named-trait reference pools (GEN.buffsSelf,

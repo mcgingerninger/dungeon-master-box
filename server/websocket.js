@@ -198,7 +198,7 @@ import {
   saveSubsystemState, loadSubsystemState,
   createAttackRequest, listAttackRequests, deleteAttackRequest,
 } from '../db/database.js';
-import { applyLongRestToPlayerState, applyItemEffectToState } from '../game-engine.js';
+import { applyLongRestToPlayerState, applyItemEffectToState, applyTrapEffectToState } from '../game-engine.js';
 
 // Phase 6d: real-time gambling sync, the one gap left over from the original Phase 5 audit (see
 // docs/ARCHITECTURE.md's Phase 6 section — deliberately deprioritized until now). Reuses Phase
@@ -417,7 +417,7 @@ export function createWebSocketServer(db, httpServer) {
         return;
       }
 
-      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect') {
+      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect') {
         if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that' });
         const targetUid = msg.targetUid;
         const existing = loadPlayerState(db, identity.campaignId, targetUid) || { state: {}, rev: 0 };
@@ -441,6 +441,11 @@ export function createWebSocketServer(db, httpServer) {
           // Uses the same shared, tested effect-application function the client's own use/drink
           // flow will eventually be able to reuse, rather than re-deriving HP/duration parsing here.
           nextState = applyItemEffectToState(nextState, msg.item || {});
+        } else if (msg.type === 'apply_trap_effect') {
+          // Same reasoning as apply_item_effect, for the Traps & Hazards compendium's own
+          // "Apply to Player" tool -- msg.saved reflects a saving throw the DM already resolved
+          // at the table (or true for an effect with no save at all).
+          nextState = applyTrapEffectToState(nextState, msg.trap || {}, !!msg.saved);
         }
 
         const nextRev = existing.rev + 1;

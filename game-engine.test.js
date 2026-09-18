@@ -335,3 +335,56 @@ describe('applyItemEffectToState', () => {
     assert.equal(next.characterCurrentHp, 10);
   });
 });
+
+describe('applyTrapEffectToState', () => {
+  const trap = { name: 'Sundering Pendulum', damage: '6d10', condition: null, conditionDuration: null };
+
+  test('a failed save deals full rolled damage, clamped at 0', () => {
+    const state = { characterCurrentHp: 10 };
+    const next = GE.applyTrapEffectToState(state, trap, false, () => 0.99); // max roll: 60
+    assert.equal(next.characterCurrentHp, 0);
+    assert.equal(state.characterCurrentHp, 10); // input state untouched
+  });
+
+  test('a successful save halves the damage', () => {
+    const state = { characterCurrentHp: 50 };
+    // 6d10 at rand()=0 rolls all 1s -> 6 total; halved -> 3
+    const next = GE.applyTrapEffectToState(state, trap, true, () => 0);
+    assert.equal(next.characterCurrentHp, 47);
+  });
+
+  test('a failed save against a conditional trap adds a timed-effect entry with sub-day duration', () => {
+    const gasTrap = { name: 'Sablesting Cloud Vent', damage: '2d8', condition: 'Poisoned', conditionDuration: '10 minutes' };
+    const state = { characterCurrentHp: 20, activeTimedEffects: [] };
+    const next = GE.applyTrapEffectToState(state, gasTrap, false, () => 0);
+    assert.equal(next.activeTimedEffects.length, 1);
+    const effect = next.activeTimedEffects[0];
+    assert.equal(effect.permanent, false);
+    assert.equal(effect.durationMs, 10 * 60 * 1000);
+    assert.match(effect.text, /Poisoned/);
+  });
+
+  test('a successful save against a conditional trap skips the condition entirely', () => {
+    const gasTrap = { name: 'Sablesting Cloud Vent', damage: '2d8', condition: 'Poisoned', conditionDuration: '10 minutes' };
+    const state = { characterCurrentHp: 20, activeTimedEffects: [] };
+    const next = GE.applyTrapEffectToState(state, gasTrap, true, () => 0);
+    assert.deepEqual(next.activeTimedEffects, []);
+  });
+
+  test('a condition with no parseable duration ("until cured") is flagged permanent', () => {
+    const netTrap = { name: 'Gravebind Snare', damage: null, condition: 'Restrained', conditionDuration: 'until cured' };
+    const state = { characterCurrentHp: 20, activeTimedEffects: [] };
+    const next = GE.applyTrapEffectToState(state, netTrap, false, () => 0);
+    const effect = next.activeTimedEffects[0];
+    assert.equal(effect.permanent, true);
+    assert.equal(effect.durationMs, undefined);
+  });
+
+  test('a trap with neither damage nor condition (a pure alarm) is a complete no-op', () => {
+    const alarmTrap = { name: 'Screaming Ward Glyph', damage: null, condition: null, conditionDuration: null };
+    const state = { characterCurrentHp: 20, activeTimedEffects: [] };
+    const next = GE.applyTrapEffectToState(state, alarmTrap, false, () => 0);
+    assert.equal(next.characterCurrentHp, 20);
+    assert.deepEqual(next.activeTimedEffects, []);
+  });
+});

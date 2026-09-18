@@ -302,6 +302,32 @@ describe('cross-player writes (DM -> player)', () => {
     assert.ok(identified.state.characterCurrentHp > 0);
   });
 
+  test('apply_trap_effect deals full damage on a failed save, using the shared applyTrapEffectToState', async () => {
+    const player = await connectAs('uid-player', 'player');
+    await pushState(player, 1, { characterCurrentHp: 50 });
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'apply_trap_effect', targetUid: 'uid-player', trap: { name: 'Sundering Pendulum', damage: '6d10' }, saved: false });
+    const update = await nextMessage(player);
+    assert.equal(update.type, 'state_update');
+    assert.ok(update.state.characterCurrentHp < 50); // damage was applied
+  });
+
+  test('apply_trap_effect halves damage and skips the condition when saved is true', async () => {
+    const player = await connectAs('uid-player', 'player');
+    await pushState(player, 1, { characterCurrentHp: 50, activeTimedEffects: [] });
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, {
+      type: 'apply_trap_effect', targetUid: 'uid-player',
+      trap: { name: 'Sablesting Cloud Vent', damage: '2d8', condition: 'Poisoned', conditionDuration: '10 minutes' },
+      saved: true,
+    });
+    const update = await nextMessage(player);
+    assert.ok(update.state.characterCurrentHp >= 42); // 2d8 max 16, halved max 8
+    assert.deepEqual(update.state.activeTimedEffects, []); // no condition on a save
+  });
+
   test('set_inventory_fields overwrites only the fields provided', async () => {
     const player = await connectAs('uid-player', 'player');
     await pushState(player, 1, { characterCurrentHp: 20, characterClass: 'Ranger' });

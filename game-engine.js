@@ -1069,6 +1069,46 @@ export function applyItemEffectToState(state, item, rand = Math.random) {
   return { ...state, characterCurrentHp, activeTimedEffects };
 }
 
+// Applies a trap/hazard's mechanical effect (damage and/or a condition, from trap-data.js's own
+// structured fields -- see that file's header) directly to a state object, for the DM's "Apply
+// Trap to Player" tool -- the same "must work even if the target is offline" need
+// applyItemEffectToState fills for items, just subtracting HP instead of healing it. Reads
+// already-structured saveAbility/saveDC/damage/condition fields rather than parsing them out of
+// prose, since this data is authored fresh rather than lifted from an existing stat-block format
+// worth reusing a text parser for. `saved` reflects a saving throw the DM has already resolved at
+// the table (or true for an effect with no save at all) -- standard 5e-style half-damage-and-no-
+// condition-on-a-save, matching every entry's own note text.
+export function applyTrapEffectToState(state, trap, saved, rand = Math.random) {
+  if (!state || !trap) return state;
+  const maxHp = typeof state.characterMaxHpEffective === 'number' ? state.characterMaxHpEffective
+    : (typeof state.characterMaxHp === 'number' ? state.characterMaxHp : undefined);
+  let characterCurrentHp = state.characterCurrentHp;
+  if (trap.damage) {
+    const rolled = rollItemEffectDiceTotal(trap.damage, rand);
+    if (rolled != null) {
+      const dealt = saved ? Math.floor(rolled / 2) : rolled;
+      const current = typeof characterCurrentHp === 'number' ? characterCurrentHp : 0;
+      characterCurrentHp = Math.max(0, current - Math.max(0, dealt));
+    }
+  }
+  let activeTimedEffects = state.activeTimedEffects;
+  if (trap.condition && !saved) {
+    const durationMs = trap.conditionDuration ? parseItemEffectDurationMs(trap.conditionDuration) : null;
+    const permanent = !durationMs || durationMs >= ITEM_EFFECT_DURATION_UNIT_SECONDS.day * 1000;
+    const entry = {
+      id: 'aeff' + Date.now() + '_' + Math.floor(rand() * 1e6),
+      key: trap.name,
+      name: trap.name,
+      text: `${trap.condition}${trap.conditionDuration ? ' (' + trap.conditionDuration + ')' : ''} — from ${trap.name}`,
+      startedAt: Date.now(),
+      permanent,
+    };
+    if (!permanent) { entry.durationMs = durationMs; entry.expiresAt = Date.now() + durationMs; }
+    activeTimedEffects = [...(state.activeTimedEffects || []), entry];
+  }
+  return { ...state, characterCurrentHp, activeTimedEffects };
+}
+
 export function newPokerTable() { return { hands: {}, results: [], roundCounter: 0 }; }
 // Already fully self-contained (deal + draw both resolve entirely within this function) — no
 // split needed, unlike Roulette/Blackjack.
