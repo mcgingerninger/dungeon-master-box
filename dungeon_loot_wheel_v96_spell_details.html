@@ -12488,9 +12488,16 @@ function buildInventoryGridHtml(idPrefix, dimFilter, storeContext) {
         // works because invCanPlaceAt ignores the dragged item's own cells; it just has
         // to be dropped starting on an empty cell, same as any other move.
         const contextMenuFn = storeContext ? 'storeInventoryItemContextMenu' : 'inventoryItemContextMenu';
+        // Double-click/double-tap mirrors the same "equip to first open slot" action right-click
+        // already does -- added per direct request, since dragging across the full inventory
+        // grid is impractical on a phone-sized layout. Store-context mirrors (Trader/Mangler/
+        // Fleshmancer) deliberately skip this, same reasoning storeInventoryItemContextMenu
+        // already skips equip on right-click there -- double-clicking an item staged for sale
+        // shouldn't silently equip it instead.
+        const dblClickAttr = storeContext ? '' : ` ondblclick="inventoryItemContextMenu(event,'${placementId}')"`;
         html += `<div class="inv-item ${rarity}${wide ? ' inv-item-fill' : ''}${dimmed ? ' inv-item-dimmed' : ''}" id="${idPrefix}inv-cell-${row}-${col}" style="width:${p.w * 44 + (p.w - 1) * 3}px" draggable="true"
           ondragstart="inventoryItemDragStart(event,'${placementId}')"
-          oncontextmenu="${contextMenuFn}(event,'${placementId}')"
+          oncontextmenu="${contextMenuFn}(event,'${placementId}')"${dblClickAttr}
           onmouseenter="showTokenTooltip(event,'${safeKey}')"
           onmousemove="moveTokenTooltip(event)"
           onmouseleave="hideTokenTooltip()">${body}</div>`;
