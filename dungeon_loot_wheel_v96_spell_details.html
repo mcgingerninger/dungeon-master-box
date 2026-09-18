@@ -1437,6 +1437,26 @@
   .interactions-ref-cat { color:var(--gold); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; font-family:'Share Tech Mono',monospace; }
   .interactions-ref-chips, .interactions-item-chips { display:flex; flex-wrap:wrap; gap:0.3rem; }
   .interactions-results { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.6rem; }
+  .dm-toggles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:0.6rem; }
+  .dm-toggle-card {
+    display:flex; align-items:flex-start; gap:0.6rem; background:var(--surface); border:1px solid var(--border);
+    padding:0.6rem 0.7rem; cursor:pointer; transition:border-color 0.15s;
+  }
+  .dm-toggle-card.active { border-color:var(--gold); }
+  .dm-toggle-card input[type="checkbox"] { margin-top:0.2rem; flex-shrink:0; cursor:pointer; }
+  .dm-toggle-card-label { color:var(--text); font-size:0.9rem; font-weight:600; }
+  .dm-toggle-card-desc { color:var(--text-dim); font-size:0.78rem; margin-top:0.15rem; }
+  .gen-lists-wrap { display:flex; flex-direction:column; gap:0.5rem; max-height:520px; overflow-y:auto; }
+  .gen-list-row { background:var(--surface); border:1px solid var(--border); padding:0.5rem 0.7rem; }
+  .gen-list-row-head { display:flex; align-items:center; gap:0.6rem; }
+  .gen-list-name { color:var(--gold); font-size:0.88rem; font-weight:600; }
+  .gen-list-count { color:var(--text-dim); font-size:0.78rem; font-style:italic; }
+  .gen-list-toggle-badge {
+    margin-left:auto; font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:0.05em;
+    padding:0.1rem 0.4rem; border:1px solid #5fd08a; color:#5fd08a;
+  }
+  .gen-list-toggle-badge.off { border-color:#d05f5f; color:#d05f5f; }
+  .gen-list-desc { color:var(--text-dim); font-size:0.8rem; margin-top:0.2rem; }
   .interactions-item-row { background:var(--surface); border:1px solid var(--border); padding:0.5rem 0.7rem; display:flex; flex-direction:column; gap:0.35rem; }
   .interactions-item-name { display:flex; align-items:center; gap:0.4rem; color:var(--text); }
   .interactions-none { color:var(--text-dim); font-size:0.78rem; font-style:italic; }
@@ -2402,6 +2422,7 @@
   <button class="tab-btn" onclick="showTab('journey',this)">🧭 Journey</button>
   <button class="tab-btn" onclick="showTab('puzzles',this)">🧩 Puzzles</button>
   <button class="tab-btn" onclick="showTab('gambling',this)">🎰 Gambling</button>
+  <button class="tab-btn" onclick="showTab('dmcontrols',this)">🎛 DM Controls</button>
   <!-- Player-only — the opposite direction from multiplayer-sync.js's body.role-player hide
        list (which hides DM-only things): this stays hidden by default and is revealed only
        for players by enforceRoleRestrictions there. -->
@@ -3570,6 +3591,24 @@
   <div id="gamblingTable"></div>
 </div>
 
+<!-- DM CONTROLS TAB — DM/solo-only (hidden for a real Player account the same way Players/
+     Compendium/etc. already are, see multiplayer-sync.js's injectStyles). A DM-facing preference
+     panel, not synced campaign state -- toggles are a local client setting (localStorage), same
+     reasoning a DM's own UI layout choices wouldn't need to sync to every player. -->
+<div id="tab-dmcontrols" class="tab-content">
+  <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin-bottom:0.6rem;">🎛 Generation Toggles</h3>
+  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">Turn specific randomization lists off if you'd rather generated items/monsters not use them. A local preference for this browser only — it doesn't sync to players or other devices.</p>
+  <div id="generationTogglesWrap" class="dm-toggles-grid"></div>
+
+  <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.4rem 0 0.6rem;">📋 All Generation Lists</h3>
+  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">Every named table this app currently samples from to build or modify an item, monster, or encounter — read-only, for reference.</p>
+  <div class="token-toolbar">
+    <input type="text" id="genListsSearch" class="token-search" placeholder="Search list names…" oninput="renderGenerationListsViewer()">
+    <span class="token-count" id="genListsCount"></span>
+  </div>
+  <div id="genListsWrap" class="gen-lists-wrap"></div>
+</div>
+
 <!-- BATTLEFIELD TAB — player-only, read-only live view of the DM's combat roster. Populated
      entirely from multiplayer-sync.js's window.applyRemoteBattlefieldState bridge; nothing
      here does anything if that never fires (e.g. no DM connected yet). -->
@@ -4534,6 +4573,7 @@ function showTab(tab, btn) {
   if (tab === 'journey') renderJourneyTab();
   if (tab === 'puzzles') { renderPuzzleCategoryTabs(); renderPuzzleCategory(); renderPuzzleLog(); }
   if (tab === 'gambling') renderGamblingTab();
+  if (tab === 'dmcontrols') renderDmControlsTab();
 }
 
 // ===================== ITEM COMPENDIUM (Items / Spells / Monsters / Effects sub-tabs) =====================
@@ -7875,6 +7915,7 @@ function scaledStatAmount(stat, rarity, fallback) {
 // Picks from GEN.buffsSelf / GEN.buffsOther. Numeric (scalar) picks get a "+N" prefix;
 // named conditions never do. Returns {stat, key, text} or null if the pools are exhausted.
 function pickBuffEffect(rarity, dur, modest, idx, usedKeys = []) {
+  if (typeof generationToggles !== 'undefined' && !generationToggles.itemBuffsDebuffs) return null;
   const preferOther = idx >= 2 && Math.random() < 0.35;
   const pool = preferOther ? GEN.buffsOther : GEN.buffsSelf;
   const wantCondition = Math.random() < 0.3;
@@ -7899,6 +7940,7 @@ function pickBuffEffect(rarity, dur, modest, idx, usedKeys = []) {
 // Picks from GEN.debuffsSelf (cursed effects that afflict the bearer) or GEN.debuffsOther
 // (effects the bearer inflicts on an enemy). Numeric picks get a "-N" prefix.
 function pickDebuffEffect(rarity, dur, modest, idx, usedKeys = []) {
+  if (typeof generationToggles !== 'undefined' && !generationToggles.itemBuffsDebuffs) return null;
   const preferSelf = Math.random() < 0.25;
   const pool = preferSelf ? GEN.debuffsSelf : GEN.debuffsOther;
   const wantCondition = Math.random() < 0.5 || idx >= 2;
@@ -7921,6 +7963,7 @@ function pickDebuffEffect(rarity, dur, modest, idx, usedKeys = []) {
 // pure blessings or pure curses with an empty side). Amounts scale with rarity; for balanced
 // trade-off traits the debuff is deliberately smaller so the trait stays worth taking.
 function pickNamedTrait(rarity, modest, usedKeys = []) {
+  if (typeof generationToggles !== 'undefined' && !generationToggles.namedTraits) return null;
   const options = GEN.namedModifiers.filter(m => !usedKeys.includes('trait:'+m.name));
   if (!options.length) return null;
   const mod = ri(options);
@@ -9725,6 +9768,7 @@ const LEGENDARY_FLOURISHES = [
   { test:/\beye\b|\bsight\b|vision|oracle/,                  color:'#5fd0c0' },
 ];
 function legendaryFlourishColor(item) {
+  if (typeof generationToggles !== 'undefined' && !generationToggles.legendaryFlourishes) return null;
   const s = (((item && item.name) || '') + ' ' + ((item && item.desc) || '')).toLowerCase();
   for (const f of LEGENDARY_FLOURISHES) if (f.test.test(s)) return f.color;
   return null;
@@ -13047,6 +13091,24 @@ let characterInitiative = 0;
 // effects already go through.
 let feats = [];
 
+// DM Controls: local-only (per-browser, not synced) on/off switches for specific randomization
+// pools used when generating items/monsters. Persisted to localStorage so a DM's preference
+// survives reload, but deliberately never sent over the wire -- each DM device decides for itself.
+const GENERATION_TOGGLES_DEFAULT = { namedTraits: true, legendaryFlourishes: true, itemBuffsDebuffs: true, monsterTraits: true };
+let generationToggles = { ...GENERATION_TOGGLES_DEFAULT };
+function loadGenerationToggles() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('dmGenerationToggles') || '{}');
+    generationToggles = { ...GENERATION_TOGGLES_DEFAULT, ...saved };
+  } catch (e) { generationToggles = { ...GENERATION_TOGGLES_DEFAULT }; }
+}
+function setGenerationToggle(key, value) {
+  generationToggles[key] = !!value;
+  try { localStorage.setItem('dmGenerationToggles', JSON.stringify(generationToggles)); } catch (e) {}
+  renderDmControlsTab();
+}
+loadGenerationToggles();
+
 // Extracted to game-engine.js in Phase 1 of the architecture migration (see
 // docs/ARCHITECTURE.md): ABILITY_NAMES, SKILL_ABILITY_MAP, SHEET_STAT_ALIASES,
 // proficiencyBonusForLevel, abilityModifier, fmtMod, extractStatDeltasFromText,
@@ -15133,6 +15195,7 @@ const TRAIT_COUNT_POOLS = {
   legendary: [2,3,3,4,4,5],
 };
 function rollMonsterTraitCount(tier) {
+  if (typeof generationToggles !== 'undefined' && !generationToggles.monsterTraits) return 0;
   return ri(TRAIT_COUNT_POOLS[tier] || TRAIT_COUNT_POOLS.common);
 }
 // Picks one trait from GEN.namedModifiers (excluding any already used on this monster),
@@ -21339,6 +21402,91 @@ function placeGamblingBet(amount, extra) {
   if (!spendPlayerGold(amount)) return false;
   submitGamblingAction({ type: 'place_bet', amount, ...extra });
   return true;
+}
+// ===================== DM CONTROLS TAB =====================
+// Local-only (per-browser) toggles for specific generation pools, plus a read-only reference
+// of every named table the app currently samples from when building/modifying an item or
+// monster. Neither section syncs over the wire -- see generationToggles above.
+const GENERATION_TOGGLE_DEFS = [
+  { key: 'namedTraits', label: 'Named Item Traits', desc: 'Fixed personality traits (e.g. "Bloody") that pair a buff+debuff on generated items.' },
+  { key: 'legendaryFlourishes', label: 'Legendary/Celestial Flourishes', desc: 'Keyword-based color flourishes applied to legendary/celestial item icons.' },
+  { key: 'itemBuffsDebuffs', label: 'Item Buffs/Debuffs', desc: 'Extra scalar/condition buffs and debuffs rolled onto generated items.' },
+  { key: 'monsterTraits', label: 'Monster Combat Traits', desc: 'Extra combat traits rolled onto generated monsters.' },
+];
+// Counts entries in a generation pool regardless of whether it's a flat array (e.g. GEN.skills)
+// or a grouped object of arrays (e.g. GEN.buffsSelf.scalar/.conditions, TRAIT_COUNT_POOLS.common/...).
+function genListCount(val) {
+  if (!val) return 0;
+  if (Array.isArray(val)) return val.length;
+  if (typeof val === 'object') return Object.values(val).reduce((sum, v) => sum + genListCount(v), 0);
+  return 0;
+}
+const GENERATION_LISTS_REGISTRY = [
+  { name: 'Named Item Traits', get: () => GEN.namedModifiers, desc: 'Fixed personality traits pairing a buff+debuff on an item.', toggle: 'namedTraits' },
+  { name: 'Legendary/Celestial Flourishes', get: () => LEGENDARY_FLOURISHES, desc: 'Color-flourish rules for legendary/celestial item icons, matched by keyword.', toggle: 'legendaryFlourishes' },
+  { name: 'Item Buffs (Self)', get: () => GEN.buffsSelf, desc: 'Positive effects an item can grant its own bearer.', toggle: 'itemBuffsDebuffs' },
+  { name: 'Item Buffs (Other)', get: () => GEN.buffsOther, desc: 'Positive effects an item lets its bearer grant to allies.', toggle: 'itemBuffsDebuffs' },
+  { name: 'Item Debuffs (Self)', get: () => GEN.debuffsSelf, desc: 'Curses an item inflicts on its own bearer.', toggle: 'itemBuffsDebuffs' },
+  { name: 'Item Debuffs (Other)', get: () => GEN.debuffsOther, desc: 'Effects an item lets its bearer inflict on enemies.', toggle: 'itemBuffsDebuffs' },
+  { name: 'Effect Flavor Descriptions', get: () => GEN.effectDescriptions, desc: 'Flavor-text fragments used to describe generated effects.' },
+  { name: 'Skills Pool', get: () => GEN.skills, desc: 'Skill names sampled for skill-granting items.' },
+  { name: 'Powers Pool', get: () => GEN.powers, desc: 'Activatable powers items can grant.' },
+  { name: 'Transform Forms', get: () => GEN.transformForms, desc: 'Creature forms a transformation item can turn the bearer into.' },
+  { name: 'Summon Entities', get: () => GEN.summonEntities, desc: 'Creatures a summoning item can call.' },
+  { name: 'Terrain Alterations', get: () => GEN.terrainAlterations, desc: 'Environmental effects an item can trigger.' },
+  { name: 'Armor Base Names', get: () => GEN.armor, desc: 'Base name pool for generated armor items.' },
+  { name: 'Weapon Base Names', get: () => GEN.weapon, desc: 'Base name pool for generated weapon items.' },
+  { name: 'Consumable Base Names', get: () => GEN.consumable, desc: 'Base name pool for generated consumable items.' },
+  { name: 'Misc Base Names', get: () => GEN.misc, desc: 'Base name pool for generated miscellaneous/wondrous items.' },
+  { name: 'Monster Trait Count Pools', get: () => TRAIT_COUNT_POOLS, desc: 'How many extra traits a generated monster gets, by rarity tier.', toggle: 'monsterTraits' },
+  { name: 'Monster Part Types', get: () => MONSTER_PART_TYPES, desc: 'Categories of grafted monster parts.' },
+  { name: 'Monster Parts (v2)', get: () => MONSTER_PARTS_V2, desc: 'Named monster-part items and their base stats.' },
+  { name: 'Monster Part Effects', get: () => MONSTER_PART_EFFECT_POOL, desc: 'Effect text pool for grafted monster parts.' },
+  { name: 'Flesh Graft Effects', get: () => FLESH_GRAFT_EFFECT_POOL, desc: 'Effect pool specifically for flesh-graft style items.' },
+  { name: 'Part Themes', get: () => PART_THEMES, desc: 'Thematic groupings used when generating monster parts.' },
+  { name: 'Creature Subtypes', get: () => CREATURE_SUBTYPES, desc: 'Subtype tags sampled for generated creatures.' },
+  { name: 'Journey Scenarios', get: () => JOURNEY_SCENARIOS, desc: 'Random encounters/events for travel downtime.' },
+  { name: 'Bounty Crimes by Rarity', get: () => BOUNTY_CRIMES_BY_RARITY, desc: 'Crime flavor text for bounty-board entries, by rarity.' },
+];
+function renderDmControlsTab() {
+  renderGenerationTogglesPanel();
+  renderGenerationListsViewer();
+}
+function renderGenerationTogglesPanel() {
+  const wrap = document.getElementById('generationTogglesWrap');
+  if (!wrap) return;
+  wrap.innerHTML = GENERATION_TOGGLE_DEFS.map(t => `
+    <label class="dm-toggle-card${generationToggles[t.key] ? ' active' : ''}">
+      <input type="checkbox" ${generationToggles[t.key] ? 'checked' : ''} onchange="setGenerationToggle('${t.key}', this.checked)">
+      <div class="dm-toggle-card-text">
+        <div class="dm-toggle-card-label">${t.label}</div>
+        <div class="dm-toggle-card-desc">${t.desc}</div>
+      </div>
+    </label>
+  `).join('');
+}
+function renderGenerationListsViewer() {
+  const wrap = document.getElementById('genListsWrap');
+  if (!wrap) return;
+  const q = (document.getElementById('genListsSearch')?.value || '').toLowerCase().trim();
+  const rows = GENERATION_LISTS_REGISTRY.filter(l => !q || l.name.toLowerCase().includes(q) || l.desc.toLowerCase().includes(q));
+  const countEl = document.getElementById('genListsCount');
+  if (countEl) countEl.textContent = `${rows.length} list${rows.length === 1 ? '' : 's'}`;
+  wrap.innerHTML = rows.map(l => {
+    let count = 0;
+    try { count = genListCount(l.get()); } catch (e) { count = 0; }
+    const toggleBadge = l.toggle ? `<span class="gen-list-toggle-badge${generationToggles[l.toggle] ? '' : ' off'}">${generationToggles[l.toggle] ? 'ON' : 'OFF'}</span>` : '';
+    return `
+      <div class="gen-list-row">
+        <div class="gen-list-row-head">
+          <span class="gen-list-name">${l.name}</span>
+          <span class="gen-list-count">${count} entries</span>
+          ${toggleBadge}
+        </div>
+        <div class="gen-list-desc">${l.desc}</div>
+      </div>
+    `;
+  }).join('') || '<p style="color:var(--text-dim);font-size:0.85rem;">No lists match your search.</p>';
 }
 function renderGamblingTab() {
   renderGamblingShell();
