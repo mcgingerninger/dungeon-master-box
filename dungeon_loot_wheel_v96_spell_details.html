@@ -3219,6 +3219,14 @@
       <span class="token-count" id="interactionsCount"></span>
     </div>
     <div id="interactionsResults" class="interactions-results"></div>
+
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.4rem 0 0.6rem;">🏷 All Item Tags</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.6rem;">Every #tag currently in use across the full catalog, tallied live rather than hand-listed — a new item's tags show up here automatically the moment it's classified.</p>
+    <div class="token-toolbar">
+      <input type="text" id="tagsSearch" class="token-search" placeholder="Search tags…" oninput="renderTagsReference()">
+      <span class="token-count" id="tagsCount"></span>
+    </div>
+    <div id="tagsReferenceWrap" class="interactions-ref-chips" style="margin-top:0.6rem;"></div>
   </div>
 
   <!-- Original content (see trap-data.js's own header) covering the same functional ground as
@@ -5046,6 +5054,30 @@ function renderInteractionsCompendium() {
     `).join('');
   }
   renderInteractionsItemResults();
+  renderTagsReference();
+}
+// Tallies every #tag actually in use across the full catalog (classifying on the fly for
+// anything not yet touched) rather than hand-listing them -- deriveItemTags' output is partly
+// free-form (a classification leaf, a sourceMonster name, a keyword hit), so a static list would
+// drift out of date the moment new items are added; a live scan can't. Cheap even at catalog
+// scale since it only ever renders one chip per UNIQUE tag, not one row per item.
+function renderTagsReference() {
+  const wrap = document.getElementById('tagsReferenceWrap');
+  if (!wrap) return;
+  buildTokenIndex();
+  const tally = {};
+  Object.values(TOKEN_INDEX).forEach(e => {
+    const item = e.item;
+    if (!item.tags) classifyItemFull(item, e.rarity);
+    (item.tags || []).forEach(t => { tally[t] = (tally[t] || 0) + 1; });
+  });
+  const search = (document.getElementById('tagsSearch')?.value || '').toLowerCase().trim();
+  const entries = Object.entries(tally).filter(([t]) => !search || t.includes(search)).sort((a, b) => b[1] - a[1]);
+  const countEl = document.getElementById('tagsCount');
+  if (countEl) countEl.textContent = entries.length + ' tag' + (entries.length !== 1 ? 's' : '');
+  wrap.innerHTML = entries.length
+    ? entries.map(([tag, count]) => `<span class="tt-prop-chip" title="${count} item${count !== 1 ? 's' : ''}">#${escapeHtml(tag)} <span style="opacity:0.6;">(${count})</span></span>`).join('')
+    : '<span class="interactions-none">No tags match.</span>';
 }
 // Same capped-search pattern as renderInventoryTokenGrid (60-item cap, gated behind an actual
 // search term) -- this browses the same full catalog, so it needs the same guard against
