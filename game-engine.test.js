@@ -76,6 +76,36 @@ describe('computeCharacterSheetFor', () => {
   test('max HP = base + flat gear bonus', () => {
     assert.equal(sheet.maxHp.total, 41); // 40 base + 1 from Ring of Protection
   });
+  test('speed defaults to 30 with no bonus sources', () => {
+    assert.deepEqual(sheet.speed, { base: 30, bonus: 0, total: 30, sources: [], status: '', tooltip: '' });
+  });
+});
+
+describe('computeCharacterSheetFor: text-driven Armor Class / Movement Speed (named traits, DM-attached modifiers)', () => {
+  test('a "+N Armor Class" effect layers on top of the item\'s own .ac field rather than replacing it', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Vanguard\'s Plate', ac: '13', effect: '+2 Armor Class' } } };
+    const sheet = GE.computeCharacterSheetFor({ dex: 10 }, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 15); // 13 base + 0 dex mod + 2 text bonus
+    assert.equal(sheet.ac.status, 'buff');
+  });
+  test('a "-N Movement Speed" effect reduces total speed below the given base', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Vanguard\'s Plate', effect: '-10 Movement Speed' } } };
+    const sheet = GE.computeCharacterSheetFor({}, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.speed.total, 20);
+    assert.equal(sheet.speed.status, 'debuff');
+  });
+  test('"AC"/"Speed" short aliases resolve to the same canonical stats as the full names', () => {
+    assert.deepEqual(GE.extractStatDeltasFromText('+1 AC and -5 Speed'), [
+      { stat: 'Armor Class', amount: 1 },
+      { stat: 'Movement Speed', amount: -5 },
+    ]);
+  });
+  test('an active timed effect (a temporary buff) can also grant Armor Class/Movement Speed', () => {
+    const sheet = GE.computeCharacterSheetFor({}, 1, [], [], {}, () => null, 10, 30, [{ name: 'Rune of Warding', text: '+1 Armor Class for 1 hour.' }]);
+    assert.equal(sheet.ac.total, 11); // 10 base + 0 dex mod + 1 text bonus
+  });
 });
 
 describe('battle: parsing, damage, effectiveness', () => {

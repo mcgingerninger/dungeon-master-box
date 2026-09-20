@@ -470,7 +470,10 @@ export const SKILL_ABILITY_MAP = {
   'Animal Handling': 'wis', 'Insight': 'wis', 'Medicine': 'wis', 'Perception': 'wis', 'Survival': 'wis',
   'Deception': 'cha', 'Intimidation': 'cha', 'Performance': 'cha', 'Persuasion': 'cha',
 };
-export const SHEET_STAT_ALIASES = { 'Max HP': 'Maximum Hit Points', 'Max Hit Points': 'Maximum Hit Points' };
+export const SHEET_STAT_ALIASES = {
+  'Max HP': 'Maximum Hit Points', 'Max Hit Points': 'Maximum Hit Points',
+  'AC': 'Armor Class', 'Speed': 'Movement Speed',
+};
 
 export function proficiencyBonusForLevel(level) {
   if (level >= 17) return 6;
@@ -486,7 +489,7 @@ let _sheetStatVocabRegex = null;
 export function extractStatDeltasFromText(text) {
   if (!text) return [];
   if (!_sheetStatVocabRegex) {
-    const names = new Set([...Object.values(ABILITY_NAMES), 'Maximum Hit Points', 'Saving Throws', ...Object.keys(SKILL_ABILITY_MAP), ...Object.keys(SHEET_STAT_ALIASES)]);
+    const names = new Set([...Object.values(ABILITY_NAMES), 'Maximum Hit Points', 'Saving Throws', 'Armor Class', 'Movement Speed', ...Object.keys(SKILL_ABILITY_MAP), ...Object.keys(SHEET_STAT_ALIASES)]);
     const alt = [...names].sort((a, b) => b.length - a.length).map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
     _sheetStatVocabRegex = new RegExp(`([+-]\\d+)\\s+(${alt})\\b`, 'g');
   }
@@ -616,7 +619,7 @@ export function collectEquippedAcBreakdown(slots, resolveItem) {
   return { base, baseSource, flatSources };
 }
 
-export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, resolveItem, baseMaxHp, activeEffects) {
+export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, resolveItem, baseMaxHp, baseSpeed, activeEffects) {
   const breakdown = addActiveEffectDeltas(collectEquippedStatBreakdown(slots, resolveItem), activeEffects);
   const setOverrides = collectStatSetOverrides(slots, resolveItem, activeEffects);
   const abilities = {};
@@ -668,15 +671,27 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   const baseSourceEntry = acField.baseSource ? [{ itemName: acField.baseSource, amount: acField.base - 10, isBaseOverride: true }] : [];
   const viaDex = dex.modDelta ? dex.sources.map(s => ({ itemName: s.itemName, amount: s.amount, viaAbility: 'Dexterity' })) : [];
   const acFlatTotal = sumBreakdown(acField.flatSources);
-  const acSources = [...baseSourceEntry, ...acField.flatSources, ...viaDex];
-  const acTotal = acField.base + dex.mod + acFlatTotal;
-  const acNet = (acField.base - 10) + acFlatTotal + dex.modDelta;
+  // Text-driven "+N Armor Class" sources -- e.g. a named trait like Vanguard, or a DM-attached
+  // modifier -- layer on top of the item's own .ac field the same way a temporary buff already
+  // layers on top of equipped gear, rather than requiring every AC source to live in one field.
+  const acTextSources = breakdown['Armor Class'] || [];
+  const acTextTotal = sumBreakdown(acTextSources);
+  const acSources = [...baseSourceEntry, ...acField.flatSources, ...viaDex, ...acTextSources];
+  const acTotal = acField.base + dex.mod + acFlatTotal + acTextTotal;
+  const acNet = (acField.base - 10) + acFlatTotal + dex.modDelta + acTextTotal;
   const ac = { total: acTotal, sources: acSources, status: statusFor(acNet), tooltip: describeStatSources(acSources) };
   const maxHpSources = breakdown['Maximum Hit Points'] || [];
   const maxHpBonus = sumBreakdown(maxHpSources);
   const base = baseMaxHp != null ? baseMaxHp : 0;
   const maxHp = { base, bonus: maxHpBonus, total: base + maxHpBonus, sources: maxHpSources, status: statusFor(maxHpBonus), tooltip: describeStatSources(maxHpSources) };
-  return { abilities, profBonus, saves, skills, ac, maxHp };
+  // Movement speed: same "+N Movement Speed" text-delta shape as everything else here (a named
+  // trait, a mount, a curse) folded onto a base the player/DM sets directly, same relationship
+  // Max HP already has to its own base.
+  const speedSources = breakdown['Movement Speed'] || [];
+  const speedBonus = sumBreakdown(speedSources);
+  const speedBase = baseSpeed != null ? baseSpeed : 30;
+  const speed = { base: speedBase, bonus: speedBonus, total: speedBase + speedBonus, sources: speedSources, status: statusFor(speedBonus), tooltip: describeStatSources(speedSources) };
+  return { abilities, profBonus, saves, skills, ac, maxHp, speed };
 }
 
 // ===================== BATTLE =====================

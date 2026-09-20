@@ -743,15 +743,18 @@
      there once so every icon anywhere in the app picks this up automatically) and to the
      handful of item-name text elements below. Both use the same --legendary/--celestial
      CSS vars everywhere else already uses, so this can't drift out of sync with them. */
+  /* Toned down from the original blur/spread/opacity values (kept the pulse/flicker itself,
+     just made the halo noticeably dimmer rather than removing it) -- per request, these were
+     reading as too bright/attention-grabbing across a grid full of legendary/celestial icons. */
   @keyframes iconCelestialPulse {
-    0%,100% { box-shadow:0 0 6px 1px var(--celestial), 0 0 14px 4px rgba(125,231,255,0.35); }
-    50%     { box-shadow:0 0 15px 3px var(--celestial), 0 0 30px 10px rgba(125,231,255,0.6); }
+    0%,100% { box-shadow:0 0 4px 1px var(--celestial), 0 0 8px 2px rgba(125,231,255,0.22); }
+    50%     { box-shadow:0 0 8px 2px var(--celestial), 0 0 16px 5px rgba(125,231,255,0.38); }
   }
   .icon-fx-celestial { animation: iconCelestialPulse 2.4s ease-in-out infinite; }
   @keyframes iconLegendaryFlicker {
-    0%,100% { box-shadow:0 0 5px 1px var(--legendary), 0 0 10px 2px rgba(255,120,40,0.35); filter:brightness(1); }
-    35%     { box-shadow:0 0 9px 2px #ff7a1a, 0 0 18px 6px rgba(255,90,20,0.55); filter:brightness(1.1); }
-    60%     { box-shadow:0 0 4px 1px var(--legendary), 0 0 8px 2px rgba(255,120,40,0.3); filter:brightness(0.96); }
+    0%,100% { box-shadow:0 0 3px 1px var(--legendary), 0 0 6px 1px rgba(255,120,40,0.22); filter:brightness(1); }
+    35%     { box-shadow:0 0 5px 1px #ff7a1a, 0 0 10px 3px rgba(255,90,20,0.35); filter:brightness(1.05); }
+    60%     { box-shadow:0 0 2px 1px var(--legendary), 0 0 5px 1px rgba(255,120,40,0.18); filter:brightness(0.97); }
   }
   .icon-fx-legendary { animation: iconLegendaryFlicker 1.9s ease-in-out infinite; }
   /* Two staggered pseudo-elements, each drawing three ember dots via box-shadow, rising
@@ -872,8 +875,11 @@
     50%     { filter:hue-rotate(30deg); text-shadow:0 0 7px currentColor; }
   }
   @keyframes tagWarp {
-    0%,100% { text-shadow:0 0 3px currentColor; letter-spacing:0.04em; }
-    50%     { text-shadow:0 0 9px currentColor, 0 0 3px currentColor; letter-spacing:0.08em; }
+    /* letter-spacing here used to change the chip's actual rendered width every cycle, reflowing
+       whatever sibling chips sat next to it (a visible jitter, not just a glow). text-shadow
+       alone still pulses the effect without ever touching layout. */
+    0%,100% { text-shadow:0 0 3px currentColor; }
+    50%     { text-shadow:0 0 9px currentColor, 0 0 3px currentColor; }
   }
 
   .item-card-body { padding: 1rem 1.4rem; display: flex; flex-direction: column; gap: 0.9rem; }
@@ -3863,6 +3869,14 @@
       <div class="sheet-field sheet-field-narrow">
         <label>Armor Class</label>
         <strong id="sheetAcValue" class="sheet-ac-value sheet-static-val">10</strong>
+      </div>
+      <div class="sheet-field sheet-field-narrow">
+        <label>Base Speed (ft)</label>
+        <input type="number" id="sheetSpeed" title="Your base walking speed before any bonus/penalty from gear or effects — DM can also adjust the total from the Players tab." oninput="updateCharacterField('characterSpeed', parseInt(this.value,10)||0)">
+      </div>
+      <div class="sheet-field sheet-field-narrow">
+        <label>Speed</label>
+        <strong id="sheetSpeedValue" class="sheet-ac-value sheet-static-val">30 ft.</strong>
       </div>
     </div>
 
@@ -13494,6 +13508,13 @@ let characterAffinity = '';
 // DM-only combat initiative counter -- the DM sets/adjusts it (see the Players tab's nudge
 // buttons and the initiative_delta wire message), the player's own client only ever displays it.
 let characterInitiative = 0;
+// Base movement speed in feet, same base/effective split as characterMaxHp/characterMaxHpEffective
+// -- the player can set their own base (racial/class speed), a named trait or curse can add a
+// "+N Movement Speed"/"-N Movement Speed" text bonus on top via the sheet computation, AND the DM
+// can independently nudge it (Players tab, mirrors the initiative counter) for house-rule terrain/
+// condition effects. characterSpeedEffective is the synced, ready-to-display total.
+let characterSpeed = 30;
+let characterSpeedEffective = 30;
 // Selected feat names (FEAT_LIBRARY, reference-data.js) -- same flat-array-of-strings shape as
 // skillProficiencies/saveProficiencies, toggled the same way. See featEffectEntries() for how a
 // selected feat's effect text feeds into the same stat-breakdown pass equipped gear/active
@@ -13844,7 +13865,7 @@ function closeDiceRoller() {
 // where the rest of its dependency chain was removed for the full explanation.
 function computeCharacterSheet() {
   buildTokenIndex();
-  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, [...(activeTimedEffects || []), ...featEffectEntries(feats), ...achievedUnlockEffectEntries(achievedUnlocks, key => TOKEN_INDEX[key] && TOKEN_INDEX[key].item)]);
+  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, characterSpeed, [...(activeTimedEffects || []), ...featEffectEntries(feats), ...achievedUnlockEffectEntries(achievedUnlocks, key => TOKEN_INDEX[key] && TOKEN_INDEX[key].item)]);
 }
 // Not a dynamic window[field] = value assignment — these are `let` bindings in a classic
 // script, which (unlike `var` or function declarations) never attach to `window`, so that
@@ -13869,6 +13890,7 @@ function updateCharacterField(field, value) {
     characterMaxHpEffective = value + gearBonus;
     characterCurrentHp = Math.min(characterCurrentHp, characterMaxHpEffective);
   }
+  else if (field === 'characterSpeed') characterSpeed = Math.max(0, parseInt(value, 10) || 0);
   renderCharacterSheet();
   if (typeof scheduleSave === 'function') scheduleSave();
 }
@@ -13945,6 +13967,14 @@ function syncCharacterMaxHp(sheet) {
   characterMaxHpEffective = sheet.maxHp.total;
   if (typeof scheduleSave === 'function') scheduleSave();
 }
+// Same relationship to characterSpeed that syncCharacterMaxHp/syncCharacterAc already have to
+// their own base fields -- keeps the synced, ready-to-display total (used by the DM roster/
+// Players tab) current any time the sheet recomputes, without every reader needing to run the
+// full computation itself.
+function syncCharacterSpeed(sheet) {
+  characterSpeedEffective = sheet.speed.total;
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
 function setInventoryViewMode(mode) {
   const equipBtn = document.getElementById('invModeEquipBtn');
   const sheetBtn = document.getElementById('invModeSheetBtn');
@@ -14001,6 +14031,7 @@ function renderCharacterSheet() {
   const sheet = computeCharacterSheet();
   syncCharacterAc(sheet);
   syncCharacterMaxHp(sheet);
+  syncCharacterSpeed(sheet);
   // The persistent "🧑 PlayerName" badge (visible on every tab, not just the Character Sheet)
   // gets the player's own current HP alongside their name, color-coded the same way the DM's
   // roster strip and the Players tab already are — a player glancing at any other tab shouldn't
@@ -14015,6 +14046,14 @@ function renderCharacterSheet() {
   // just to see it.
   const initBannerEl = document.getElementById('invPlayerInitiative');
   if (initBannerEl) initBannerEl.textContent = `Init ${fmtMod(characterInitiative || 0)}`;
+  const speedEl = document.getElementById('sheetSpeed');
+  if (speedEl && document.activeElement !== speedEl) speedEl.value = characterSpeed;
+  const speedValueEl = document.getElementById('sheetSpeedValue');
+  if (speedValueEl) {
+    speedValueEl.textContent = sheet.speed.total + ' ft.';
+    speedValueEl.className = 'sheet-ac-value' + (sheet.speed.status ? ' stat-' + sheet.speed.status : '');
+    if (sheet.speed.tooltip) speedValueEl.title = sheet.speed.tooltip; else speedValueEl.removeAttribute('title');
+  }
   const profBonusEl = document.getElementById('sheetProfBonus');
   if (profBonusEl) profBonusEl.textContent = fmtMod(sheet.profBonus);
 
@@ -17730,7 +17769,7 @@ function buildForeignCharacterSheetHtml(s) {
   const saveProfs = s.saveProficiencies || [];
   const slots = s.playerSlots || {};
   const baseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
+  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, s.characterSpeed, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
   const abilitiesHtml = Object.keys(ABILITY_NAMES).map(abbr => {
     const a = sheet.abilities[abbr];
     const cls = a.status ? ' stat-' + a.status : '';
@@ -18001,7 +18040,7 @@ function openDmEditPlayerModal() {
   // modal itself has no way to change equipment. Max HP's gear bonus gets the same "computed
   // fresh, shown alongside the editable base" treatment as AC — see characterMaxHpEffective.
   const dmEditBaseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
+  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, s.characterSpeed, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
   const dmAcEl = document.getElementById('dmEditAcValue');
   if (dmAcEl) dmAcEl.textContent = acSheet.ac.total;
   const dmMaxHpBonusEl = document.getElementById('dmEditMaxHpBonus');
@@ -18053,7 +18092,7 @@ function saveDmEditPlayerModal() {
   // is clamped against the gear-inclusive total, not the raw typed base, so a buffed player's
   // headroom the DM just saw in the modal doesn't get silently clipped back off on save.
   const s = viewedPlayerState || {};
-  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
+  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, s.characterSpeed, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
   curHp = Math.max(0, Math.min(curHp, acSheet.maxHp.total));
   const fields = {
     characterRace: document.getElementById('dmEditRace').value,
@@ -18188,6 +18227,7 @@ function showPlayerRosterTooltip(evt, uid) {
     ['Class', p.characterClass || '—'],
     ['Affinity', p.characterAffinity || '—'],
     ['AC', p.ac != null ? p.ac : '—'],
+    ['Speed', (p.speed != null ? p.speed : 30) + ' ft'],
   ];
   tt.innerHTML = `<div class="tt-header"><span>${escapeHtml(p.username)}</span></div>
     <div class="tt-stats"><span class="${hpCls}">❤ ${escapeHtml(hpText)}</span></div>
@@ -18205,7 +18245,7 @@ function renderPlayersTab() {
     <div class="players-list-row${p.uid === viewedPlayerUid ? ' active' : ''}">
       <div class="players-list-main" onclick="selectViewedPlayer('${p.uid}')">
         <div class="players-list-name">${escapeHtml(p.username)}</div>
-        <div class="players-list-stats">${p.currentHp != null ? `HP <span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span> · AC ${escapeHtml(String(p.ac))} · Init ${escapeHtml(fmtMod(p.initiative || 0))}` : 'No character sheet yet'}</div>
+        <div class="players-list-stats">${p.currentHp != null ? `HP <span class="${hpColorClass(p.currentHp, p.maxHp)}">${escapeHtml(String(p.currentHp))}/${escapeHtml(String(p.maxHp))}</span> · AC ${escapeHtml(String(p.ac))} · Init ${escapeHtml(fmtMod(p.initiative || 0))} · Speed ${escapeHtml(String(p.speed != null ? p.speed : 30))} ft` : 'No character sheet yet'}</div>
       </div>
       ${p.currentHp != null ? `<div class="players-hp-adjust" onclick="event.stopPropagation()">
         <button class="hp-nudge-btn hp-nudge-down" onclick="nudgePlayerHp('${p.uid}',-10)" title="-10 HP">«</button>
@@ -18253,6 +18293,11 @@ function renderPlayersTab() {
           <span>Init <strong id="playersDetailInitiative">0</strong></span>
           <button class="hp-nudge-btn" onclick="nudgePlayerInitiative('${viewedPlayerUid}',1)" title="+1 Initiative">›</button>
         </div>
+        <div class="players-init-adjust" title="Base movement speed — the player can set their own base, and gear/effects can add to it, but you can also override the total directly here (e.g. a terrain or condition house rule).">
+          <button class="hp-nudge-btn hp-nudge-down" onclick="nudgePlayerSpeed('${viewedPlayerUid}',-5)" title="-5 ft. Speed">‹</button>
+          <span>Speed <strong id="playersDetailSpeed">30</strong> ft</span>
+          <button class="hp-nudge-btn" onclick="nudgePlayerSpeed('${viewedPlayerUid}',5)" title="+5 ft. Speed">›</button>
+        </div>
       </div>
       <details class="collapsible" open>
         <summary>🧾 Character Sheet</summary>
@@ -18283,6 +18328,8 @@ function renderPlayersTab() {
   if (statsEl) statsEl.textContent = viewedMeta.currentHp != null ? `HP ${viewedMeta.currentHp}/${viewedMeta.maxHp} · AC ${viewedMeta.ac}` : 'No character sheet yet';
   const initEl = document.getElementById('playersDetailInitiative');
   if (initEl) initEl.textContent = fmtMod(viewedMeta.initiative || 0);
+  const speedDetailEl = document.getElementById('playersDetailSpeed');
+  if (speedDetailEl) speedDetailEl.textContent = viewedMeta.speed != null ? viewedMeta.speed : 30;
 
   const sheetEl = document.getElementById('playersSheetSection');
   if (sheetEl) sheetEl.innerHTML = buildForeignCharacterSheetHtml(s);
@@ -18336,6 +18383,11 @@ function nudgePlayerHp(uid, delta) {
 // as nudgePlayerHp), no slider since there's no natural min/max to clamp a range input to.
 function nudgePlayerInitiative(uid, delta) {
   if (typeof window.applyInitiativeDeltaToPlayer === 'function') window.applyInitiativeDeltaToPlayer(uid, delta);
+}
+// Same fire-and-forget pattern -- server clamps at a minimum of 0 (see speed_delta), unlike
+// initiative which has no natural floor.
+function nudgePlayerSpeed(uid, delta) {
+  if (typeof window.applySpeedDeltaToPlayer === 'function') window.applySpeedDeltaToPlayer(uid, delta);
 }
 // DM-only view of every hidden-power tier on the viewed player's own current items (equipped +
 // stored) with a toggle to mark each one achieved/not. Full condition/reward text is always shown
@@ -23166,7 +23218,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
-      characterRace, characterAffinity, characterInitiative, deckOfManyThingsLog, geomorphTiles, achievedUnlocks,
+      characterRace, characterAffinity, characterInitiative, characterSpeed, characterSpeedEffective, deckOfManyThingsLog, geomorphTiles, achievedUnlocks,
       appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
@@ -23265,6 +23317,9 @@ function applyStateBlob(data) {
   if (data.characterRace !== undefined) characterRace = data.characterRace;
   if (data.characterAffinity !== undefined) characterAffinity = data.characterAffinity;
   if (typeof data.characterInitiative === 'number') characterInitiative = data.characterInitiative;
+  if (typeof data.characterSpeed === 'number') characterSpeed = data.characterSpeed;
+  if (typeof data.characterSpeedEffective === 'number') characterSpeedEffective = data.characterSpeedEffective;
+  else characterSpeedEffective = characterSpeed;
   if (data.appliedGamblingPayoutIds) appliedGamblingPayoutIds = data.appliedGamblingPayoutIds;
   if (data.journeySetting) journeySetting = data.journeySetting;
   if (Array.isArray(data.journeyLog)) journeyLog = data.journeyLog;
@@ -23342,6 +23397,8 @@ window.resetMainAppStateToBlank = function () {
   characterRace = '';
   characterAffinity = '';
   characterInitiative = 0;
+  characterSpeed = 30;
+  characterSpeedEffective = 30;
   battlefieldRoster = [];
   battlefieldLog = [];
   viewedPlayerUid = null;

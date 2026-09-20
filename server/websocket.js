@@ -285,6 +285,8 @@ export function createWebSocketServer(db, httpServer) {
         uid: accountUid, username: entry.username || 'Unnamed', role: 'player', currentHp, maxHp, ac: s.characterAc,
         characterClass: s.characterClass, characterRace: s.characterRace, characterAffinity: s.characterAffinity,
         initiative: typeof s.characterInitiative === 'number' ? s.characterInitiative : 0,
+        speed: typeof s.characterSpeedEffective === 'number' ? s.characterSpeedEffective
+          : (typeof s.characterSpeed === 'number' ? s.characterSpeed : 30),
       });
     }
     return roster;
@@ -418,7 +420,7 @@ export function createWebSocketServer(db, httpServer) {
         return;
       }
 
-      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect' || msg.type === 'initiative_delta' || msg.type === 'toggle_unlock_achieved') {
+      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect' || msg.type === 'initiative_delta' || msg.type === 'toggle_unlock_achieved' || msg.type === 'speed_delta') {
         if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that' });
         const targetUid = msg.targetUid;
         const existing = loadPlayerState(db, identity.campaignId, targetUid) || { state: {}, rev: 0 };
@@ -462,6 +464,11 @@ export function createWebSocketServer(db, httpServer) {
           const idx = list.findIndex(a => a.itemKey === itemKey && a.tierIndex === tierIndex);
           if (idx === -1) list.push({ itemKey, tierIndex }); else list.splice(idx, 1);
           nextState.achievedUnlocks = list;
+        } else if (msg.type === 'speed_delta') {
+          // Base movement speed, DM-adjustable like initiative -- clamped at 0 (unlike
+          // initiative) since a negative walking speed isn't meaningful.
+          const current = typeof nextState.characterSpeed === 'number' ? nextState.characterSpeed : 30;
+          nextState.characterSpeed = Math.max(0, current + (Number(msg.delta) || 0));
         }
 
         const nextRev = existing.rev + 1;

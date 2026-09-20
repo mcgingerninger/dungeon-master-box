@@ -327,6 +327,9 @@ function applyHpDelta(targetUid, delta) {
 function applyInitiativeDelta(targetUid, delta) {
   send({ type: 'initiative_delta', targetUid, delta }); // fire-and-forget, same as applyHpDelta
 }
+function applySpeedDelta(targetUid, delta) {
+  send({ type: 'speed_delta', targetUid, delta }); // fire-and-forget, same as applyHpDelta
+}
 function crossWrite(type, targetUid, extra) {
   send({ type, targetUid, ...extra });
   return waitForNext((m) => (m.type === 'cross_write_ack' && m.targetUid === targetUid) || m.type === 'error')
@@ -369,6 +372,10 @@ window.applyHpDeltaToPlayer = function (targetUid, delta) {
 window.applyInitiativeDeltaToPlayer = function (targetUid, delta) {
   if (!mp.connected) return;
   applyInitiativeDelta(targetUid, delta);
+};
+window.applySpeedDeltaToPlayer = function (targetUid, delta) {
+  if (!mp.connected) return;
+  applySpeedDelta(targetUid, delta);
 };
 window.giftArbitraryItemToPlayer = function (targetUid, item) {
   if (!mp.connected) return Promise.reject(new Error('Not connected'));

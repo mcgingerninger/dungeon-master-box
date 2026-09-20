@@ -311,6 +311,32 @@ describe('cross-player writes (DM -> player)', () => {
     assert.match(msg.message, /DM/);
   });
 
+  test('speed_delta adjusts the target\'s base speed, clamped to a minimum of 0', async () => {
+    const player = await connectAs('uid-player', 'player');
+    await pushState(player, 1, { characterSpeed: 30 });
+
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'speed_delta', targetUid: 'uid-player', delta: -10 });
+    let update = await nextMessage(player);
+    assert.equal(update.state.characterSpeed, 20);
+
+    send(dm, { type: 'speed_delta', targetUid: 'uid-player', delta: -1000 });
+    update = await nextMessage(player);
+    assert.equal(update.state.characterSpeed, 0);
+  });
+
+  test('a fresh target with no prior speed defaults to 30 before the delta is applied', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'speed_delta', targetUid: 'uid-offline-player', delta: 10 });
+    const ack = await dm.next();
+    assert.equal(ack.type, 'cross_write_ack');
+
+    const ws2 = await connect();
+    send(ws2, { type: 'identify', campaignId, accountUid: 'uid-offline-player', role: 'player' });
+    const identified = await nextMessage(ws2);
+    assert.equal(identified.state.characterSpeed, 40);
+  });
+
   test('gift_item adds the item to the target\'s savedGeneratedItems and recentlyLooted', async () => {
     const player = await connectAs('uid-player', 'player');
     const dm = await connectAs('uid-dm', 'dm');
