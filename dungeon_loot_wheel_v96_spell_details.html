@@ -83,7 +83,7 @@
   .tab-content.active { display: block; }
 
   /* ITEM COMPENDIUM sub-tabs (Items / Spells / Monsters within one tab) */
-  .compendium-subtabs { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+  .compendium-subtabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
   .compendium-subtab-btn {
     background: transparent; border: 1px solid var(--border); color: var(--text-dim);
     font-family: 'Crimson Text', serif; font-size: 0.95rem; padding: 0.4rem 1.1rem;
@@ -96,7 +96,7 @@
   /* Combat's sub-tabs (Battle / Loot Presets) reuse this exact visual style under their own
      class names — see showCombatSub() — so a global .compendium-subpanel selector elsewhere
      (showCompendiumSub) can never also toggle Combat's panels off. */
-  .combat-subtabs { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+  .combat-subtabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
   .combat-subtab-btn {
     background: transparent; border: 1px solid var(--border); color: var(--text-dim);
     font-family: 'Crimson Text', serif; font-size: 0.95rem; padding: 0.4rem 1.1rem;
@@ -538,7 +538,11 @@
   /* ITEMS TAB */
   .items-layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 
-  .items-panel { background: var(--surface); border: 1px solid var(--border); }
+  /* min-width:0 overrides a CSS Grid item's default min-width:auto -- without it, a grid track
+     stretches to fit its item's own min-content size (e.g. a <select> with a long option, or any
+     nowrap text inside), which was silently forcing this whole panel wider than the viewport on
+     narrow screens even though every element inside it already used width:100%/flex-wrap. */
+  .items-panel { background: var(--surface); border: 1px solid var(--border); min-width: 0; }
 
   .items-panel-header {
     padding: 0.8rem 1rem;
@@ -577,9 +581,14 @@
   .interactions-field-head { display:flex; align-items:center; justify-content:space-between; color:var(--gold); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; }
   .interactions-refresh-btn { background:transparent; border:1px solid var(--border); color:var(--text-dim); font-size:0.72rem; padding:0.1rem 0.4rem; cursor:pointer; text-transform:none; letter-spacing:normal; }
   .interactions-refresh-btn:hover { border-color:var(--gold); color:var(--gold); }
-  .interactions-checklist { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:0.25rem 0.6rem; max-height:180px; overflow-y:auto; padding:0.5rem; background:var(--bg); border:1px solid var(--border); }
-  .interactions-check { display:flex; align-items:center; gap:0.35rem; font-size:0.8rem; color:var(--text-dim); cursor:pointer; }
-  .interactions-check input { cursor:pointer; }
+  .interactions-checklist { display:flex; flex-direction:column; gap:0.5rem; max-height:220px; overflow-y:auto; padding:0.6rem; background:var(--bg); border:1px solid var(--border); }
+  .interactions-check-group-label { font-size:0.68rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; }
+  .interactions-check-row { display:flex; flex-wrap:wrap; gap:0.3rem 0.9rem; }
+  .interactions-check {
+    display:flex; align-items:flex-start; gap:0.35rem; font-size:0.8rem; color:var(--text-dim); cursor:pointer;
+    flex:0 0 auto; max-width:100%; line-height:1.25;
+  }
+  .interactions-check input { cursor:pointer; flex-shrink:0; margin-top:0.2rem; }
 
   .add-btn {
     background: var(--surface2);
@@ -1818,6 +1827,17 @@
   }
   .doll-slot.ring, .doll-slot.charm { width:78px; height:78px; }
   .doll-slot-empty-icon { font-size:1.5rem; opacity:0.28; filter:grayscale(1); }
+  /* The doll's columns/slots are sized for desktop (130/150/130px, 110px slots) -- fixed-width
+     enough to blow past a phone's viewport and drag the whole page into horizontal scroll.
+     Scaled down (~0.8x) rather than wrapped in a scroll container, since unlike the spatial
+     inventory grid this is small enough to just shrink and keep fully visible and usable. */
+  @media (max-width: 700px) {
+    .player-doll { grid-template-columns: 92px 104px 92px; gap: 0.35rem; }
+    .doll-slot { width: 84px; height: 60px; padding: 0.2rem; }
+    .doll-slot.ring, .doll-slot.charm { width: 58px; height: 58px; }
+    .doll-slot-row { gap: 0.35rem; }
+    .doll-slot-empty-icon { font-size: 1.15rem; }
+  }
   .doll-slot.filled { border-style:solid; border-color:var(--gold); background:var(--surface2); cursor:grab; }
   .doll-slot.slot-invalid { border-color:var(--danger) !important; animation:slotShake 0.3s; }
   @keyframes slotShake {
@@ -2254,6 +2274,10 @@
   /* ---- Players tab (DM-only roster + per-player inventory/equipment viewer) ---- */
   .players-layout{display:grid;grid-template-columns:220px 1fr;gap:1.2rem;align-items:start}
   @media (max-width:700px){.players-layout{grid-template-columns:1fr}}
+  /* See .items-panel's own comment -- same CSS Grid min-width:auto pitfall: without this, either
+     column stretches the single mobile track (and the whole layout) to fit its widest descendant
+     (the equipment doll, a stat grid, etc.) instead of shrinking to the viewport. */
+  .players-list, .players-detail{min-width:0}
   .players-list{display:flex;flex-direction:column;gap:.4rem}
   .players-list-row{background:var(--surface);border:1px solid var(--border);padding:.6rem .7rem;cursor:pointer;transition:border-color .15s}
   .players-list-row:hover{border-color:var(--gold)}
@@ -3903,7 +3927,7 @@
     <span>📦 Slots Used: <strong id="rlSlotsUsed">0</strong> / <span id="rlSlotsTotal">36</span></span>
     <button class="action-btn" style="width:auto;max-width:none" onclick="clearRecentlyLooted()">Clear All</button>
   </div>
-  <div class="inv-grid" id="recentlyLootedGrid"></div>
+  <div class="inv-grid-wrap"><div class="inv-grid" id="recentlyLootedGrid"></div></div>
   <div class="store-buy-msg" id="recentlyLootedMsg"></div>
 
   <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.5rem 0 0.6rem;">🎒 Token Library</h3>
@@ -6902,8 +6926,21 @@ function renderInteractionsChecklist(prefix, existingItem) {
   const defaults = computeInteractionDefaults(prefix);
   container.dataset.defaults = JSON.stringify(defaults);
   const checkedSet = new Set(existingItem && existingItem.interactions ? existingItem.interactions : defaults);
-  container.innerHTML = Object.keys(INTERACTIONS).map(key => `
-    <label class="interactions-check"><input type="checkbox" value="${key}"${checkedSet.has(key) ? ' checked' : ''}> ${escapeHtml(INTERACTIONS[key].label)}</label>
+  // Grouped by INTERACTIONS' own `cat` field (same grouping the read-only Interactions
+  // reference in the Compendium already uses) -- a flat 29-checkbox list, sorted alphabetically
+  // by internal key, had no visual structure to it at all. Each group is its own flex-wrap row so
+  // a long label wraps within its own item instead of throwing off a rigid grid's row heights.
+  const groups = {};
+  Object.keys(INTERACTIONS).forEach(key => { (groups[INTERACTIONS[key].cat] = groups[INTERACTIONS[key].cat] || []).push(key); });
+  container.innerHTML = Object.keys(groups).map(cat => `
+    <div class="interactions-check-group">
+      <div class="interactions-check-group-label">${escapeHtml(cat)}</div>
+      <div class="interactions-check-row">
+        ${groups[cat].map(key => `
+          <label class="interactions-check"><input type="checkbox" value="${key}"${checkedSet.has(key) ? ' checked' : ''}> ${escapeHtml(INTERACTIONS[key].label)}</label>
+        `).join('')}
+      </div>
+    </div>
   `).join('');
 }
 // Diffs the checked boxes against the defaults captured at render time -- only the DIFFERENCE
