@@ -418,7 +418,7 @@ export function createWebSocketServer(db, httpServer) {
         return;
       }
 
-      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect' || msg.type === 'initiative_delta') {
+      if (msg.type === 'hp_delta' || msg.type === 'gift_item' || msg.type === 'set_inventory_fields' || msg.type === 'apply_item_effect' || msg.type === 'apply_trap_effect' || msg.type === 'initiative_delta' || msg.type === 'toggle_unlock_achieved') {
         if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can do that' });
         const targetUid = msg.targetUid;
         const existing = loadPlayerState(db, identity.campaignId, targetUid) || { state: {}, rev: 0 };
@@ -452,6 +452,16 @@ export function createWebSocketServer(db, httpServer) {
           // (a heavily-penalized roll can legitimately go negative).
           const current = typeof nextState.characterInitiative === 'number' ? nextState.characterInitiative : 0;
           nextState.characterInitiative = current + (Number(msg.delta) || 0);
+        } else if (msg.type === 'toggle_unlock_achieved') {
+          // Flips one item's hidden-power tier between achieved/not for this player -- the DM is
+          // the sole judge of whether the tier's condition was actually met at the table, so this
+          // (like every other branch here) only ever runs for identity.role === 'dm'.
+          const itemKey = String(msg.itemKey || '');
+          const tierIndex = Number(msg.tierIndex);
+          const list = Array.isArray(nextState.achievedUnlocks) ? nextState.achievedUnlocks.slice() : [];
+          const idx = list.findIndex(a => a.itemKey === itemKey && a.tierIndex === tierIndex);
+          if (idx === -1) list.push({ itemKey, tierIndex }); else list.splice(idx, 1);
+          nextState.achievedUnlocks = list;
         }
 
         const nextRev = existing.rev + 1;

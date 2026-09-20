@@ -290,6 +290,27 @@ describe('cross-player writes (DM -> player)', () => {
     assert.equal(identified.state.characterInitiative, 4);
   });
 
+  test('toggle_unlock_achieved marks a tier achieved, then unmarks it on a second toggle', async () => {
+    const player = await connectAs('uid-player', 'player');
+    const dm = await connectAs('uid-dm', 'dm');
+
+    send(dm, { type: 'toggle_unlock_achieved', targetUid: 'uid-player', itemKey: 'loot:legendary:Emberfang, the Wyrmslayer Blade', tierIndex: 0 });
+    let update = await nextMessage(player);
+    assert.deepEqual(update.state.achievedUnlocks, [{ itemKey: 'loot:legendary:Emberfang, the Wyrmslayer Blade', tierIndex: 0 }]);
+
+    send(dm, { type: 'toggle_unlock_achieved', targetUid: 'uid-player', itemKey: 'loot:legendary:Emberfang, the Wyrmslayer Blade', tierIndex: 0 });
+    update = await nextMessage(player);
+    assert.deepEqual(update.state.achievedUnlocks, []);
+  });
+
+  test('a non-DM cannot toggle an unlock tier', async () => {
+    const player = await connectAs('uid-player', 'player');
+    send(player, { type: 'toggle_unlock_achieved', targetUid: 'uid-player', itemKey: 'loot:common:Dagger', tierIndex: 0 });
+    const msg = await nextMessage(player);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+
   test('gift_item adds the item to the target\'s savedGeneratedItems and recentlyLooted', async () => {
     const player = await connectAs('uid-player', 'player');
     const dm = await connectAs('uid-dm', 'dm');

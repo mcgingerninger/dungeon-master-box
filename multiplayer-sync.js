@@ -356,6 +356,12 @@ function applyTrapEffectToPlayer(targetUid, trap, saved) {
     throw err;
   });
 }
+function toggleUnlockAchieved(targetUid, itemKey, tierIndex) {
+  return crossWrite('toggle_unlock_achieved', targetUid, { itemKey, tierIndex }).catch((err) => {
+    console.error('[multiplayer-sync] toggleUnlockAchieved failed:', err);
+    throw err;
+  });
+}
 window.applyHpDeltaToPlayer = function (targetUid, delta) {
   if (!mp.connected) return;
   applyHpDelta(targetUid, delta);
@@ -379,6 +385,10 @@ window.applyTrapEffectToPlayerUid = function (targetUid, trap, saved) {
 window.dmSetPlayerInventoryFields = function (targetUid, fields) {
   if (!mp.connected) return Promise.reject(new Error('Not connected'));
   return setPlayerInventoryFields(targetUid, fields);
+};
+window.toggleUnlockAchievedForPlayer = function (targetUid, itemKey, tierIndex) {
+  if (!mp.connected) return Promise.reject(new Error('Not connected'));
+  return toggleUnlockAchieved(targetUid, itemKey, tierIndex);
 };
 
 // ---------- Real-time looting: loot claims (first-write-wins, arbitrated server-side) ----------

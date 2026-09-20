@@ -1639,6 +1639,20 @@
     color:var(--text); font-size:0.8rem; width:24px; height:24px; line-height:1; cursor:pointer; border-radius:3px;
   }
   .geomorph-reroll-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .unlock-item-card { background:var(--surface); border:1px solid var(--border); padding:0.6rem 0.7rem; margin-bottom:0.6rem; }
+  .unlock-item-name { color:var(--gold-bright); font-weight:600; margin-bottom:0.4rem; }
+  .unlock-tier-row { border-top:1px solid var(--border); padding-top:0.4rem; margin-top:0.4rem; }
+  .unlock-tier-row:first-of-type { border-top:none; padding-top:0; margin-top:0; }
+  .unlock-tier-row.achieved { color:#8fd08a; }
+  .unlock-tier-head { display:flex; align-items:center; justify-content:space-between; gap:0.6rem; margin-bottom:0.25rem; }
+  .unlock-tier-label { font-size:0.85rem; font-weight:600; }
+  .unlock-toggle-btn {
+    background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Crimson Text',serif;
+    font-size:0.78rem; padding:0.25rem 0.55rem; cursor:pointer;
+  }
+  .unlock-toggle-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .unlock-tier-row.achieved .unlock-toggle-btn { border-color:#5fa877; color:#8fd08a; }
+  .unlock-tier-field { font-size:0.8rem; color:var(--text-dim); margin-top:0.15rem; }
   .sheet-abilities-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:0.5rem; margin-bottom:0.8rem; }
   .sheet-ability-box { background:var(--surface); border:1px solid var(--border); padding:0.45rem; text-align:center; }
   .sheet-ability-box label { display:block; font-size:0.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem; }
@@ -2062,6 +2076,7 @@
   .tt-interaction-chip { background:rgba(91,156,246,0.1); border:1px solid var(--blue,#5b9cf6); color:#8fbcf7; font-family:'Share Tech Mono',monospace; font-size:0.68rem; padding:0.05rem 0.35rem; }
   .tt-unlocks { margin-top:0.5rem; border-top:1px solid var(--border); padding-top:0.4rem; }
   .tt-unlocks-title { font-size:0.75rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem; }
+  .tt-unlock-locked { color:var(--text-dim); font-style:italic; }
   .tt-unlock-tier { font-size:0.8rem; color:var(--text-dim); margin-bottom:0.2rem; }
 
   /* ===================== INSPECTION SYSTEM ===================== */
@@ -13447,6 +13462,11 @@ let characterInitiative = 0;
 // selected feat's effect text feeds into the same stat-breakdown pass equipped gear/active
 // effects already go through.
 let feats = [];
+// Which hidden-power unlock tiers this character has actually achieved, DM-confirmed --
+// {itemKey, tierIndex} pairs. Keyed by item key rather than a per-instance id (matching how
+// activeTimedEffects already keys off item key too) so an achieved tier survives the item being
+// unequipped/re-equipped. See achievedUnlockEffectEntries below for how this feeds the sheet.
+let achievedUnlocks = [];
 
 // DM Controls: local-only (per-browser, not synced) on/off switches for specific randomization
 // pools used when generating items/monsters. Persisted to localStorage so a DM's preference
@@ -13787,7 +13807,7 @@ function closeDiceRoller() {
 // where the rest of its dependency chain was removed for the full explanation.
 function computeCharacterSheet() {
   buildTokenIndex();
-  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, [...(activeTimedEffects || []), ...featEffectEntries(feats)]);
+  return computeCharacterSheetFor(characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, key => TOKEN_INDEX[key], characterMaxHp, [...(activeTimedEffects || []), ...featEffectEntries(feats), ...achievedUnlockEffectEntries(achievedUnlocks, key => TOKEN_INDEX[key] && TOKEN_INDEX[key].item)]);
 }
 // Not a dynamic window[field] = value assignment — these are `let` bindings in a classic
 // script, which (unlike `var` or function declarations) never attach to `window`, so that
@@ -13850,6 +13870,29 @@ function featEffectEntries(featNames) {
     const def = (typeof FEAT_LIBRARY !== 'undefined' ? FEAT_LIBRARY : []).find(f => f.name === name);
     return def ? { name: def.name, text: def.description } : null;
   }).filter(Boolean);
+}
+// Same {name, text} shape as featEffectEntries, for a character's DM-confirmed hidden-power
+// unlocks -- resolveItemFn abstracts over "my own TOKEN_INDEX" vs. "a foreign/viewed player's own
+// savedGeneratedItems" (see resolveForeignItem), since the two contexts resolve a 'gen:' key from
+// different places. Any recognized "+N Stat"/"+N Skill" text in a tier's reward flows into the
+// sheet automatically via the same addActiveEffectDeltas pass every other entry here goes through;
+// anything else (a granted spell, a trait too free-form to parse) just shows as descriptive text.
+function achievedUnlockEffectEntries(achievedList, resolveItemFn) {
+  return (achievedList || []).map(a => {
+    const item = resolveItemFn(a.itemKey);
+    const tier = item && item.unlocks && item.unlocks[a.tierIndex];
+    if (!tier) return null;
+    return { name: `${item.name} — ${tier.tierLabel || 'Hidden Power'}`, text: tier.reward || '' };
+  }).filter(Boolean);
+}
+function isUnlockAchieved(itemKey, tierIndex) {
+  return (achievedUnlocks || []).some(a => a.itemKey === itemKey && a.tierIndex === tierIndex);
+}
+// Weapons and companions (pets/mounts) are the two item families where hidden-power unlock
+// DETAILS (condition/reward text) are kept DM-only until a tier is actually achieved -- everything
+// else (armor, misc/wondrous items) keeps showing its unlocks in full to players, as it always has.
+function isUnlockGatedForItem(item) {
+  return !!item && (item.type === 'weapon' || item.subcategory === 'pet' || item.subcategory === 'mount');
 }
 // AC is fully derived now (ability scores + equipped gear, exactly like Saves/Skills already
 // were) rather than a manually-typed field the player had to remember to sync — see
@@ -14151,7 +14194,9 @@ function renderActiveEffectsDisplay() {
     }
     let unlocksHtml = '';
     if (item.unlocks && item.unlocks.length) {
-      unlocksHtml = `<div class="ae-unlocks">🔒 Hidden Power${item.unlocks.length > 1 ? 's' : ''} available: ${item.unlocks.map(u => escapeHtml(u.tierLabel || 'Tier')).join(', ')}</div>`;
+      const gated = isUnlockGatedForItem(item) && document.body.classList.contains('role-player');
+      const labels = item.unlocks.map((u, i) => isUnlockAchieved(key, i) ? (u.tierLabel || 'Tier') + ' ✓' : (gated ? 'Locked' : (u.tierLabel || 'Tier')));
+      unlocksHtml = `<div class="ae-unlocks">🔒 Hidden Power${item.unlocks.length > 1 ? 's' : ''}: ${labels.map(l => escapeHtml(l)).join(', ')}</div>`;
     }
     return `
       <div class="ae-row ${entry.rarity}">
@@ -14187,8 +14232,13 @@ function buildTooltipHtml(entry) {
   const typeLabel = item.type || item.cat || '';
   let unlocksHtml = '';
   if (item.unlocks && item.unlocks.length) {
-    const tierRows = item.unlocks.map(function(u) {
-      return '<div class="tt-unlock-tier"><b>' + escapeHtml(u.tierLabel || 'Tier') + ':</b> ' + escapeHtml(u.reward) + '</div>';
+    const gated = isUnlockGatedForItem(item) && document.body.classList.contains('role-player');
+    const tierRows = item.unlocks.map(function(u, i) {
+      const achieved = isUnlockAchieved(entry.key, i);
+      if (gated && !achieved) {
+        return '<div class="tt-unlock-tier tt-unlock-locked">🔒 Hidden Power — locked (ask your DM)</div>';
+      }
+      return '<div class="tt-unlock-tier"><b>' + escapeHtml(u.tierLabel || 'Tier') + (achieved ? ' ✓' : '') + ':</b> ' + escapeHtml(u.reward) + '</div>';
     }).join('');
     unlocksHtml = '<div class="tt-unlocks"><div class="tt-unlocks-title">Hidden Powers</div>' + tierRows + '</div>';
   }
@@ -17643,7 +17693,7 @@ function buildForeignCharacterSheetHtml(s) {
   const saveProfs = s.saveProficiencies || [];
   const slots = s.playerSlots || {};
   const baseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats)]);
+  const sheet = computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, key => resolveForeignItem(key, s.savedGeneratedItems), baseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
   const abilitiesHtml = Object.keys(ABILITY_NAMES).map(abbr => {
     const a = sheet.abilities[abbr];
     const cls = a.status ? ' stat-' + a.status : '';
@@ -17914,7 +17964,7 @@ function openDmEditPlayerModal() {
   // modal itself has no way to change equipment. Max HP's gear bonus gets the same "computed
   // fresh, shown alongside the editable base" treatment as AC — see characterMaxHpEffective.
   const dmEditBaseMaxHp = s.characterMaxHp != null ? s.characterMaxHp : 10;
-  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats)]);
+  const acSheet = computeCharacterSheetFor(abilityScores, s.characterLevel || 1, s.skillProficiencies || [], s.saveProficiencies || [], s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), dmEditBaseMaxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
   const dmAcEl = document.getElementById('dmEditAcValue');
   if (dmAcEl) dmAcEl.textContent = acSheet.ac.total;
   const dmMaxHpBonusEl = document.getElementById('dmEditMaxHpBonus');
@@ -17966,7 +18016,7 @@ function saveDmEditPlayerModal() {
   // is clamped against the gear-inclusive total, not the raw typed base, so a buffed player's
   // headroom the DM just saw in the modal doesn't get silently clipped back off on save.
   const s = viewedPlayerState || {};
-  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats)]);
+  const acSheet = computeCharacterSheetFor(abilityScores, level, skillProficiencies, saveProficiencies, s.playerSlots || {}, key => resolveForeignItem(key, s.savedGeneratedItems), maxHp, [...(s.activeTimedEffects || []), ...featEffectEntries(s.feats), ...achievedUnlockEffectEntries(s.achievedUnlocks, key => { const r = resolveForeignItem(key, s.savedGeneratedItems); return r && r.item; })]);
   curHp = Math.max(0, Math.min(curHp, acSheet.maxHp.total));
   const fields = {
     characterRace: document.getElementById('dmEditRace').value,
@@ -18171,6 +18221,10 @@ function renderPlayersTab() {
         <summary>🧾 Character Sheet</summary>
         <div class="collapsible-body"><div id="playersSheetSection"></div></div>
       </details>
+      <details class="collapsible">
+        <summary>🔓 Hidden Powers</summary>
+        <div class="collapsible-body"><div id="playersUnlocksSection"></div></div>
+      </details>
       <div class="players-section-title">🎒 Equipped</div>
       <div id="playersEquipDoll"></div>
       <div class="players-section-title" id="playersInvTitle">📦 Inventory</div>
@@ -18195,6 +18249,9 @@ function renderPlayersTab() {
 
   const sheetEl = document.getElementById('playersSheetSection');
   if (sheetEl) sheetEl.innerHTML = buildForeignCharacterSheetHtml(s);
+
+  const unlocksEl = document.getElementById('playersUnlocksSection');
+  if (unlocksEl) unlocksEl.innerHTML = buildPlayerUnlocksHtml(viewedPlayerUid, s);
 
   const foreignSlots = s.playerSlots || {};
   const equipEl = document.getElementById('playersEquipDoll');
@@ -18242,6 +18299,38 @@ function nudgePlayerHp(uid, delta) {
 // as nudgePlayerHp), no slider since there's no natural min/max to clamp a range input to.
 function nudgePlayerInitiative(uid, delta) {
   if (typeof window.applyInitiativeDeltaToPlayer === 'function') window.applyInitiativeDeltaToPlayer(uid, delta);
+}
+// DM-only view of every hidden-power tier on the viewed player's own current items (equipped +
+// stored) with a toggle to mark each one achieved/not. Full condition/reward text is always shown
+// here, regardless of item type -- this panel IS the DM-only surface; the redaction in
+// buildTooltipHtml/renderActiveEffectsDisplay is what keeps the same info from a player's own view.
+function buildPlayerUnlocksHtml(uid, s) {
+  const keys = new Set([
+    ...Object.values(s.playerSlots || {}),
+    ...Object.values(s.inventoryPlacements || {}).map(p => p.key),
+  ].filter(Boolean));
+  const achieved = s.achievedUnlocks || [];
+  const cards = [];
+  keys.forEach(key => {
+    const resolved = resolveForeignItem(key, s.savedGeneratedItems);
+    const item = resolved && resolved.item;
+    if (!item || !item.unlocks || !item.unlocks.length) return;
+    const tiersHtml = item.unlocks.map((u, i) => {
+      const isAchieved = achieved.some(a => a.itemKey === key && a.tierIndex === i);
+      return `
+        <div class="unlock-tier-row${isAchieved ? ' achieved' : ''}">
+          <div class="unlock-tier-head">
+            <span class="unlock-tier-label">${escapeHtml(u.tierLabel || 'Tier ' + (i + 1))}</span>
+            <button class="unlock-toggle-btn" onclick="window.toggleUnlockAchievedForPlayer('${uid}','${key.replace(/'/g, "\\'")}',${i})">${isAchieved ? '✓ Achieved — unmark' : 'Mark Achieved'}</button>
+          </div>
+          <div class="unlock-tier-field"><strong>Condition:</strong> ${escapeHtml(u.condition || '')}</div>
+          <div class="unlock-tier-field"><strong>Reward:</strong> ${escapeHtml(u.reward || '')}</div>
+        </div>
+      `;
+    }).join('');
+    cards.push(`<div class="unlock-item-card"><div class="unlock-item-name">${escapeHtml(item.name)}</div>${tiersHtml}</div>`);
+  });
+  return cards.length ? cards.join('') : '<p style="color:var(--text-dim);font-size:0.85rem;font-style:italic;">None of this player\'s current items have hidden powers to unlock.</p>';
 }
 // The DM's own searchable Token Library, filtered live — separate from the Inventory tab's
 // own token grid (renderInventoryTokenGrid) since this one needs a "Send to <viewed player>"
@@ -23040,7 +23129,7 @@ function saveAppState() {
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
-      characterRace, characterAffinity, characterInitiative, deckOfManyThingsLog, geomorphTiles,
+      characterRace, characterAffinity, characterInitiative, deckOfManyThingsLog, geomorphTiles, achievedUnlocks,
       appliedGamblingPayoutIds,
       // journeySettingWeights is derived from JOURNEY_SETTINGS (which updateJourneyWeight
       // mutates directly, same pattern as combatLootSettings) rather than a separately
@@ -23114,6 +23203,7 @@ function applyStateBlob(data) {
   if (data.skillProficiencies) skillProficiencies = data.skillProficiencies;
   if (data.saveProficiencies) saveProficiencies = data.saveProficiencies;
   if (data.feats) feats = data.feats;
+  if (data.achievedUnlocks) achievedUnlocks = data.achievedUnlocks;
   if (data.deckOfManyThingsLog) deckOfManyThingsLog = data.deckOfManyThingsLog;
   if (data.geomorphTiles) geomorphTiles = data.geomorphTiles;
   if (typeof data.characterCurrentHp === 'number') characterCurrentHp = data.characterCurrentHp;
@@ -23203,6 +23293,7 @@ window.resetMainAppStateToBlank = function () {
   skillProficiencies = [];
   saveProficiencies = [];
   feats = [];
+  achievedUnlocks = [];
   deckOfManyThingsLog = [];
   geomorphTiles = [];
   characterCurrentHp = 10;
