@@ -127,6 +127,38 @@ const TRAP_LIBRARY = [
     saveAbility: "DEX", saveDC: 15, damage: "6d10", damageType: "slashing", condition: null, conditionDuration: null,
     note: "Half damage on a successful save. The blade resets and swings again every 3 rounds until the mechanism (usually a gear cluster in an alcove partway down the corridor) is jammed or destroyed (AC 15, 20 hit points). Perception DC 15 to notice the ceiling track before the first swing.",
   },
+  {
+    name: "Tongue-Binding Ward",
+    tier: "setback",
+    trigger: "Speaking a knowingly false statement aloud while within a warded courtroom, shrine, or bargaining circle.",
+    description: "The moment the lie leaves their lips, the liar's throat seizes shut mid-word, as if the air itself refused to carry it.",
+    saveAbility: "CHA", saveDC: 13, damage: null, damageType: null, condition: "Silenced", conditionDuration: "1 minute",
+    note: "No damage — purely a social/interrogation trap. A successful save means the ward strains against the lie but doesn't quite catch it (visibly, to anyone watching closely — Insight DC 13 notices the moment of resistance). Arcana or Religion DC 13 identifies the ward's presence beforehand from the telltale circle inscribed underfoot.",
+  },
+  {
+    name: "Vain Glass",
+    tier: "setback",
+    trigger: "Looking into an enchanted mirror or polished surface and speaking a compliment to one's own reflection.",
+    description: "The glass warms and flatters back, and for a long moment it's genuinely difficult to look away from oneself.",
+    saveAbility: "CHA", saveDC: 12, damage: null, damageType: null, condition: "-2 Perception (Self-Absorbed)", conditionDuration: "10 minutes",
+    note: "No damage. Meant as a comedic or narrative complication (missing something important happening nearby) rather than a threat. Insight DC 12 beforehand senses something's slightly off about how the mirror responds. A creature immune to being charmed automatically succeeds.",
+  },
+  {
+    name: "Court of Flushed Faces",
+    tier: "dangerous",
+    trigger: "Attempting to deceive someone while standing within a noble court, inquisitor's chamber, or negotiation hall warded against dishonesty.",
+    description: "Nothing dramatic happens — no flash, no sound — but the liar's face visibly flushes and their voice catches just enough for anyone paying attention to notice.",
+    saveAbility: "CHA", saveDC: 14, damage: null, damageType: null, condition: "-3 Persuasion and -3 Deception (Visibly Caught Lying)", conditionDuration: "1 hour",
+    note: "No damage — the cost is entirely social. Every witness present (Insight DC 10, easy, since the ward does most of the work) clocks the tell, and word of it tends to travel exactly as far as it's inconvenient for the party. Arcana DC 14 identifies the ward beforehand from the room's subtle inlay pattern.",
+  },
+  {
+    name: "The Debt Collector's Mark",
+    tier: "setback",
+    trigger: "Cheating at a warded game of chance, or reneging on a bargain sealed in the presence of the mark's owner (a guild, a fence, a black-market broker).",
+    description: "Nothing visible happens at the time. Later, in dim light, a faint brand becomes visible on the back of the offender's hand — one only certain people know to look for.",
+    saveAbility: null, saveDC: null, damage: null, damageType: null, condition: "Marked for Collection", conditionDuration: "until cured",
+    note: "No save, no damage — this is a pure plot-hook trap. The mark is invisible in normal light (Investigation DC 15 or a detect magic spell reveals it) but instantly recognizable to anyone connected to whoever set it, who can use it to locate the marked creature at the DM's convenience. Removing it requires either paying the debt in full or a Remove Curse-equivalent effect.",
+  },
 ];
 
 const HAZARD_LIBRARY = [
@@ -193,5 +225,21 @@ const HAZARD_LIBRARY = [
     description: "A torch carried into the lower shaft gutters and dies; a moment later, so does the strength in the legs of whoever's carrying it.",
     saveAbility: "CON", saveDC: 14, damage: null, damageType: null, condition: "Unconscious", conditionDuration: "until cured",
     note: "No damage on its own, but an unconscious creature left in the gas begins suffocating per normal rules and needs to be physically dragged out to recover — this is meant to be a real emergency, not a background tax. A carried flame dying unexpectedly is the players' warning sign before anyone needs to roll.",
+  },
+  {
+    name: "Poisoned Toast",
+    tier: "setback",
+    trigger: "Drinking from a shared cup or joining a ceremonial toast at a gathering where a rival has had the opportunity to tamper with it beforehand.",
+    description: "The drink tastes fine going down. It's only a few moments later, mid-sentence in front of everyone, that the room starts to feel a little too warm and the words stop coming out right.",
+    saveAbility: "CON", saveDC: 12, damage: null, damageType: null, condition: "-3 Charisma (Slurred and Hiccupping)", conditionDuration: "10 minutes",
+    note: "No damage — the cost is entirely social, in front of exactly the people it's least convenient to embarrass yourself in front of. Investigation DC 13 beforehand, if someone thinks to check the cup, spots the tampering. Perception DC 14 during the toast itself might catch the tamperer's hand.",
+  },
+  {
+    name: "A Room That Remembers",
+    tier: "setback",
+    trigger: "Speaking indiscreetly, gossiping, or sharing a secret aloud in a crowded tavern, salon, or market square with the wrong ears nearby.",
+    description: "Nothing supernatural here — just a room full of people with nothing better to do than listen, remember, and repeat.",
+    saveAbility: null, saveDC: null, damage: null, damageType: null, condition: null, conditionDuration: null,
+    note: "No save, no damage, no condition — this is a pure DM-pacing hazard, not a mechanical one. Whatever's said indiscreetly here should resurface later, exaggerated and attributed to the party by name, at a moment of the DM's choosing. A quiet corner, a hushed voice, or an actual Stealth/Deception check to cover a conversation avoids it entirely.",
   },
 ];
