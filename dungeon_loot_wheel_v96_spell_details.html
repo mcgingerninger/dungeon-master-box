@@ -22884,6 +22884,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'nightsight', label:'Night Sight', appliesTo:['weapon','armor'], utilityText:() => `Grants Darkvision 60 ft. (or +60 ft. if you already have it).` },
     { id:'truesight', label:'Preternatural Sight', appliesTo:['weapon','armor'], utilityText:() => `See through illusions and invisibility within 30 ft., so long as you have line of sight.` },
     { id:'huntersfocus', label:"Hunter's Focus", appliesTo:['weapon'], utilityText:() => `Advantage on your first attack roll each combat against a creature you can see.` },
+    { id:'analyticaleye', label:'Analytical Eye', appliesTo:['weapon','armor'], intAdd:true, text:m => `+${m} Intelligence — it studies wounds and openings with unsettling precision.` },
   ],
   fang: [
     { id:'venombite', label:'Venomous Bite', appliesTo:['weapon'], dmgAdd:true, dmgType:'poison', text:d => `+${d} poison damage on hit.` },
@@ -22891,6 +22892,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'bloodscent', label:'Blood Scent', appliesTo:['weapon','armor'], utilityText:() => `Advantage on tracking a creature you've drawn blood from in the last hour.` },
     { id:'lockjaw', label:'Lockjaw Grip', appliesTo:['weapon'], utilityText:() => `On a hit, the target's speed is halved until the start of your next turn.` },
     { id:'bloodfrenzy', label:'Blood Frenzy', appliesTo:['weapon'], utilityText:m => `+${m} to damage rolls against a target below half HP.` },
+    { id:'predatorresilience', label:"Predator's Resilience", appliesTo:['weapon','armor'], conAdd:true, text:m => `+${m} Constitution — whatever this fang came from was built to survive.` },
   ],
   claw: [
     { id:'rendingclaw', label:'Rending Claw', appliesTo:['weapon'], dmgAdd:true, dmgType:'slashing', text:d => `+${d} slashing damage on hit.` },
@@ -22898,20 +22900,23 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'quickstrike', label:'Quick Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls.` },
     { id:'shred', label:'Shredding Claws', appliesTo:['weapon'], utilityText:() => `On a hit, the target also takes 1d4 damage at the start of its next turn from the wound (once per hit).` },
     { id:'climber', label:'Climbing Claws', appliesTo:['weapon','armor'], utilityText:() => `Grants a climbing speed equal to your walking speed.` },
+    { id:'nimblegrip', label:'Nimble Grip', appliesTo:['weapon','armor'], dexAdd:true, text:m => `+${m} Dexterity — the claw's own quickness lingers in the grip.` },
   ],
   hide: [
     { id:'toughhide', label:'Tough Hide', appliesTo:['armor'], acAdd:true, text:m => `+${m} AC.` },
     { id:'insulated', label:'Insulated Hide', appliesTo:['armor','weapon'], utilityText:() => `Resistance to cold damage while worn/held.` },
-    { id:'sturdy', label:'Sturdy Hide', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} max HP while worn.` },
+    { id:'sturdy', label:'Sturdy Hide', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} Maximum Hit Points while worn.` },
     { id:'camouflage', label:'Camouflage Hide', appliesTo:['armor'], utilityText:m => `Advantage on Stealth checks while in terrain matching the hide's origin (+${m} when contested).` },
     { id:'thickskin', label:'Thick-Skinned', appliesTo:['armor'], utilityText:() => `Once per short rest, halve the damage from a single nonmagical bludgeoning, piercing, or slashing hit.` },
+    { id:'thickhide', label:'Thick Hide', appliesTo:['armor'], conAdd:true, text:m => `+${m} Constitution while worn.` },
   ],
   horn: [
     { id:'gore', label:'Goring Point', appliesTo:['weapon'], dmgAdd:true, dmgType:'piercing', text:d => `+${d} piercing damage on the first hit each combat.` },
     { id:'reach', label:'Extended Reach', appliesTo:['weapon'], reachAdd:true, text:() => `Reach increased by 5 ft.` },
     { id:'charge', label:'Charging Point', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls when you moved 10+ ft. before the attack.` },
     { id:'trample', label:'Trampling Point', appliesTo:['weapon'], utilityText:() => `Deal an extra 1d6 damage on a hit against a Prone creature.` },
-    { id:'unyielding', label:'Unyielding Horn', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} max HP while worn.` },
+    { id:'unyielding', label:'Unyielding Horn', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} Maximum Hit Points while worn.` },
+    { id:'brutishmight', label:'Brutish Might', appliesTo:['weapon','armor'], strAdd:true, text:m => `+${m} Strength — mounted or worn, it carries the same raw force.` },
   ],
   wing: [
     { id:'featherlight', label:'Featherlight', appliesTo:['weapon','armor'], weightMult:0.7, utilityText:() => `Noticeably lighter than it should be.` },
@@ -22919,6 +22924,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'gliding', label:'Gliding', appliesTo:['armor'], utilityText:() => `Falls affect you as if 20 ft. shorter for damage purposes.` },
     { id:'featherfall', label:'Feather Fall', appliesTo:['armor'], utilityText:() => `You take no damage from falling.` },
     { id:'skyward', label:'Skyward Wing', appliesTo:['weapon','armor'], utilityText:m => `+${m * 5} ft. to your long and high jump distance.` },
+    { id:'aerialgrace', label:'Aerial Grace', appliesTo:['weapon','armor'], dexAdd:true, text:m => `+${m} Dexterity — it moves like it still remembers flight.` },
   ],
   tail: [
     { id:'sweep', label:'Sweeping Tail', appliesTo:['weapon'], utilityText:() => `On a hit, you may attempt to knock the target Prone (Strength save vs. your attack DC).` },
@@ -22926,6 +22932,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'balance', label:'Balance', appliesTo:['weapon','armor'], utilityText:m => `Advantage on Acrobatics checks (+${m} when contested).` },
     { id:'countertail', label:'Counter-Tail', appliesTo:['weapon'], utilityText:() => `Once per turn when a creature misses you with a melee attack, you may make a free tail attack against it.` },
     { id:'anchor', label:'Anchoring Tail', appliesTo:['armor'], utilityText:() => `Advantage on saves against being knocked Prone or forcibly moved.` },
+    { id:'predatoryinstinct', label:'Predatory Instinct', appliesTo:['weapon','armor'], wisAdd:true, text:m => `+${m} Wisdom — you start reading a room the way it once read prey.` },
   ],
   venomsac: [
     { id:'poisoncoat', label:'Poison Coating', appliesTo:['weapon'], dmgAdd:true, dmgType:'poison', text:d => `+${d} poison damage on hit; target must save or be Poisoned for 1 minute.` },
@@ -22933,13 +22940,15 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'numbing', label:'Numbing Venom', appliesTo:['weapon'], utilityText:() => `On a critical hit, the target has disadvantage on its next attack roll.` },
     { id:'paralytic', label:'Paralytic Venom', appliesTo:['weapon'], utilityText:() => `On a critical hit, the target must succeed on a Constitution save or be Paralyzed until the end of its next turn.` },
     { id:'weakening', label:'Weakening Toxin', appliesTo:['weapon'], utilityText:() => `On a hit, the target has disadvantage on Strength checks and Strength saving throws for 1 minute.` },
+    { id:'venomsense', label:'Venom Sense', appliesTo:['weapon','armor'], wisAdd:true, text:m => `+${m} Wisdom — you've learned to notice what's about to hurt you.` },
   ],
   heart: [
-    { id:'vitality', label:'Beating Heart', appliesTo:['weapon','armor'], hpAdd:true, text:m => `+${m * 2} max HP while worn/held.` },
+    { id:'vitality', label:'Beating Heart', appliesTo:['weapon','armor'], hpAdd:true, text:m => `+${m * 2} Maximum Hit Points while worn/held.` },
     { id:'lifedrink', label:'Lifedrinker', appliesTo:['weapon'], utilityText:m => `On a killing blow, regain ${m}d4 HP.` },
     { id:'steadfast', label:'Steadfast Heart', appliesTo:['weapon','armor'], utilityText:() => `Advantage on saving throws against being Frightened.` },
     { id:'secondwind', label:'Second Wind', appliesTo:['weapon','armor'], utilityText:() => `Once per long rest, drop to 1 HP instead of 0 when you would be reduced to 0.` },
     { id:'furious', label:'Furious Heart', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls once you're below half HP.` },
+    { id:'fearlessheart', label:'Fearless Heart', appliesTo:['weapon','armor'], chaAdd:true, text:m => `+${m} Charisma — courage like that is contagious, even secondhand.` },
   ],
   bone: [
     { id:'boneplate', label:'Bone-Reinforced', appliesTo:['armor'], acAdd:true, text:m => `+${m} AC.` },
@@ -22947,6 +22956,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'heavyblow', label:'Heavy Blow', appliesTo:['weapon'], dmgDieUp:true, text:() => `Reforged around the bone — damage die increased.` },
     { id:'bonespike', label:'Bone Spike', appliesTo:['weapon'], dmgAdd:true, dmgType:'piercing', text:d => `+${d} piercing damage on hit.` },
     { id:'fractureresist', label:'Fracture-Resistant', appliesTo:['armor'], utilityText:() => `Advantage on saving throws against being knocked Prone.` },
+    { id:'reinforcedframe', label:'Reinforced Frame', appliesTo:['weapon','armor'], strAdd:true, text:m => `+${m} Strength — built around a frame stronger than the original.` },
   ],
   talon: [
     { id:'piercingtalon', label:'Piercing Talon', appliesTo:['weapon'], dmgAdd:true, dmgType:'piercing', text:d => `+${d} piercing damage on hit.` },
@@ -22954,6 +22964,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'talonstrike', label:'Talon Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls.` },
     { id:'divestrike', label:'Diving Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls if you moved at least 10 ft. straight toward the target this turn.` },
     { id:'irongrip', label:'Iron Grip', appliesTo:['armor'], utilityText:() => `Advantage on checks and saves made to avoid being disarmed.` },
+    { id:'precisegrip', label:'Precise Grip', appliesTo:['weapon','armor'], dexAdd:true, text:m => `+${m} Dexterity — its grip finds purchase you never had to think about.` },
   ],
   tongue: [
     { id:'silver', label:'Silver Tongue', appliesTo:['weapon','armor'], utilityText:m => `Advantage on Persuasion and Deception checks (+${m} when contested).` },
@@ -22961,13 +22972,15 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'keeninsight', label:'Keen Insight', appliesTo:['weapon','armor'], utilityText:m => `Advantage on Insight checks (+${m} when contested).` },
     { id:'mimicry', label:'Mimic Tongue', appliesTo:['weapon','armor'], utilityText:() => `You can convincingly mimic any voice or sounds you've heard for at least a minute.` },
     { id:'keensmell', label:'Keen Taste', appliesTo:['weapon','armor'], utilityText:m => `Advantage on checks to track or identify a creature by scent/taste (+${m} when contested).` },
+    { id:'silverwords', label:'Silver Words', appliesTo:['weapon','armor'], chaAdd:true, text:m => `+${m} Charisma — the words come easier than they should.` },
   ],
   shell: [
     { id:'shellplate', label:'Shell-Plated', appliesTo:['armor'], acAdd:true, text:m => `+${m} AC.` },
     { id:'bracing', label:'Braced Shell', appliesTo:['armor'], utilityText:() => `Resistance to bludgeoning damage.` },
-    { id:'hardened', label:'Hardened Shell', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} max HP while worn.` },
+    { id:'hardened', label:'Hardened Shell', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} Maximum Hit Points while worn.` },
     { id:'retreatshell', label:'Retreating Shell', appliesTo:['armor'], utilityText:m => `As a reaction when hit, reduce the damage taken by ${m * 2} (once per turn).` },
     { id:'buoyant', label:'Buoyant Shell', appliesTo:['armor'], utilityText:() => `You float on water and can't be forced fully underwater against your will.` },
+    { id:'armoredvitality', label:'Armored Vitality', appliesTo:['armor'], conAdd:true, text:m => `+${m} Constitution while worn.` },
   ],
   pelt: [
     { id:'furlined', label:'Fur-Lined', appliesTo:['armor'], acAdd:true, text:m => `+${m} AC.` },
@@ -22975,6 +22988,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'stalker', label:"Stalker's Pelt", appliesTo:['armor'], utilityText:m => `Advantage on Stealth checks (+${m} when contested).` },
     { id:'nightprowl', label:'Night Prowler', appliesTo:['armor'], utilityText:() => `Advantage on Stealth checks made in darkness or dim light.` },
     { id:'warmth', label:'Insulating Pelt', appliesTo:['armor'], utilityText:() => `Immune to the effects of natural cold weather; resistance to cold damage.` },
+    { id:'keeninstincts', label:'Keen Instincts', appliesTo:['armor'], wisAdd:true, text:m => `+${m} Wisdom while worn.` },
   ],
   // Fallback for any part type not covered above (future part types, or a legacy/hand-authored
   // "monster part" that never went through buildMonsterPartItem).
@@ -23047,7 +23061,10 @@ function applyMonsterPartToItem(item, part, partRarity) {
   } else if (template.acAdd && !isWeapon && item.ac) {
     item.ac = bumpAcValue(item.ac, magnitude);
     mechText = template.text(magnitude);
-  } else if (template.attackBonus || template.hpAdd) {
+  } else if (template.attackBonus || template.hpAdd || template.strAdd || template.dexAdd || template.conAdd || template.intAdd || template.wisAdd || template.chaAdd) {
+    // hpAdd and the six ability-score flags produce real "+N Maximum Hit Points"/"+N <Ability>"
+    // text -- recognized by extractStatDeltasFromText, so (unlike attackBonus, which has no
+    // matching character-sheet field to hook into) these actually change the sheet once equipped.
     mechText = template.text(magnitude);
   } else if (template.reachAdd) {
     mechText = template.text();
