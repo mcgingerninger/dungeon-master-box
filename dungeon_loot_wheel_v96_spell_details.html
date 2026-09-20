@@ -1419,6 +1419,10 @@
 
   /* Unlock editor in modal */
   .unlock-editor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; }
+  .add-modifier-field { background:var(--bg); border:1px solid var(--border); padding:0.6rem 0.7rem; margin-top:0.3rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .add-modifier-row { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
+  .add-modifier-row select { width:auto; flex:1 1 160px; min-width:140px; }
+  .add-modifier-row button { flex:0 0 auto; white-space:nowrap; }
   .unlock-editor-label { font-size:0.82rem; color:var(--text-dim); font-family:'Share Tech Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; }
   .unlock-add-btn { background:transparent; border:1px solid var(--border); color:var(--gold); font-family:'Crimson Text',serif; font-size:0.85rem; padding:0.2rem 0.7rem; cursor:pointer; transition:all 0.15s; }
   .unlock-add-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
@@ -3478,6 +3482,21 @@
       <label>Charges (optional)</label><input id="editItemCharges" type="text" placeholder="e.g. 7, 3/day, 1 use">
       <label>Effect / Special Ability</label><textarea id="editItemEffect" style="min-height:70px"></textarea>
       <div class="add-item-hint">Day-or-longer durations ("for 7 days") become permanent until the next day roll — keep those low-magnitude (e.g. +1). Save bigger numbers for short round/minute durations.</div>
+      <div class="add-modifier-field">
+        <div class="interactions-field-head">🎯 Add a Modifier <span class="add-item-hint" style="margin:0;">— appends real, recognized effect text above; scaled to the rarity selected</span></div>
+        <div class="add-modifier-row">
+          <select id="editModifierTraitSelect"></select>
+          <button type="button" class="deck-draw-btn" onclick="applyNamedTraitToEditItem()">+ Add Named Trait</button>
+        </div>
+        <div class="add-modifier-row">
+          <select id="editModifierStatSelect"></select>
+          <select id="editModifierDirectionSelect">
+            <option value="buff">as a buff (+)</option>
+            <option value="debuff">as a debuff (−)</option>
+          </select>
+          <button type="button" class="deck-draw-btn" onclick="applyStatModifierToEditItem()">+ Add</button>
+        </div>
+      </div>
       <label>Icon override</label>
       <select id="editItemIcon" title="Icon override — leave on Auto-detect unless the guessed icon doesn't fit"></select>
       <div class="interactions-field">
@@ -6972,6 +6991,64 @@ function readInteractionsChecklistDiff(prefix) {
   };
 }
 
+// ---------- DM "Add a Modifier" tool (Edit Item modal) ----------
+// Lets a DM attach a Named Trait (GEN.namedModifiers) or an individual stat buff/debuff to ANY
+// existing item, generating the exact same "+N Stat"/"-N Stat" text the random generators
+// produce -- which, since extractStatDeltasFromText recognizes ability scores, skills, Saving
+// Throws, Maximum Hit Points, Armor Class, and Movement Speed, means the result is a REAL
+// mechanical change for whoever has the item equipped, not just added flavor text.
+function modestAmountForRarity(rarity) {
+  return rarity==='common'?1:rarity==='uncommon'?rn(1,2):rarity==='rare'?rn(2,3):rarity==='superrare'?rn(3,5):rarity==='legendary'?rn(5,8):rn(8,12);
+}
+function synthesizeNamedTraitText(traitName, rarity) {
+  const mod = GEN.namedModifiers.find(m => m.name === traitName);
+  if (!mod) return null;
+  const modest = modestAmountForRarity(rarity);
+  const debuffAmt = Math.max(1, Math.round(modest * 0.6));
+  const parts = [
+    ...(mod.buffs || []).map(stat => `+${scaledStatAmount(stat, rarity, modest)} ${stat}`),
+    ...(mod.debuffs || []).map(stat => `-${scaledStatAmount(stat, rarity, debuffAmt)} ${stat}`),
+  ];
+  return `<strong>${mod.name}</strong>: ${parts.join(', ')}`;
+}
+function synthesizeStatModifierText(stat, isBuff, rarity) {
+  const amount = scaledStatAmount(stat, rarity, modestAmountForRarity(rarity));
+  return isBuff ? `+${amount} ${stat}` : `-${amount} ${stat}`;
+}
+// Every stat name extractStatDeltasFromText actually recognizes -- keeping this list in sync
+// with that vocabulary (rather than e.g. the full GEN.buffsSelf/debuffsSelf pools, many of whose
+// entries are pure roleplay conditions with no numeric field at all) is what guarantees every
+// option in this dropdown produces a real effect once equipped, not silently-inert text.
+function recognizedStatNames() {
+  return [...Object.values(ABILITY_NAMES), ...Object.keys(SKILL_ABILITY_MAP), 'Armor Class', 'Movement Speed', 'Maximum Hit Points', 'Saving Throws'];
+}
+function populateEditModifierSelects() {
+  const traitSel = document.getElementById('editModifierTraitSelect');
+  const statSel = document.getElementById('editModifierStatSelect');
+  if (traitSel && typeof GEN !== 'undefined') {
+    traitSel.innerHTML = GEN.namedModifiers.map(m => `<option value="${escapeHtml(m.name)}">${escapeHtml(m.name)}</option>`).join('');
+  }
+  if (statSel) {
+    statSel.innerHTML = recognizedStatNames().map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  }
+}
+function applyNamedTraitToEditItem() {
+  const traitName = document.getElementById('editModifierTraitSelect').value;
+  const rarity = document.getElementById('editItemRarity').value || 'common';
+  const text = synthesizeNamedTraitText(traitName, rarity);
+  if (!text) return;
+  const effectEl = document.getElementById('editItemEffect');
+  effectEl.value = (effectEl.value ? effectEl.value.trim() + ' ' : '') + text;
+}
+function applyStatModifierToEditItem() {
+  const stat = document.getElementById('editModifierStatSelect').value;
+  const isBuff = document.getElementById('editModifierDirectionSelect').value === 'buff';
+  const rarity = document.getElementById('editItemRarity').value || 'common';
+  const text = synthesizeStatModifierText(stat, isBuff, rarity);
+  const effectEl = document.getElementById('editItemEffect');
+  effectEl.value = (effectEl.value ? effectEl.value.trim() + ' ' : '') + text;
+}
+
 function addItem() {
   const name=document.getElementById('newItemName').value.trim();
   const desc=document.getElementById('newItemDesc').value.trim();
@@ -7144,6 +7221,7 @@ function editItem(rarity, index) {
   // any prior extraInteractions/blockedInteractions overrides -- not just a fresh type-only guess.
   if (!item.interactions) classifyItemFull(item, rarity);
   renderInteractionsChecklist('edit', item);
+  populateEditModifierSelects();
   document.getElementById('editItemModal').classList.add('open');
 }
 
@@ -8317,16 +8395,30 @@ const CARRY_LBS_BY_RARITY = {
   common: [5, 15], uncommon: [15, 30], rare: [30, 60],
   superrare: [60, 120], legendary: [120, 300], celestial: [300, 800],
 };
-function isRangeStat(stat) { return /\(feet\)/i.test(stat) || stat === 'Movement Speed'; }
+// Movement Speed now actually changes how far a character walks (see computeCharacterSheetFor's
+// "Movement Speed" text-delta handling) rather than being inert flavor text, so it needs its OWN,
+// much more conservative scale than a sense/detection range — a real +80-300 ft speed bonus at
+// legendary/celestial (what the shared RANGE_FEET_BY_RARITY table would have produced) would be
+// wildly unbalanced for something whose base value is usually only 25-40 ft to begin with.
+const MOVEMENT_FEET_BY_RARITY = {
+  common: [5, 10], uncommon: [10, 15], rare: [10, 20],
+  superrare: [15, 25], legendary: [20, 30], celestial: [25, 40],
+};
+function isRangeStat(stat) { return /\(feet\)/i.test(stat); }
+function isMovementStat(stat) { return stat === 'Movement Speed'; }
 function isCarryStat(stat) { return /\(lbs\)/i.test(stat); }
 // Distances and weights always land on a clean multiple of 10 (60 feet, 50 lbs) — never an
 // arbitrary number like 56 — since real-world distance/weight bonuses are never measured
 // that precisely. Floors at 10 so a low roll never rounds down to 0.
 function roundToTen(n) { return Math.max(10, Math.round(n / 10) * 10); }
+// Movement speed specifically uses 5-ft increments (matching D&D's own movement granularity),
+// floored at 5 rather than 10, since a "+10" minimum would already be a big chunk of a 30-ft base.
+function roundToFive(n) { return Math.max(5, Math.round(n / 5) * 5); }
 // Returns the magnitude to use for a scalar stat's "+N"/"-N" — the normal shared `fallback`
-// (modest/debuffAmt) for ordinary stats, or a rarity-scaled, round-to-10 roll from the
-// tables above for distance/capacity stats.
+// (modest/debuffAmt) for ordinary stats, or a rarity-scaled roll from the tables above for
+// distance/capacity/movement stats.
 function scaledStatAmount(stat, rarity, fallback) {
+  if (isMovementStat(stat)) { const [lo, hi] = MOVEMENT_FEET_BY_RARITY[rarity] || MOVEMENT_FEET_BY_RARITY.common; return roundToFive(rn(lo, hi)); }
   if (isRangeStat(stat)) { const [lo, hi] = RANGE_FEET_BY_RARITY[rarity] || RANGE_FEET_BY_RARITY.common; return roundToTen(rn(lo, hi)); }
   if (isCarryStat(stat))  { const [lo, hi] = CARRY_LBS_BY_RARITY[rarity]  || CARRY_LBS_BY_RARITY.common;  return roundToTen(rn(lo, hi)); }
   return fallback;
