@@ -106,6 +106,24 @@
   .combat-subtab-btn.active { background: var(--surface2); border-color: var(--gold); color: var(--gold-bright); }
   .combat-subpanel { display: none; }
   .combat-subpanel.active { display: block; }
+  /* DM Controls' sub-tabs (Lore / Lists / Interactions / Reference / Geomorphs) reuse this same
+     exact visual style under their own class names too — see showDmControlsSub() — same reason
+     Combat's own sub-tabs above got a dedicated class rather than sharing .compendium-subpanel:
+     a global querySelectorAll('.compendium-subpanel') elsewhere can never also toggle these off. */
+  .dmcontrols-subtabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+  .dmcontrols-subtab-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    font-family: 'Crimson Text', serif; font-size: 0.95rem; padding: 0.4rem 1.1rem;
+    cursor: pointer; letter-spacing: 0.04em; transition: all 0.2s;
+  }
+  .dmcontrols-subtab-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .dmcontrols-subtab-btn.active { background: var(--surface2); border-color: var(--gold); color: var(--gold-bright); }
+  .dmcontrols-subpanel { display: none; }
+  .dmcontrols-subpanel.active { display: block; }
+  .lore-panel { max-width: 900px; }
+  .lore-p { color: var(--text); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.8rem; }
+  .lore-list { margin: 0 0 0.9rem 1.2rem; padding: 0; }
+  .lore-list li { color: var(--text); font-size: 0.88rem; line-height: 1.55; margin-bottom: 0.5rem; }
 
   /* Effects & Traits reference sub-tab — a browsable list of every buff/debuff/condition/
      named-trait pool the generators (items, Fleshmancer, Combat tab monster variants) draw
@@ -1035,11 +1053,28 @@
     border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin: 1.2rem 0 0.8rem;
     display: flex; align-items: center;
   }
-  .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.6rem; }
   .store-card {
     background: var(--surface); border: 2px solid var(--border); padding: 1rem;
     display: flex; flex-direction: column; align-items: center; gap: 0.4rem; text-align: center;
   }
+  /* Compact variant -- used for Standing Stock/Today's Wares cards (storeStapleCardHtml/
+     storeDailyCardHtml) now that those sections default to open rather than collapsed, so
+     there's more of them on screen at once. Icon/name/price sit on one tight header row;
+     description and any effect/stat text still get their own full-width line below it, so
+     nothing meaningful is hidden -- it's just laid out sideways instead of stacked top to
+     bottom like the (taller, centered) base .store-card used for Fleshmancer-style cards. */
+  .store-card-compact { flex-direction: column; align-items: stretch; text-align: left; gap: 0.3rem; padding: 0.55rem 0.7rem; }
+  .store-card-compact-top { display: flex; align-items: center; gap: 0.55rem; }
+  .store-card-compact .flesh-icon-box { width: 40px; height: 40px; flex-shrink: 0; }
+  .store-card-compact-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+  .store-card-compact .store-card-name { font-size: 0.85rem; }
+  .store-card-compact .store-card-rarity { font-size: 0.6rem; }
+  .store-card-compact-buy { display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem; flex-shrink: 0; }
+  .store-card-compact .store-card-gp { margin: 0; font-size: 0.72rem; white-space: nowrap; }
+  .store-card-compact .ic-action-btn { padding: 0.25rem 0.55rem; font-size: 0.72rem; white-space: nowrap; }
+  .store-card-compact .store-card-desc, .store-card-compact .store-card-effect { font-size: 0.74rem; line-height: 1.4; }
+  .store-card-compact .store-card-stock { font-size: 0.62rem; }
   .store-card.common    { border-color: var(--common); }
   .store-card.uncommon  { border-color: var(--uncommon); }
   .store-card.rare      { border-color: var(--rare); }
@@ -3117,12 +3152,10 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('monsters',this)">🐉 Monsters</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('effects',this)">🎲 Effects &amp; Traits</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('monsterparts',this)">🦴 Monster Parts</button>
-    <button class="compendium-subtab-btn" onclick="showCompendiumSub('interactions',this)">⚙ Interactions</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('traps',this)">💀 Traps &amp; Hazards</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('cults',this)">🩸 Cults</button>
-    <button class="compendium-subtab-btn" onclick="showCompendiumSub('reference',this)">📜 Reference</button>
-    <button class="compendium-subtab-btn" onclick="showCompendiumSub('geomorphs',this)">🗺 Geomorphs</button>
   </div>
+  <p style="color:var(--text-dim);font-size:0.8rem;font-style:italic;margin:-0.6rem 0 0.8rem;">Interactions, Reference, and Geomorphs moved to the DM Controls tab.</p>
 
   <div id="compendium-items" class="compendium-subpanel active">
   <div class="items-layout">
@@ -3250,28 +3283,6 @@
   <div id="monsterPartsCompendiumWrap"></div>
   </div>
 
-  <!-- Reference list of every INTERACTIONS entry (game-engine.js), grouped by category, plus a
-       searchable item browser showing each match's computed interactions as chips -- gives the
-       cat/label metadata on INTERACTIONS an actual place to be seen, and lets a DM check "what
-       can this item do" without digging through code. -->
-  <div id="compendium-interactions" class="compendium-subpanel">
-    <div id="interactionsReference" class="interactions-reference"></div>
-    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.2rem 0 0.6rem;">Look up an item</h3>
-    <div class="token-toolbar">
-      <input type="text" id="interactionsSearch" class="token-search" placeholder="Search items…" oninput="renderInteractionsItemResults()">
-      <span class="token-count" id="interactionsCount"></span>
-    </div>
-    <div id="interactionsResults" class="interactions-results"></div>
-
-    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.4rem 0 0.6rem;">🏷 All Item Tags</h3>
-    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.6rem;">Every #tag currently in use across the full catalog, tallied live rather than hand-listed — a new item's tags show up here automatically the moment it's classified.</p>
-    <div class="token-toolbar">
-      <input type="text" id="tagsSearch" class="token-search" placeholder="Search tags…" oninput="renderTagsReference()">
-      <span class="token-count" id="tagsCount"></span>
-    </div>
-    <div id="tagsReferenceWrap" class="interactions-ref-chips" style="margin-top:0.6rem;"></div>
-  </div>
-
   <!-- Original content (see trap-data.js's own header) covering the same functional ground as
        classic trap/hazard archetypes -- not transcribed from any published sourcebook. Cards
        double as the DM's "Apply to Player" tool: pick a player in the Players tab first, then
@@ -3295,37 +3306,7 @@
     <div id="cultsListWrap" class="cults-list"></div>
   </div>
 
-  <!-- Actions/Conditions closely follow core 5e SRD rules text (legitimately free to reuse
-       closely). Diseases/Deities/Gifts & Rewards/Vehicles are original content covering the same
-       functional ground as specific-sourcebook material -- see reference-data.js's own header. -->
-  <div id="compendium-reference" class="compendium-subpanel">
-    <div class="reference-subtabs">
-      <button class="reference-subtab-btn active" onclick="showReferenceSection('actions',this)">Actions</button>
-      <button class="reference-subtab-btn" onclick="showReferenceSection('conditions',this)">Conditions &amp; Diseases</button>
-      <button class="reference-subtab-btn" onclick="showReferenceSection('deities',this)">Deities</button>
-      <button class="reference-subtab-btn" onclick="showReferenceSection('gifts',this)">Gifts &amp; Rewards</button>
-      <button class="reference-subtab-btn" onclick="showReferenceSection('vehicles',this)">Vehicles</button>
-      <button class="reference-subtab-btn" onclick="showReferenceSection('feats',this)">Feats</button>
-      <button class="reference-subtab-btn" onclick="showReferenceSection('fragments',this)">Fragments of Suffering</button>
-    </div>
-    <div class="token-toolbar">
-      <input type="text" id="referenceSearch" class="token-search" placeholder="Search this section…" oninput="renderReferenceSection()">
-      <select id="referenceFilter" class="token-filter" onchange="renderReferenceSection()" style="display:none;"></select>
-      <span class="token-count" id="referenceCount"></span>
-    </div>
-    <div id="referenceListWrap" class="reference-list"></div>
-  </div>
 
-  <!-- Procedurally-generated pixel-art dungeon tiles, in the same low-fi rect/SVG style as the
-       app's own item icons -- see generateGeomorphGrid/geomorphTileSvg. Click a card to open it
-       large; each tile can be individually rerolled, or all of them at once. -->
-  <div id="compendium-geomorphs" class="compendium-subpanel">
-    <div class="token-toolbar">
-      <span style="color:var(--text-dim);font-size:0.85rem;">Procedurally-generated dungeon-tile cards — click one to view it large. Rerolling a tile replaces it with a freshly generated layout.</span>
-      <button class="deck-draw-btn" style="margin-left:auto;" onclick="rerollAllGeomorphTiles()">🔄 Reroll All</button>
-    </div>
-    <div id="geomorphGrid" class="geomorph-grid"></div>
-  </div>
 </div>
 
 <!-- FLESHMANCER TAB -->
@@ -3815,21 +3796,114 @@
 </div>
 
 <!-- DM CONTROLS TAB — DM/solo-only (hidden for a real Player account the same way Players/
-     Compendium/etc. already are, see multiplayer-sync.js's injectStyles). A DM-facing preference
-     panel, not synced campaign state -- toggles are a local client setting (localStorage), same
-     reasoning a DM's own UI layout choices wouldn't need to sync to every player. -->
+     Compendium/etc. already are, see multiplayer-sync.js's injectStyles). Now a sub-tabbed panel
+     (see showDmControlsSub) — Lore (the campaign's own big-picture summary), Lists (generation
+     toggles + the read-only list inspector, this tab's original content), and Interactions/
+     Reference/Geomorphs, all three relocated here from the Item Compendium tab. -->
 <div id="tab-dmcontrols" class="tab-content">
-  <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin-bottom:0.6rem;">🎛 Generation Toggles</h3>
-  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">Turn specific randomization lists off if you'd rather generated items/monsters not use them. A local preference for this browser only — it doesn't sync to players or other devices.</p>
-  <div id="generationTogglesWrap" class="dm-toggles-grid"></div>
-
-  <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.4rem 0 0.6rem;">📋 All Generation Lists</h3>
-  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">Every named table this app currently samples from to build or modify an item, monster, or encounter — read-only, for reference.</p>
-  <div class="token-toolbar">
-    <input type="text" id="genListsSearch" class="token-search" placeholder="Search list names…" oninput="renderGenerationListsViewer()">
-    <span class="token-count" id="genListsCount"></span>
+  <div class="dmcontrols-subtabs">
+    <button class="dmcontrols-subtab-btn active" onclick="showDmControlsSub('lore',this)">📖 Lore</button>
+    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('lists',this)">🎛 Lists</button>
+    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('interactions',this)">⚙ Interactions</button>
+    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('reference',this)">📜 Reference</button>
+    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('geomorphs',this)">🗺 Geomorphs</button>
   </div>
-  <div id="genListsWrap" class="gen-lists-wrap"></div>
+
+  <!-- LORE — the campaign's own big-picture summary: the Ashcrown Empire, the Broken Crown, who
+       the major players are and what they actually want, and how it all connects. Pure narrative
+       reference for the DM, same spirit as the Reference tab's Deities/Cults material but scoped
+       to THIS campaign specifically rather than general-purpose content any table could use. -->
+  <div id="dmcontrols-lore" class="dmcontrols-subpanel active">
+    <div class="lore-panel">
+      <h3 style="color:var(--gold);font-size:1.15rem;letter-spacing:0.05em;margin-bottom:0.5rem;">The Big Picture</h3>
+      <p class="lore-p">Karvossa sits at the center of the Ashcrown Empire, and the Empire, on paper, is at peace. It has been for eleven years — no open war, no famine, no plague. Ask anyone in a Karvossa market why that is and they'll tell you the Crown keeps order. Ask a Broken Crown recruit and they'll tell you the Empire simply got quieter about how it keeps it: the Quiet Legion writes the laws that remove the need for anyone to choose anything, the Ashbound Concord decides who gets to keep a fire lit through winter, and the Ledger of Debts Unpaid has a quiet claim on more of the nobility than the nobility would like known. Nothing about Ashcrown rule looks like a boot on anyone's throat. That's rather the point, and rather the problem.</p>
+      <p class="lore-p">The throne belongs to <strong style="color:var(--text)">Empress Isolde Draventh III</strong>, who was — by every honest account, including her own court's — a real reformer for the first several years of her reign. Something changed. Nobody agrees on exactly when, including her. What's left is a ruler who still believes she's governing exactly the way she always meant to, propped up by a Lord Commander who's started keeping a private, dangerous record of orders he considers dishonorable, and shadowed by a Crown Prince who's spent four years secretly funding the people trying to end her rule.</p>
+
+      <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.3rem 0 0.5rem;">The Empire's Machinery</h3>
+      <p class="lore-p">The Empire doesn't run on any one person's cruelty — it runs on a handful of institutions that each seemed reasonable when they started, and that a party can pull apart one at a time:</p>
+      <ul class="lore-list">
+        <li><strong>The Ashbound Concord</strong> holds the Empire's fire monopoly — hearths, forges, signal beacons — licensed by the Crown and taxed for the treasury's benefit. Its founder, <strong>Zaharos</strong>, genuinely believes controlling flame prevents worse disasters. He doesn't know the Crown has started quietly diverting Concord tax revenue into military spending that has nothing to do with fire at all.</li>
+        <li><strong>The Quiet Legion</strong> no longer needs to infiltrate the civil service — it effectively <em>is</em> the civil service, staffing the scribes and magistrates who draft the "Harmony Ordinances" that keep Ashcrown citizens from making meaningful choices. Its founder, <strong>Magistrate Odessa Faircross</strong>, ran the experiment on a real village once. It worked exactly as advertised, and the village stopped producing anything new — art, ideas, or children who wanted to stay.</li>
+        <li><strong>The Ledger of Debts Unpaid</strong> holds manufactured leverage over a growing number of sitting court officials, and has started patiently engineering debts against the royal family itself. Its local face, <strong>Auditor Voss Ferrand</strong>, doesn't know the "First Creditor" he answers to isn't a person at all.</li>
+      </ul>
+      <p class="lore-p">None of the three answer to each other, and none of them think of themselves as tyranny's instruments — which is exactly what makes them useful to a Crown that would rather not be seen holding the leash directly.</p>
+
+      <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.3rem 0 0.5rem;">The Broken Crown</h3>
+      <p class="lore-p">The rebellion is smaller than the Empire, poorer than the Empire, and — a fact its own leadership doesn't yet know — quietly bankrolled by the Empire's own heir. <strong>Commander Elara Thorne</strong> deserted the Ashcrown army nine years ago over an order she's never fully explained, and has spent the years since building something real out of deserters, dockworkers, and one very patient anonymous benefactor known only as "the Patron." Nobody in the Broken Crown has met the Patron. Spymaster Renn Ashwick, on the Empire's side, already suspects who it is. Neither Elara nor Isolde know yet.</p>
+      <p class="lore-p">The rebellion isn't purely idealistic, and that's worth keeping in play at the table — <strong>Captain Rhoswen Ash</strong> carries a twenty-year-old grudge against General Korrin that's about to become very personal, and a saboteur going by <strong>"Nyx"</strong> has quietly let Imperial patrols escape sabotage runs rather than risk civilian bystanders, a mercy Elara doesn't know about and might not approve of.</p>
+
+      <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.3rem 0 0.5rem;">Threads Worth Pulling</h3>
+      <p class="lore-p">A few connections already exist under the surface, ready to surface whenever a party goes looking (or accidentally trips over one):</p>
+      <ul class="lore-list">
+        <li><strong>Aldric &amp; the Patron</strong> — the Crown Prince is funding the rebellion against his own mother. If this comes out publicly, it reshapes the entire war overnight.</li>
+        <li><strong>Vane &amp; Vane</strong> — Grand Inquisitor Darrow Vane's estranged sister, Lysette, performs in Karvossa's taverns under his own nose. He's had her quietly watched for years, not out of suspicion, but because it's the closest thing to checking on her he'll let himself do.</li>
+        <li><strong>The Cinderwright's real identity</strong> — the rebellion's most effective propagandist is Old Yura, the market-square fortune teller, hiding in plain sight from three separate Inquisitorial investigations.</li>
+        <li><strong>Old Marrow</strong> is a Cinder Coast rebellion survivor Imperial records still list as executed twenty years ago — under General Korrin's own signature.</li>
+      </ul>
+      <p class="lore-p" style="margin-bottom:0;">See the <strong>NPCs tab</strong> for the full roster (backstories, stats, and DM-only secrets for all thirty), the <strong>Cults</strong> sub-tab under Compendium for the Ashbound Concord/Quiet Legion/Ledger writeups this page references, and the <strong>Fragments of Suffering</strong> and pantheon entries under Reference below if you want to tie divine or Court-of-Sin patronage into any of the above.</p>
+    </div>
+  </div>
+
+  <div id="dmcontrols-lists" class="dmcontrols-subpanel">
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin-bottom:0.6rem;">🎛 Generation Toggles</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">Turn specific randomization lists off if you'd rather generated items/monsters not use them. A local preference for this browser only — it doesn't sync to players or other devices.</p>
+    <div id="generationTogglesWrap" class="dm-toggles-grid"></div>
+
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.4rem 0 0.6rem;">📋 All Generation Lists</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">Every named table this app currently samples from to build or modify an item, monster, or encounter — read-only, for reference.</p>
+    <div class="token-toolbar">
+      <input type="text" id="genListsSearch" class="token-search" placeholder="Search list names…" oninput="renderGenerationListsViewer()">
+      <span class="token-count" id="genListsCount"></span>
+    </div>
+    <div id="genListsWrap" class="gen-lists-wrap"></div>
+  </div>
+
+  <!-- Relocated from the Item Compendium tab -- see showDmControlsSub()'s own comment above. -->
+  <div id="dmcontrols-interactions" class="dmcontrols-subpanel">
+    <div id="interactionsReference" class="interactions-reference"></div>
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.2rem 0 0.6rem;">Look up an item</h3>
+    <div class="token-toolbar">
+      <input type="text" id="interactionsSearch" class="token-search" placeholder="Search items…" oninput="renderInteractionsItemResults()">
+      <span class="token-count" id="interactionsCount"></span>
+    </div>
+    <div id="interactionsResults" class="interactions-results"></div>
+
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.4rem 0 0.6rem;">🏷 All Item Tags</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.6rem;">Every #tag currently in use across the full catalog, tallied live rather than hand-listed — a new item's tags show up here automatically the moment it's classified.</p>
+    <div class="token-toolbar">
+      <input type="text" id="tagsSearch" class="token-search" placeholder="Search tags…" oninput="renderTagsReference()">
+      <span class="token-count" id="tagsCount"></span>
+    </div>
+    <div id="tagsReferenceWrap" class="interactions-ref-chips" style="margin-top:0.6rem;"></div>
+  </div>
+
+  <!-- Relocated from the Item Compendium tab -- see showDmControlsSub()'s own comment above. -->
+  <div id="dmcontrols-reference" class="dmcontrols-subpanel">
+    <div class="reference-subtabs">
+      <button class="reference-subtab-btn active" onclick="showReferenceSection('actions',this)">Actions</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('conditions',this)">Conditions &amp; Diseases</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('deities',this)">Deities</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('gifts',this)">Gifts &amp; Rewards</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('vehicles',this)">Vehicles</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('feats',this)">Feats</button>
+      <button class="reference-subtab-btn" onclick="showReferenceSection('fragments',this)">Fragments of Suffering</button>
+    </div>
+    <div class="token-toolbar">
+      <input type="text" id="referenceSearch" class="token-search" placeholder="Search this section…" oninput="renderReferenceSection()">
+      <select id="referenceFilter" class="token-filter" onchange="renderReferenceSection()" style="display:none;"></select>
+      <span class="token-count" id="referenceCount"></span>
+    </div>
+    <div id="referenceListWrap" class="reference-list"></div>
+  </div>
+
+  <!-- Relocated from the Item Compendium tab -- see showDmControlsSub()'s own comment above. -->
+  <div id="dmcontrols-geomorphs" class="dmcontrols-subpanel">
+    <div class="token-toolbar">
+      <span style="color:var(--text-dim);font-size:0.85rem;">Procedurally-generated dungeon-tile cards — click one to view it large. Rerolling a tile replaces it with a freshly generated layout.</span>
+      <button class="deck-draw-btn" style="margin-left:auto;" onclick="rerollAllGeomorphTiles()">🔄 Reroll All</button>
+    </div>
+    <div id="geomorphGrid" class="geomorph-grid"></div>
+  </div>
 </div>
 
 <!-- BATTLEFIELD TAB — player-only, read-only live view of the DM's combat roster. Populated
@@ -5114,11 +5188,9 @@ function initCompendiumSub(sub) {
   else if (sub === 'monsters') loadMonsterDatabase(false);
   else if (sub === 'effects') renderEffectsCompendium();
   else if (sub === 'monsterparts') renderMonsterPartsCompendium();
-  else if (sub === 'interactions') renderInteractionsCompendium();
   else if (sub === 'traps') renderTrapsCompendium();
   else if (sub === 'cults') renderCultsCompendium();
-  else if (sub === 'reference') renderReferenceSection();
-  else if (sub === 'geomorphs') renderGeomorphsPanel();
+  // Interactions/Reference/Geomorphs moved to the DM Controls tab -- see showDmControlsSub().
 }
 function showCompendiumSub(sub, btn) {
   activeCompendiumSub = sub;
@@ -11104,8 +11176,8 @@ let currentMerchant = null;
 // otherwise snap the Standing Stock / Today's Wares collapsibles shut again after every single
 // purchase — annoying mid-shopping-spree. Tracked here instead of read off the DOM so it
 // survives that full re-render.
-let storeStockSectionOpen = false;
-let storeDailySectionOpen = false;
+let storeStockSectionOpen = true;
+let storeDailySectionOpen = true;
 // Per-merchant persistent stock state, keyed by merchant key. Lazily initialized the first
 // time a merchant is ever visited (ensureMerchantStock), and from then on only touched by an
 // explicit restock — NOT regenerated every time the player switches merchants and back —
@@ -11250,7 +11322,7 @@ window.onDayAdvanced = function () {
 };
 
 function storeStapleCardHtml(staple, merchantKey, idx) {
-  const icon = itemPixelIcon(staple, 40, 'common');
+  const icon = itemPixelIcon(staple, 24, 'common');
   const subcategory = classifySubcategory(staple.name, staple.type || 'misc', 'common');
   const statBits = [];
   if (staple.dmg) statBits.push(`⚔ ${staple.dmg}`);
@@ -11262,21 +11334,27 @@ function storeStapleCardHtml(staple, merchantKey, idx) {
     ? (outOfStock ? `<div class="store-card-stock out">OUT OF STOCK</div>` : `<div class="store-card-stock">In stock: ${remaining}</div>`)
     : '';
   return `
-    <div class="store-card${outOfStock ? ' store-card-soldout' : ''}">
-      <div class="flesh-icon-box">${icon}</div>
-      <div class="store-card-name">${escapeHtml(staple.name)}</div>
-      <div class="store-card-rarity">${SUBCATEGORY_LABELS[subcategory] || ''}</div>
+    <div class="store-card store-card-compact${outOfStock ? ' store-card-soldout' : ''}">
+      <div class="store-card-compact-top">
+        <div class="flesh-icon-box">${icon}</div>
+        <div class="store-card-compact-info">
+          <div class="store-card-name">${escapeHtml(staple.name)}</div>
+          <div class="store-card-rarity">${SUBCATEGORY_LABELS[subcategory] || ''}</div>
+        </div>
+        <div class="store-card-compact-buy">
+          <div class="store-card-gp">💰 ${escapeHtml(staple.gp)}</div>
+          <button class="ic-action-btn" ${outOfStock ? 'disabled' : ''} onclick="buyStapleItem(event,'${merchantKey}', ${idx})">${outOfStock ? '✗ Sold Out' : '🛒 Buy'}</button>
+        </div>
+      </div>
       <div class="store-card-desc">${escapeHtml(staple.desc)}</div>
-      <div class="store-card-effect">${escapeHtml(staple.effect)}</div>
+      ${staple.effect ? `<div class="store-card-effect">${escapeHtml(staple.effect)}</div>` : ''}
       ${statBits.length ? `<div class="store-card-effect"><strong>${statBits.join(' · ')}</strong></div>` : ''}
-      <div class="store-card-gp">💰 ${escapeHtml(staple.gp)}</div>
       ${stockLabel}
-      <button class="ic-action-btn" ${outOfStock ? 'disabled' : ''} onclick="buyStapleItem(event,'${merchantKey}', ${idx})">${outOfStock ? '✗ Sold Out' : '🛒 Buy'}</button>
     </div>
   `;
 }
 function storeDailyCardHtml(item, idx, sold) {
-  const icon = itemPixelIcon(item, 40, item.rarity);
+  const icon = itemPixelIcon(item, 24, item.rarity);
   // Procedurally generated wares carry a mods[] array; hand-authored ones (like the Animal
   // Tamer's daily pets, pulled straight from lootData) use a flat effect string instead —
   // fall back to that so their card isn't left with no effect text at all.
@@ -11289,15 +11367,21 @@ function storeDailyCardHtml(item, idx, sold) {
   if (item.hp) statBits.push(`❤ ${item.hp}`);
   if (item.charges) statBits.push(`✦ ${item.charges}`);
   return `
-    <div class="store-card ${item.rarity}${sold ? ' store-card-soldout' : ''}">
-      <div class="flesh-icon-box">${icon}</div>
-      <div class="store-card-name">${escapeHtml(item.name)}</div>
-      <div class="store-card-rarity">${rarityNames[item.rarity] || item.rarity}${item.subcategory ? ' · ' + (SUBCATEGORY_LABELS[item.subcategory]||'') : ''}</div>
+    <div class="store-card store-card-compact ${item.rarity}${sold ? ' store-card-soldout' : ''}">
+      <div class="store-card-compact-top">
+        <div class="flesh-icon-box">${icon}</div>
+        <div class="store-card-compact-info">
+          <div class="store-card-name">${escapeHtml(item.name)}</div>
+          <div class="store-card-rarity">${rarityNames[item.rarity] || item.rarity}${item.subcategory ? ' · ' + (SUBCATEGORY_LABELS[item.subcategory]||'') : ''}</div>
+        </div>
+        <div class="store-card-compact-buy">
+          <div class="store-card-gp">💰 ${escapeHtml(item.gp)}</div>
+          <button class="ic-action-btn" ${sold ? 'disabled' : ''} onclick="buyStoreDailyItem(event,${idx})">${sold ? '✗ Sold Out' : '🛒 Buy'}</button>
+        </div>
+      </div>
       ${statBits.length ? `<div class="store-card-effect"><strong>${statBits.join(' · ')}</strong></div>` : ''}
       <div class="store-card-effect">${effectText}</div>
-      <div class="store-card-gp">💰 ${escapeHtml(item.gp)}</div>
       ${sold ? `<div class="store-card-stock out">OUT OF STOCK</div>` : ''}
-      <button class="ic-action-btn" ${sold ? 'disabled' : ''} onclick="buyStoreDailyItem(event,${idx})">${sold ? '✗ Sold Out' : '🛒 Buy'}</button>
     </div>
   `;
 }
@@ -11447,14 +11531,27 @@ function renderStoreTab() {
       </div>
       <div class="store-gold-display">💰 Your Gold: <span id="storePlayerGoldDisplay">${coinPouchGpText(getPlayerGold())}</span></div>
     </div>
-    <!-- Selling/using items comes first now, right under the header — no scrolling past the
-         buy listings to reach it. The drop zone sits directly against "Your Inventory" (the
-         thing you're actually dragging FROM) instead of above the till with the inventory
-         grid pushed further down — dragging an item no longer means eyeballing a drop target
-         that's nowhere near where your items actually are. Standing Stock / Today's Wares move
-         into collapsed-by-default sections below instead of being the thing you always scroll
-         past first. -->
-    <h4 class="store-section-label">💰 Sell Your Goods</h4>
+    <!-- Standing Stock / Today's Wares now lead the panel, open by default (storeStockSectionOpen/
+         storeDailySectionOpen both default true) instead of being collapsed sections you had to
+         scroll past everything else to find — what a merchant actually has for sale is the first
+         thing you see. Selling still follows directly after, and the inventory grid + till stay
+         right under their own "Sell Your Goods" header as one tight unit, same reasoning as
+         before: the drop zone belongs next to the things you're dragging FROM, not off on its own. -->
+    <details class="collapsible"${storeStockSectionOpen ? ' open' : ''} ontoggle="storeStockSectionOpen=this.open">
+      <summary>🛍 Standing Stock</summary>
+      <div class="collapsible-body">
+        ${staplesSearchable ? `<input type="text" id="storeStapleSearch" class="token-search" placeholder="Search standing stock…" oninput="renderStoreStaplesGrid()" style="margin-bottom:0.6rem;">` : ''}
+        <div class="store-grid" id="storeStaplesGrid">${staplesHtml}</div>
+      </div>
+    </details>
+    <details class="collapsible"${storeDailySectionOpen ? ' open' : ''} ontoggle="storeDailySectionOpen=this.open" style="margin-top:0.6rem;">
+      <summary>✨ Today's Wares</summary>
+      <div class="collapsible-body">
+        ${isRealPlayerAccount() ? '' : `<button class="ic-action-btn" style="margin-bottom:0.6rem;" onclick="rerollStoreDaily()">🔄 Restock (resets stock)</button>`}
+        <div class="store-grid">${dailyHtml}</div>
+      </div>
+    </details>
+    <h4 class="store-section-label" style="margin-top:1.2rem;">💰 Sell Your Goods</h4>
     <p style="color:var(--text-dim);font-size:0.85rem;font-style:italic;margin-bottom:0.6rem;">Right-click or drag an item from your inventory below to stage it in the till — ${escapeHtml(m.name)} ${merchantTradeDescription(currentMerchant)} Nothing is sold until you click "Sell All."</p>
     <h4 class="store-section-label">🎒 Your Inventory</h4>
     <div class="inv-grid-wrap" ondragover="slotDragOver(event)" ondrop="inventoryGridSmartDrop(event,'traderSellInvGrid')">
@@ -11469,20 +11566,6 @@ function renderStoreTab() {
       <div class="token-grid" id="merchantTillGrid"></div>
     </div>
     <div class="store-buy-msg" id="storeBuyMsg"></div>
-    <details class="collapsible"${storeStockSectionOpen ? ' open' : ''} ontoggle="storeStockSectionOpen=this.open" style="margin-top:1.2rem;">
-      <summary>🛍 Standing Stock</summary>
-      <div class="collapsible-body">
-        ${staplesSearchable ? `<input type="text" id="storeStapleSearch" class="token-search" placeholder="Search standing stock…" oninput="renderStoreStaplesGrid()" style="margin-bottom:0.6rem;">` : ''}
-        <div class="store-grid" id="storeStaplesGrid">${staplesHtml}</div>
-      </div>
-    </details>
-    <details class="collapsible"${storeDailySectionOpen ? ' open' : ''} ontoggle="storeDailySectionOpen=this.open" style="margin-top:0.6rem;">
-      <summary>✨ Today's Wares</summary>
-      <div class="collapsible-body">
-        ${isRealPlayerAccount() ? '' : `<button class="ic-action-btn" style="margin-bottom:0.6rem;" onclick="rerollStoreDaily()">🔄 Restock (resets stock)</button>`}
-        <div class="store-grid">${dailyHtml}</div>
-      </div>
-    </details>
   `;
   if (staplesSearchable) renderStoreStaplesGrid();
   renderTraderSellTokenGrid();
@@ -22629,9 +22712,28 @@ function formatGenListValue(value) {
 function humanizeGenListKey(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
+// DM Controls holds five sub-panels now (Lore/Lists/Interactions/Reference/Geomorphs, see
+// showDmControlsSub) -- same pattern as the Item Compendium's own sub-tabs (showCompendiumSub),
+// with its own dedicated dmcontrols-subtab-btn/dmcontrols-subpanel classes so this querySelectorAll
+// never collides with the Compendium or Combat tabs' identically-shaped sub-tab bars.
+let activeDmControlsSub = 'lore';
 function renderDmControlsTab() {
-  renderGenerationTogglesPanel();
-  renderGenerationListsViewer();
+  initDmControlsSub(activeDmControlsSub);
+}
+function initDmControlsSub(sub) {
+  if (sub === 'lore') { /* static content, nothing to render */ }
+  else if (sub === 'lists') { renderGenerationTogglesPanel(); renderGenerationListsViewer(); }
+  else if (sub === 'interactions') renderInteractionsCompendium();
+  else if (sub === 'reference') renderReferenceSection();
+  else if (sub === 'geomorphs') renderGeomorphsPanel();
+}
+function showDmControlsSub(sub, btn) {
+  activeDmControlsSub = sub;
+  document.querySelectorAll('.dmcontrols-subpanel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.dmcontrols-subtab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('dmcontrols-' + sub).classList.add('active');
+  btn.classList.add('active');
+  initDmControlsSub(sub);
 }
 function renderGenerationTogglesPanel() {
   const wrap = document.getElementById('generationTogglesWrap');
