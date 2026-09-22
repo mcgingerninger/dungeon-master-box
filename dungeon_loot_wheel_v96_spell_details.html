@@ -5464,6 +5464,20 @@ function registerNpcWeapons() {
   });
   if (typeof buildTokenIndex === 'function') buildTokenIndex();
 }
+// Maps a named campaign NPC (NPC_LIBRARY's own `name` field, matching NPC_LIBRARY_MONSTERS'
+// monster.name exactly, since both are built from the same underlying name) to their real,
+// lootable signature weapon -- only populated for NPCs whose `weapon` field is an actual item
+// name in NPC_WEAPONS, not flavor text like "an unremarkable court rapier" that was never meant
+// to drop anything. Built once from data rather than hand-listing the pairing a second time
+// somewhere that could drift out of sync with npc-data.js. See rollMonsterCombatLoot's use of
+// this for the actual guaranteed-drop behavior.
+const NPC_SIGNATURE_WEAPON_BY_NAME = {};
+if (typeof NPC_LIBRARY !== 'undefined' && typeof NPC_WEAPONS !== 'undefined') {
+  const npcWeaponNames = new Set(NPC_WEAPONS.map(w => w.name));
+  NPC_LIBRARY.forEach(npc => {
+    if (npc.weapon && npcWeaponNames.has(npc.weapon)) NPC_SIGNATURE_WEAPON_BY_NAME[npc.name] = npc.weapon;
+  });
+}
 
 // ---------- References sub-tab: Actions / Conditions & Diseases / Deities / Gifts / Vehicles ----------
 let activeReferenceSection = 'actions';
@@ -15630,7 +15644,7 @@ async function loadMonsterDatabase(force = false) {
     // monsters (see its own try/catch) rather than throwing, so a DM with no connection still
     // lands here with `all` empty — that's exactly the case the count message below calls out,
     // rather than an unreachable catch below ever needing to handle it.
-    monsterDatabase = all.concat(CUSTOM_HUMAN_NPCS);
+    monsterDatabase = all.concat(CUSTOM_HUMAN_NPCS, NPC_LIBRARY_MONSTERS);
     monsterDatabaseLoaded = true;
     populateMonsterFilters();
     renderMonsterTable();
@@ -15645,7 +15659,7 @@ async function loadMonsterDatabase(force = false) {
     // Genuinely unexpected failure (not a network error — see the comment above) — the
     // homebrew NPCs still work with no dependency on any of this, so fall back to just those
     // rather than leaving the tab empty.
-    monsterDatabase = CUSTOM_HUMAN_NPCS.slice();
+    monsterDatabase = CUSTOM_HUMAN_NPCS.concat(NPC_LIBRARY_MONSTERS);
     monsterDatabaseLoaded = true;
     populateMonsterFilters();
     renderMonsterTable();
@@ -15955,6 +15969,13 @@ const HUMAN_NPC_DEFS = [
     desc:"Carries out the city's harshest sentences without ceremony or hesitation, and treats a fight the same clinical way." },
 ];
 const CUSTOM_HUMAN_NPCS = HUMAN_NPC_DEFS.map(humanNpc);
+// Named campaign NPCs (see NPC_COMBAT_DEFS in npc-data.js) built through the exact same
+// humanNpc() pipeline as the generic homebrew roster above, so their to-hit/damage numbers are
+// never hand-typed independently of the ability scores on file -- same consistency guarantee,
+// just for the Ashcrown Empire/Broken Crown cast instead of anonymous townsfolk. Concatenated
+// into monsterDatabase alongside CUSTOM_HUMAN_NPCS below, so every one of them shows up in the
+// Combat tab's ordinary monster picker, filterable and usable exactly like any other creature.
+const NPC_LIBRARY_MONSTERS = (typeof NPC_COMBAT_DEFS !== 'undefined') ? NPC_COMBAT_DEFS.map(humanNpc) : [];
 function monsterMatches(m) {
   const q = (document.getElementById('monsterSearch')?.value || '').toLowerCase().trim();
   const typeFilter = document.getElementById('monsterTypeFilter')?.value || 'all';
@@ -17155,6 +17176,15 @@ function rollMonsterCombatLoot(entry) {
   }
   if (Math.random() * 100 < settings.partChance) {
     items.push({ ...generateMonsterPartV2(entry.monster, tier), reserved: false });
+  }
+  // A named campaign NPC with a real signature weapon on file (see NPC_SIGNATURE_WEAPON_BY_NAME)
+  // always drops it, on top of the normal roll above -- defeating the Lord Commander always
+  // gets you a shot at Cinderfall specifically, not just "something legendary" from the general
+  // pool. Guarded against the general roll already having produced the same item by chance.
+  const sigWeaponName = NPC_SIGNATURE_WEAPON_BY_NAME[entry.monster.name];
+  if (sigWeaponName && !items.some(it => it.name === sigWeaponName)) {
+    const sigWeapon = lootData.legendary.find(it => it.name === sigWeaponName);
+    if (sigWeapon) items.push({ ...sigWeapon, rarity: 'legendary', id: 'cloot' + (++monsterPartCounter), reserved: false });
   }
   return { tier, gold: rollCombatGoldForTier(tier), items };
 }
