@@ -1476,6 +1476,19 @@
   }
   .gen-list-toggle-badge.off { border-color:#d05f5f; color:#d05f5f; }
   .gen-list-desc { color:var(--text-dim); font-size:0.8rem; margin-top:0.2rem; }
+  .gen-list-row-head { cursor:pointer; }
+  .gen-list-expand-icon { color:var(--text-dim); font-size:0.7rem; width:0.9em; flex-shrink:0; }
+  .gen-list-usedby { color:var(--text-dim); font-size:0.78rem; font-style:italic; margin-top:0.4rem; border-left:2px solid var(--border); padding-left:0.5rem; }
+  .gen-list-entries { margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem; max-height:340px; overflow-y:auto; border-top:1px solid var(--border); padding-top:0.5rem; }
+  .gen-list-category { color:var(--gold); font-size:0.78rem; font-weight:600; margin-top:0.5rem; }
+  .gen-list-category:first-child { margin-top:0; }
+  .gen-list-entry { color:var(--text); font-size:0.8rem; padding:0.15rem 0; border-bottom:1px dotted var(--border); }
+  .gen-list-entry:last-child { border-bottom:none; }
+  .gen-list-entry-name { color:var(--text); font-weight:600; }
+  .gen-list-entry-detail { color:var(--text-dim); }
+  .gen-list-entry-empty { color:var(--text-dim); font-size:0.78rem; font-style:italic; }
+  .gen-list-entry-flow { display:flex; flex-wrap:wrap; gap:0.3rem; }
+  .gen-list-pill { color:var(--text-dim); font-size:0.74rem; border:1px solid var(--border); padding:0.05rem 0.4rem; }
   .interactions-item-row { background:var(--surface); border:1px solid var(--border); padding:0.5rem 0.7rem; display:flex; flex-direction:column; gap:0.35rem; }
   .interactions-item-name { display:flex; align-items:center; gap:0.4rem; color:var(--text); }
   .interactions-none { color:var(--text-dim); font-size:0.78rem; font-style:italic; }
@@ -1510,6 +1523,28 @@
   .cult-card-hooks { font-size:0.86rem; line-height:1.45; margin-bottom:0.5rem; color:var(--text-dim); }
   .cult-card-hooks strong { color:var(--gold); }
   .cult-card-figure { font-size:0.82rem; line-height:1.4; font-style:italic; color:var(--text-dim); border-top:1px solid var(--border); padding-top:0.5rem; }
+  .npc-card { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--border); padding:0.9rem 1.1rem; position:relative; }
+  .npc-card.faction-empire { border-left-color:var(--danger); }
+  .npc-card.faction-neutral { border-left-color:var(--gold); }
+  .npc-card.faction-rebel { border-left-color:var(--uncommon); }
+  .npc-card-head { display:flex; align-items:baseline; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.3rem; padding-right:2.2rem; }
+  .npc-card-name { color:var(--gold-bright); font-weight:600; font-size:1.05rem; }
+  .npc-card-title { color:var(--text-dim); font-size:0.85rem; font-style:italic; }
+  .npc-card-faction-badge { margin-left:auto; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; border:1px solid var(--border); padding:0.05rem 0.4rem; }
+  .npc-card.faction-empire .npc-card-faction-badge { color:var(--danger); border-color:var(--danger); }
+  .npc-card.faction-neutral .npc-card-faction-badge { color:var(--gold); border-color:var(--gold); }
+  .npc-card.faction-rebel .npc-card-faction-badge { color:var(--uncommon); border-color:var(--uncommon); }
+  .npc-card-stats { font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--text-dim); margin-bottom:0.5rem; }
+  .npc-card-field { font-size:0.86rem; line-height:1.45; margin-bottom:0.4rem; color:var(--text); }
+  .npc-card-field strong { color:var(--gold); }
+  .npc-card-attacks { font-size:0.83rem; line-height:1.4; margin-bottom:0.5rem; color:var(--text-dim); }
+  .npc-card-attacks div { margin-bottom:0.15rem; }
+  .npc-card-attacks b { color:var(--text); }
+  .npc-card-secret { font-size:0.86rem; line-height:1.45; margin:0.6rem 0; padding:0.5rem 0.7rem; background:rgba(224,82,82,0.08); border-left:2px solid var(--danger); color:var(--text-dim); }
+  .npc-card-secret strong { color:var(--danger); }
+  .npc-card-cult { font-size:0.8rem; color:var(--superrare); margin-top:0.4rem; }
+  .npc-card-edit-btn { position:absolute; top:0.7rem; right:0.8rem; background:var(--surface2); border:1px solid var(--border); color:var(--text-dim); cursor:pointer; padding:0.15rem 0.5rem; font-size:0.85rem; }
+  .npc-card-edit-btn:hover { border-color:var(--gold); color:var(--gold); }
   .reference-subtabs { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.8rem; }
   .reference-subtab-btn { background:var(--surface); border:1px solid var(--border); color:var(--text-dim); font-family:'Crimson Text',serif; font-size:0.85rem; padding:0.35rem 0.8rem; cursor:pointer; transition:border-color .15s,color .15s; }
   .reference-subtab-btn:hover { border-color:var(--gold); color:var(--gold); }
@@ -1524,6 +1559,12 @@
   .ref-card-mech { font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:var(--gold-bright); margin-bottom:0.4rem; }
   .ref-card-benefit strong { color:var(--uncommon); }
   .ref-card-drawback strong { color:var(--danger); }
+  .deity-card.deity-celestial { border-color:var(--celestial); box-shadow:0 0 0 1px var(--celestial) inset; }
+  .deity-card.deity-celestial .ref-card-name { color:var(--celestial); }
+  .deity-card.deity-legendary { border-color:var(--legendary); box-shadow:0 0 0 1px var(--legendary) inset; }
+  .deity-card.deity-legendary .ref-card-name { color:var(--legendary); }
+  .deity-card.deity-superrare { border-color:var(--superrare); box-shadow:0 0 0 1px var(--superrare) inset; }
+  .deity-card.deity-superrare .ref-card-name { color:var(--superrare); }
 
   .token-grid {
     display:grid;
@@ -2077,6 +2118,7 @@
   .tt-effect { color:var(--text); margin-bottom:0.3rem; }
   .tt-mods { margin-top:0.4rem; }
   .tt-mod { font-size:0.82rem; color:var(--text-dim); margin-bottom:0.2rem; }
+  .mod-monster-stats { font-size:0.78rem; color:var(--text-dim); font-family:'Share Tech Mono',monospace; border-left:2px solid var(--border); padding-left:0.5rem; margin:0.15rem 0 0.4rem; }
   .tt-classification { font-size:0.72rem; color:var(--text-dim); margin-bottom:0.4rem; }
   .tt-crumb-sep { color:var(--border); }
   .tt-properties, .tt-tags { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.4rem; }
@@ -2492,6 +2534,7 @@
   <button class="tab-btn" onclick="showTab('journey',this)">🧭 Journey</button>
   <button class="tab-btn" onclick="showTab('puzzles',this)">🧩 Puzzles</button>
   <button class="tab-btn" onclick="showTab('gambling',this)">🎰 Gambling</button>
+  <button class="tab-btn" onclick="showTab('npcs',this)">🎭 NPCs</button>
   <button class="tab-btn" onclick="showTab('dmcontrols',this)">🎛 DM Controls</button>
   <!-- Player-only — the opposite direction from multiplayer-sync.js's body.role-player hide
        list (which hides DM-only things): this stays hidden by default and is revealed only
@@ -3267,6 +3310,7 @@
     </div>
     <div class="token-toolbar">
       <input type="text" id="referenceSearch" class="token-search" placeholder="Search this section…" oninput="renderReferenceSection()">
+      <select id="referenceFilter" class="token-filter" onchange="renderReferenceSection()" style="display:none;"></select>
       <span class="token-count" id="referenceCount"></span>
     </div>
     <div id="referenceListWrap" class="reference-list"></div>
@@ -3384,10 +3428,6 @@
             <div class="mw-card">
               <h3>👁 Summon</h3>
               <div class="mw-row"><label>Weight</label><input type="range" id="fmw-summon" min="0" max="20" value="2" oninput="updateFleshMWDisplay('summon')"><span class="mw-val" id="fmv-summon">2</span></div>
-            </div>
-            <div class="mw-card">
-              <h3>🗺 Terrain</h3>
-              <div class="mw-row"><label>Weight</label><input type="range" id="fmw-terrain" min="0" max="20" value="1" oninput="updateFleshMWDisplay('terrain')"><span class="mw-val" id="fmv-terrain">1</span></div>
             </div>
             <div class="mw-card">
               <h3>🗡 Skill</h3>
@@ -3724,6 +3764,56 @@
   <div id="gamblingTable"></div>
 </div>
 
+<!-- NPCS TAB — the Ashcrown Empire / Broken Crown campaign roster (see npc-data.js). DM-facing
+     edits (backstory/secrets/stats/etc.) are stored separately in npcEdits, overlaid onto
+     NPC_LIBRARY at render time, and persisted through the normal save/load campaign state --
+     see saveNpcEdit/loadState's npcEdits handling below. -->
+<div id="tab-npcs" class="tab-content">
+  <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">The Ashcrown Empire, the Broken Crown rebellion, and everyone caught between them. Edits you make here are saved with your campaign.</p>
+  <div class="token-toolbar">
+    <input type="text" id="npcSearch" class="token-search" placeholder="Search name, role, backstory…" oninput="renderNpcsTab()">
+    <select id="npcFactionFilter" class="token-filter" onchange="renderNpcsTab()">
+      <option value="all">All Factions</option>
+      <option value="Empire">Empire</option>
+      <option value="Neutral">Neutral</option>
+      <option value="Rebel">Rebel</option>
+    </select>
+    <span class="token-count" id="npcCount"></span>
+  </div>
+  <div id="npcListWrap" class="reference-list"></div>
+</div>
+
+<!-- NPC edit modal — reuses the same .edit-modal-overlay/.edit-modal chrome as Edit Item. -->
+<div id="editNpcModal" class="edit-modal-overlay" onclick="if(event.target===this) closeEditNpcModal()">
+  <div class="edit-modal">
+    <div class="edit-modal-header"><h3>✎ Edit NPC</h3><button class="edit-modal-close" onclick="closeEditNpcModal()">×</button></div>
+    <div class="edit-modal-body">
+      <label>Name</label><input id="editNpcName" type="text">
+      <label>Title</label><input id="editNpcTitle" type="text">
+      <div class="item-form-meta">
+        <div><label>Faction</label><select id="editNpcFaction"><option value="Empire">Empire</option><option value="Neutral">Neutral</option><option value="Rebel">Rebel</option></select></div>
+        <div><label>Role</label><input id="editNpcRole" type="text"></div>
+        <div><label>Alignment</label><input id="editNpcAlignment" type="text"></div>
+      </div>
+      <div class="item-form-meta">
+        <div><label>AC</label><input id="editNpcAc" type="text"></div>
+        <div><label>HP (with hit dice)</label><input id="editNpcHp" type="text" placeholder="e.g. 112 (15d8 + 45)"></div>
+        <div><label>Speed</label><input id="editNpcSpeed" type="text"></div>
+      </div>
+      <label>Weapon</label><input id="editNpcWeapon" type="text">
+      <label>Attacks (one per line, as "Name: text")</label><textarea id="editNpcAttacks" style="min-height:70px"></textarea>
+      <label>Backstory</label><textarea id="editNpcBackstory" style="min-height:90px"></textarea>
+      <label>Secrets (DM-only)</label><textarea id="editNpcSecrets" style="min-height:70px"></textarea>
+      <label>Cult Tie (optional)</label><input id="editNpcCultTie" type="text" placeholder="e.g. The Quiet Legion">
+      <label>Location</label><input id="editNpcLocation" type="text">
+    </div>
+    <div class="edit-modal-actions">
+      <button class="edit-cancel-btn" onclick="resetNpcEdit()">↺ Reset to Original</button>
+      <button class="edit-save-btn" onclick="saveEditedNpc()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- DM CONTROLS TAB — DM/solo-only (hidden for a real Player account the same way Players/
      Compendium/etc. already are, see multiplayer-sync.js's injectStyles). A DM-facing preference
      panel, not synced campaign state -- toggles are a local client setting (localStorage), same
@@ -4035,6 +4125,7 @@ const APP_VERSION = 'v96';
 <script src="puzzle-data.js"></script>
 <script src="trap-data.js"></script>
 <script src="cult-data.js"></script>
+<script src="npc-data.js"></script>
 <script src="reference-data.js"></script>
 <script>
 
@@ -4091,7 +4182,7 @@ const SUBCATEGORY_SLOT_SIZE = {
   ring:1, amulet:1, charm:1, commonMisc:1, rareMisc:1, wondrousMisc:1,
   pet:1, mount:1,
   arm:2, hand:1, leg:2, foot:1, eye:1, ear:1, finger:1, heart:1, tongue:1,
-  // Raw crafting materials (see MONSTER_PART_TYPES) — small enough to always be 1 slot.
+  // Raw crafting materials (see MONSTER_PARTS) — small enough to always be 1 slot.
   monsterpart:1,
   // Document/Treasure/Key-Quest-Object branches — almost everything here is small and
   // pocketable; Art is the one exception (statues/paintings), sized up accordingly.
@@ -4183,7 +4274,7 @@ function classifySubcategory(name, type, rarity, desc) {
   }
   if (type === 'consumable') {
     if (/scroll/.test(n)) return 'scroll';
-    if (/potion|draught|elixir|tonic|\bvial\b|\boil\b/.test(n)) return 'potion';
+    if (/potion|draught|elixir|tonic|\bvial\b|\boil\b|philter|\bbrew\b/.test(n)) return 'potion';
     if (/bomb|grenade|flask|\bdart\b|\bdust\b|powder/.test(n)) return 'throwable';
     return 'food';
   }
@@ -4235,10 +4326,16 @@ function classifySubcategory(name, type, rarity, desc) {
   return '';
 }
 // Consumables get a charges value whenever their subcategory implies limited uses —
-// potions/scrolls/food are single-use, throwables sometimes come in small stacks.
-function rollConsumableCharges(subcategory) {
+// potions/scrolls/food scale by rarity now (see POTION_CHARGES_BY_RARITY — a common potion is
+// still just 1 dose, but a celestial one is a real multi-dose reserve), throwables sometimes
+// come in small stacks regardless of rarity. `rarity` is optional so any caller that doesn't
+// have it handy still gets a sensible single-use default instead of crashing.
+function rollConsumableCharges(subcategory, rarity) {
   if (subcategory === 'throwable') return ri(['1 use','2 uses','3 uses']);
-  if (subcategory === 'potion' || subcategory === 'scroll' || subcategory === 'food') return '1 use';
+  if (subcategory === 'potion' || subcategory === 'scroll' || subcategory === 'food') {
+    const doses = (typeof POTION_CHARGES_BY_RARITY !== 'undefined' && POTION_CHARGES_BY_RARITY[rarity]) || 1;
+    return doses === 1 ? '1 use' : `${doses} uses`;
+  }
   return '';
 }
 // ---------- Item weight (lbs) ----------
@@ -4950,7 +5047,7 @@ function inferItemMetadata(item, rarity){
   }
   if(!item.subcategory) item.subcategory=classifySubcategory(item.name, item.type, rarity, item.desc);
   if(!item.slotSize) item.slotSize=SUBCATEGORY_SLOT_SIZE[item.subcategory]||1;
-  if(item.type==='consumable' && !item.charges) item.charges=rollConsumableCharges(item.subcategory);
+  if(item.type==='consumable' && !item.charges) item.charges=rollConsumableCharges(item.subcategory, rarity);
   if(item.weight===undefined || item.weight===null) item.weight=computeItemWeight(item);
   if(item.type==='weapon' && !item.dmg) item.dmg=FALLBACK_WEAPON_DICE_BY_RARITY[rarity]||FALLBACK_WEAPON_DICE_BY_RARITY.common;
   if(item.type==='armor' && !item.ac) item.ac=FALLBACK_ARMOR_AC_BY_RARITY[rarity]||FALLBACK_ARMOR_AC_BY_RARITY.common;
@@ -4967,6 +5064,10 @@ function inferItemMetadata(item, rarity){
 // (verified before making this change), so this is the only ordering change Phase 1 required.
 document.addEventListener('DOMContentLoaded', () => {
   Object.entries(lootData).forEach(([r, arr]) => arr.forEach(item => inferItemMetadata(item, r)));
+  // NPC signature weapons (see NPC_WEAPONS in npc-data.js) register after the pass above, not
+  // before -- they're already fully classified by registerNpcWeapons itself, so running them
+  // through inferItemMetadata too would just be redundant work.
+  if (typeof registerNpcWeapons === 'function') registerNpcWeapons();
 });
 
 const rarityNames  = { common:'Common', uncommon:'Uncommon', rare:'Rare', superrare:'Super Rare',legendary:'Legendary',celestial:'Celestial' };
@@ -5001,6 +5102,7 @@ function showTab(tab, btn) {
   if (tab === 'journey') renderJourneyTab();
   if (tab === 'puzzles') { renderPuzzleCategoryTabs(); renderPuzzleCategory(); renderPuzzleLog(); }
   if (tab === 'gambling') renderGamblingTab();
+  if (tab === 'npcs') renderNpcsTab();
   if (tab === 'dmcontrols') renderDmControlsTab();
 }
 
@@ -5222,6 +5324,147 @@ function renderCultsCompendium() {
     : '<div class="empty-results">No cults match your search.</div>';
 }
 
+// ---------- NPCs tab: the Ashcrown Empire / Broken Crown campaign roster (see npc-data.js) ----------
+// DM edits (backstory/secrets/stats/attacks/etc.) never mutate NPC_LIBRARY itself -- they're
+// stored here, keyed by npc id, and overlaid at render/edit time. Same reasoning
+// _revealedFields/generationToggles use local-override objects instead of rewriting the
+// underlying const data: the source content stays a clean, re-diffable file, and "what a
+// specific DM changed" stays a small, separately-saved patch (see saveAppState/loadAppState's
+// npcEdits handling) instead of a full copy of every NPC on every save.
+let npcEdits = {};
+let editingNpcId = null;
+function effectiveNpc(npc) {
+  const edit = npcEdits[npc.id];
+  return edit ? { ...npc, ...edit } : npc;
+}
+function npcCardHtml(npc) {
+  const n = effectiveNpc(npc);
+  const factionClass = 'faction-' + n.faction.toLowerCase();
+  const attacksHtml = (n.attacks && n.attacks.length)
+    ? `<div class="npc-card-attacks">${n.attacks.map(a => `<div><b>${escapeHtml(a.name)}.</b> ${escapeHtml(a.text)}</div>`).join('')}</div>`
+    : '';
+  const statsLine = [n.ac ? `AC ${n.ac}` : null, n.hp && n.hp !== '—' ? `HP ${n.hp}` : null, n.speed && n.speed !== '—' ? `Speed ${n.speed}` : null]
+    .filter(Boolean).join(' · ');
+  return `<div class="npc-card ${factionClass}">
+    <button class="npc-card-edit-btn" onclick="editNpc('${npc.id}')" title="Edit">✎</button>
+    <div class="npc-card-head">
+      <span class="npc-card-name">${escapeHtml(n.name)}</span>
+      <span class="npc-card-title">${escapeHtml(n.title)}</span>
+      <span class="npc-card-faction-badge">${escapeHtml(n.faction)}</span>
+    </div>
+    ${statsLine ? `<div class="npc-card-stats">${escapeHtml(statsLine)}</div>` : ''}
+    <div class="npc-card-field"><strong>Role:</strong> ${escapeHtml(n.role)} · <strong>Alignment:</strong> ${escapeHtml(n.alignment)}</div>
+    ${n.weapon ? `<div class="npc-card-field"><strong>Weapon:</strong> ${escapeHtml(n.weapon)}</div>` : ''}
+    ${attacksHtml}
+    <div class="npc-card-field">${escapeHtml(n.backstory)}</div>
+    <div class="npc-card-secret"><strong>DM Secret:</strong> ${escapeHtml(n.secrets)}</div>
+    <div class="npc-card-field"><strong>Location:</strong> ${escapeHtml(n.location)}</div>
+    ${n.cultTie ? `<div class="npc-card-cult">🕯 Tied to: ${escapeHtml(n.cultTie)}</div>` : ''}
+  </div>`;
+}
+function renderNpcsTab() {
+  const wrap = document.getElementById('npcListWrap');
+  if (!wrap) return;
+  const searchEl = document.getElementById('npcSearch');
+  const factionEl = document.getElementById('npcFactionFilter');
+  const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  const factionFilter = factionEl ? factionEl.value : 'all';
+  const matches = NPC_LIBRARY.filter(npc => {
+    const n = effectiveNpc(npc);
+    if (factionFilter !== 'all' && n.faction !== factionFilter) return false;
+    if (!search) return true;
+    const haystack = [n.name, n.title, n.role, n.backstory, n.location, n.cultTie].filter(Boolean).join(' ').toLowerCase();
+    return haystack.includes(search);
+  });
+  const countEl = document.getElementById('npcCount');
+  if (countEl) countEl.textContent = matches.length + ' NPC' + (matches.length !== 1 ? 's' : '');
+  wrap.innerHTML = matches.length
+    ? matches.map(npcCardHtml).join('')
+    : '<div class="empty-results">No NPCs match your search.</div>';
+}
+function editNpc(id) {
+  const npc = NPC_LIBRARY.find(n => n.id === id);
+  if (!npc) return;
+  editingNpcId = id;
+  const n = effectiveNpc(npc);
+  document.getElementById('editNpcName').value = n.name || '';
+  document.getElementById('editNpcTitle').value = n.title || '';
+  document.getElementById('editNpcFaction').value = n.faction || 'Neutral';
+  document.getElementById('editNpcRole').value = n.role || '';
+  document.getElementById('editNpcAlignment').value = n.alignment || '';
+  document.getElementById('editNpcAc').value = n.ac != null ? n.ac : '';
+  document.getElementById('editNpcHp').value = n.hp || '';
+  document.getElementById('editNpcSpeed').value = n.speed || '';
+  document.getElementById('editNpcWeapon').value = n.weapon || '';
+  document.getElementById('editNpcAttacks').value = (n.attacks || []).map(a => `${a.name}: ${a.text}`).join('\n');
+  document.getElementById('editNpcBackstory').value = n.backstory || '';
+  document.getElementById('editNpcSecrets').value = n.secrets || '';
+  document.getElementById('editNpcCultTie').value = n.cultTie || '';
+  document.getElementById('editNpcLocation').value = n.location || '';
+  document.getElementById('editNpcModal').classList.add('open');
+}
+function closeEditNpcModal() {
+  document.getElementById('editNpcModal').classList.remove('open');
+  editingNpcId = null;
+}
+// Parses the "Name: text" per-line attacks textarea back into {name, text} objects. A line
+// with no colon becomes a nameless entry rather than being silently dropped, so a DM who
+// forgets the format doesn't just lose what they typed.
+function parseNpcAttacksInput(raw) {
+  return raw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+    const idx = line.indexOf(':');
+    if (idx === -1) return { name: 'Attack', text: line };
+    return { name: line.slice(0, idx).trim(), text: line.slice(idx + 1).trim() };
+  });
+}
+function saveEditedNpc() {
+  if (!editingNpcId) return;
+  npcEdits[editingNpcId] = {
+    name: document.getElementById('editNpcName').value.trim(),
+    title: document.getElementById('editNpcTitle').value.trim(),
+    faction: document.getElementById('editNpcFaction').value,
+    role: document.getElementById('editNpcRole').value.trim(),
+    alignment: document.getElementById('editNpcAlignment').value.trim(),
+    ac: document.getElementById('editNpcAc').value.trim(),
+    hp: document.getElementById('editNpcHp').value.trim(),
+    speed: document.getElementById('editNpcSpeed').value.trim(),
+    weapon: document.getElementById('editNpcWeapon').value.trim(),
+    attacks: parseNpcAttacksInput(document.getElementById('editNpcAttacks').value),
+    backstory: document.getElementById('editNpcBackstory').value.trim(),
+    secrets: document.getElementById('editNpcSecrets').value.trim(),
+    cultTie: document.getElementById('editNpcCultTie').value.trim() || null,
+    location: document.getElementById('editNpcLocation').value.trim(),
+  };
+  if (typeof scheduleSave === 'function') scheduleSave(); else if (typeof saveAppState === 'function') saveAppState();
+  closeEditNpcModal();
+  renderNpcsTab();
+}
+function resetNpcEdit() {
+  if (!editingNpcId) return;
+  delete npcEdits[editingNpcId];
+  if (typeof scheduleSave === 'function') scheduleSave(); else if (typeof saveAppState === 'function') saveAppState();
+  editNpc(editingNpcId); // repopulate the still-open form from the original data
+  renderNpcsTab();
+}
+// One-time: adds every NPC's signature weapon (see NPC_WEAPONS in npc-data.js) into the
+// legendary loot pool so it's a real, findable/lootable item -- not just flavor text on a
+// character card -- the same reasoning generatePremadeMonsterPartsV2 populates lootData with
+// every monster's harvestable parts up front. Guarded so re-running (e.g. a forced data
+// reload) never duplicates entries.
+let npcWeaponsRegistered = false;
+function registerNpcWeapons() {
+  if (npcWeaponsRegistered || typeof NPC_WEAPONS === 'undefined') return;
+  npcWeaponsRegistered = true;
+  const existingNames = new Set(lootData.legendary.map(it => it.name));
+  NPC_WEAPONS.forEach(w => {
+    if (existingNames.has(w.name)) return;
+    const item = { ...w };
+    if (typeof classifyItemFull === 'function') classifyItemFull(item, 'legendary');
+    lootData.legendary.push(item);
+  });
+  if (typeof buildTokenIndex === 'function') buildTokenIndex();
+}
+
 // ---------- References sub-tab: Actions / Conditions & Diseases / Deities / Gifts / Vehicles ----------
 let activeReferenceSection = 'actions';
 function showReferenceSection(section, btn) {
@@ -5230,17 +5473,48 @@ function showReferenceSection(section, btn) {
   if (btn) btn.classList.add('active');
   const searchEl = document.getElementById('referenceSearch');
   if (searchEl) searchEl.value = '';
+  renderReferenceFilterOptions();
   renderReferenceSection();
 }
 function referenceSectionData(section) {
   if (section === 'actions') return ACTIONS_LIBRARY;
-  if (section === 'conditions') return [...CONDITIONS_LIBRARY, ...DISEASE_LIBRARY.map(d => ({ ...d, __kind: 'disease' }))];
+  if (section === 'conditions') return [...CONDITIONS_LIBRARY.map(c => ({ ...c, __kind: 'condition' })), ...DISEASE_LIBRARY.map(d => ({ ...d, __kind: 'disease' }))];
   if (section === 'deities') return DEITY_LIBRARY;
   if (section === 'gifts') return GIFT_LIBRARY;
   if (section === 'vehicles') return VEHICLE_LIBRARY;
   if (section === 'feats') return FEAT_LIBRARY;
   if (section === 'fragments') return FRAGMENT_LIBRARY;
   return [];
+}
+// Which sections have a second filter dropdown (beyond free-text search) and what field it
+// filters on -- only sections with a genuinely long, categorizable list get one. Conditions &
+// Diseases splits on the __kind tag referenceSectionData adds above; Deities splits by pantheon
+// (which also separates out the unique, non-pantheon deities as their own "Unique Deities"
+// option); Gifts & Rewards splits by the Boon/Blessing/Gift type tier.
+function referenceFilterConfig(section) {
+  if (section === 'conditions') return { field: '__kind', label: 'Type' };
+  if (section === 'deities') return { field: 'pantheon', label: 'Pantheon' };
+  if (section === 'gifts') return { field: 'type', label: 'Type' };
+  return null;
+}
+function referenceFilterOptionLabel(section, value) {
+  if (section === 'conditions') return value === 'disease' ? 'Diseases' : 'Conditions';
+  return value;
+}
+function renderReferenceFilterOptions() {
+  const filterEl = document.getElementById('referenceFilter');
+  if (!filterEl) return;
+  const cfg = referenceFilterConfig(activeReferenceSection);
+  if (!cfg) {
+    filterEl.style.display = 'none';
+    filterEl.innerHTML = '';
+    return;
+  }
+  const values = [...new Set(referenceSectionData(activeReferenceSection).map(item => item[cfg.field]).filter(Boolean))].sort();
+  filterEl.style.display = '';
+  filterEl.innerHTML = `<option value="">All ${escapeHtml(cfg.label)}s</option>`
+    + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(referenceFilterOptionLabel(activeReferenceSection, v))}</option>`).join('');
+  filterEl.value = '';
 }
 // Flattens whatever string/array-of-string fields an entry has into one searchable blob, rather
 // than hardcoding a field list per section -- every section's shape is different enough that a
@@ -5265,17 +5539,26 @@ function referenceCardHtml(section, item) {
     return `<div class="ref-card"><div class="ref-card-name">${escapeHtml(item.name)} <span class="ref-card-tag">Condition</span></div><div class="ref-card-desc">${escapeHtml(item.description)}</div></div>`;
   }
   if (section === 'deities') {
-    return `<div class="ref-card">
-      <div class="ref-card-name">${escapeHtml(item.name)}, ${escapeHtml(item.title)}</div>
+    const tierClass = item.powerTier ? ` deity-${item.powerTier}` : '';
+    const rankLabel = item.rank === 'major' ? 'Major Deity' : item.rank === 'minor' ? 'Minor Deity' : 'Unique Deity';
+    const lineage = item.rank === 'minor'
+      ? `<div class="ref-card-field"><strong>Serves:</strong> ${escapeHtml(item.parent)} · <strong>Pantheon:</strong> ${escapeHtml(item.pantheon)}</div>`
+      : item.rank === 'major'
+        ? `<div class="ref-card-field"><strong>Pantheon:</strong> ${escapeHtml(item.pantheon)} (head of the pantheon)</div>`
+        : '';
+    return `<div class="ref-card deity-card${tierClass}">
+      <div class="ref-card-name">${escapeHtml(item.name)}, ${escapeHtml(item.title)} <span class="ref-card-tag">${rankLabel}</span></div>
+      ${lineage}
       <div class="ref-card-field"><strong>Alignment:</strong> ${escapeHtml(item.alignment)} · <strong>Domains:</strong> ${escapeHtml(item.domains.join(', '))}</div>
       <div class="ref-card-field"><strong>Symbol:</strong> ${escapeHtml(item.symbol)}</div>
       <div class="ref-card-field"><strong>Portfolio:</strong> ${escapeHtml(item.portfolio)}</div>
       <div class="ref-card-desc"><em>${escapeHtml(item.dogma)}</em></div>
+      ${item.boon ? `<div class="ref-card-field ref-card-benefit"><strong>Boon — ${escapeHtml(item.boon.name)}:</strong> ${escapeHtml(item.boon.effect)}</div>` : ''}
     </div>`;
   }
   if (section === 'gifts') {
     return `<div class="ref-card">
-      <div class="ref-card-name">${escapeHtml(item.name)}</div>
+      <div class="ref-card-name">${escapeHtml(item.name)} <span class="ref-card-tag">${escapeHtml(item.type || 'Gift')}</span></div>
       <div class="ref-card-field"><strong>Trigger:</strong> ${escapeHtml(item.trigger)}</div>
       <div class="ref-card-field ref-card-benefit"><strong>Benefit:</strong> ${escapeHtml(item.benefit)}</div>
       <div class="ref-card-field ref-card-drawback"><strong>Drawback:</strong> ${escapeHtml(item.drawback)}</div>
@@ -5303,8 +5586,14 @@ function renderReferenceSection() {
   if (!wrap) return;
   const searchEl = document.getElementById('referenceSearch');
   const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+  const filterCfg = referenceFilterConfig(activeReferenceSection);
+  const filterEl = document.getElementById('referenceFilter');
+  const filterValue = filterEl ? filterEl.value : '';
   const data = referenceSectionData(activeReferenceSection);
-  const matches = data.filter(item => !search || referenceMatchText(item).includes(search));
+  const matches = data.filter(item =>
+    (!search || referenceMatchText(item).includes(search))
+    && (!filterCfg || !filterValue || item[filterCfg.field] === filterValue)
+  );
   const countEl = document.getElementById('referenceCount');
   if (countEl) countEl.textContent = matches.length + ' entr' + (matches.length !== 1 ? 'ies' : 'y');
   wrap.innerHTML = matches.length
@@ -6863,7 +7152,7 @@ function classificationTagsRowHtml(item) {
 // have no `mods`, so they keep using the plain `effect` text as before.
 function itemEffectBlockHtml(item) {
   if (item.mods && item.mods.length) {
-    return `<div class="item-effect">${item.mods.map(m => colorizeModifierText(m.text, m.type)).join(' ')}</div>`;
+    return `<div class="item-effect">${item.mods.map(m => colorizeModifierText(m.text, m.type) + summonedMonsterStatHtml(m)).join(' ')}</div>`;
   }
   if (item.effect) return `<div class="item-effect">Effect: ${item.effect}</div>`;
   return '';
@@ -7356,8 +7645,8 @@ const POWER_POOL = [
   {name:"Time Stop", tier:'legendary'},
   {name:"Gate", tier:'celestial'},
   {name:"True Polymorph", tier:'celestial'},
-  {name:"Power Word Kill", tier:null},
-  {name:"Power Word Stun", tier:null},
+  {name:"Power Word Kill", tier:'celestial'},
+  {name:"Power Word Stun", tier:'legendary'},
   {name:"Imprisonment", tier:'celestial'},
   {name:"Reverse Gravity", tier:'legendary'},
   {name:"Maze", tier:'legendary'},
@@ -7366,97 +7655,278 @@ const POWER_POOL = [
   {name:"Disintegrate", tier:'superrare'},
   {name:"Finger of Death", tier:'legendary'},
   {name:"Flesh to Stone", tier:'superrare'},
-  {name:"Teleport", tier:null},
+  {name:"Teleport", tier:'superrare'},
   {name:"Plane Shift", tier:'superrare'},
-  {name:"Etherealness", tier:null},
+  {name:"Etherealness", tier:'superrare'},
   {name:"Astral Projection", tier:'celestial'},
   {name:"Foresight", tier:'celestial'},
   {name:"Mass Heal", tier:'celestial'},
-  {name:"Resurrection", tier:null},
+  {name:"Resurrection", tier:'legendary'},
   {name:"True Resurrection", tier:'legendary'},
-  {name:"Divine Intervention", tier:null},
+  {name:"Divine Intervention", tier:'celestial'},
   {name:"Mass Cure Wounds (Upcasted)", tier:'superrare'},
-  {name:"Animate Dead", tier:null},
-  {name:"Create Undead", tier:null},
-  {name:"Circle of Death", tier:null},
+  {name:"Animate Dead", tier:'rare'},
+  {name:"Create Undead", tier:'superrare'},
+  {name:"Circle of Death", tier:'superrare'},
   {name:"Blight", tier:'rare'},
-  {name:"Inflict Wounds", tier:null},
-  {name:"Cloudkill", tier:null},
-  {name:"Contagion", tier:null},
-  {name:"Harm", tier:null},
-  {name:"Wither and Bloom (Strixhaven)", tier:null},
-  {name:"Soul Cage", tier:null},
+  {name:"Inflict Wounds", tier:'uncommon'},
+  {name:"Cloudkill", tier:'rare'},
+  {name:"Contagion", tier:'rare'},
+  {name:"Harm", tier:'superrare'},
+  {name:"Wither and Bloom (Strixhaven)", tier:'uncommon'},
+  {name:"Soul Cage", tier:'superrare'},
   {name:"Banishment", tier:'rare'},
-  {name:"Dismissal (Banishment variant)", tier:null},
+  {name:"Dismissal (Banishment variant)", tier:'rare'},
   {name:"Counterspell (9th level)", tier:'rare'},
-  {name:"Dispel Magic (9th level)", tier:null},
+  {name:"Dispel Magic (9th level)", tier:'legendary'},
   {name:"Antimagic Field", tier:'legendary'},
   {name:"Forcecage", tier:'superrare'},
   {name:"Wall of Force", tier:'superrare'},
   {name:"Telekinesis", tier:'rare'},
-  {name:"Psychic Scream", tier:null},
-  {name:"Modify Memory", tier:null},
+  {name:"Psychic Scream", tier:'celestial'},
+  {name:"Modify Memory", tier:'rare'},
   {name:"Detect Thoughts", tier:'uncommon'},
-  {name:"Sending", tier:null},
-  {name:"Telepathic Bond", tier:null},
-  {name:"Rary's Telepathic Lash (Strixhaven)", tier:null},
+  {name:"Sending", tier:'uncommon'},
+  {name:"Telepathic Bond", tier:'rare'},
+  {name:"Rary's Telepathic Lash (Strixhaven)", tier:'uncommon'},
   {name:"Synaptic Static", tier:'rare'},
-  {name:"Summon Greater Demon", tier:null},
-  {name:"Infernal Calling", tier:null},
-  {name:"Planar Binding", tier:null},
-  {name:"Conjure Celestial", tier:null},
-  {name:"Summon Fiend (Tasha's)", tier:null},
+  {name:"Summon Greater Demon", tier:'rare'},
+  {name:"Infernal Calling", tier:'rare'},
+  {name:"Planar Binding", tier:'rare'},
+  {name:"Conjure Celestial", tier:'superrare'},
+  {name:"Summon Fiend (Tasha's)", tier:'superrare'},
   {name:"Ice Storm", tier:'uncommon'},
   {name:"Cone of Cold", tier:'rare'},
-  {name:"Investiture of Ice", tier:null},
-  {name:"Arms of Hadar (Cold variant)", tier:null},
-  {name:"Otiluke's Freezing Sphere", tier:null},
-  {name:"Call Lightning", tier:null},
-  {name:"Storm Sphere", tier:null},
+  {name:"Investiture of Ice", tier:'superrare'},
+  {name:"Arms of Hadar (Cold variant)", tier:'uncommon'},
+  {name:"Otiluke's Freezing Sphere", tier:'superrare'},
+  {name:"Call Lightning", tier:'rare'},
+  {name:"Storm Sphere", tier:'rare'},
   {name:"Thunder Step", tier:'uncommon'},
   {name:"Lightning Arrow", tier:'uncommon'},
-  {name:"Control Winds", tier:null},
+  {name:"Control Winds", tier:'rare'},
   {name:"Wall of Fire", tier:'rare'},
-  {name:"Fire Storm", tier:null},
-  {name:"Incendiary Cloud", tier:null},
-  {name:"Investiture of Flame", tier:null},
+  {name:"Fire Storm", tier:'superrare'},
+  {name:"Incendiary Cloud", tier:'legendary'},
+  {name:"Investiture of Flame", tier:'superrare'},
   {name:"Sunburst", tier:'legendary'},
   {name:"Earthquake", tier:'legendary'},
-  {name:"Move Earth", tier:null},
-  {name:"Stone Shape", tier:null},
-  {name:"Transmute Rock", tier:null},
-  {name:"Erupting Earth", tier:null},
-  {name:"Tsunami", tier:null},
-  {name:"Watery Sphere", tier:null},
-  {name:"Control Water", tier:null},
-  {name:"Maelstrom", tier:null},
+  {name:"Move Earth", tier:'superrare'},
+  {name:"Stone Shape", tier:'rare'},
+  {name:"Transmute Rock", tier:'rare'},
+  {name:"Erupting Earth", tier:'rare'},
+  {name:"Tsunami", tier:'legendary'},
+  {name:"Watery Sphere", tier:'rare'},
+  {name:"Control Water", tier:'rare'},
+  {name:"Maelstrom", tier:'rare'},
   {name:"Tidal Wave", tier:'uncommon'},
-  {name:"Dawn (Xanathar's)", tier:null},
-  {name:"Searing Smite", tier:null},
+  {name:"Dawn (Xanathar's)", tier:'rare'},
+  {name:"Searing Smite", tier:'uncommon'},
   {name:"Sacred Flame (Upcast)", tier:'common'},
-  {name:"Divine Word", tier:null},
+  {name:"Divine Word", tier:'superrare'},
   {name:"Misty Step (Shadow variant)", tier:'common'},
-  {name:"Shadow of Moil", tier:null},
+  {name:"Shadow of Moil", tier:'rare'},
   {name:"Darkness", tier:'uncommon'},
-  {name:"Shadow Blade (Upcast)", tier:null},
-  {name:"Hunger of Hadar", tier:null},
-  {name:"Life Transference (Xanathar's)", tier:null},
-  {name:"Vampiric Touch (Upcast)", tier:null},
+  {name:"Shadow Blade (Upcast)", tier:'uncommon'},
+  {name:"Hunger of Hadar", tier:'rare'},
+  {name:"Life Transference (Xanathar's)", tier:'uncommon'},
+  {name:"Vampiric Touch (Upcast)", tier:'rare'},
   {name:"Bestow Curse", tier:'rare'},
-  {name:"Enervation (Xanathar's)", tier:null},
+  {name:"Enervation (Xanathar's)", tier:'rare'},
   {name:"Fear", tier:'uncommon'},
-  {name:"Symbol", tier:null},
-  {name:"Crown of Madness", tier:null},
-  {name:"Enemies Abound (Xanathar's)", tier:null},
-  {name:"Mind Blank", tier:null},
-  {name:"Scatter (Xanathar's)", tier:null},
-  {name:"Gravity Sinkhole (Wildemount)", tier:null},
-  {name:"Immovable Object (Wildemount)", tier:null},
-  {name:"Fortune's Favor (Wildemount)", tier:null},
-  {name:"Ravenous Void (Wildemount)", tier:null},
+  {name:"Symbol", tier:'superrare'},
+  {name:"Crown of Madness", tier:'uncommon'},
+  {name:"Enemies Abound (Xanathar's)", tier:'rare'},
+  {name:"Mind Blank", tier:'legendary'},
+  {name:"Scatter (Xanathar's)", tier:'superrare'},
+  {name:"Gravity Sinkhole (Wildemount)", tier:'rare'},
+  {name:"Immovable Object (Wildemount)", tier:'uncommon'},
+  {name:"Fortune's Favor (Wildemount)", tier:'uncommon'},
+  {name:"Ravenous Void (Wildemount)", tier:'celestial'},
 ];
 function powersForTier(tier) {
   return POWER_POOL.filter(p => p.tier === tier).map(p => p.name);
+}
+
+// ===================== ITEM BASE TYPES + AFFIXES =====================
+// Replaces the old approach where GEN.weapon/armor/consumable/misc each hardcoded 100 fully-
+// baked flavor names ("Rusty Shortsword", "Iron Warhammer") with zero mechanical grounding —
+// a Dagger and a Greatsword sampled from the same rarity rolled identical damage, because the
+// name was just cosmetic text bolted onto a rarity-only stat roll. Real D&D-style weapon/armor
+// TYPE now drives the base stat (a Dagger is 1d4, a Greatsword is 2d6, always), and what used to
+// be baked into the name (Rusty/Iron/Flaming/Sharp/...) is now a real, stacking mechanical
+// modifier rolled separately -- see ITEM_AFFIXES below. classifySubcategory/buildDescParagraphs
+// key off substrings in the item's name exactly like before (a "Shortsword" still matches the
+// same /sword|.../ regex "Rusty Shortsword" always did), so none of that machinery needed to
+// change -- only what produces the base name, and what (if anything) rides in front of it.
+//
+// Consumables/misc got the same treatment for a different reason: GEN.consumable/GEN.misc's 100
+// names already baked the item's EFFECT into its flavor name ("Healing Draught", "Potion of
+// Speed") while a separate buff/debuff modifier system (below) rolls the item's actual effect
+// independently -- meaning the name and the mechanics could already disagree with each other.
+// Shrinking those to a small set of true container/object base forms (Potion, Scroll, Ring,
+// Wand, ...) and letting buildItemName's existing theme-matching do the composition (it already
+// picks one descriptor from the rolled effect and produces "Potion of Mending" / "Swift Ring")
+// means the name and the mechanics can never disagree again, for free, with no new code there.
+
+// Real weapon types and their SRD-standard base damage die -- open game content, same sourcing
+// rule this project already applies to core rules text (see reference-data.js's header).
+const WEAPON_BASE_TYPES = [
+  { name: 'Club', dmgDie: '1d4' }, { name: 'Dagger', dmgDie: '1d4' }, { name: 'Handaxe', dmgDie: '1d6' },
+  { name: 'Javelin', dmgDie: '1d6' }, { name: 'Mace', dmgDie: '1d6' }, { name: 'Quarterstaff', dmgDie: '1d6' },
+  { name: 'Sickle', dmgDie: '1d4' }, { name: 'Spear', dmgDie: '1d6' }, { name: 'Shortsword', dmgDie: '1d6' },
+  { name: 'Scimitar', dmgDie: '1d6' }, { name: 'Battleaxe', dmgDie: '1d8' }, { name: 'Longsword', dmgDie: '1d8' },
+  { name: 'Rapier', dmgDie: '1d8' }, { name: 'Trident', dmgDie: '1d6' }, { name: 'Warhammer', dmgDie: '1d8' },
+  { name: 'Morningstar', dmgDie: '1d8' }, { name: 'War Pick', dmgDie: '1d8' }, { name: 'Flail', dmgDie: '1d8' },
+  { name: 'Whip', dmgDie: '1d4' }, { name: 'Halberd', dmgDie: '1d10' }, { name: 'Glaive', dmgDie: '1d10' },
+  { name: 'Pike', dmgDie: '1d10' }, { name: 'Greataxe', dmgDie: '1d12' }, { name: 'Greatsword', dmgDie: '2d6' },
+  { name: 'Maul', dmgDie: '2d6' }, { name: 'Shortbow', dmgDie: '1d6' }, { name: 'Longbow', dmgDie: '1d8' },
+  { name: 'Sling', dmgDie: '1d4' }, { name: 'Light Crossbow', dmgDie: '1d8' }, { name: 'Heavy Crossbow', dmgDie: '1d10' },
+  { name: 'Hand Crossbow', dmgDie: '1d6' },
+];
+// Real armor types and the AC they contribute before rarity's bonus is added. Body pieces (worn
+// as the chest slot -- classifySubcategory falls through to 'chest' for all of these, since none
+// contain a shield/helm/cloak/etc keyword) use SRD base AC values; shield/head/hand/leg/foot/
+// cloak/belt pieces are accessories layered on top of body armor, so they contribute a small flat
+// bonus instead of a full suit's AC -- matching how those slots already work everywhere else in
+// this app (a helm was never meant to carry the same AC as a breastplate).
+const ARMOR_BASE_TYPES = [
+  { name: 'Padded Armor', baseAC: 11 }, { name: 'Leather Armor', baseAC: 11 }, { name: 'Studded Leather', baseAC: 12 },
+  { name: 'Hide Armor', baseAC: 12 }, { name: 'Chain Shirt', baseAC: 13 }, { name: 'Ring Mail', baseAC: 14 },
+  { name: 'Scale Mail', baseAC: 14 }, { name: 'Breastplate', baseAC: 14 }, { name: 'Half Plate', baseAC: 15 },
+  { name: 'Chain Mail', baseAC: 16 }, { name: 'Splint Armor', baseAC: 17 }, { name: 'Plate Armor', baseAC: 18 },
+  { name: 'Buckler Shield', baseAC: 1 }, { name: 'Round Shield', baseAC: 1 }, { name: 'Kite Shield', baseAC: 2 }, { name: 'Tower Shield', baseAC: 3 },
+  { name: 'Iron Cap', baseAC: 1 }, { name: 'Great Helm', baseAC: 2 }, { name: 'War Helm', baseAC: 2 },
+  { name: 'Leather Gauntlets', baseAC: 1 }, { name: 'Steel Bracers', baseAC: 1 },
+  { name: 'Reinforced Greaves', baseAC: 1 }, { name: 'Leather Boots', baseAC: 1 },
+  { name: "Traveler's Cloak", baseAC: 1 }, { name: 'Battle Mantle', baseAC: 1 }, { name: 'Studded Belt', baseAC: 1 },
+];
+// Container/delivery forms only -- the actual magical effect comes from the same buff/debuff
+// modifier roll every other item category already gets (see generateModifierOfType), and
+// buildItemName's existing theme-matching turns that effect into "Potion of Mending"/"Swift
+// Ring"/etc automatically, same as it always has for the effect-driven half of a name.
+const CONSUMABLE_BASE_FORMS = ['Potion', 'Draught', 'Elixir', 'Tonic', 'Oil', 'Philter', 'Brew', 'Vial', 'Scroll', 'Bomb', 'Powder', 'Incense'];
+const MISC_BASE_FORMS = ['Ring', 'Amulet', 'Pendant', 'Wand', 'Rod', 'Orb', 'Charm', 'Talisman', 'Sigil', 'Tome', 'Compass', 'Mirror', 'Lantern', 'Coin', 'Key'];
+
+// Every affix a weapon or armor base item can roll -- what used to be baked into GEN.weapon/
+// armor's flavor names (materials like Rusty/Iron/Mithral) plus real mechanical enchantments
+// (Sharp/Flaming/Sturdy/...), all in ONE list rather than several near-duplicate ones, filtered
+// by `appliesTo` at roll time. `text` is scaled the same way MONSTER_PART_EFFECT_POOL's
+// templates are -- called with a magnitude from MANGLER_RARITY_MAGNITUDE (1-4 by rarity) so
+// every scaled-effect system in the app shares one curve. Universal stat prefixes reuse
+// GEN.buffsSelf.scalar's own stat-name strings (defined below) rather than inventing new ones,
+// so scaledStatAmount/the Effects & Traits reference lookup both keep working on them unchanged.
+const ITEM_AFFIXES = [
+  // -- Materials (roughly common → exotic; several are pure flavor at low tiers on purpose,
+  //    same as a real "Rusty" or "Iron" prefix never being mechanically special) --
+  { name: 'Rusty', appliesTo: ['weapon'], minRarity: 'common', maxRarity: 'uncommon', text: () => '-1 to attack rolls — the corroded edge bites unevenly.' },
+  { name: 'Rusty', appliesTo: ['armor'], minRarity: 'common', maxRarity: 'uncommon', text: () => "-1 AC — it doesn't seal right anymore." },
+  { name: 'Iron', appliesTo: ['weapon','armor'], minRarity: 'common', maxRarity: 'uncommon', text: () => 'No mechanical change — a plain, honestly-made iron piece.' },
+  { name: 'Steel', appliesTo: ['weapon'], minRarity: 'common', maxRarity: 'rare', text: () => '+1 to damage rolls — a properly tempered edge.' },
+  { name: 'Steel', appliesTo: ['armor'], minRarity: 'common', maxRarity: 'rare', text: () => '+1 AC — properly tempered plate.' },
+  { name: 'Silvered', appliesTo: ['weapon'], minRarity: 'uncommon', text: () => '+1 to attack rolls against shapechangers and undead specifically.' },
+  { name: 'Mithral', appliesTo: ['weapon'], minRarity: 'rare', text: () => 'Considerably lighter than it looks — never imposes a heavy-weapon penalty.' },
+  { name: 'Mithral', appliesTo: ['armor'], minRarity: 'rare', text: () => '+1 AC, and no Strength requirement no matter how heavy the base piece.' },
+  { name: 'Adamantine', appliesTo: ['weapon'], minRarity: 'rare', text: () => 'Critical hits with this weapon automatically maximize their damage dice.' },
+  { name: 'Adamantine', appliesTo: ['armor'], minRarity: 'rare', text: () => "Attack rolls against the wearer can't score a critical hit." },
+  { name: 'Dragonbone', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to damage rolls, and once per turn deals an extra ${m}d4 damage of a damage type matching a dragon's breath (wielder's choice).` },
+  { name: 'Voidsteel', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to attack and damage rolls; on a critical hit, the target has disadvantage on its next saving throw.` },
+  { name: 'Runic', appliesTo: ['weapon','armor'], minRarity: 'rare', text: m => `+${m} to saving throws made by whoever wields/wears this.` },
+  { name: 'Ancient', appliesTo: ['weapon','armor'], minRarity: 'legendary', text: () => 'Once per short rest, treat a failed attack roll, ability check, or saving throw made with/while wearing this as a success instead.' },
+  // -- Weapon enchantments --
+  { name: 'Sharp', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m} to attack rolls.` },
+  { name: 'Heavy', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m + 1} to damage rolls, but -1 to attack rolls.` },
+  { name: 'Balanced', appliesTo: ['weapon'], minRarity: 'common', text: () => '+1 to attack rolls and +1 to damage rolls.' },
+  { name: 'Flaming', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 fire damage on a hit.` },
+  { name: 'Frost', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 cold damage on a hit, and the target's speed is reduced by 10 ft. until the end of its next turn.` },
+  { name: 'Shocking', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 lightning damage on a hit.` },
+  { name: 'Venomous', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 poison damage on a hit, and the target has disadvantage on its next Constitution saving throw.` },
+  { name: 'Radiant', appliesTo: ['weapon'], minRarity: 'rare', text: m => `+${m}d4 radiant damage on a hit (+${m}d4 more against undead and fiends).` },
+  { name: 'Vicious', appliesTo: ['weapon'], minRarity: 'rare', text: m => `Deals an extra ${m}d6 damage on a critical hit.` },
+  { name: 'Vampiric', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `The wielder regains ${m} hit points whenever this weapon deals damage.` },
+  // -- Armor enchantments --
+  { name: 'Sturdy', appliesTo: ['armor'], minRarity: 'common', text: m => `+${m} AC.` },
+  { name: 'Warded', appliesTo: ['armor'], minRarity: 'uncommon', text: () => "Resistance to one damage type of the wearer's choice, chosen when this armor is equipped." },
+  { name: 'Padded', appliesTo: ['armor'], minRarity: 'common', text: m => `+${m * 2} to the wearer's maximum hit points.` },
+  { name: 'Silent', appliesTo: ['armor'], minRarity: 'common', text: () => 'Advantage on Dexterity (Stealth) checks made while wearing this.' },
+  { name: 'Reflective', appliesTo: ['armor'], minRarity: 'uncommon', text: () => '+1 AC against ranged attacks specifically.' },
+  { name: 'Grounded', appliesTo: ['armor'], minRarity: 'common', text: () => 'Advantage on saving throws against being knocked prone.' },
+  // -- Universal stat prefixes (weapon or armor) -- reuse GEN.buffsSelf.scalar's own stat names.
+  { name: 'Mighty', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Strength.` },
+  { name: 'Nimble', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Dexterity.` },
+  { name: 'Hardy', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Constitution.` },
+  { name: 'Brilliant', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Intelligence.` },
+  { name: 'Wise', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Wisdom.` },
+  { name: 'Charismatic', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Charisma.` },
+];
+// How many affixes a generated weapon/armor item rolls, by rarity -- deliberately modest (the
+// existing buff/debuff/power/trait system already adds its own modifiers on top of these; this
+// isn't meant to replace that, just give the base item's own name real mechanical teeth).
+const AFFIX_COUNT_BY_RARITY = { common: [0,1], uncommon: [0,1], rare: [1,2], superrare: [1,2], legendary: [2,3], celestial: [2,3] };
+
+// Classic named potion effects -- rolled specifically for the 'potion' subcategory, on top of
+// (not instead of) the general buff/debuff pool every other item already draws from, the same
+// way ITEM_AFFIXES supplements a weapon/armor's own roll rather than replacing it. Each entry's
+// `text` scales with MANGLER_RARITY_MAGNITUDE, same curve as everything else in this file.
+const POTION_STATUS_EFFECTS = [
+  { name: 'Giant Strength', minRarity: 'common', text: m => `+${m + 1} Strength for 1 hour. Your hands and forearms visibly thicken for the duration.` },
+  { name: 'Growth', minRarity: 'common', text: m => `Your size increases by one category (to a maximum of Huge) for 10 minutes. Advantage on Strength checks and saves, +${m} Strength, but disadvantage on Dexterity saves.` },
+  { name: 'Diminution', minRarity: 'common', text: m => `Your size decreases by one category (to a minimum of Tiny) for 10 minutes. +${m} to Dexterity (Stealth) checks, but your weapons deal 1 less die of damage.` },
+  { name: 'Feather Fall', minRarity: 'common', text: () => `For 1 hour, you and anything you're carrying fall slowly — 60 feet per round — and take no damage from falling.` },
+  { name: 'Fire Breath', minRarity: 'uncommon', text: m => `As an action, exhale fire in a 15-foot cone: each creature in it takes ${m}d6 fire damage (DC 13 Dexterity save for half). One use, then the potion is spent even if you don't drink the rest.` },
+  { name: 'Gaseous Form', minRarity: 'uncommon', text: () => `For 10 minutes, become a misty cloud: fly speed 10 ft. (hover), squeeze through any gap that isn't airtight, immune to nonmagical damage, but you can't attack, cast spells, or interact with objects.` },
+  { name: 'Water Breathing', minRarity: 'common', text: () => `You can breathe underwater for 8 hours. Doesn't grant a swim speed — you still have to actually swim there.` },
+  { name: 'Climbing', minRarity: 'common', text: () => `For 1 hour, you gain a climbing speed equal to your walking speed and can climb on ceilings without needing to check for handholds.` },
+  { name: 'Invisibility', minRarity: 'rare', text: () => `You become invisible for 10 minutes, or until you attack or cast a spell.` },
+  { name: 'Heroism', minRarity: 'common', text: m => `Gain ${m * 5} temporary hit points and immunity to being Frightened for 10 minutes.` },
+  { name: 'Vitality', minRarity: 'uncommon', text: () => `Cures one disease or the Poisoned condition, and ends one level of exhaustion.` },
+  { name: 'Clairvoyance', minRarity: 'rare', text: () => `Create an invisible sensor at a location you've seen before, up to 1 mile away, and see/hear through it for 10 minutes.` },
+  { name: 'Speed', minRarity: 'rare', text: () => `Your speed doubles, you gain +2 AC, and you make one extra attack when you take the Attack action, for 1 minute. When it ends, you can't move or act until your next turn.` },
+  { name: 'Mind Reading', minRarity: 'rare', text: () => `For 10 minutes, you can read the surface thoughts of one creature within 30 ft. that isn't specifically guarding its mind against it.` },
+  { name: 'Animal Friendship', minRarity: 'common', text: () => `One beast that isn't hostile to you and has an Intelligence of 3 or lower becomes charmed by you for 24 hours (DC 13 Wisdom negates).` },
+  { name: 'Poison Resistance', minRarity: 'common', text: () => `Resistance to poison damage and advantage on saving throws against poison, for 1 hour.` },
+  { name: 'Fire Resistance', minRarity: 'common', text: () => `Resistance to fire damage for 1 hour.` },
+  { name: 'Cold Resistance', minRarity: 'common', text: () => `Resistance to cold damage for 1 hour.` },
+  { name: 'Longevity', minRarity: 'superrare', text: () => `Reduces your age by 1d6+6 years, to a minimum of your species' age of majority. No mechanical effect beyond the calendar — but for some, that's the entire point.` },
+  { name: 'Truesight', minRarity: 'superrare', text: m => `You have truesight out to ${m * 15} ft. for 10 minutes — see through illusions, invisibility, and into the Ethereal Plane.` },
+  { name: 'Comprehend Languages', minRarity: 'common', text: () => `For 1 hour, you understand the literal meaning of any spoken language you hear, and any written language you touch while reading it.` },
+  { name: "Frost Giant's Might", minRarity: 'uncommon', text: m => `+${m + 1} Strength for 1 hour, and resistance to cold damage for the same duration.` },
+  { name: 'Reflexes', minRarity: 'common', text: m => `+${m + 1} Dexterity for 1 hour.` },
+  { name: 'Undying Flesh', minRarity: 'legendary', text: () => `Once, if this would be your last drink before dying, instead drop to 1 hit point. Doesn't work twice on the same creature within a week, no matter how many more you drink.` },
+];
+// Doses/charges scale by rarity now -- previously every potion, at any rarity, was hardcoded to
+// exactly "1 use", which made a common potion and a celestial one functionally identical on the
+// one stat (charges) that should have said the most about how much power you're actually
+// holding. See rollConsumableCharges below, which reads this for the potion/scroll/food branch.
+const POTION_CHARGES_BY_RARITY = { common: 1, uncommon: 1, rare: 2, superrare: 3, legendary: 3, celestial: 4 };
+function rollPotionStatusEffect(rarity) {
+  const rarityIdx = BAL.rarityOrder.indexOf(rarity);
+  const pool = POTION_STATUS_EFFECTS.filter(p => BAL.rarityOrder.indexOf(p.minRarity) <= rarityIdx);
+  if (!pool.length) return null;
+  const picked = ri(pool);
+  const magnitude = MANGLER_RARITY_MAGNITUDE[rarity] || 1;
+  return { type: 'Potion Status', key: 'potionstatus:' + picked.name, name: picked.name, text: picked.text(magnitude) };
+}
+function rollItemAffixes(cat, rarity) {
+  if (cat !== 'weapon' && cat !== 'armor') return [];
+  const rarityIdx = BAL.rarityOrder.indexOf(rarity);
+  const pool = ITEM_AFFIXES.filter(a => a.appliesTo.includes(cat)
+    && BAL.rarityOrder.indexOf(a.minRarity) <= rarityIdx
+    && (!a.maxRarity || BAL.rarityOrder.indexOf(a.maxRarity) >= rarityIdx));
+  const [lo, hi] = AFFIX_COUNT_BY_RARITY[rarity] || [0,1];
+  const count = rn(lo, hi);
+  const magnitude = MANGLER_RARITY_MAGNITUDE[rarity] || 1;
+  const picked = [];
+  const usedNames = new Set();
+  let attempts = 0;
+  while (picked.length < count && attempts < 20 && pool.length) {
+    attempts++;
+    const affix = ri(pool);
+    if (usedNames.has(affix.name)) continue;
+    usedNames.add(affix.name);
+    picked.push({ type: 'Affix', key: 'affix:' + affix.name, name: affix.name, prefix: true, text: affix.text(magnitude) });
+  }
+  return picked;
 }
 
 const GEN = {
@@ -7470,102 +7940,21 @@ const GEN = {
     celestial: { min:20, max:40, gpMin:150000,gpMax:999999,label:'Celestial' },
   },
 
-  // 100 base armor items
-  armor: [
-    "Iron Cap","Leather Skullcap","Studded Leather Cuirass","Chainmail Coif","Scale Vest",
-    "Bronze Breastplate","Iron Pauldrons","Splint Gauntlets","Padded Gambeson","Ringmail Shirt",
-    "Half-Plate Greaves","Full Plate Helm","Darkwood Shield","Iron Buckler","Tower Shield of Oak",
-    "Kite Shield","Heater Shield","Spiked Pauldrons","Vambraces of Iron","Chain Gloves",
-    "Dragon-Scale Vest","Elven Chain Shirt","Mithral Breastplate","Shadowweave Cloak","Battlemage Robes",
-    "Adamantine Pauldrons","Stonewall Shield","Runeglass Visor","War Skirt of Ringmail","Iron Gorget",
-    "Sabaton of the Warlord","Knight's Tasset","Drakehide Bracers","Ironwood Chestplate","Warded Mantle",
-    "Ghostweave Robe","Boneplate Cuirass","Seaborn Harness","Cinderveil Cloak","Thornweave Jacket",
-    "Embossed Buckler","Gold-Threaded Tabard","Wardstone Amulet","Runed Gorget","Obsidian Pauldrons",
-    "Sealord's Mantle","Griffin-Feather Cloak","Moonsilver Vambraces","Sunforged Breastplate","Icestone Shield",
-    "Wyrmhide Vest","Darksteel Half-Plate","Ashwood Tower Shield","Silk War Robe","Battle Harness of Thorns",
-    "Petrified-Oak Buckler","Serpentscale Skirt","Ironbark Mantle","Bloodsteel Pauldrons","Voidweave Shroud",
-    "Cloudsteel Helm","Thornmail","Night Plate","Starfall Vambraces","Tidecaller's Mantle",
-    "Crimson War Robes","Tempest Tabard","Soulforged Gauntlets","Wraithweave Cloak","Heaven-Iron Cuirass",
-    "Doomplate Greaves","Angelwing Shoulder Guard","Sentry's Warplate","Champion's Gorget","Siegebreaker Shield",
-    "Tidesteel Sabaton","Magmaforged Vambraces","Crystalmere Breastplate","Ashenwood Shield","Ironmist Cloak",
-    "Blazehide Jacket","Frostmantle","Embersteel Helm","Runite Cuirass","Skyshard Pauldrons",
-    "Silksteel Vambraces","Voidstone Buckler","Emberwoven Mantle","Tideborn Harness","Stormmail Coif",
-    "Oath-Iron Chestplate","Dawnforged Helm","Nightshard Shield","Soulweave Robes","Warfather's Pauldrons",
-    "Hollowed-Light Breastplate","Tidecrest Gauntlets","Runic Tabard","Skyforged Helm","Dawnward Mantle"
-  ],
+  // Real armor type names (see ARMOR_BASE_TYPES above) — base AC now comes from the type
+  // itself, not from rarity alone. Material/enchantment "Rusty"/"Sturdy"/etc. prefixes are
+  // rolled separately (see ITEM_AFFIXES) rather than baked into this list.
+  armor: ARMOR_BASE_TYPES.map(a => a.name),
 
-  // 100 base weapon items
-  weapon: [
-    "Rusty Shortsword","Bone-Handle Dagger","Splitting Hatchet","Gnarled Club","Splintered Spear",
-    "Iron Longsword","Hunting Crossbow","Recurve Longbow","Soldier's Mace","Iron Warhammer",
-    "Serrated Falchion","Weighted Flail","Pike of the Watch","Barbed Trident","Dueling Rapier",
-    "Twin Hook Swords","Curved Saber","Notched Greataxe","Heavy Maul","Blade-Staff",
-    "Whip of Barbs","Throwing Chakram","Blessed Morningstar","Rune-Etched Spear","Enchanted Bastard Sword",
-    "Silverite Dagger","Shadow-Forged Rapier","Battle Scythe","Cursed Cleaver","Venom-Coated Shortbow",
-    "Flamestrike Longsword","Frostfang Axe","Thunderclap Warhammer","Voidshard Dagger","Windcutter Blade",
-    "Chain-Flail","Soulreaper Scythe","Shadowpike","Blightbow","Poisonwood Staff",
-    "Stormcaller Trident","Blazing Falchion","Icebolt Crossbow","Heartseeker Rapier","Dragonbone Club",
-    "Ironwood Great Club","Siege Crossbow","Runic Halberd","War-Pick of Depths","Bladestorm Twin Swords",
-    "Death's Lantern (Spiked Flail)","Crowned Morningstar","Ashwood Greatbow","Wrath Blade","Embersting Shortbow",
-    "Tidebreaker Trident","Voidcleaver","Boneshatter Warhammer","Hexblade","Runemetal Spear",
-    "Soulpiercer Arrow (Bow)","Moonsilver Blade","Runespike Mace","Silksteel Whip","Wraithblade Dagger",
-    "Dawnblade Longsword","Crimsonthorn Flail","Skyshard Spear","Flamewrought Axe","Glacial Maul",
-    "Starweave Longbow","Obsidian War-Pick","Sunglaive","Tideblade","Magmaforged Warhammer",
-    "Nightmare Scythe","Duskblade","Oathkeeper Broadsword","Veilpiercer Rapier","Storm-Runed Glaive",
-    "Cinderblade","Thornspike Mace","Heaven-Forged Greatsword","Soulbrand Sword","Abyssal Edge",
-    "Doombringer Axe","Runic Zweihander","Starfall Blade","Dawnbreaker","Shadowhew Greataxe",
-    "Oracle's Shortbow","Battleborn Spear","Tidecutter Falchion","Voidthorn Dagger","Sungold Longsword",
-    "Ironveil Blade","Stormwrath Halberd","Deathmask Scythe","Celestine Rapier","Worldender Greatsword"
-  ],
+  // Real weapon type names (see WEAPON_BASE_TYPES above) — base damage die now comes from the
+  // type itself, not from rarity alone. Material/enchantment prefixes roll separately.
+  weapon: WEAPON_BASE_TYPES.map(w => w.name),
 
-  // 100 consumables
-  consumable: [
-    "Healing Draught","Minor Mana Vial","Antidote Tincture","Smoke Pellet","Acid Flask",
-    "Alchemist's Fire","Potion of Vigor","Vial of Liquid Courage","Blinding Dust","Tanglefoot Bag",
-    "Iron Stomach Tonic","Potion of Speed","Vial of True Sight","Scroll of Light","Warding Incense",
-    "Potion of Silence","Glamour Dust","Potion of Giant's Blood","Scroll of Thunderclap","Vitality Elixir",
-    "Potion of Featherweight","Scroll of Arcane Bolt","Smelling Salts","Stasis Vial","Rage Tonic",
-    "Potion of Stone Skin","Scroll of Charm","Potion of Etherealness","Midnight Ink Bomb","Memory Draught",
-    "Potion of Iron Will","Scroll of Fear","Venom Vial","Potion of the Deep","Lantern Oil of Revealing",
-    "Scroll of Chain Lightning","Potion of Frenzy","Crystallized Storm","Soulbind Candle","Scroll of Banishment",
-    "Potion of Tremor Resistance","Scroll of Meteor Swarm","Elixir of True Form","Draught of the Void","Potion of Gravity",
-    "Scroll of Time Stop","Tonic of Starlight","Potion of World Sight","Essence of the Phoenix","Draught of Undying",
-    "Potion of Phase Walk","Scroll of Reality Tear","Crystallized Sunlight","Vial of the Storm God","Elixir of Creation",
-    "Potion of Soul Sight","Draught of the Mountain","Scroll of Fate","Elixir of the Titan","Vial of Dragon's Blood",
-    "Potion of the Leviathan","Scroll of Divine Word","Draught of Ancient Sight","Elixir of the Planar Walk","Potion of Nullification",
-    "Essence of Shadow","Vial of Astral Dust","Scroll of Mass Resurrection","Elixir of Worldbreaker","Draught of Perfect Form",
-    "Potion of a Thousand Lives","Vial of God-Flame","Scroll of Creation","Elixir of the First Light","Tonic of the Last Star",
-    "Potion of Inverse Time","Scroll of the World's End","Draught of Genesis","Elixir of Divine Ascension","Vial of Broken Reality",
-    "Potion of Omniscience","Scroll of Planar Rend","Elixir of Eternal Will","Draught of the Worldsoul","Vial of Star-Death",
-    "Potion of Echoes","Scroll of Soul Binding","Elixir of Fate","Draught of the Final Breath","Vial of Becoming",
-    "Potion of the Void","Scroll of Unmaking","Elixir of the First Spark","Draught of All-Sight","Tonic of the Age",
-    "Potion of the Gods","Draught of Myth","Vial of the Primordial","Elixir of the Sun","Scroll of the Cosmos"
-  ],
+  // Container/delivery forms only (see CONSUMABLE_BASE_FORMS above) — the actual effect comes
+  // from the buff/debuff modifier roll below, same as every other category.
+  consumable: CONSUMABLE_BASE_FORMS,
 
-  // 100 misc items
-  misc: [
-    "Brass Compass","Folding Tent","Thieves' Kit","Iron Lantern","Grappling Hook",
-    "Pouch of Gemstones","Cartographer's Quill","Runestone","Signal Mirror","Lockbox",
-    "Enchanted Rope","Crystal Orb","Spy Glass","Shadow Cloak Pin","Rune-Carved Ring",
-    "Talisman of the Hunt","Idol of the Old Gods","Warding Amulet","Resonance Crystal","Soul Cage",
-    "Ring of Echoes","Totem of Binding","Charm of the Fox","Golem Heart","Mindlock Cube",
-    "Sigil Stone","Arcane Focus","Speaking Crystal","Fate Coin","Null-Gem",
-    "Phase Compass","Memory Locket","Soul Mirror","Astral Tether","Plane-Walking Rod",
-    "Dream Catcher Totem","Binding Chain","Void Orb","Reality Anchor","Leyline Tap",
-    "Chrono-Gem","Prophecy Tablet","Essence Bottle","Demon Seal","Titan's Tooth",
-    "God-Sliver","World-Shard","Primordial Seed","Star Fragment","Fate Weave",
-    "Eternal Candle","Seer's Eye","Banishment Coin","Rift Key","Godmark",
-    "Planar Compass","Doom Seal","Soul Knot","Infinite Pouch","Time-Stop Hourglass",
-    "Creation Flame","Void Splinter","Genesis Stone","Cosmic Thread","All-Seeing Monocle",
-    "Heaven-Lock Ring","Abyss Shard","World Anchor","Planar Key","God-Chain",
-    "Fate Spinner","Reality Prism","Soul Weave","Eternal Eye","Void Compass",
-    "Godfire Jewel","Planar Core","Universe Sliver","Cosmic Seal","World Thread",
-    "Eternity Lock","Heaven Shard","Genesis Ring","Doom Orb","Fate Anchor",
-    "Reality Thread","Soul Splinter","God-Weave","Cosmic Key","Void Prism",
-    "Planar Eye","Star Seal","Universe Chain","World Flame","Heaven Compass",
-    "Eternal Key","Doom Thread","Genesis Orb","Fate Splinter","Reality Seal",
-    "Soul Prism","God-Key","Cosmic Flame","Void Weave","Planar Anchor"
-  ],
+  // Object forms only (see MISC_BASE_FORMS above) — same reasoning as consumable.
+  misc: MISC_BASE_FORMS,
 
   // 100 creatures to transform into
   transformForms: [
@@ -7594,46 +7983,19 @@ const GEN = {
     "a yugoloth (Ultroloth)","a dao (Dao, earth genie)","a djinni (Djinni, air genie)","an efreeti (Efreeti, fire genie)","a marid (Marid, water genie)"
   ],
 
-  // 50 entities to summon
+  // A small curated pool of named unique entities — a rare flavor variant celestial-tier
+  // summons can roll instead of a generic same-CR creature from the monster database (see
+  // pickSummonEntity's SUMMON_NAMED_CHANCE below). Trimmed down from an earlier 50-entry list
+  // that, in practice, never actually got reached (pickMonsterForRarity always found a real
+  // match first) — kept as an occasional special case rather than dead weight or the default.
   summonEntities: [
     "Zyrath the Flame Tyrant (Balor)","Malachar the Broken (Pit Fiend)","Vexis of the Void (Marilith)",
-    "Nethrul the Whisperer (Glabrezu)","Sorvath the Unclean (Nalfeshnee)","Abraxis the Eye (Beholder)",
-    "Thaumek, Warlord of the Abyss (Goristro)","Ix the Consuming (Sibriex)",
-    "Korrath the Flesh-Weaver (Demon Lord — use Orcus stat block)","Zeryx the Unbound (Demon Lord — use Demogorgon stat block)",
-    "Seraphiel the Ardent (Solar)","Luminal the Witness (Planetar)","Aeonir the Undying (Deva)",
-    "Radiance, the Sword of Heaven (Empyrean)","Etherion the Just (Monastic Archon — use Planetar stat block)",
-    "Vorindel the Storm-Father (Elder Tempest, primordial)","Solareth the Bright (Solar)",
-    "Morvath the Reaper (Orcus, Demon Lord of Undeath)","Kalia the Worldweaver (Empyrean)",
-    "Aximath the Lawbringer (Marut, inevitable)","Threnix the Forgotten (Vestige — use Ancient Dragon stat block)",
-    "The Null Voice (Star Spawn Seer)","Primordius the Unbegun (Zaratan, primordial)",
-    "Sareth the All-Hungry (Astral Dreadnought)","Ixion the World-Burner (Phoenix, primordial)",
-    "Valorian, Champion of Heaven (Solar)","Obsidix the Damned (Fallen Solar — use Solar stat block with evil alignment)",
-    "Yrath the Last Word (Nightwalker)","Chronael the Inevitable (Marut, inevitable)",
-    "Morwyn the Pale (Night Hag — Elder variant)","Ashketh the Undying (Skull Lord)",
-    "Ravanthor the Ravager (Demon Lord — use Baphomet stat block)","Gloom-That-Speaks (Bodak)",
-    "The Burning Judge (Solar)","Axirath the Eternal (Marut, inevitable)",
-    "Tessivrath the Dream-Eater (Elder Oblex)","Xerath the Unwritten (Vestige — use Death Knight stat block)",
-    "The Iron King (Iron Golem — legendary variant)","Naerath the Gentle (Deva)",
-    "Pyraxis the World-Forge (Zaratan, primordial)","Sorveth the Unmade (Leviathan, primordial)",
-    "Liath the Moon-Crowned (Empyrean)","Vareth the Storm-Crowned (Elder Tempest, primordial)",
-    "Alix the Patient (Demon Lord — use Juiblex stat block)","Zerith the Severed (Death Knight)",
-    "Calix the Dreaming (Dybbuk — elder form)","Morax the Unending (Demon Lord — use Baphomet stat block)",
-    "Velith the Still (Nagpa)","Pyreth the First Flame (Efreeti — elder form)"
-  ],
-
-  // 30 terrain alterations
-  terrainAlterations: [
-    "raises a wall of stone","opens a chasm in the earth","freezes all water in a large area",
-    "conjures a dense fog bank","ignites a ring of unquenchable fire","sinks the ground into soft mud",
-    "raises a stone fortress","collapses a ceiling or cliff","reverses gravity in a zone",
-    "summons a raging river","turns soil to glass","encases the area in ice",
-    "causes vines to erupt and overgrow","detonates a localized earthquake","opens a sinkhole",
-    "raises a volcanic vent","conjures a salt flat","causes a forest to grow instantly",
-    "opens a rift to the Astral Plane","turns the sky to twilight permanently",
-    "raises a mountain peak","floods an area with seawater","turns stone to sand",
-    "splits a road or bridge","conjures a permanent storm over a region","buries a city in ash",
-    "raises an island from the sea","drains a lake or river dry","shatters a mountain into rubble",
-    "reshapes a coastline"
+    "Abraxis the Eye (Beholder)","Seraphiel the Ardent (Solar)","Radiance, the Sword of Heaven (Empyrean)",
+    "Morvath the Reaper (Orcus, Demon Lord of Undeath)","The Null Voice (Star Spawn Seer)",
+    "Ixion the World-Burner (Phoenix, primordial)","Yrath the Last Word (Nightwalker)",
+    "Ashketh the Undying (Skull Lord)","Chronael the Inevitable (Marut, inevitable)",
+    "Xerath the Unwritten (Vestige — use Death Knight stat block)","Sorveth the Unmade (Leviathan, primordial)",
+    "Pyreth the First Flame (Efreeti — elder form)"
   ],
 
   // ── Buffs & debuffs, split by who they affect (self vs. another creature) ──
@@ -8027,12 +8389,26 @@ function getModifierCount() {
 }
 
 function buildItemName(baseName, rarity, stats = {}, mods = []) {
+  // Weapon/armor affix prefixes (materials + enchantments, e.g. "Flaming"/"Sharp"/"Rusty" —
+  // see ITEM_AFFIXES/rollItemAffixes) stack in roll order ahead of the base name. This is
+  // separate from the single "of X"/"Y Base" descriptor below, which is still chosen from
+  // buff/debuff/trait effects exactly as before — the two systems compose (e.g. "Flaming Sharp
+  // Shortsword of Mending" if it also happened to roll a healing buff).
+  const affixWords = mods.filter(m => m.prefix).map(m => m.name);
+  const prefixedBase = affixWords.length ? `${affixWords.join(' ')} ${baseName}` : baseName;
+  const nonAffixMods = mods.filter(m => !m.prefix);
+
   // Names are intentionally short and describe what the item actually does.
   // At most one descriptor is added, chosen from the item's strongest stat/effect.
-  const effectText = mods.map(m => `${m.type} ${m.text}`).join(' ').toLowerCase();
-  // A named trait (e.g. "Bloody") is the most specific descriptor available — prefer it
+  const effectText = nonAffixMods.map(m => `${m.type} ${m.text}`).join(' ').toLowerCase();
+  // A rolled Potion Status (Giant Strength, Gaseous Form, ... — see POTION_STATUS_EFFECTS) is
+  // the single most specific, most flavorful descriptor a potion can have, and always reads
+  // best as "Potion of X" rather than "X Potion" — so it's checked first, ahead of even a
+  // named Trait, and forces the "of X" format below regardless of the keyword-matched themes.
+  const potionStatusMod = nonAffixMods.find(m => m.type === 'Potion Status' && m.name);
+  // A named trait (e.g. "Bloody") is the next-most-specific descriptor available — prefer it
   // over the generic keyword-matched themes below.
-  let descriptor = mods.find(m => m.type === 'Trait' && m.name)?.name || '';
+  let descriptor = potionStatusMod?.name || nonAffixMods.find(m => m.type === 'Trait' && m.name)?.name || '';
   const themes = [
     [/fire|flame|burn/, ['Flame','Ember']],
     [/cold|frost|ice/, ['Frost','Winter']],
@@ -8052,20 +8428,25 @@ function buildItemName(baseName, rarity, stats = {}, mods = []) {
       if (pattern.test(effectText)) { descriptor = ri(words); break; }
     }
   }
-  // Fall back to a descriptor based on the actual numerical quality, not rarity adjectives.
-  if (!descriptor && stats.dmg) {
+  // Fall back to a descriptor based on the actual numerical quality, not rarity adjectives —
+  // but only when there's no affix word already doing that job. Base weapon/armor dice/AC now
+  // come from the item's TYPE (see WEAPON_BASE_TYPES/ARMOR_BASE_TYPES), not rarity alone, so a
+  // die-size or AC threshold no longer reliably signals "this item rolled well" the way it did
+  // when rarity was the only thing driving those numbers — checking it unconditionally would
+  // tack "Keen"/"Mighty" onto nearly every longsword-or-bigger weapon regardless of rarity.
+  if (!descriptor && !affixWords.length && stats.dmg) {
     const m = stats.dmg.match(/(\d+)d(\d+)(?:\+(\d+))?/);
     if (m && (+m[1] >= 4 || +m[3] >= 4)) descriptor = 'Mighty';
     else if (m && (+m[1] >= 2 || +m[2] >= 8)) descriptor = 'Keen';
   }
-  if (!descriptor && stats.ac && Number(stats.ac) >= 18) descriptor = 'Bulwark';
+  if (!descriptor && !affixWords.length && stats.ac && Number(stats.ac) >= 18) descriptor = 'Bulwark';
   if (!descriptor && stats.hp && rarity !== 'common') descriptor = 'Restoring';
 
   // Prefer "Base of Theme" for effect-driven items and "Descriptor Base" for stat-driven ones.
-  if (descriptor && /Flame|Ember|Frost|Winter|Storm|Thunder|Venom|Viper|Shadow|Grave|Radiant|Sun/.test(descriptor)) {
-    return `${baseName} of ${descriptor}`;
+  if (potionStatusMod || (descriptor && /Flame|Ember|Frost|Winter|Storm|Thunder|Venom|Viper|Shadow|Grave|Radiant|Sun/.test(descriptor))) {
+    return `${prefixedBase} of ${descriptor}`;
   }
-  return descriptor ? `${descriptor} ${baseName}` : baseName;
+  return descriptor ? `${descriptor} ${prefixedBase}` : prefixedBase;
 }
 
 // Shared stat roller used by the Unique Item Generator, the Store, and anywhere else an
@@ -8073,26 +8454,33 @@ function buildItemName(baseName, rarity, stats = {}, mods = []) {
 // get decided, so a "weapon" or "armor" of a given rarity is built the exact same way no
 // matter which tab produced it. Subcategory (and therefore slotSize) comes from the base
 // item's name, never randomized.
+// Extra damage dice/AC rarity layers on top of a weapon/armor base TYPE's own structural stat
+// (WEAPON_BASE_TYPES.dmgDie / ARMOR_BASE_TYPES.baseAC) — replaces the old system where rarity
+// alone decided damage/AC and the weapon/armor's actual type was purely cosmetic text.
+const RARITY_EXTRA_DICE = { common:0, uncommon:0, rare:1, superrare:1, legendary:2, celestial:3 };
+const RARITY_AC_BONUS = { common:0, uncommon:1, rare:2, superrare:3, legendary:5, celestial:8 };
 function rollItemStats(cat, rarity, baseName) {
   const subcategory = classifySubcategory(baseName, cat, rarity);
   const slotSize = SUBCATEGORY_SLOT_SIZE[subcategory] || 1;
   const s = GEN.scale[rarity];
   let dmg = '', ac = '', hp = '', requirement = '', charges = '';
   if (cat === 'weapon') {
-    const dieSize = rarity === 'celestial' ? 12 : rarity === 'legendary' ? 10 : rarity === 'superrare' ? 8 : rarity === 'rare' ? 6 : rarity === 'uncommon' ? 6 : 4;
-    const dieCount = rarity === 'celestial' ? rn(4,8) : rarity === 'legendary' ? rn(3,6) : rarity === 'superrare' ? rn(2,4) : rarity === 'rare' ? rn(2,3) : rn(1,2);
+    const base = WEAPON_BASE_TYPES.find(w => w.name === baseName);
+    const [baseDieCount, dieSize] = base ? base.dmgDie.split('d').map(Number) : [1, 6];
+    const dieCount = baseDieCount + (RARITY_EXTRA_DICE[rarity] || 0);
     const bonus = s.min;
     dmg = `${dieCount}d${dieSize}+${bonus}`;
   }
   if (cat === 'armor') {
-    const base = rarity === 'celestial' ? rn(22,26) : rarity === 'legendary' ? rn(18,22) : rarity === 'superrare' ? rn(16,18) : rarity === 'rare' ? rn(14,16) : rarity === 'uncommon' ? rn(13,15) : rn(11,13);
-    ac = String(base);
-    requirement = base >= 17 ? 'Heavy armor proficiency' : base >= 14 ? 'Medium armor proficiency' : 'No proficiency required';
+    const base = ARMOR_BASE_TYPES.find(a => a.name === baseName);
+    const baseAC = base ? base.baseAC : 11;
+    ac = String(baseAC + (RARITY_AC_BONUS[rarity] || 0));
+    requirement = baseAC >= 16 ? 'Heavy armor proficiency' : baseAC >= 13 ? 'Medium armor proficiency' : 'No proficiency required';
   }
   if (cat === 'consumable') {
     const dieCount = rarity === 'celestial' ? rn(15,30) : rarity === 'legendary' ? rn(10,20) : rarity === 'superrare' ? rn(6,12) : rarity === 'rare' ? rn(4,8) : rarity === 'uncommon' ? rn(2,4) : rn(1,2);
     hp = `${dieCount}d8+${rn(s.min * 2, s.max * 3)}`;
-    charges = rollConsumableCharges(subcategory);
+    charges = rollConsumableCharges(subcategory, rarity);
   }
   return { subcategory, slotSize, dmg, ac, hp, requirement, charges };
 }
@@ -8115,11 +8503,24 @@ function generateUniqueItem() {
   const { subcategory, slotSize, dmg, ac, hp, requirement, charges } = rollItemStats(cat, rarity, baseName);
   const gp = scaledGP(rarity);
 
+  // --- Weapon/armor affixes (materials + enchantments — see ITEM_AFFIXES) — rolled first and
+  // seeded into mods/usedModKeys so the buff/debuff loop below can't pick a colliding key, and
+  // so buildItemName sees them when composing the final name (each stacks as its own prefix
+  // word, e.g. "Flaming Sharp Shortsword", rather than the single-descriptor system below). A
+  // no-op for consumable/misc — rollItemAffixes only ever returns entries for weapon/armor.
+  const affixMods = rollItemAffixes(cat, rarity);
+  // --- Potion status effect (see POTION_STATUS_EFFECTS) — a guaranteed, classic-named potion
+  // effect (Giant Strength, Gaseous Form, ...), on top of whatever the general buff/debuff loop
+  // below also rolls, same "supplement, don't replace" relationship affixes have with weapons.
+  // Only for the potion subcategory specifically — a scroll or ration doesn't drink like one.
+  const potionStatus = subcategory === 'potion' ? rollPotionStatusEffect(rarity) : null;
+  const startingMods = potionStatus ? [...affixMods, potionStatus] : affixMods;
+
   // --- Modifier generation: NO duplicates, synergy-weighted, spell/buff heavy ---
   const modCount = getModifierCount();
-  const mods = [];
+  const mods = [...startingMods];
   const usedModTypes = []; // tracks modifier categories already used (prevents duplicate category)
-  const usedModKeys = [];  // tracks specific buff/debuff/power strings already picked (prevents duplicate content)
+  const usedModKeys = startingMods.map(m => m.key);  // tracks specific buff/debuff/power/affix/potion strings already picked (prevents duplicate content)
 
   let attempts = 0;
   while (mods.length < modCount && attempts < 40) {
@@ -8172,6 +8573,7 @@ function generateUniqueItem() {
     <div class="ic-mod-group">
       <div class="ic-mod-label">${m.type}</div>
       <div class="ic-mod-entry">${colorizeModifierText(m.text, m.type)}</div>
+      ${summonedMonsterStatHtml(m)}
     </div>
   `).join('');
 
@@ -8603,19 +9005,40 @@ const SUMMON_TIERS = [
   ['a grizzly bear','a pack of 2 wolves','a giant elk','a hunting owlbear','a giant vulture','a greater elemental'],
   ['a veteran war-bear','a young elemental drake','a dire wolf pack (3 wolves)','a formidable fiend','an ancient elemental','a planetar-like champion'],
 ];
+// Odds that a celestial-tier summon rolls one of the curated named entities (GEN.summonEntities)
+// instead of a generic same-CR creature pulled straight from the monster database. Deliberately
+// small — the point is an occasional special case, not the default (see GEN.summonEntities'
+// own header comment on why the old, much bigger version of this list never got reached at all).
+const SUMMON_NAMED_CHANCE = 0.15;
+// Returns { label, monster } — label is always a display string; monster is the full monster
+// record when the summon came from the database (so callers can surface AC/HP/size/etc.), or
+// null for a named-entity or generic SUMMON_TIERS result, neither of which have a stat block on
+// file here.
 function pickSummonEntity(idx) {
-  const monster = pickMonsterForRarity(BAL.rarityOrder[idx], false);
-  if (monster) return withArticle(monster.name);
-  if (idx < SUMMON_TIERS.length) return ri(SUMMON_TIERS[idx]);
-  // Celestial fallback: draw from the epic named entities, same three-slice mix as before.
-  return ri([ri(GEN.summonEntities.slice(10,20)), ri(GEN.summonEntities.slice(20,35)), ri(GEN.summonEntities.slice(0,10))]);
+  const rarity = BAL.rarityOrder[idx];
+  if (rarity === 'celestial' && Math.random() < SUMMON_NAMED_CHANCE) {
+    return { label: ri(GEN.summonEntities), monster: null };
+  }
+  const monster = pickMonsterForRarity(rarity, false);
+  if (monster) return { label: withArticle(monster.name), monster };
+  if (idx < SUMMON_TIERS.length) return { label: ri(SUMMON_TIERS[idx]), monster: null };
+  // Nothing in the database matched this CR band at all -- fall back to a named entity rather
+  // than coming back empty-handed.
+  return { label: ri(GEN.summonEntities), monster: null };
+}
+// Compact stat snapshot for a summoned/transformed-into monster, captured at generation time so
+// it can be shown on the item itself later (AC/HP/size/etc.) without needing the full monster
+// database loaded again wherever the item gets displayed.
+function monsterStatSnapshot(monster) {
+  if (!monster) return null;
+  return { name: monster.name, ac: monster.ac, hp: monster.hp, size: monster.size, cr: monster.cr, type: monster.type, speed: monster.speed };
 }
 // Multi-summon count is only ever offered for generic "a/an X" entities (ordinary
-// creatures) — GEN.summonEntities' celestial fallback is a pool of proper-named unique
-// individuals ("Zyrath the Flame Tyrant"), and duplicating a named person doesn't make
-// sense, so those never roll above 1. Also fixes the "Summons 2 a wolf" grammar bug by
-// stripping the article and using "2× Wolf" instead of trying to pluralize an arbitrary
-// monster name (which "wolves"-style irregular plurals can't be done reliably).
+// creatures) — GEN.summonEntities' named entities are proper-named unique individuals ("Zyrath
+// the Flame Tyrant"), and duplicating a named person doesn't make sense, so those never roll
+// above 1. Also fixes the "Summons 2 a wolf" grammar bug by stripping the article and using
+// "2× Wolf" instead of trying to pluralize an arbitrary monster name (which "wolves"-style
+// irregular plurals can't be done reliably).
 function summonCountFor(idx, entity) {
   const hasArticle = /^(a|an)\s/i.test(entity);
   return idx >= 4 && hasArticle && Math.random() < 0.3 ? 2 : 1;
@@ -8683,13 +9106,20 @@ function generateModifierOfType(type, rarity, usedKeys = []) {
   if (type === 'transform') {
     const monster = pickMonsterForRarity(rarity, false);
     const form = monster ? withArticle(monster.name) : pickTier(GEN.transformForms, rarity);
-    return { type:'Transform', key:'transform:'+form, text:`The bearer transforms into <strong>${form}</strong> ${durationClause(dur)}, retaining their personality and memories. The transformation ends early if dismissed.` };
+    const transformMod = { type:'Transform', key:'transform:'+form, text:`The bearer transforms into <strong>${form}</strong> ${durationClause(dur)}, retaining their personality and memories. The transformation ends early if dismissed.` };
+    if (monster) transformMod.summonedMonster = monsterStatSnapshot(monster);
+    return transformMod;
   }
   if (type === 'summon') {
-    const entity = pickSummonEntity(idx);
-    const count = summonCountFor(idx, entity);
+    const picked = pickSummonEntity(idx);
+    const count = summonCountFor(idx, picked.label);
     const summonDur = pickSummonDuration(rarity);
-    return { type:'Summon', key:'summon:'+entity, text:`Summons <strong>${formatSummonLabel(entity, count)}</strong> for <strong>${summonDur}</strong>. ${count>1?'They follow':'It follows'} reasonable commands and ${count>1?'vanish':'vanishes'} when the duration ends.` };
+    const summonMod = { type:'Summon', key:'summon:'+picked.label, text:`Summons <strong>${formatSummonLabel(picked.label, count)}</strong> for <strong>${summonDur}</strong>. ${count>1?'They follow':'It follows'} reasonable commands and ${count>1?'vanish':'vanishes'} when the duration ends.` };
+    // Only ever set for a real database monster (count === 1 in that case, always — see
+    // summonCountFor/formatSummonLabel's own comments on why named/generic-flavor entities
+    // never stack) so a popup can show the summoned creature's actual AC/HP/size at a glance.
+    if (picked.monster) summonMod.summonedMonster = monsterStatSnapshot(picked.monster);
+    return summonMod;
   }
   // 'terrain' (permanent/temporary area terrain alterations) was removed from this generator
   // per direct request — not balanced against the other modifier types weapons and generated
@@ -9353,8 +9783,34 @@ const COMMERCE_SCALE = {
 // much stronger than the other — previously price only looked at rarity + mod COUNT, never
 // mod/roll MAGNITUDE, so a maxed-out legendary sword and a bottom-of-the-barrel one were
 // priced identically.
-function rollPowerRatio(cat, rarity, dmg, ac, hp) {
+// weapon/armor's dmg/ac used to be the thing that varied within a rarity (a "common weapon"
+// could roll 1 or 2 damage dice at random) which is what this function originally measured.
+// Since WEAPON_BASE_TYPES/ARMOR_BASE_TYPES made dmg/ac mostly deterministic per type+rarity
+// (see rollItemStats), dice count/AC no longer signal how good a specific roll was — how many
+// ITEM_AFFIXES it picked up, and how rare those affixes themselves are, is what actually varies
+// now, so that's what pricing reads instead. mods is the item's full modifier list (affix
+// entries are tagged `prefix: true`, see rollItemAffixes) — optional so any other caller that
+// doesn't pass it still gets the old dmg/ac fallback rather than breaking.
+function rollPowerRatio(cat, rarity, dmg, ac, hp, mods) {
   const clamp01 = (n) => Math.max(0, Math.min(1, n));
+  if ((cat === 'weapon' || cat === 'armor') && Array.isArray(mods)) {
+    const affixes = mods.filter(m => m.prefix);
+    const [lo, hi] = AFFIX_COUNT_BY_RARITY[rarity] || [0, 1];
+    const countRatio = hi > lo ? clamp01((affixes.length - lo) / (hi - lo)) : (affixes.length ? 1 : 0.5);
+    if (!affixes.length) return countRatio;
+    // How deep into the rarity ladder each rolled affix's own minRarity reaches, relative to
+    // this item's own rarity — an Adamantine/Ancient affix landing on a legendary item is a
+    // better roll than a common-tier Sharp/Sturdy landing on the same item.
+    const rarityIdx = BAL.rarityOrder.indexOf(rarity);
+    const depthScore = affixes.reduce((sum, m) => {
+      const def = ITEM_AFFIXES.find(a => a.name === m.name && a.appliesTo.includes(cat));
+      const defIdx = def ? BAL.rarityOrder.indexOf(def.minRarity) : 0;
+      return sum + (rarityIdx > 0 ? defIdx / rarityIdx : (defIdx > 0 ? 1 : 0));
+    }, 0);
+    return clamp01((countRatio + clamp01(depthScore / affixes.length)) / 2);
+  }
+  // Fallback for any caller that doesn't have the item's mods handy (or a weapon/armor whose
+  // dmg/ac wasn't derived from a base type at all) — same dice/AC-based estimate as before.
   if (cat === 'weapon' && dmg) {
     const m = /^(\d+)d/.exec(dmg);
     if (m) {
@@ -9824,10 +10280,10 @@ function renderFleshWorkshop() {
       : 'Drag a monster part here';
   }
   if (entry) {
-    const category = PART_TO_LIMB_CATEGORY[entry.item.partType] || 'arm';
+    const category = PART_TO_LIMB_CATEGORY[entry.item.anatomicalId] || 'arm';
     const magnitude = MANGLER_RARITY_MAGNITUDE[entry.rarity] || 1;
     const cost = fleshGraftReworkCost(entry.rarity);
-    const partLabel = MONSTER_PART_TYPE_LABEL[entry.item.partType] || entry.item.name;
+    const partLabel = MONSTER_PART_TYPE_LABEL[entry.item.anatomicalId] || entry.item.name;
     const rarityLabel = rarityNames[entry.rarity] || entry.rarity;
     const categoryLabel = SUBCATEGORY_LABELS[category] || category;
     if (preview) preview.innerHTML = `<div class="mangler-preview-line">Result: a <b>${escapeHtml(categoryLabel)}</b> graft reworked from the <b>${escapeHtml(partLabel)}</b> (${escapeHtml(rarityLabel)}), carrying <b>${magnitude}</b> beneficial effect${magnitude > 1 ? 's' : ''}.</div><div class="mangler-preview-cost">💰 Cost: ${cost} gp</div>`;
@@ -9849,7 +10305,7 @@ function reworkPartIntoGraft() {
   if (_pendingFleshItem) { flashFleshWorkshopMessage('Save or discard your current graft result first.', true); return; }
   const part = entry.item;
   const partRarity = entry.rarity;
-  const category = PART_TO_LIMB_CATEGORY[part.partType] || 'arm';
+  const category = PART_TO_LIMB_CATEGORY[part.anatomicalId] || 'arm';
   const candidates = FLESH_LIMB_DEFS.filter(d => d.category === category);
   const limbDef = candidates.length ? ri(candidates) : FLESH_LIMB_DEFS[0];
   const cost = fleshGraftReworkCost(partRarity);
@@ -9859,7 +10315,7 @@ function reworkPartIntoGraft() {
   }
   const mods = rollFleshGraftEffects(category, partRarity);
   const effectText = mods.map(m => m.text).join(' ');
-  const partLabel = (MONSTER_PART_TYPE_LABEL[part.partType] || 'monstrous remains').toLowerCase();
+  const partLabel = (MONSTER_PART_TYPE_LABEL[part.anatomicalId] || 'monstrous remains').toLowerCase();
   const item = {
     name: `${limbDef.name} of the ${part.sourceMonster || 'Beast'}`, rarity: partRarity, type: 'limb', subcategory: limbDef.category,
     gp: formatGpAmount(cost), dmg:'', ac:'', hp:'', requirement:'', charges:'',
@@ -9877,6 +10333,7 @@ function reworkPartIntoGraft() {
     <div class="ic-mod-group">
       <div class="ic-mod-label">${escapeHtml(m.type)}</div>
       <div class="ic-mod-entry">${colorizeModifierText(m.text, m.type)}</div>
+      ${summonedMonsterStatHtml(m)}
     </div>
   `).join('');
   const resultEl = document.getElementById('fleshResult');
@@ -9972,6 +10429,7 @@ function attemptFleshAttach() {
     <div class="ic-mod-group">
       <div class="ic-mod-label">${escapeHtml(m.type)}</div>
       <div class="ic-mod-entry">${colorizeModifierText(m.text, m.type)}</div>
+      ${summonedMonsterStatHtml(m)}
     </div>
   `).join('');
 
@@ -10098,7 +10556,7 @@ const STORE_ICONS = {
   compass:    { viewBox:'0 0 8 8', rects:[[2,0,4,1],[0,2,1,4],[7,2,1,4],[2,7,4,1],[3,2,2,4]] },
   cauldron:   { viewBox:'0 0 8 6', rects:[[1,1,6,1],[0,2,8,3],[1,5,1,1],[6,5,1,1]] },
   tower:      { viewBox:'0 0 8 10', rects:[[1,0,1,1],[3,0,1,1],[6,0,1,1],[1,1,6,2],[2,3,4,7]] },
-  // For MONSTER_PARTS_V2's "Scale"/"Wing Membrane" labels (see MONSTER_PART_ICON_MAP below) --
+  // For MONSTER_PARTS's "Scale"/"Wing Membrane" labels (see MONSTER_PART_ICON_MAP below) --
   // no existing shape fit either well enough to reuse.
   scale:      { viewBox:'0 0 6 6', rects:[[2,0,2,2],[1,2,4,2],[2,4,2,2]] },
   wing:       { viewBox:'0 0 8 6', rects:[[6,0,2,1],[4,1,3,1],[2,2,4,1],[0,3,4,1],[2,4,3,1],[4,5,2,1]] },
@@ -10129,7 +10587,7 @@ function storeIconCategory(item) {
   // \btorc\b, not the bare substring "torc" -- that alone matched inside "Torch" as a plain
   // substring (no word boundary), which was silently classifying every Torch item as an amulet.
   if (/amulet|necklace|pendant|periapt|\btorc\b|gorget/.test(n)) return 'amulet';
-  if (/potion|draught|elixir|tonic|vial/.test(n)) return 'potion';
+  if (/potion|draught|elixir|tonic|vial|philter|\bbrew\b/.test(n)) return 'potion';
   if (/scroll|\bmap\b/.test(n)) return 'scroll';
   if (item.type === 'document' || /\btome\b|\bbook\b|journal|ledger|grimoire/.test(n)) return 'book';
   // Added for the misc/mundane-gear icon gap (Phase H) -- see STORE_ICONS' own comment on the
@@ -10328,7 +10786,7 @@ function hslLighten(hslStr, deltaL) {
   const l = Math.max(8, Math.min(92, parseInt(m[3], 10) + deltaL));
   return `hsl(${m[1]}, ${m[2]}%, ${l}%)`;
 }
-// Every MONSTER_PARTS_V2-generated item is named literally "<Creature> <Label>", where Label is
+// Every MONSTER_PARTS-generated item is named literally "<Creature> <Label>", where Label is
 // always one of this fixed, known set of 20 -- these generated parts vastly outnumber the
 // hand-authored catalog (roughly half the live item count once a bestiary's worth have been
 // generated), so this one small table is by far the highest-leverage fix for the "random icon"
@@ -10344,7 +10802,7 @@ const MONSTER_PART_ICON_MAP = {
   talon: 'charm:9', horn: 'charm:6', bone: 'charm:1', tendon: 'rope',
   'venom sac': 'potion', hide: 'cloak', blood: 'potion', marrow: 'charm:1',
 };
-// Scoped to items actually shaped like a MONSTER_PARTS_V2 output (craftable + a partType) rather
+// Scoped to items actually shaped like a MONSTER_PARTS output (craftable + a partType) rather
 // than matching these words against any item's name -- several of these labels (Eye, Claw, Horn)
 // are common enough English words that a hand-authored item could coincidentally contain one
 // without being a monster part at all, and this must not repaint those.
@@ -10598,11 +11056,17 @@ function generateStoreItem(merchantKey) {
   // dmg/ac/hp/charges are built identically regardless of which tab produced the item.
   const { subcategory, slotSize, dmg, ac, hp, requirement, charges } = rollItemStats(cat, rarity, baseName);
 
+  // Weapon/armor affixes (materials + enchantments — see ITEM_AFFIXES) roll the same way here
+  // as in the Unique Item Generator, so Store wares stack "Flaming Sharp"-style prefixes too
+  // instead of only ever getting the generic buff/debuff/power modifiers below.
+  const affixMods = rollItemAffixes(cat, rarity);
+  const potionStatus = subcategory === 'potion' ? rollPotionStatusEffect(rarity) : null;
+  const startingMods = potionStatus ? [...affixMods, potionStatus] : affixMods;
   const r = Math.random();
   const modCount = r > 0.85 ? 3 : r > 0.4 ? 2 : 1;
-  const mods = [], usedTypes = [], usedKeys = [];
+  const mods = [...startingMods], usedTypes = [], usedKeys = startingMods.map(m => m.key);
   let attempts = 0;
-  while (mods.length < modCount && attempts < 30) {
+  while (mods.length < modCount + startingMods.length && attempts < 30) {
     attempts++;
     const type = pickWeightedType(weightedPool, usedTypes);
     if (!type) break;
@@ -10615,7 +11079,7 @@ function generateStoreItem(merchantKey) {
   const itemName = buildItemName(baseName, rarity, { dmg, ac, hp }, mods);
   const descParagraphs = buildDescParagraphs(baseName, cat, rarity, tags, mods, { dmg, ac, hp });
   const flavor = descParagraphs.map(p => p.text).join('\n\n');
-  const gp = formatGpAmount(commercePrice(rarity, mods.length, rollPowerRatio(cat, rarity, dmg, ac, hp)));
+  const gp = formatGpAmount(commercePrice(rarity, mods.length, rollPowerRatio(cat, rarity, dmg, ac, hp, mods)));
   const weight = computeItemWeight({ type: cat, subcategory, name: itemName });
 
   return { name:itemName, rarity, cat, type:cat, subcategory, gp, dmg, ac, hp, requirement, charges, slotSize, weight, mods, flavor, descParagraphs, tags, merchant:merchantKey };
@@ -11526,7 +11990,7 @@ function resetModWeights() {
 
 // Fleshmancer keeps its own independent set of effect weights (buffs/traits favored,
 // terrain/summon rare) rather than sharing the Generate Item tab's weights.
-const FLESH_MOD_WEIGHT_DEFAULTS = { power:6, buff:8, debuff:7, trait:8, skill:3, monsterskill:4, transform:3, summon:2, terrain:1 };
+const FLESH_MOD_WEIGHT_DEFAULTS = { power:6, buff:8, debuff:7, trait:8, skill:3, monsterskill:4, transform:3, summon:2 };
 let fleshModWeights = { ...FLESH_MOD_WEIGHT_DEFAULTS };
 
 function updateFleshMWDisplay(key) {
@@ -11673,60 +12137,6 @@ function pickTier(arr,r){
   const start=Math.max(0,Math.floor(idx*arr.length/6));
   const end=Math.max(start+1,Math.floor((idx+1)*arr.length/6));
   return ri(arr.slice(start,end));
-}
-function generateModifier(rarity) {
-  const idx=BAL.rarityOrder.indexOf(rarity);
-  const typePools=[
-    ['skill','buff','debuff','trait','monsterskill'],
-    ['skill','buff','debuff','trait','power','monsterskill'],
-    ['buff','debuff','trait','power','transform','monsterskill'],
-    ['buff','debuff','trait','power','transform','summon','terrain','monsterskill'],
-    ['power','transform','summon','terrain','buff','trait','monsterskill'],
-    ['power','transform','summon','terrain','buff','debuff','trait','monsterskill']
-  ];
-  const type=ri(typePools[idx]);
-  const dur=ri(BAL.durations[rarity]);
-  const modest=rarity==='common'?1:rarity==='uncommon'?rn(1,2):rarity==='rare'?rn(2,3):rarity==='superrare'?rn(3,5):rarity==='legendary'?rn(5,8):rn(8,12);
-  if(type==='power'){
-    const p=ri(BAL.powerTiers[rarity]||GEN.powers);
-    const uses=usesPerRarity(idx);
-    return {type:'Power/Spell',text:`Grants the ability to cast <strong>${p}</strong> (<strong>${uses}</strong>). Spell save DC is <strong>${10+idx*2+rn(0,2)}</strong>.`};
-  }
-  if(type==='transform'){
-    const monster=pickMonsterForRarity(rarity, false);
-    const form=monster ? withArticle(monster.name) : pickTier(GEN.transformForms,rarity);
-    return {type:'Transform',text:`The bearer transforms into <strong>${form}</strong> ${durationClause(dur)}, retaining their personality and memories. The transformation ends early if dismissed.`};
-  }
-  if(type==='summon'){
-    // Lower tiers summon mundane animals; apex tiers unlock major named entities.
-    const entity=pickSummonEntity(idx);
-    const count=summonCountFor(idx, entity);
-    const summonDur=pickSummonDuration(rarity);
-    return {type:'Summon',text:`Summons <strong>${formatSummonLabel(entity, count)}</strong> for <strong>${summonDur}</strong>. ${count>1?'They follow':'It follows'} reasonable commands and ${count>1?'vanish':'vanishes'} when the duration ends.`};
-  }
-  if(type==='terrain'){
-    const alt=pickTier(GEN.terrainAlterations,rarity);
-    const radius=['20 feet','60 feet','150 feet','500 feet','1 mile','5 miles'][idx];
-    return {type:'Terrain',text:`<strong>${alt.charAt(0).toUpperCase()+alt.slice(1)}</strong> within a <strong>${radius}</strong> area. ${dur==='permanently'?'The alteration is permanent.':`The change lasts for ${dur}.`}`};
-  }
-  if(type==='buff'){
-    const picked = pickBuffEffect(rarity, dur, modest, idx);
-    if (picked) return {type:'Buff', text:picked.text};
-  }
-  if(type==='debuff'){
-    const picked = pickDebuffEffect(rarity, dur, modest, idx);
-    if (picked) return {type:'Debuff', text:picked.text};
-  }
-  if(type==='trait'){
-    const picked = pickNamedTrait(rarity, modest);
-    if (picked) return {type:'Trait', text:picked.text};
-  }
-  if(type==='monsterskill'){
-    const picked = pickMonsterSkill(rarity);
-    if (picked) return {type:'Monster Skill', text:picked.text};
-  }
-  const skill=ri(GEN.skills);
-  return {type:'Skill',text:`Grants exceptional aptitude in <strong>${skill}</strong>, providing a <strong>+${Math.max(1,idx+1)}</strong> bonus to related checks.`};
 }
 // Every creature's premade monster parts live in lootData right alongside ordinary gear (see
 // generatePremadeMonsterParts) purely so they're browsable from the Item Compendium — they're
@@ -12386,6 +12796,24 @@ function stripModTags(str) {
 // wearer (green); only a bad effect that lands on the wearer themselves (a curse) is
 // actually bad (red). Buffs are always a "good effect", so they're always green
 // regardless of who they land on. Debuffs need their text checked for which phrasing they
+// A Summon or Transform modifier that resolved to a real database monster (see
+// monsterStatSnapshot/generateModifierOfType) carries a compact stat snapshot — this renders
+// it as a small inline stat-block line under that modifier's own text, so an item that calls a
+// pit fiend or turns its bearer into one shows what that actually means (AC/HP/size/CR) right
+// in the popup, instead of just a name someone has to go look up. No-op (empty string) for any
+// mod without a snapshot, so callers can splice this in unconditionally after every mod.
+function summonedMonsterStatHtml(mod) {
+  if (!mod || !mod.summonedMonster) return '';
+  const s = mod.summonedMonster;
+  const parts = [
+    s.ac != null ? `AC ${s.ac}` : null,
+    s.hp ? `HP ${s.hp}` : null,
+    s.size ? `${s.size}${s.type ? ' ' + s.type : ''}` : (s.type || null),
+    s.cr != null ? `CR ${s.cr}` : null,
+    s.speed ? `Speed ${s.speed}` : null,
+  ].filter(Boolean).join(' · ');
+  return `<div class="mod-monster-stats">🐾 <strong>${escapeHtml(s.name)}</strong> — ${escapeHtml(parts)}</div>`;
+}
 // used — "the bearer suffers" (self-inflicted curse, red) vs "Inflicts ... on one target"
 // (aimed at an enemy, green). Named Traits mix exactly one of each in a single line
 // (always self-directed), so those are colored per +N/-N sign instead of as one block.
@@ -14444,7 +14872,7 @@ function buildTooltipHtml(entry) {
   }
   let modsHtml = '';
   if (item.mods && item.mods.length) {
-    modsHtml = `<div class="tt-mods">${item.mods.map(m => `<div class="tt-mod"><b>${escapeHtml(m.type)}:</b> ${colorizeModifierText(m.text, m.type)}</div>`).join('')}</div>`;
+    modsHtml = `<div class="tt-mods">${item.mods.map(m => `<div class="tt-mod"><b>${escapeHtml(m.type)}:</b> ${colorizeModifierText(m.text, m.type)}</div>${summonedMonsterStatHtml(m)}`).join('')}</div>`;
   }
   // Classification breadcrumb + properties/tags chips — see classifyItemFull(). Falls back
   // to computing on the spot for anything shown before it's been saved/loaded through the
@@ -16144,160 +16572,13 @@ function monsterIsBirdlike(monster) { return /bird|avian|eagle|hawk|owl|raven|cr
 function monsterIsAquaticTentacled(monster) { return /kraken|octopus|squid|aberration|tentacle|star spawn|flumph|gibbering/.test(monsterAnatomyText(monster)); }
 function monsterIsOrganic(monster) { return !monsterIsConstruct(monster) && !monsterIsElemental(monster); }
 
-const MONSTER_PART_TYPES = [
-  { key:'eye', label:'Eye', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/compound eye|many eyes|multiple eyes|eye stalk|stalked eye/.test(t)) return ri(['Compound Eye','Stalked Eye','Multifaceted Eye']);
-      if (/slit pupil|reptile|serpent|snake|dragon/.test(t)) return ri(['Slit-Pupil Eye','Reptilian Eye','Dragon Eye']);
-      if (/spider|arachnid|insect|beetle/.test(t)) return ri(['Faceted Eye','Beadlike Eye','Compound Eye']);
-      if (/undead|vampire|lich|wraith|ghost/.test(t)) return ri(['Unnatural Eye','Dead Eye','Spectral Eye']);
-      return ri(['Eye','Watchful Eye','Clear Eye']);
-    }, when: () => true },
-  { key:'fang', label:'Fang', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/tusk|elephant|mammoth|boar|orc/.test(t)) return ri(['Tusk','Curved Tusk','Heavy Tusk']);
-      if (/vampire|bat|wolf|werewolf|dire wolf/.test(t)) return ri(['Fang','Long Fang','Predator Fang']);
-      if (/snake|serpent|yuan-ti/.test(t)) return ri(['Hollow Fang','Venom Fang','Needle Fang']);
-      return ri(['Fang','Sharp Fang','Jagged Fang']);
-    }, when: monsterHasBite },
-  { key:'claw', label:'Claw', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (monsterIsHumanoid(monster) && !monsterHasClaws(monster)) return ri(['Hand','Calloused Hand','Grasping Hand','Weathered Hand']);
-      if (monsterIsAquaticTentacled(monster)) return ri(['Grasping Tentacle','Suction-Cup Tentacle','Barbed Tentacle']);
-      if (/pincer|crab|lobster|scorpion/.test(t)) return ri(['Pincer','Crushing Pincer','Hooked Pincer']);
-      if (monsterIsBirdlike(monster)) return ri(['Clawed Foot','Hooked Claw','Raking Claw']);
-      if (/hoof|centaur|goat|ram|deer|horse/.test(t)) return ri(['Hoof','Split Hoof','Hard Hoof']);
-      return ri(['Claw','Hooked Claw','Raking Claw','Heavy Claw']);
-    }, when: () => true },
-  { key:'hide', label:'Hide', variants: monster => {
-      if (monsterIsHumanoid(monster)) return ri(['Skin','Scalp','Hide','Calloused Skin']);
-      if (monsterHasScales(monster)) return ri(['Scaled Hide','Scale-Lined Hide','Thick Hide']);
-      if (monsterHasShell(monster)) return ri(['Armored Hide','Chitin-Lined Hide','Tough Hide']);
-      if (monsterIsUndead(monster)) return ri(['Dead Hide','Dried Hide','Necrotic Skin']);
-      return ri(['Hide','Thick Hide','Tough Hide','Weathered Hide']);
-    }, when: monsterIsOrganic },
-  { key:'horn', label:'Horn', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/antler|deer|elk|stag/.test(t)) return ri(['Antler','Forked Antler','Crown Antler']);
-      if (/ram|goat|minotaur/.test(t)) return ri(['Ram Horn','Curved Horn','Spiral Horn']);
-      if (/tusk|elephant|mammoth|boar/.test(t)) return ri(['Tusk','Ivory Tusk','Heavy Tusk']);
-      return ri(['Horn','Curved Horn','Ridge Horn','Crown Horn']);
-    }, when: monsterHasHorns },
-  { key:'wing', label:'Wing', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/bat|vampire|devil|demon|dragon|wyvern/.test(t)) return ri(['Membranous Wing','Batlike Wing','Leathery Wing']);
-      if (monsterIsBirdlike(monster)) return ri(['Feathered Wing','Flight Wing','Broad Wing']);
-      if (/insect|beetle|fly|wasp|bee|dragonfly|pixie|fairy/.test(t)) return ri(['Insect Wing','Veined Wing','Delicate Wing']);
-      return ri(['Wing','Broad Wing','Powerful Wing']);
-    }, when: monsterHasWings },
-  { key:'tail', label:'Tail', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/scorpion|stinger|venom/.test(t)) return ri(['Stinger Tail','Barbed Tail','Venomous Tail']);
-      if (/dragon|wyvern/.test(t)) return ri(['Dragon Tail','Armored Tail','Spiked Tail']);
-      if (/snake|serpent|lizard/.test(t)) return ri(['Scaled Tail','Whiplike Tail','Prehensile Tail']);
-      return ri(['Tail','Whiplike Tail','Prehensile Tail','Tufted Tail']);
-    }, when: monsterHasTail },
-  { key:'venomsac', label:'Venom Sac', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/spider|scorpion|insect/.test(t)) return ri(['Venom Sac','Poison Gland','Venom Bladder']);
-      return ri(['Venom Sac','Poison Gland','Toxic Sac','Venom Gland']);
-    }, when: monsterHasVenom },
-  { key:'heart', label:'Heart', variants: monster => {
-      if (monsterIsConstruct(monster)) return ri(['Arcane Core','Power Core','Construct Core']);
-      if (monsterIsElemental(monster)) return ri(['Elemental Core','Essence Core','Primal Core']);
-      if (monsterIsUndead(monster)) return ri(['Necrotic Heart','Dead Heart','Blackened Heart']);
-      return ri(['Heart','Strong Heart','Vital Heart']);
-    }, when: () => true },
-  { key:'bone', label:'Bone', variants: monster => {
-      if (monsterIsUndead(monster)) return ri(['Bone','Rib Bone','Vertebra','Jawbone']);
-      return ri(['Bone','Rib Bone','Vertebra','Long Bone','Jawbone']);
-    }, when: monster => monsterIsOrganic(monster) || monsterIsUndead(monster) },
-  { key:'talon', label:'Talon', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (monsterIsBirdlike(monster)) return ri(['Talon','Hooked Talon','Raptor Talon','Eagle Talon']);
-      if (/dragon|wyvern/.test(t)) return ri(['Dragon Talon','Hooked Talon','Raking Talon']);
-      return ri(['Talon','Hooked Talon','Raking Talon']);
-    }, when: monster => monsterIsBirdlike(monster) || /talon|raptor|bird|dragon|wyvern|claw foot/.test(monsterAnatomyText(monster)) },
-  { key:'tongue', label:'Tongue', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/snake|serpent|lizard|yuan-ti/.test(t)) return ri(['Forked Tongue','Scaled Tongue','Serpent Tongue']);
-      if (/frog|toad|bullywug/.test(t)) return ri(['Long Tongue','Sticky Tongue','Frog Tongue']);
-      if (/tentacle|kraken|aberration/.test(t)) return ri(['Sensory Tongue','Barbed Tongue','Prehensile Tongue']);
-      return ri(['Tongue','Long Tongue','Rough Tongue']);
-    }, when: monster => monsterIsOrganic(monster) || monsterIsUndead(monster) },
-  { key:'shell', label:'Shell', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/turtle|tortoise/.test(t)) return ri(['Shell','Carapace','Armored Shell']);
-      if (/crab|lobster/.test(t)) return ri(['Carapace','Chitin Plate','Armored Carapace']);
-      return ri(['Shell','Carapace','Chitin Plate','Exoskeletal Plate']);
-    }, when: monsterHasShell },
-  { key:'pelt', label:'Pelt', variants: monster => {
-      const t = monsterAnatomyText(monster);
-      if (/lion|tiger|cat/.test(t)) return ri(['Pelt','Fur','Striped Pelt','Soft Coat']);
-      if (/wolf|dog|fox/.test(t)) return ri(['Pelt','Fur','Thick Coat','Guard Hair']);
-      if (/bear/.test(t)) return ri(['Pelt','Bearskin','Dense Fur','Heavy Coat']);
-      if (/mane/.test(t)) return ri(['Mane','Pelt','Coarse Fur','Thick Mane']);
-      return ri(['Pelt','Fur','Thick Coat','Tuft of Fur']);
-    }, when: monsterHasFur },
-];
-
 const MONSTER_PART_WEIGHT_RANGE = { common:[0.2,2], uncommon:[0.5,3], rare:[1,5], superrare:[2,8], legendary:[3,12], celestial:[5,20] };
 const MONSTER_PART_GP_RANGE = { common:[5,25], uncommon:[25,100], rare:[100,400], superrare:[400,1500], legendary:[1500,6000], celestial:[6000,20000] };
+// General-purpose incrementing id source -- despite the name, reused well beyond monster parts
+// (scroll loot ids, stash ids; see call sites elsewhere in the file) so this stays even though
+// the monster-part builder that originally justified the name was retired into MONSTER_PARTS'
+// unified pipeline above.
 let monsterPartCounter = 0;
-// Builds one specific part-type item for a monster at a given tier — shared by the random
-// per-kill roll (generateMonsterPart, picks one partType at random) and the premade catalog
-// generator (generatePremadeMonsterParts, below, which builds all of them up front).
-function buildMonsterPartItem(monster, tier, partType) {
-  const label = typeof partType.variants === 'function' ? partType.variants(monster) : partType.label;
-  const name = `${monster.name} ${label}`;
-  const [wLo, wHi] = MONSTER_PART_WEIGHT_RANGE[tier] || MONSTER_PART_WEIGHT_RANGE.common;
-  const weight = Math.round((wLo + Math.random() * (wHi - wLo)) * 10) / 10;
-  const [gLo, gHi] = MONSTER_PART_GP_RANGE[tier] || MONSTER_PART_GP_RANGE.common;
-  const gp = formatGpAmount(rn(gLo, gHi));
-  // No effect on its own — what it imbues is decided at combine time by the Monster Mangler,
-  // based on this part's type and rarity (see MONSTER_PART_EFFECT_POOL / applyMonsterPartToItem).
-  const effect = `Raw crafting material — no effect on its own, but the Monster Mangler can work it into a compatible weapon or piece of armor, imbuing an effect themed to what it is (${label.toLowerCase()}) and scaled by its own rarity (${rarityNames[tier] || tier}).`;
-  const part = {
-    id: 'part' + (++monsterPartCounter), name, type: 'craftable', subcategory: 'monsterpart',
-    partType: partType.key, rarity: tier, weight, gp, slotSize: 1,
-    desc: `A ${label.toLowerCase()} harvested from a defeated ${monster.name.toLowerCase()}, still faintly redolent of the creature it came from.`,
-    effect, sourceMonster: monster.name,
-  };
-  // Premade parts (generatePremadeMonsterParts) are pushed straight into lootData without
-  // ever passing through inferItemMetadata, so classification has to happen here at
-  // construction time rather than relying on that later pass.
-  classifyItemFull(part, tier);
-  return part;
-}
-function generateMonsterPart(monster, tier) {
-  const eligible = MONSTER_PART_TYPES.filter(p => !p.when || p.when(monster));
-  return buildMonsterPartItem(monster, tier, ri(eligible.length ? eligible : MONSTER_PART_TYPES));
-}
-// Pre-generates every part type for every creature in the registry, at that creature's own
-// natural CR tier (not every rarity for every monster — a Kobold's celestial-tier Fang
-// wouldn't make sense), and adds them straight into lootData like any other hand-authored
-// item. That makes them permanently browsable from the Item Compendium and eligible to turn
-// up in wheel spins/chests, at any time — not just something that appears after you defeat
-// the specific creature. Runs once, automatically, as soon as the creature registry finishes
-// loading (see loadMonsterDatabase()); safe to call again (e.g. a later force-reload of the
-// registry) since the completed flag makes every call after the first a no-op.
-let premadeMonsterPartsGenerated = false;
-function generatePremadeMonsterParts() {
-  if (premadeMonsterPartsGenerated || !monsterDatabase.length) return;
-  premadeMonsterPartsGenerated = true;
-  monsterDatabase.forEach(monster => {
-    const tier = monsterRarityTier(monster, null);
-    MONSTER_PART_TYPES.forEach(partType => {
-      if (partType.when && !partType.when(monster)) return;
-      lootData[tier].push(buildMonsterPartItem(monster, tier, partType));
-    });
-  });
-  // Refresh anything already on screen that reads from lootData/TOKEN_INDEX so the new
-  // entries show up without the player needing to manually switch tabs and back.
-  buildTokenIndex();
-  if (typeof renderItemsList === 'function') renderItemsList();
-}
-
 // ---------- Monster rarity tier (drives loot chances) ----------
 const MONSTER_LOOT_CR_BANDS = [
   { max: 2, tier: 'common' }, { max: 5, tier: 'uncommon' }, { max: 9, tier: 'rare' },
@@ -16320,7 +16601,7 @@ function monsterRarityTier(monster, variant) {
 }
 
 // ===================== MONSTER PARTS v2 (creature family / subtype driven) =====================
-// Replaces the old per-monster-named system (MONSTER_PART_TYPES/buildMonsterPartItem/
+// Replaces the old per-monster-named system (MONSTER_PARTS (merged)/
 // generateMonsterPart above) for actual gameplay, without deleting any of it — the old system
 // stays fully defined ("background lists") but is no longer called from the live spawn paths
 // (see the call-site swaps at rollMonsterCombatLoot and loadMonsterDatabase, and
@@ -16504,29 +16785,131 @@ function getCreatureSubtype(monster, family) {
 // ---------- The ~20 new part definitions (10 equip, 10 combine) ----------
 // eligible(monster) reuses the SAME anatomy-detection helpers the old system already proved out
 // (monsterHasClaws, monsterHasBite, etc.) rather than inventing a parallel check.
-const MONSTER_PARTS_V2 = [
+// Unified monster-parts list -- merges what used to be two separate lists (MONSTER_PART_TYPES,
+// the older anatomical-key system, and MONSTER_PARTS_V2, the active equip/combine system).
+// MONSTER_PART_TYPES's own builder/picker (buildMonsterPartItem/generateMonsterPart/
+// generatePremadeMonsterParts) was already fully superseded and never actually called in live
+// play -- rollMonsterCombatLoot and the catalog pre-population both went through the V2 pipeline
+// exclusively. So this merge keeps V2's pipeline (buildMonsterPartItemV2 etc., below) as the one
+// active system, and folds the old system's two genuinely useful contributions into it instead
+// of keeping a second, dead list around:
+//   1. `variants` -- the old system's per-monster anatomy-flavored naming (a fire elemental's
+//      "claw" becomes "Hooked Claw", a snake's "fang" becomes "Hollow Fang", etc.) is ported onto
+//      every part id the two lists had in common (eye, claw, fang, horn, venomsac, bone, hide,
+//      talon) via a `variants(monster)` field; buildMonsterPartItemV2 prefers it over the flat
+//      anatomicalPart label when present.
+//   2. Five parts that only ever existed in the old list (wing, tail, tongue, shell, pelt) are
+//      added as new entries here -- each is genuinely new to the active pipeline, so each gets a
+//      freshly assigned `mode` rather than inheriting one from anywhere: shell and pelt read as
+//      protective/wearable, so equip; wing, tail, and tongue read as crafting reagents, so
+//      combine. (The old list's "heart" entry isn't re-added on its own -- it's already
+//      well-covered by four specialized equip parts below: heartstone/soulfragment/essence/core.)
+// Both old-list ids and new ids share MONSTER_PART_EFFECT_POOL's key space (see
+// pickMonsterPartEffect), so every part here -- old or new -- already resolves to real effect
+// text with no further changes needed there.
+const MONSTER_PARTS = [
   // -- Equip (worn in a charm slot; grants a real, enforced passive bonus) --
   { id: 'heartstone', anatomicalPart: 'Heartstone', mode: 'equip', eligible: () => true },
   { id: 'soulfragment', anatomicalPart: 'Soul Fragment', mode: 'equip', eligible: m => ['undead','spirit','fiend','celestial','aberration'].includes(getCreatureFamily(m).id) },
   { id: 'essence', anatomicalPart: 'Essence', mode: 'equip', eligible: m => ['elemental','fey','spirit'].includes(getCreatureFamily(m).id) },
   { id: 'core', anatomicalPart: 'Core', mode: 'equip', eligible: m => ['construct','elemental'].includes(getCreatureFamily(m).id) },
-  { id: 'eye', anatomicalPart: 'Eye', mode: 'equip', eligible: () => true },
+  { id: 'eye', anatomicalPart: 'Eye', mode: 'equip', eligible: () => true, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/compound eye|many eyes|multiple eyes|eye stalk|stalked eye/.test(t)) return ri(['Compound Eye','Stalked Eye','Multifaceted Eye']);
+      if (/slit pupil|reptile|serpent|snake|dragon/.test(t)) return ri(['Slit-Pupil Eye','Reptilian Eye','Dragon Eye']);
+      if (/spider|arachnid|insect|beetle/.test(t)) return ri(['Faceted Eye','Beadlike Eye','Compound Eye']);
+      if (/undead|vampire|lich|wraith|ghost/.test(t)) return ri(['Unnatural Eye','Dead Eye','Spectral Eye']);
+      return ri(['Eye','Watchful Eye','Clear Eye']);
+    } },
   { id: 'feather', anatomicalPart: 'Feather', mode: 'equip', eligible: m => monsterIsBirdlike(m) || monsterHasWings(m) },
   { id: 'tooth', anatomicalPart: 'Tooth', mode: 'equip', eligible: monsterHasBite },
   { id: 'scale', anatomicalPart: 'Scale', mode: 'equip', eligible: monsterHasScales },
   { id: 'wingmembrane', anatomicalPart: 'Wing Membrane', mode: 'equip', eligible: monsterHasWings },
   { id: 'antler', anatomicalPart: 'Antler', mode: 'equip', eligible: monsterHasHorns },
+  { id: 'shell', anatomicalPart: 'Shell', mode: 'equip', eligible: monsterHasShell, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/turtle|tortoise/.test(t)) return ri(['Shell','Carapace','Armored Shell']);
+      if (/crab|lobster/.test(t)) return ri(['Carapace','Chitin Plate','Armored Carapace']);
+      return ri(['Shell','Carapace','Chitin Plate','Exoskeletal Plate']);
+    } },
+  { id: 'pelt', anatomicalPart: 'Pelt', mode: 'equip', eligible: monsterHasFur, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/lion|tiger|cat/.test(t)) return ri(['Pelt','Fur','Striped Pelt','Soft Coat']);
+      if (/wolf|dog|fox/.test(t)) return ri(['Pelt','Fur','Thick Coat','Guard Hair']);
+      if (/bear/.test(t)) return ri(['Pelt','Bearskin','Dense Fur','Heavy Coat']);
+      if (/mane/.test(t)) return ri(['Mane','Pelt','Coarse Fur','Thick Mane']);
+      return ri(['Pelt','Fur','Thick Coat','Tuft of Fur']);
+    } },
   // -- Combine (Monster Mangler ingredient; grants a scaled bonus damage die via the existing mechanism) --
-  { id: 'claw', anatomicalPart: 'Claw', mode: 'combine', eligible: () => true },
-  { id: 'fang', anatomicalPart: 'Fang', mode: 'combine', eligible: monsterHasBite },
-  { id: 'talon', anatomicalPart: 'Talon', mode: 'combine', eligible: m => monsterIsBirdlike(m) || getCreatureFamily(m).id === 'dragon' },
-  { id: 'horn', anatomicalPart: 'Horn', mode: 'combine', eligible: monsterHasHorns },
-  { id: 'bone', anatomicalPart: 'Bone', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m) },
+  { id: 'claw', anatomicalPart: 'Claw', mode: 'combine', eligible: () => true, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (monsterIsHumanoid(monster) && !monsterHasClaws(monster)) return ri(['Hand','Calloused Hand','Grasping Hand','Weathered Hand']);
+      if (monsterIsAquaticTentacled(monster)) return ri(['Grasping Tentacle','Suction-Cup Tentacle','Barbed Tentacle']);
+      if (/pincer|crab|lobster|scorpion/.test(t)) return ri(['Pincer','Crushing Pincer','Hooked Pincer']);
+      if (monsterIsBirdlike(monster)) return ri(['Clawed Foot','Hooked Claw','Raking Claw']);
+      if (/hoof|centaur|goat|ram|deer|horse/.test(t)) return ri(['Hoof','Split Hoof','Hard Hoof']);
+      return ri(['Claw','Hooked Claw','Raking Claw','Heavy Claw']);
+    } },
+  { id: 'fang', anatomicalPart: 'Fang', mode: 'combine', eligible: monsterHasBite, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/tusk|elephant|mammoth|boar|orc/.test(t)) return ri(['Tusk','Curved Tusk','Heavy Tusk']);
+      if (/vampire|bat|wolf|werewolf|dire wolf/.test(t)) return ri(['Fang','Long Fang','Predator Fang']);
+      if (/snake|serpent|yuan-ti/.test(t)) return ri(['Hollow Fang','Venom Fang','Needle Fang']);
+      return ri(['Fang','Sharp Fang','Jagged Fang']);
+    } },
+  { id: 'talon', anatomicalPart: 'Talon', mode: 'combine', eligible: m => monsterIsBirdlike(m) || getCreatureFamily(m).id === 'dragon' || /talon|raptor|bird|wyvern|claw foot/.test(monsterAnatomyText(m)), variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (monsterIsBirdlike(monster)) return ri(['Talon','Hooked Talon','Raptor Talon','Eagle Talon']);
+      if (/dragon|wyvern/.test(t)) return ri(['Dragon Talon','Hooked Talon','Raking Talon']);
+      return ri(['Talon','Hooked Talon','Raking Talon']);
+    } },
+  { id: 'horn', anatomicalPart: 'Horn', mode: 'combine', eligible: monsterHasHorns, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/antler|deer|elk|stag/.test(t)) return ri(['Antler','Forked Antler','Crown Antler']);
+      if (/ram|goat|minotaur/.test(t)) return ri(['Ram Horn','Curved Horn','Spiral Horn']);
+      if (/tusk|elephant|mammoth|boar/.test(t)) return ri(['Tusk','Ivory Tusk','Heavy Tusk']);
+      return ri(['Horn','Curved Horn','Ridge Horn','Crown Horn']);
+    } },
+  { id: 'bone', anatomicalPart: 'Bone', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m), variants: monster => {
+      if (monsterIsUndead(monster)) return ri(['Bone','Rib Bone','Vertebra','Jawbone']);
+      return ri(['Bone','Rib Bone','Vertebra','Long Bone','Jawbone']);
+    } },
   { id: 'tendon', anatomicalPart: 'Tendon', mode: 'combine', eligible: monsterIsOrganic },
-  { id: 'venomsac', anatomicalPart: 'Venom Sac', mode: 'combine', eligible: monsterHasVenom },
-  { id: 'hide', anatomicalPart: 'Hide', mode: 'combine', eligible: monsterIsOrganic },
+  { id: 'venomsac', anatomicalPart: 'Venom Sac', mode: 'combine', eligible: monsterHasVenom, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/spider|scorpion|insect/.test(t)) return ri(['Venom Sac','Poison Gland','Venom Bladder']);
+      return ri(['Venom Sac','Poison Gland','Toxic Sac','Venom Gland']);
+    } },
+  { id: 'hide', anatomicalPart: 'Hide', mode: 'combine', eligible: monsterIsOrganic, variants: monster => {
+      if (monsterIsHumanoid(monster)) return ri(['Skin','Scalp','Hide','Calloused Skin']);
+      if (monsterHasScales(monster)) return ri(['Scaled Hide','Scale-Lined Hide','Thick Hide']);
+      if (monsterHasShell(monster)) return ri(['Armored Hide','Chitin-Lined Hide','Tough Hide']);
+      if (monsterIsUndead(monster)) return ri(['Dead Hide','Dried Hide','Necrotic Skin']);
+      return ri(['Hide','Thick Hide','Tough Hide','Weathered Hide']);
+    } },
   { id: 'blood', anatomicalPart: 'Blood', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m) },
   { id: 'marrow', anatomicalPart: 'Marrow', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m) },
+  { id: 'wing', anatomicalPart: 'Wing', mode: 'combine', eligible: monsterHasWings, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/bat|vampire|devil|demon|dragon|wyvern/.test(t)) return ri(['Membranous Wing','Batlike Wing','Leathery Wing']);
+      if (monsterIsBirdlike(monster)) return ri(['Feathered Wing','Flight Wing','Broad Wing']);
+      if (/insect|beetle|fly|wasp|bee|dragonfly|pixie|fairy/.test(t)) return ri(['Insect Wing','Veined Wing','Delicate Wing']);
+      return ri(['Wing','Broad Wing','Powerful Wing']);
+    } },
+  { id: 'tail', anatomicalPart: 'Tail', mode: 'combine', eligible: monsterHasTail, variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/scorpion|stinger|venom/.test(t)) return ri(['Stinger Tail','Barbed Tail','Venomous Tail']);
+      if (/dragon|wyvern/.test(t)) return ri(['Dragon Tail','Armored Tail','Spiked Tail']);
+      if (/snake|serpent|lizard/.test(t)) return ri(['Scaled Tail','Whiplike Tail','Prehensile Tail']);
+      return ri(['Tail','Whiplike Tail','Prehensile Tail','Tufted Tail']);
+    } },
+  { id: 'tongue', anatomicalPart: 'Tongue', mode: 'combine', eligible: m => monsterIsOrganic(m) || monsterIsUndead(m), variants: monster => {
+      const t = monsterAnatomyText(monster);
+      if (/snake|serpent|lizard|yuan-ti/.test(t)) return ri(['Forked Tongue','Scaled Tongue','Serpent Tongue']);
+      if (/frog|toad|bullywug/.test(t)) return ri(['Long Tongue','Sticky Tongue','Frog Tongue']);
+      if (/tentacle|kraken|aberration/.test(t)) return ri(['Sensory Tongue','Barbed Tongue','Prehensile Tongue']);
+      return ri(['Tongue','Long Tongue','Rough Tongue']);
+    } },
 ];
 
 let monsterPartV2Counter = 0;
@@ -16546,15 +16929,19 @@ function buildMonsterPartItemV2(monster, tier, partDef) {
   const subtype = getCreatureSubtype(monster, family);
   const theme = PART_THEMES[(subtype && subtype.theme) || family.baseTheme] || PART_THEMES.primal_strength;
   const themeLabel = subtype ? subtype.label : family.label;
-  const name = `${themeLabel} ${partDef.anatomicalPart}`;
+  // Anatomy-flavored parts (variants present) use a per-monster label (e.g. "Hollow Fang" for a
+  // snake) instead of the flat anatomicalPart name -- see MONSTER_PARTS' header comment.
+  let partLabel = partDef.anatomicalPart;
+  if (partDef.variants) { try { partLabel = partDef.variants(monster) || partLabel; } catch {} }
+  const name = `${themeLabel} ${partLabel}`;
   const [wLo, wHi] = MONSTER_PART_WEIGHT_RANGE[tier] || MONSTER_PART_WEIGHT_RANGE.common;
   const weight = Math.round((wLo + Math.random() * (wHi - wLo)) * 10) / 10;
   const [gLo, gHi] = MONSTER_PART_GP_RANGE[tier] || MONSTER_PART_GP_RANGE.common;
   const gp = formatGpAmount(rn(gLo, gHi));
-  const desc = `A ${partDef.anatomicalPart.toLowerCase()} taken from a ${themeLabel.toLowerCase()}, radiating ${theme.flavor}.`;
+  const desc = `A ${partLabel.toLowerCase()} taken from a ${themeLabel.toLowerCase()}, radiating ${theme.flavor}.`;
   let effect, subcategory;
   if (partDef.mode === 'equip') {
-    effect = `${describeV2EquipEffect(theme, tier)} Worn as a charm. (${rarityNames[tier] || tier} ${themeLabel} ${partDef.anatomicalPart.toLowerCase()}.)`;
+    effect = `${describeV2EquipEffect(theme, tier)} Worn as a charm. (${rarityNames[tier] || tier} ${themeLabel} ${partLabel.toLowerCase()}.)`;
     subcategory = 'charm';
   } else {
     effect = `Raw crafting material — no effect on its own, but the Monster Mangler can work it into a compatible weapon or piece of armor, imbuing a ${theme.combineDmgType} effect themed to ${themeLabel} and scaled by its own rarity (${rarityNames[tier] || tier}).`;
@@ -16562,15 +16949,21 @@ function buildMonsterPartItemV2(monster, tier, partDef) {
   }
   const part = {
     id: 'partv2_' + (++monsterPartV2Counter), name, type: 'craftable', subcategory,
-    partType: (subtype && subtype.theme) || family.baseTheme, rarity: tier, weight, gp, slotSize: 1,
+    partType: (subtype && subtype.theme) || family.baseTheme,
+    // The part's own anatomical id (eye/fang/claw/...) -- kept alongside partType's theme id so
+    // the Monster Mangler can draw from MONSTER_PART_EFFECT_POOL's richer, anatomy-specific
+    // effects (see pickMonsterPartEffect) as well as the theme-flavored ones, instead of only
+    // the latter.
+    anatomicalId: partDef.id,
+    rarity: tier, weight, gp, slotSize: 1,
     desc, effect, sourceMonster: monster.name, creatureFamily: family.id,
   };
   classifyItemFull(part, tier);
   return part;
 }
 function generateMonsterPartV2(monster, tier) {
-  const eligible = MONSTER_PARTS_V2.filter(p => { try { return p.eligible(monster); } catch { return false; } });
-  const pick = eligible.length ? ri(eligible) : ri(MONSTER_PARTS_V2);
+  const eligible = MONSTER_PARTS.filter(p => { try { return p.eligible(monster); } catch { return false; } });
+  const pick = eligible.length ? ri(eligible) : ri(MONSTER_PARTS);
   return buildMonsterPartItemV2(monster, tier, pick);
 }
 let premadeMonsterPartsV2Generated = false;
@@ -16579,7 +16972,7 @@ function generatePremadeMonsterPartsV2() {
   premadeMonsterPartsV2Generated = true;
   monsterDatabase.forEach(monster => {
     const tier = monsterRarityTier(monster, null);
-    MONSTER_PARTS_V2.forEach(partDef => {
+    MONSTER_PARTS.forEach(partDef => {
       let ok; try { ok = partDef.eligible(monster); } catch { ok = false; }
       if (!ok) return;
       lootData[tier].push(buildMonsterPartItemV2(monster, tier, partDef));
@@ -16588,10 +16981,10 @@ function generatePremadeMonsterPartsV2() {
   buildTokenIndex();
   if (typeof renderItemsList === 'function') renderItemsList();
 }
-// Theme-keyed combine effect pool, parallel to MONSTER_PART_EFFECT_POOL (keyed by anatomical
-// part type) but keyed by THEME id instead — pickMonsterPartEffect (Monster Mangler section,
-// below) checks this pool as a fallback when partType isn't one of the old anatomical keys, so
-// v2 combine parts flow through the exact same, already-tested combine mechanism unchanged.
+// Theme-keyed combine effect pool, parallel to MONSTER_PART_EFFECT_POOL (keyed by the part's own
+// anatomical id instead) — pickMonsterPartEffect (Monster Mangler section, below) blends both
+// pools together, so a combine draws from the anatomical pool's specific mechanics (a fang's
+// Venomous Bite, Lockjaw Grip, ...) AND this pool's theme-flavored damage bonus, not just one.
 const MONSTER_PART_V2_EFFECT_POOL = {};
 Object.keys(PART_THEMES).forEach(themeId => {
   const theme = PART_THEMES[themeId];
@@ -22080,38 +22473,132 @@ const GENERATION_TOGGLE_DEFS = [
 // Counts entries in a generation pool regardless of whether it's a flat array (e.g. GEN.skills)
 // or a grouped object of arrays (e.g. GEN.buffsSelf.scalar/.conditions, TRAIT_COUNT_POOLS.common/...).
 function genListCount(val) {
-  if (!val) return 0;
+  if (val == null) return 0;
   if (Array.isArray(val)) return val.length;
   if (typeof val === 'object') return Object.values(val).reduce((sum, v) => sum + genListCount(v), 0);
-  return 0;
+  return 1; // a genuine leaf value (e.g. GEN.effectDescriptions' key -> text) counts as one entry, not zero
 }
 const GENERATION_LISTS_REGISTRY = [
-  { name: 'Named Item Traits', get: () => GEN.namedModifiers, desc: 'Fixed personality traits pairing a buff+debuff on an item.', toggle: 'namedTraits' },
-  { name: 'Legendary/Celestial Flourishes', get: () => LEGENDARY_FLOURISHES, desc: 'Color-flourish rules for legendary/celestial item icons, matched by keyword.', toggle: 'legendaryFlourishes' },
-  { name: 'Item Buffs (Self)', get: () => GEN.buffsSelf, desc: 'Positive effects an item can grant its own bearer.', toggle: 'itemBuffsDebuffs' },
-  { name: 'Item Buffs (Other)', get: () => GEN.buffsOther, desc: 'Positive effects an item lets its bearer grant to allies.', toggle: 'itemBuffsDebuffs' },
-  { name: 'Item Debuffs (Self)', get: () => GEN.debuffsSelf, desc: 'Curses an item inflicts on its own bearer.', toggle: 'itemBuffsDebuffs' },
-  { name: 'Item Debuffs (Other)', get: () => GEN.debuffsOther, desc: 'Effects an item lets its bearer inflict on enemies.', toggle: 'itemBuffsDebuffs' },
-  { name: 'Effect Flavor Descriptions', get: () => GEN.effectDescriptions, desc: 'Flavor-text fragments used to describe generated effects.' },
-  { name: 'Skills Pool', get: () => GEN.skills, desc: 'Skill names sampled for skill-granting items.' },
-  { name: 'Powers Pool', get: () => GEN.powers, desc: 'Activatable powers items can grant.' },
-  { name: 'Transform Forms', get: () => GEN.transformForms, desc: 'Creature forms a transformation item can turn the bearer into.' },
-  { name: 'Summon Entities', get: () => GEN.summonEntities, desc: 'Creatures a summoning item can call.' },
-  { name: 'Terrain Alterations', get: () => GEN.terrainAlterations, desc: 'Environmental effects an item can trigger.' },
-  { name: 'Armor Base Names', get: () => GEN.armor, desc: 'Base name pool for generated armor items.' },
-  { name: 'Weapon Base Names', get: () => GEN.weapon, desc: 'Base name pool for generated weapon items.' },
-  { name: 'Consumable Base Names', get: () => GEN.consumable, desc: 'Base name pool for generated consumable items.' },
-  { name: 'Misc Base Names', get: () => GEN.misc, desc: 'Base name pool for generated miscellaneous/wondrous items.' },
-  { name: 'Monster Trait Count Pools', get: () => TRAIT_COUNT_POOLS, desc: 'How many extra traits a generated monster gets, by rarity tier.', toggle: 'monsterTraits' },
-  { name: 'Monster Part Types', get: () => MONSTER_PART_TYPES, desc: 'Categories of grafted monster parts.' },
-  { name: 'Monster Parts (v2)', get: () => MONSTER_PARTS_V2, desc: 'Named monster-part items and their base stats.' },
-  { name: 'Monster Part Effects', get: () => MONSTER_PART_EFFECT_POOL, desc: 'Effect text pool for grafted monster parts.' },
-  { name: 'Flesh Graft Effects', get: () => FLESH_GRAFT_EFFECT_POOL, desc: 'Effect pool specifically for flesh-graft style items.' },
-  { name: 'Part Themes', get: () => PART_THEMES, desc: 'Thematic groupings used when generating monster parts.' },
-  { name: 'Creature Subtypes', get: () => CREATURE_SUBTYPES, desc: 'Subtype tags sampled for generated creatures.' },
-  { name: 'Journey Scenarios', get: () => JOURNEY_SCENARIOS, desc: 'Random encounters/events for travel downtime.' },
-  { name: 'Bounty Crimes by Rarity', get: () => BOUNTY_CRIMES_BY_RARITY, desc: 'Crime flavor text for bounty-board entries, by rarity.' },
+  { name: 'Named Item Traits', get: () => GEN.namedModifiers, desc: 'Fixed personality traits pairing a buff+debuff on an item.', toggle: 'namedTraits',
+    usedBy: 'Rolled onto generated items as a personality trait (e.g. "Bloody"), and onto generated monsters as a Monster Combat Trait — same pool, two consumers.' },
+  { name: 'Legendary/Celestial Flourishes', get: () => LEGENDARY_FLOURISHES, desc: 'Color-flourish rules for legendary/celestial item icons, matched by keyword.', toggle: 'legendaryFlourishes',
+    usedBy: 'Matched by keyword/regex against a Legendary or Celestial item\'s name to pick its icon\'s color flourish.' },
+  { name: 'Item Buffs (Self)', get: () => GEN.buffsSelf, desc: 'Positive effects an item can grant its own bearer.', toggle: 'itemBuffsDebuffs',
+    usedBy: 'Rolled as a positive effect when generating or rerolling an item\'s own bonus (Store restock, Loot roll, item builder "Roll Random").' },
+  { name: 'Item Buffs (Other)', get: () => GEN.buffsOther, desc: 'Positive effects an item lets its bearer grant to allies.', toggle: 'itemBuffsDebuffs',
+    usedBy: 'Same generation paths as Item Buffs (Self), rolled when the generated effect targets an ally instead of the bearer.' },
+  { name: 'Item Debuffs (Self)', get: () => GEN.debuffsSelf, desc: 'Curses an item inflicts on its own bearer.', toggle: 'itemBuffsDebuffs',
+    usedBy: 'Rolled when a generated item comes up cursed, as the drawback it inflicts on its own wearer.' },
+  { name: 'Item Debuffs (Other)', get: () => GEN.debuffsOther, desc: 'Effects an item lets its bearer inflict on enemies.', toggle: 'itemBuffsDebuffs',
+    usedBy: 'Rolled as a harmful effect a generated weapon/item lets its bearer inflict on a struck enemy.' },
+  { name: 'Effect Flavor Descriptions', get: () => GEN.effectDescriptions, desc: 'Flavor-text fragments used to describe generated effects.',
+    usedBy: 'Looked up by exact stat/condition name to show the plain-English mechanical explanation in the Compendium\'s Effects & Traits sub-tab, for any name rolled from the four Item Buffs/Debuffs pools above.' },
+  { name: 'Skills Pool', get: () => GEN.skills, desc: 'Skill names sampled for skill-granting items.',
+    usedBy: 'Sampled when generating an item or monster trait that grants a flat skill-check bonus.' },
+  { name: 'Powers Pool', get: () => GEN.powers, desc: 'Activatable powers items can grant.',
+    usedBy: 'Sampled (falling back from the rarity-gated BAL.powerTiers pool) when generating an item\'s activatable power.' },
+  { name: 'Transform Forms', get: () => GEN.transformForms, desc: 'Creature forms a transformation item can turn the bearer into.',
+    usedBy: 'Sampled when generating a transformation-granting item, to pick the creature form it turns the bearer into.' },
+  { name: 'Summon Entities', get: () => GEN.summonEntities, desc: 'Creatures a summoning item can call.',
+    usedBy: 'Sampled when generating a summoning item, to pick the named creature it calls.' },
+  { name: 'Armor Base Names', get: () => ARMOR_BASE_TYPES, desc: 'Real armor types (Breastplate, Kite Shield, ...), each with its own structural base AC.',
+    usedBy: 'Sampled as the base type whenever a new armor item is generated (Store, Loot roll, item builder) — its baseAC plus a rarity bonus becomes the item\'s AC (see rollItemStats).' },
+  { name: 'Weapon Base Names', get: () => WEAPON_BASE_TYPES, desc: 'Real weapon types (Dagger, Greatsword, Longbow, ...), each with its own structural base damage die.',
+    usedBy: 'Sampled as the base type whenever a new weapon item is generated — its dmgDie plus rarity-scaled extra dice becomes the item\'s damage (see rollItemStats).' },
+  { name: 'Consumable Base Names', get: () => GEN.consumable, desc: 'Container/delivery forms only (Potion, Scroll, Elixir, ...) — the effect comes from a separate buff/debuff roll.',
+    usedBy: 'Sampled as the base name whenever a new consumable item is generated; buildItemName composes the final name with whatever effect got rolled (e.g. "Potion of Mending").' },
+  { name: 'Misc Base Names', get: () => GEN.misc, desc: 'Object forms only (Ring, Wand, Amulet, ...) — the effect comes from a separate buff/debuff roll.',
+    usedBy: 'Sampled as the base name whenever a new misc/wondrous item is generated; composed with its rolled effect the same way consumables are (e.g. "Swift Ring").' },
+  { name: 'Item Affixes', get: () => ITEM_AFFIXES, desc: 'Materials (Rusty, Mithral, ...) and enchantments (Sharp, Flaming, Sturdy, ...) a generated weapon/armor item can stack as name prefixes.',
+    usedBy: 'Filtered by category and rarity, then 0-3 are rolled per weapon/armor item (rollItemAffixes) and stack as prefix words ahead of the base type name, e.g. "Flaming Sharp Shortsword".' },
+  { name: 'Monster Trait Count Pools', get: () => TRAIT_COUNT_POOLS, desc: 'How many extra traits a generated monster gets, by rarity tier.', toggle: 'monsterTraits',
+    usedBy: 'Rolled (indexed by the monster\'s rarity tier) to decide how many Named Item Traits a generated monster receives.' },
+  { name: 'Monster Parts', get: () => MONSTER_PARTS, desc: 'Harvestable monster-part items (equip charms and Monster Mangler combine ingredients), with anatomy-flavored naming.',
+    usedBy: 'Filtered by per-monster eligibility checks to build the harvestable-parts list for a given monster; sampled per kill (rollMonsterCombatLoot) and pre-generated into the catalog for every creature in the registry.' },
+  { name: 'Monster Part Effects', get: () => MONSTER_PART_EFFECT_POOL, desc: 'Anatomy-specific effect pool (six per part: eye, fang, claw, etc.) for combined monster parts — richer than the theme-based pool it\'s blended with.',
+    usedBy: 'Blended with MONSTER_PART_V2_EFFECT_POOL by pickMonsterPartEffect when the Monster Mangler combines a part into a weapon or piece of armor, keyed by the part\'s own anatomical id (part.anatomicalId).' },
+  { name: 'Flesh Graft Effects', get: () => FLESH_GRAFT_EFFECT_POOL, desc: 'Effect pool specifically for flesh-graft style items.',
+    usedBy: 'Sampled by limb category (arm, hand, leg, eye, etc.) in the Flesh Workshop when grafting a limb, scaled by the grafted part\'s rarity magnitude — not stored as fixed text, so no existing item carries this verbatim until a DM actually performs a graft.' },
+  { name: 'Part Themes', get: () => PART_THEMES, desc: 'Thematic groupings used when generating monster parts.',
+    usedBy: 'Looked up by a monster\'s creature-family/subtype theme to determine a harvested part\'s stat bonus and combine damage type.' },
+  { name: 'Creature Subtypes', get: () => CREATURE_SUBTYPES, desc: 'Subtype tags sampled for generated creatures.',
+    usedBy: 'Keyword-matched (by family) against a monster\'s name to assign it a named subtype and Part Theme, e.g. "Red Dragon" → elemental_fire.' },
+  { name: 'Journey Scenarios', get: () => JOURNEY_SCENARIOS, desc: 'Random encounters/events for travel downtime.',
+    usedBy: 'Filtered by travel setting and category, then sampled for the Journey tab\'s random travel encounters/events.' },
+  { name: 'Bounty Crimes by Rarity', get: () => BOUNTY_CRIMES_BY_RARITY, desc: 'Crime flavor text for bounty-board entries, by rarity.',
+    usedBy: 'Sampled by rarity tier for the flavor-text crime description on a generated bounty-board entry.' },
 ];
+let expandedGenLists = new Set(); // local-only UI state -- which DM Controls list rows are expanded to show entries
+function toggleGenListExpand(name) {
+  if (expandedGenLists.has(name)) expandedGenLists.delete(name); else expandedGenLists.add(name);
+  renderGenerationListsViewer();
+}
+// Generic, recursive formatter for the Generation Lists viewer -- every pool in the registry
+// above has its own shape (flat string array, {scalar,conditions} object, array of
+// {name,buffs,debuffs}, category-keyed dict of {label,text:fn} arrays, etc.). Rather than a
+// bespoke renderer per pool, this walks whatever shape it's given: strings/numbers print
+// directly (flat arrays of them render as a wrapped pill list), functions are sample-invoked
+// (these are all magnitude-scaled effect templates, e.g. FLESH_GRAFT_EFFECT_POOL, so magnitude 1
+// stands in for "smallest version, scales up with rarity"), and objects pull whichever
+// identifying/descriptive fields they actually have.
+function genListEntryLabel(entry) {
+  if (entry == null) return '';
+  if (typeof entry === 'string' || typeof entry === 'number') return escapeHtml(String(entry));
+  if (typeof entry === 'function') {
+    try {
+      const sample = entry(1);
+      if (typeof sample === 'string') return escapeHtml(sample) + ' <span class="gen-list-entry-detail">(at magnitude 1 — scales with rarity)</span>';
+    } catch (e) {}
+    return '<span class="gen-list-entry-detail">(dynamic — computed at generation time)</span>';
+  }
+  if (entry instanceof RegExp) return '<code>' + escapeHtml(entry.source) + '</code>';
+  if (Array.isArray(entry)) return entry.map(genListEntryLabel).join(', ');
+  if (typeof entry === 'object') {
+    const name = entry.name || entry.label || entry.title || entry.anatomicalPart || entry.id || entry.key;
+    const parts = [];
+    if (entry.buffs && entry.buffs.length) parts.push('+' + entry.buffs.join(', +'));
+    if (entry.debuffs && entry.debuffs.length) parts.push('-' + entry.debuffs.join(', -'));
+    if (entry.keywords) parts.push('keywords: ' + entry.keywords.join(', '));
+    if (entry.theme) parts.push('theme: ' + entry.theme);
+    if (typeof entry.text === 'string') parts.push(entry.text);
+    else if (typeof entry.text === 'function') parts.push(genListEntryLabel(entry.text));
+    if (typeof entry.utilityText === 'function') parts.push(genListEntryLabel(entry.utilityText));
+    if (entry.desc) parts.push(entry.desc);
+    if (entry.flavor) parts.push(entry.flavor);
+    const knownKeys = new Set(['name','label','title','anatomicalPart','id','key','buffs','debuffs','keywords','theme','text','utilityText','desc','flavor']);
+    Object.keys(entry).forEach(k => {
+      if (knownKeys.has(k)) return;
+      const v = entry[k];
+      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') parts.push(`${k}: ${v}`);
+      else if (Array.isArray(v) && v.every(x => typeof x === 'string')) parts.push(`${k}: ${v.join(', ')}`);
+    });
+    const head = name ? `<span class="gen-list-entry-name">${escapeHtml(String(name))}</span>` : '';
+    const detail = parts.length ? `<span class="gen-list-entry-detail">${head ? ' — ' : ''}${parts.join(' · ')}</span>` : (!name ? escapeHtml(JSON.stringify(entry).slice(0, 160)) : '');
+    return head + detail;
+  }
+  return escapeHtml(String(entry));
+}
+function formatGenListValue(value) {
+  if (value == null) return '';
+  if (Array.isArray(value)) {
+    if (!value.length) return '<div class="gen-list-entry-empty">— empty —</div>';
+    const allPrimitive = value.every(v => typeof v === 'string' || typeof v === 'number');
+    if (allPrimitive) return `<div class="gen-list-entry-flow">${value.map(v => `<span class="gen-list-pill">${escapeHtml(String(v))}</span>`).join('')}</div>`;
+    return value.map(v => `<div class="gen-list-entry">${genListEntryLabel(v)}</div>`).join('');
+  }
+  if (typeof value === 'object') {
+    return Object.entries(value).map(([key, val]) => {
+      if (Array.isArray(val) || (val && typeof val === 'object' && !(val instanceof RegExp))) {
+        return `<div class="gen-list-category">${escapeHtml(humanizeGenListKey(key))}</div>${formatGenListValue(val)}`;
+      }
+      return `<div class="gen-list-entry">${genListEntryLabel({ name: key, text: val })}</div>`;
+    }).join('');
+  }
+  return `<div class="gen-list-entry">${genListEntryLabel(value)}</div>`;
+}
+function humanizeGenListKey(key) {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 function renderDmControlsTab() {
   renderGenerationTogglesPanel();
   renderGenerationListsViewer();
@@ -22140,14 +22627,26 @@ function renderGenerationListsViewer() {
     let count = 0;
     try { count = genListCount(l.get()); } catch (e) { count = 0; }
     const toggleBadge = l.toggle ? `<span class="gen-list-toggle-badge${generationToggles[l.toggle] ? '' : ' off'}">${generationToggles[l.toggle] ? 'ON' : 'OFF'}</span>` : '';
+    const expanded = expandedGenLists.has(l.name);
+    let entriesHtml = '';
+    if (expanded) {
+      let raw = null;
+      try { raw = l.get(); } catch (e) {}
+      entriesHtml = `
+        <div class="gen-list-usedby">Used by: ${escapeHtml(l.usedBy || 'No usage note recorded for this list yet.')}</div>
+        <div class="gen-list-entries">${formatGenListValue(raw)}</div>
+      `;
+    }
     return `
       <div class="gen-list-row">
-        <div class="gen-list-row-head">
+        <div class="gen-list-row-head" onclick="toggleGenListExpand('${l.name.replace(/'/g, "\\'")}')">
+          <span class="gen-list-expand-icon">${expanded ? '▾' : '▸'}</span>
           <span class="gen-list-name">${l.name}</span>
           <span class="gen-list-count">${count} entries</span>
           ${toggleBadge}
         </div>
         <div class="gen-list-desc">${l.desc}</div>
+        ${entriesHtml}
       </div>
     `;
   }).join('') || '<p style="color:var(--text-dim);font-size:0.85rem;">No lists match your search.</p>';
@@ -22875,7 +23374,7 @@ function renderManglerSlots() {
   }
   if (partEntry && itemEntry) {
     const cost = manglerCombineCost(partEntry.rarity, itemEntry.rarity);
-    const partLabel = MONSTER_PART_TYPE_LABEL[partEntry.item.partType] || partEntry.item.name;
+    const partLabel = MONSTER_PART_TYPE_LABEL[partEntry.item.anatomicalId] || partEntry.item.name;
     const rarityLabel = rarityNames[partEntry.rarity] || partEntry.rarity;
     // The actual effect is rolled from a pool at combine time (see applyMonsterPartToItem),
     // so the preview names the theme and power tier rather than pre-committing to a specific
@@ -22903,7 +23402,7 @@ const MANGLER_RARITY_MAGNITUDE = { common:1, uncommon:1, rare:2, superrare:2, le
 const MANGLER_BONUS_DIE_BY_MAGNITUDE = { 1:'1d4', 2:'1d6', 3:'1d8', 4:'1d10' };
 const DAMAGE_DIE_LADDER = [4, 6, 8, 10, 12, 20];
 const MONSTER_PART_TYPE_LABEL = {};
-MONSTER_PART_TYPES.forEach(p => { MONSTER_PART_TYPE_LABEL[p.key] = p.label; });
+MONSTER_PARTS.forEach(p => { MONSTER_PART_TYPE_LABEL[p.id] = p.anatomicalPart; });
 // Each template: appliesTo says whether it can land on a weapon, armor, or either. One of
 // dmgAdd / dmgDieUp / acAdd / attackBonus / hpAdd / reachAdd / weightMult selects the
 // mechanical change (if any); text()/utilityText() produces the effect line shown to the
@@ -23050,14 +23549,19 @@ function bumpAcValue(acStr, magnitude) {
   const num = parseInt(m[2], 10) + magnitude;
   return (m[1] === '-' ? '-' : (m[1] === '+' ? '+' : '')) + num + (m[3] || '');
 }
-// Picks one effect template for this part type, preferring ones that actually apply to the
-// base item's type (weapon vs. armor) — falls back to any dual-purpose ("either") template if
-// nothing in the pool targets this item type, so combining never silently no-ops.
-function pickMonsterPartEffect(partType, itemIsWeapon) {
-  // v2 combine parts carry a theme id (e.g. 'elemental_fire') as their partType, which never
-  // collides with the old system's anatomical keys (e.g. 'fang') — checked second so an old
-  // part's exact key always wins first, matching this function's pre-v2 behavior unchanged.
-  const pool = MONSTER_PART_EFFECT_POOL[partType] || MONSTER_PART_V2_EFFECT_POOL[partType] || MONSTER_PART_EFFECT_POOL.default;
+// Picks one effect template for this part, blending two pools: MONSTER_PART_EFFECT_POOL (keyed
+// by the part's own anatomical id -- eye/fang/claw/...; six genuinely distinct, specific
+// mechanical effects per part) and MONSTER_PART_V2_EFFECT_POOL (keyed by the monster's theme id
+// -- a generic damage-type bonus plus a flavor-only utility line per theme). Both pools are
+// combined into one candidate list so a combine ends up with the full range: "this is a fang"
+// (Venomous Bite, Lockjaw Grip, ...) AND "this fang came from a fire elemental" (a themed fire
+// bonus) are both on the table, not just one or the other. Falls back to any dual-purpose
+// ("either") template if nothing in the pool targets this item type, so combining never
+// silently no-ops.
+function pickMonsterPartEffect(anatomicalId, themeId, itemIsWeapon) {
+  const anatomicalPool = MONSTER_PART_EFFECT_POOL[anatomicalId] || [];
+  const themePool = MONSTER_PART_V2_EFFECT_POOL[themeId] || [];
+  const pool = (anatomicalPool.length || themePool.length) ? [...anatomicalPool, ...themePool] : MONSTER_PART_EFFECT_POOL.default;
   const wantKind = itemIsWeapon ? 'weapon' : 'armor';
   const targeted = pool.filter(e => e.appliesTo.includes(wantKind));
   const fallback = pool.filter(e => e.appliesTo.length > 1);
@@ -23081,7 +23585,7 @@ function applyMonsterPartToItem(item, part, partRarity) {
   const isWeapon = item.type === 'weapon';
   const rarity = partRarity || part.rarity || 'common';
   const magnitude = MANGLER_RARITY_MAGNITUDE[rarity] || 1;
-  const template = pickMonsterPartEffect(part.partType, isWeapon);
+  const template = pickMonsterPartEffect(part.anatomicalId, part.partType, isWeapon);
   let mechText;
   if (template.dmgAdd && isWeapon && item.dmg) {
     const die = MANGLER_BONUS_DIE_BY_MAGNITUDE[magnitude] || '1d4';
@@ -23109,7 +23613,7 @@ function applyMonsterPartToItem(item, part, partRarity) {
   if (!item.mods) item.mods = [];
   item.mods.push({ type: template.label, text: `${template.label}: ${mechText} (worked in from ${part.name})` });
   item.effect = (item.effect ? item.effect + ' ' : '') + `Infused with ${part.name}: ${mechText}`;
-  const partLabel = (MONSTER_PART_TYPE_LABEL[part.partType] || 'monstrous part').toLowerCase();
+  const partLabel = (MONSTER_PART_TYPE_LABEL[part.anatomicalId] || 'monstrous part').toLowerCase();
   item.desc = (item.desc || '') + ` Bears a trace of ${part.sourceMonster || 'something monstrous'} — a ${partLabel} worked into its make.`;
   item.name = nameAfterMangle(item.name, part.sourceMonster);
   return { template, magnitude, mechText };
@@ -23356,7 +23860,7 @@ function saveAppState() {
       _battleActionTextMap, _battleActionCounter,
       activeBounties, bountyCounter,
       manglerFinishedWork, manglerPartKey, manglerItemKey, manglerFocus,
-      combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights,
+      combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights, npcEdits,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
       characterRace, characterAffinity, characterInitiative, characterSpeed, characterSpeedEffective, deckOfManyThingsLog, geomorphTiles, achievedUnlocks,
@@ -23427,7 +23931,13 @@ function applyStateBlob(data) {
     // keep rolling it after the fact.
     delete modWeights.terrain;
   }
-  if (data.fleshModWeights) fleshModWeights = data.fleshModWeights;
+  if (data.fleshModWeights) {
+    fleshModWeights = data.fleshModWeights;
+    // Same reasoning as modWeights above — an old save could still carry a stale terrain
+    // weight from before it was removed as a Fleshmancer modifier type.
+    delete fleshModWeights.terrain;
+  }
+  if (data.npcEdits) npcEdits = data.npcEdits;
   if (data.characterAbilityScores) characterAbilityScores = data.characterAbilityScores;
   if (typeof data.characterLevel === 'number') characterLevel = data.characterLevel;
   if (data.skillProficiencies) skillProficiencies = data.skillProficiencies;
