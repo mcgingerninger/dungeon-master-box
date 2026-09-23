@@ -1786,7 +1786,7 @@
      reuses .inv-grid-wrap for its scrollable border/background so a large grid doesn't blow out
      the page layout, same fix already applied to the Inventory/Players panels. */
   .mapbuilder-layout { display:flex; gap:1rem; align-items:flex-start; }
-  .mapbuilder-sidebar { flex:0 0 240px; min-width:0; display:flex; flex-direction:column; gap:0.6rem; }
+  .mapbuilder-sidebar { flex:0 0 200px; min-width:0; display:flex; flex-direction:column; gap:0.6rem; }
   .mapbuilder-main { flex:1 1 auto; min-width:0; }
   .mapbuilder-new-form { display:flex; flex-direction:column; gap:0.4rem; background:var(--surface); border:1px solid var(--border); padding:0.6rem; }
   .mapbuilder-new-form input[type="text"], .mapbuilder-new-form input[type="number"] {
@@ -1812,7 +1812,7 @@
   .mapbuilder-props-panel { background:var(--surface); border:1px solid var(--border); padding:0.6rem; margin-bottom:0.7rem; }
   .mapbuilder-prop-btn { background:var(--surface2); border:2px solid var(--border); cursor:pointer; padding:0.2rem; }
   .mapbuilder-prop-btn.active { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
-  .mapbuilder-canvas-wrap { max-height:70vh; overflow:auto; }
+  .mapbuilder-canvas-wrap { max-height:80vh; min-height:420px; overflow:auto; }
   .mapbuilder-canvas-wrap svg { touch-action:none; display:block; }
   @media (max-width: 700px) {
     .mapbuilder-layout { flex-direction:column; }
@@ -5144,33 +5144,81 @@ const MAP_BUILDER_TERRAIN = {
   wood:  { label: 'Wood',  color: '#7a5230' },
 };
 const MAP_BUILDER_MAX_DIM = 60;
-const MAP_BUILDER_DEFAULT_CELL_PX = 24;
+const MAP_BUILDER_DEFAULT_CELL_PX = 28;
 
-// Prop/token shapes, in the exact {viewBox, rects:[[x,y,w,h],...]} format STORE_ICONS already
-// uses -- rendered with the same pixelIconSvg() helper, just placed on the map grid instead of
-// an inventory slot.
+// Prop/token shapes, in the same {viewBox, rects:[[x,y,w,h],...]} format STORE_ICONS uses, plus
+// a parallel `colors` array (one fill per rect, in rect order) for a bit of shading/detail --
+// see pixelIconSvg()'s extended signature below. Rendered with that same shared helper, just
+// placed on the map grid instead of an inventory slot.
 const MAP_ICONS = {
-  torch:      { viewBox: '0 0 8 14',  rects: [[3,0,2,4],[2,4,4,2],[3,6,2,8]] },
-  chest:      { viewBox: '0 0 14 10', rects: [[0,3,14,7],[0,3,14,2],[6,0,2,4]] },
-  table:      { viewBox: '0 0 14 10', rects: [[0,0,14,2],[1,2,2,8],[11,2,2,8]] },
-  barrel:     { viewBox: '0 0 10 14', rects: [[1,0,8,14],[0,3,10,1],[0,10,10,1]] },
-  stairsUp:   { viewBox: '0 0 14 14', rects: [[0,11,14,3],[2,8,10,3],[4,5,8,3],[6,2,6,3]] },
-  stairsDown: { viewBox: '0 0 14 14', rects: [[0,0,14,3],[2,3,10,3],[4,6,8,3],[6,9,6,3]] },
-  trap:       { viewBox: '0 0 12 12', rects: [[0,0,12,2],[0,10,12,2],[0,0,2,12],[10,0,2,12],[4,4,4,4]] },
-  altar:      { viewBox: '0 0 14 10', rects: [[2,0,10,2],[0,2,14,2],[3,4,8,6]] },
-  statue:     { viewBox: '0 0 10 14', rects: [[3,0,4,4],[2,4,6,6],[0,10,10,4]] },
-  campfire:   { viewBox: '0 0 12 12', rects: [[1,9,10,2],[4,4,1,5],[7,4,1,5],[5,1,2,6]] },
-  tree:       { viewBox: '0 0 12 14', rects: [[5,8,2,6],[1,2,10,7]] },
-  rock:       { viewBox: '0 0 12 8',  rects: [[2,2,8,6],[0,5,3,3],[9,5,3,3]] },
-  bones:      { viewBox: '0 0 14 8',  rects: [[0,3,14,2],[1,0,2,2],[1,6,2,2],[11,0,2,2],[11,6,2,2]] },
-  monster:    { viewBox: '0 0 10 10', rects: [[1,1,8,8],[2,3,2,2],[6,3,2,2]] },
-  player:     { viewBox: '0 0 8 12',  rects: [[2,0,4,4],[1,4,6,5],[0,9,3,3],[5,9,3,3]] },
+  torch:      { viewBox: '0 0 8 14',  rects: [[3,6,2,8],[2,4,4,2],[3,1,2,3],[3,0,2,1]],
+                colors: ['#5a3d22','#3a3a3a','#e8963a','#f7d774'] },
+  chest:      { viewBox: '0 0 14 10', rects: [[0,3,14,7],[0,3,14,2],[6,1,2,3],[0,6,14,1]],
+                colors: ['#5a3d22','#6b4a30','#c9a84c','#3a2a18'] },
+  table:      { viewBox: '0 0 14 10', rects: [[0,0,14,2],[1,2,2,8],[11,2,2,8]],
+                colors: ['#7a5230','#4a3218','#4a3218'] },
+  barrel:     { viewBox: '0 0 10 14', rects: [[1,0,8,14],[0,3,10,1],[0,10,10,1]],
+                colors: ['#6b4a30','#3a2a18','#3a2a18'] },
+  stairsUp:   { viewBox: '0 0 14 14', rects: [[0,11,14,3],[2,8,10,3],[4,5,8,3],[6,2,6,3]],
+                colors: ['#5a4a3a','#6b5a48','#7a6858','#8a7868'] },
+  stairsDown: { viewBox: '0 0 14 14', rects: [[0,0,14,3],[2,3,10,3],[4,6,8,3],[6,9,6,3]],
+                colors: ['#8a7868','#7a6858','#6b5a48','#5a4a3a'] },
+  trap:       { viewBox: '0 0 12 12', rects: [[0,0,12,2],[0,10,12,2],[0,0,2,12],[10,0,2,12],[4,4,4,4]],
+                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#a83232'] },
+  altar:      { viewBox: '0 0 14 10', rects: [[2,0,10,2],[0,2,14,2],[3,4,8,6]],
+                colors: ['#c9a84c','#8a8070','#5a5040'] },
+  statue:     { viewBox: '0 0 10 14', rects: [[3,0,4,4],[2,4,6,6],[0,10,10,4]],
+                colors: ['#9a9a9a','#8a8a8a','#6a6a6a'] },
+  campfire:   { viewBox: '0 0 12 12', rects: [[1,9,10,2],[4,4,1,5],[7,4,1,5],[5,1,2,6]],
+                colors: ['#4a3218','#e8963a','#e8963a','#f7d774'] },
+  bookshelf:  { viewBox: '0 0 12 14', rects: [[0,0,12,14],[0,4,12,1],[0,9,12,1],[1,1,2,3],[4,1,2,3],[7,1,2,3]],
+                colors: ['#4a3218','#2a1a10','#2a1a10','#a83232','#3a6ba8','#4a7a3a'] },
+  rug:        { viewBox: '0 0 14 10', rects: [[0,0,14,10],[1,1,12,8],[2,2,10,6]],
+                colors: ['#7a2a2a','#9a3a3a','#7a2a2a'] },
+  well:       { viewBox: '0 0 12 12', rects: [[0,0,12,2],[1,0,10,2],[2,4,8,8],[3,5,6,6]],
+                colors: ['#5a3d22','#5a3d22','#7a7a7a','#1a2a3a'] },
+  cage:       { viewBox: '0 0 12 12', rects: [[0,0,2,12],[10,0,2,12],[5,0,2,12],[0,0,12,2],[0,10,12,2]],
+                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a'] },
+  anvil:      { viewBox: '0 0 14 10', rects: [[3,0,8,3],[5,3,4,4],[0,7,14,3]],
+                colors: ['#4a4a4a','#3a3a3a','#2a2a2a'] },
+  cauldron:   { viewBox: '0 0 12 10', rects: [[4,0,1,3],[7,0,1,3],[0,2,12,1],[2,3,8,6]],
+                colors: ['#4a4a4a','#4a4a4a','#3a3a3a','#2a2a2a'] },
+  banner:     { viewBox: '0 0 8 14',  rects: [[3,0,2,14],[0,2,8,8],[2,10,4,2]],
+                colors: ['#5a3d22','#7a2a2a','#4a1a1a'] },
+  tree:       { viewBox: '0 0 12 14', rects: [[5,8,2,6],[1,2,10,7]],
+                colors: ['#4a3218','#3f6b34'] },
+  rock:       { viewBox: '0 0 12 8',  rects: [[2,2,8,6],[0,5,3,3],[9,5,3,3]],
+                colors: ['#6a6a6a','#5a5a5a','#5a5a5a'] },
+  bridge:     { viewBox: '0 0 16 8',  rects: [[0,6,16,2],[1,0,2,4],[13,0,2,4],[0,4,16,2]],
+                colors: ['#3a2a18','#4a3218','#4a3218','#6b4a30'] },
+  pillar:     { viewBox: '0 0 8 14',  rects: [[0,0,8,2],[2,2,4,10],[0,12,8,2]],
+                colors: ['#8a8a8a','#7a7a7a','#8a8a8a'] },
+  rubble:     { viewBox: '0 0 14 8',  rects: [[0,4,4,4],[5,5,3,3],[9,3,5,5],[3,2,2,2]],
+                colors: ['#5a5a5a','#6a6a6a','#4a4a4a','#7a7a7a'] },
+  fountain:   { viewBox: '0 0 12 10', rects: [[1,6,10,3],[3,2,6,4],[5,0,2,2]],
+                colors: ['#7a7a7a','#7a7a7a','#3a7a9a'] },
+  bones:      { viewBox: '0 0 14 8',  rects: [[0,3,14,2],[1,0,2,2],[1,6,2,2],[11,0,2,2],[11,6,2,2]],
+                colors: ['#e8dfc8','#e8dfc8','#e8dfc8','#e8dfc8','#e8dfc8'] },
+  ladder:     { viewBox: '0 0 8 14',  rects: [[0,0,1,14],[7,0,1,14],[0,2,8,1],[0,6,8,1],[0,10,8,1]],
+                colors: ['#6b4a30','#6b4a30','#6b4a30','#6b4a30','#6b4a30'] },
+  portcullis: { viewBox: '0 0 12 14', rects: [[0,0,2,14],[3,0,2,14],[6,0,2,14],[9,0,2,14],[0,4,12,1],[0,9,12,1]],
+                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#2a2a2a','#2a2a2a'] },
+  lever:      { viewBox: '0 0 8 12',  rects: [[0,8,8,4],[3,0,2,9],[1,0,2,2]],
+                colors: ['#4a4a4a','#6a6a6a','#a83232'] },
+  monster:    { viewBox: '0 0 10 10', rects: [[1,1,8,8],[2,3,2,2],[6,3,2,2]],
+                colors: ['#5a3a5a','#e83232','#e83232'] },
+  player:     { viewBox: '0 0 8 12',  rects: [[2,0,4,4],[1,4,6,5],[0,9,3,3],[5,9,3,3]],
+                colors: ['#e8dfc8','#3a6ba8','#2a2a2a','#2a2a2a'] },
+  boss:       { viewBox: '0 0 12 12', rects: [[1,1,10,10],[2,3,2,2],[8,3,2,2],[3,8,6,1]],
+                colors: ['#3a1a3a','#e8d060','#e8d060','#e83232'] },
+  npcAlly:    { viewBox: '0 0 8 12',  rects: [[2,0,4,4],[1,4,6,5],[0,9,3,3],[5,9,3,3]],
+                colors: ['#e8dfc8','#4a7a3a','#2a2a2a','#2a2a2a'] },
 };
 const MAP_ICON_GROUPS = [
-  { label: 'Dungeon Dressing', keys: ['torch','chest','table','barrel','altar','statue','campfire','bones'] },
-  { label: 'Terrain Features', keys: ['tree','rock'] },
-  { label: 'Passage', keys: ['stairsUp','stairsDown','trap'] },
-  { label: 'Tokens', keys: ['monster','player'] },
+  { label: 'Dungeon Dressing', keys: ['torch','chest','table','barrel','altar','statue','campfire','bookshelf','rug','well','cage','anvil','cauldron','banner'] },
+  { label: 'Terrain Features', keys: ['tree','rock','bridge','pillar','rubble','fountain'] },
+  { label: 'Passage', keys: ['stairsUp','stairsDown','trap','ladder','portcullis','lever'] },
+  { label: 'Tokens', keys: ['monster','boss','player','npcAlly'] },
 ];
 
 let mapBuilderMaps = [];
@@ -5318,7 +5366,8 @@ function mapBuilderCanvasSvg(map) {
     if (!shape) return;
     const pad = cellPx * 0.12;
     const size = cellPx - pad * 2;
-    const rects = shape.rects.map(([rx, ry, rw, rh]) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="#f0e6c8"/>`).join('');
+    const palette = shape.colors || ['#f0e6c8'];
+    const rects = shape.rects.map(([rx, ry, rw, rh], i) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${palette[i] || palette[palette.length - 1]}"/>`).join('');
     props += `<svg x="${p.x * cellPx + pad}" y="${p.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}">${rects}</svg>`;
   });
   return `<svg id="mapBuilderCanvasSvg" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
@@ -10090,9 +10139,17 @@ const FLESH_LIMB_ICONS = {
 };
 // Generic renderer shared by every pixel-icon set in the app (limbs, store goods, ...):
 // takes an {viewBox, rects:[[x,y,w,h],...]} definition and fills every rect with one color.
+// `color` is normally a single fill string shared by every rect (item icons, limb icons --
+// unchanged behavior). If the shape def itself carries a `colors` array (one fill per rect, see
+// MAP_ICONS), or `color` is passed as an array directly, each rect gets its own fill instead --
+// this is what gives map props their shading/detail without a separate rendering path.
 function pixelIconSvg(def, color, px = 56) {
   if (!def) return '';
-  const rects = def.rects.map(([x,y,w,h]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${color}"/>`).join('');
+  const palette = Array.isArray(color) ? color : (def.colors || color);
+  const rects = def.rects.map(([x,y,w,h], i) => {
+    const fill = Array.isArray(palette) ? (palette[i] || palette[palette.length - 1]) : palette;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`;
+  }).join('');
   return `<svg class="pixel-svg" viewBox="${def.viewBox}" width="${px}" height="${px}" style="image-rendering:pixelated;">${rects}</svg>`;
 }
 function fleshLimbIconSvg(category, color) {
