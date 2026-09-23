@@ -598,6 +598,75 @@ describe('battlefield broadcast (Phase 5c)', () => {
   });
 });
 
+describe('battle map broadcast (Map Builder battle map)', () => {
+  const sampleMap = { id: 'map-1', name: 'Goblin Warren', w: 5, h: 5, cellPx: 24, cells: [], edges: {}, props: [] };
+  const sampleTokens = [{ id: 'tok-1', kind: 'monster', refUid: 'monster-1', icon: 'monster', x: 2, y: 3, label: 'Goblin (5/7 HP)' }];
+
+  test('a battle map push reaches every connected player, never the DM', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    const playerNext = messageQueue(player);
+    send(dm, { type: 'push_battle_map', activeBattleMap: sampleMap, battleMapTokens: sampleTokens });
+    const ack = await nextNonRosterMessage(dm.next);
+    assert.equal(ack.type, 'push_battle_map_ack');
+    await assertNoQueuedMessage(dm.next); // no battle_map_update for the DM itself
+
+    const update = await playerNext();
+    assert.equal(update.type, 'battle_map_update');
+    assert.equal(update.activeBattleMap.name, 'Goblin Warren');
+    assert.equal(update.battleMapTokens.length, 1);
+  });
+
+  test('the map and token fields pass through unfiltered — nothing here is loot-style stripped', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    const playerNext = messageQueue(player);
+    send(dm, { type: 'push_battle_map', activeBattleMap: sampleMap, battleMapTokens: sampleTokens });
+    await nextNonRosterMessage(dm.next);
+    const update = await playerNext();
+    assert.deepEqual(update.activeBattleMap, sampleMap);
+    assert.deepEqual(update.battleMapTokens, sampleTokens);
+  });
+
+  test('clearing the battle map (null) reaches players too', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    const player = await connectAs('uid-alice', 'player');
+    const playerNext = messageQueue(player);
+    send(dm, { type: 'push_battle_map', activeBattleMap: null, battleMapTokens: [] });
+    await nextNonRosterMessage(dm.next);
+    const update = await playerNext();
+    assert.equal(update.activeBattleMap, null);
+    assert.deepEqual(update.battleMapTokens, []);
+  });
+
+  test('a push_battlefield and a push_battle_map do not clobber each other on reconnect catch-up', async () => {
+    const dm = await connectAs('uid-dm', 'dm');
+    send(dm, { type: 'push_battlefield', battleRoster: [{ uid: 'monster-1', monster: 'Goblin', hp: 5, maxHp: 7 }], battleLog: ['hit'] });
+    await nextMessage(dm);
+    send(dm, { type: 'push_battle_map', activeBattleMap: sampleMap, battleMapTokens: sampleTokens });
+    await nextNonRosterMessage(dm.next);
+
+    const ws = await connect();
+    const wsNext = messageQueue(ws);
+    send(ws, { type: 'identify', campaignId, accountUid: 'uid-late-player', role: 'player' });
+    await wsNext(); // 'identified'
+    const rosterCatchUp = await wsNext();
+    assert.equal(rosterCatchUp.type, 'battlefield_update');
+    assert.equal(rosterCatchUp.battleRoster[0].monster, 'Goblin');
+    const mapCatchUp = await wsNext();
+    assert.equal(mapCatchUp.type, 'battle_map_update');
+    assert.equal(mapCatchUp.activeBattleMap.name, 'Goblin Warren');
+  });
+
+  test('a non-DM cannot push battle map state', async () => {
+    const player = await connectAs('uid-alice', 'player');
+    send(player, { type: 'push_battle_map', activeBattleMap: sampleMap, battleMapTokens: [] });
+    const msg = await nextMessage(player);
+    assert.equal(msg.type, 'error');
+    assert.match(msg.message, /DM/);
+  });
+});
+
 describe('puzzle log broadcast (Phase 5c)', () => {
   test('a puzzle log push reaches every connected player, never the DM', async () => {
     const dm = await connectAs('uid-dm', 'dm');

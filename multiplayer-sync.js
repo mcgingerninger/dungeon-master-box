@@ -198,6 +198,9 @@ function handleServerMessage(msg) {
     case 'battlefield_update':
       if (typeof window.applyRemoteBattlefieldState === 'function') window.applyRemoteBattlefieldState(msg.battleRoster || [], msg.battleLog || []);
       return;
+    case 'battle_map_update':
+      if (typeof window.applyRemoteBattleMapState === 'function') window.applyRemoteBattleMapState(msg.activeBattleMap || null, msg.battleMapTokens || []);
+      return;
     case 'puzzle_log_update':
       if (typeof window.applyRemotePuzzleLog === 'function') window.applyRemotePuzzleLog(msg.puzzleLog || []);
       return;
@@ -465,6 +468,13 @@ window.pushBattlefieldState = function (battleRoster, battleLog) {
   _battlefieldPushTimer = setTimeout(() => {
     send({ type: 'push_battlefield', battleRoster, battleLog });
   }, 400);
+};
+// No debounce here -- unlike the roster/log (which can mutate many times per second during a
+// flurry of attacks), the battle map is only pushed on a deliberate DM action: picking a map, or
+// releasing a dragged token. One send per action is already the minimum possible traffic.
+window.pushBattleMapState = function (activeBattleMap, battleMapTokens) {
+  if (!mp.connected || mp.role !== 'dm') return;
+  send({ type: 'push_battle_map', activeBattleMap: activeBattleMap || null, battleMapTokens: battleMapTokens || [] });
 };
 let _puzzleLogPushTimer = null;
 window.pushPuzzleLogState = function (puzzleLog) {

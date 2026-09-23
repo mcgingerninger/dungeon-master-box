@@ -3713,6 +3713,11 @@
 
     <div id="pendingAttacksPanel"></div>
 
+    <!-- Live battle map -- the DM's editable copy of whatever map is chosen under DM Controls →
+         Maps (see setActiveBattleMap), with movable tokens for the roster below plus connected
+         players. Read-only mirror on the player-only Battlefield tab (renderBattlefieldForPlayer). -->
+    <div id="combatBattleMapPanel" style="margin-bottom:1rem;"></div>
+
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.6rem;">
         <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:.05em;margin:0;">⚔ Battle Roster</h3>
@@ -3991,10 +3996,12 @@
   <div id="mapBuilderRoot"></div>
 </div>
 
-<!-- BATTLEFIELD TAB — player-only, read-only live view of the DM's combat roster. Populated
-     entirely from multiplayer-sync.js's window.applyRemoteBattlefieldState bridge; nothing
-     here does anything if that never fires (e.g. no DM connected yet). -->
+<!-- BATTLEFIELD TAB — player-only, read-only live view of the DM's combat roster (and, if the DM
+     has picked one, the current battle map with everyone's token positions). Populated entirely
+     from multiplayer-sync.js's window.applyRemoteBattlefieldState/applyRemoteBattleMapState
+     bridges; nothing here does anything if those never fire (e.g. no DM connected yet). -->
 <div id="tab-battlefield" class="tab-content">
+  <div id="battlefieldMapWrap"></div>
   <div class="combat-roster" id="battlefieldRosterEl"><div class="combat-empty-roster">Nothing happening yet.</div></div>
 </div>
 
@@ -5124,10 +5131,18 @@ loadActiveBattleMapId();
 function activeBattleMap() {
   return mapBuilderMaps.find(m => m.id === activeBattleMapId) || null;
 }
+// Token positions for whoever's currently on the battle map -- {id, kind:'monster'|'player',
+// refUid, icon, x, y, label}. Deliberately separate from battleRoster/connectedPlayers (which
+// already carry combat stats and sync through their own paths) rather than bolting x/y onto
+// either; `label` is a plain snapshot string ("Goblin (12/15 HP)") refreshed whenever a token is
+// placed or dragged, not a live binding, so the map stays a position tracker, not another HP feed.
+let battleMapTokens = [];
 function setActiveBattleMap(id) {
   activeBattleMapId = id;
   try { localStorage.setItem('dmActiveBattleMapId', id); } catch (e) {}
   renderBattleMapGallery();
+  if (typeof renderCombatBattleMap === 'function') renderCombatBattleMap();
+  if (typeof window.pushBattleMapState === 'function') window.pushBattleMapState(activeBattleMap(), battleMapTokens);
 }
 
 // Renders both galleries in the Maps sub-tab: the DM's own Map Builder maps (with the "Use as
@@ -5392,9 +5407,12 @@ function mapBuilderThumbSvg(map, cellPx) {
   </svg>`;
 }
 
-function mapBuilderCanvasSvg(map) {
+// Shared terrain/wall-door/prop rendering, factored out so the Map Builder's own editable canvas
+// and the live battle map (Combat tab DM view + Battlefield tab player view, below) never drift
+// out of sync with each other -- both are "render this map object," just with different overlays
+// (edit affordances vs. combatant tokens) on top of the identical base.
+function mapGridBaseSvgParts(map) {
   const cellPx = map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX;
-  const viewW = map.w * cellPx, viewH = map.h * cellPx;
   let cells = '';
   for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
     const terrain = MAP_BUILDER_TERRAIN[map.cells[y][x]] || MAP_BUILDER_TERRAIN.void;
@@ -5427,9 +5445,151 @@ function mapBuilderCanvasSvg(map) {
     const rects = shape.rects.map(([rx, ry, rw, rh], i) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${palette[i] || palette[palette.length - 1]}"/>`).join('');
     props += `<svg x="${p.x * cellPx + pad}" y="${p.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}">${rects}</svg>`;
   });
+  return { cellPx, cells, edges, props };
+}
+function mapBuilderCanvasSvg(map) {
+  const { cellPx, cells, edges, props } = mapGridBaseSvgParts(map);
+  const viewW = map.w * cellPx, viewH = map.h * cellPx;
   return `<svg id="mapBuilderCanvasSvg" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
     <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${cells}${edges}${props}
   </svg>`;
+}
+// The live battle map: same base rendering as mapBuilderCanvasSvg, plus one icon per placed
+// token. `svgId` lets the DM's editable Combat-tab copy and the player's read-only Battlefield-tab
+// copy use distinct element ids (both panels exist in the DOM at once, one just hidden by role).
+// Tokens outside the current grid (e.g. left over after switching to a smaller map) are skipped
+// rather than clipped/crashing.
+function battleMapCanvasSvg(map, tokens, svgId) {
+  const { cellPx, cells, edges, props } = mapGridBaseSvgParts(map);
+  const viewW = map.w * cellPx, viewH = map.h * cellPx;
+  let tokenSvg = '';
+  (tokens || []).forEach(t => {
+    if (t.x < 0 || t.y < 0 || t.x >= map.w || t.y >= map.h) return;
+    const shape = MAP_ICONS[t.icon] || MAP_ICONS.monster;
+    const pad = cellPx * 0.08;
+    const size = cellPx - pad * 2;
+    const palette = shape.colors || ['#e8dfc8'];
+    const rects = shape.rects.map(([rx, ry, rw, rh], i) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${palette[i] || palette[palette.length - 1]}"/>`).join('');
+    tokenSvg += `<svg x="${t.x * cellPx + pad}" y="${t.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}" data-token-id="${t.id}"><title>${escapeHtml(t.label || '')}</title>${rects}</svg>`;
+  });
+  return `<svg id="${svgId}" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
+    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${cells}${edges}${props}${tokenSvg}
+  </svg>`;
+}
+
+// ---------- DM editable battle map (Combat tab) ----------
+// `label` is a plain snapshot string, not a live binding -- see the battleMapTokens comment
+// above. Recomputed here whenever a token is placed or moved, from whichever roster (battleRoster
+// for monsters/corpses, connectedPlayers for PCs) currently has that combatant.
+function battleMapLabelFor(kind, refUid) {
+  if (kind === 'monster') {
+    const e = (battleRoster || []).find(x => String(x.uid) === String(refUid));
+    return e ? `${e.displayName || e.monster} (${e.hp}/${e.maxHp} HP)` : 'Unknown creature';
+  }
+  const p = (connectedPlayers || []).find(x => String(x.uid) === String(refUid));
+  return p ? `${p.username} (${p.currentHp}/${p.maxHp} HP)` : 'Unknown player';
+}
+// Every non-defeated monster/corpse and every connected player who doesn't already have a
+// battleMapTokens entry -- shown in a "drop onto the map" tray so placing a token is opt-in
+// (adding a monster to the fight doesn't force an immediate map position).
+function battleMapUnplacedCombatants() {
+  const placedKeys = new Set(battleMapTokens.map(t => t.kind + ':' + t.refUid));
+  const monsters = (battleRoster || []).filter(e => !e.defeated && !placedKeys.has('monster:' + e.uid)).map(e => ({
+    kind: 'monster', refUid: String(e.uid), icon: e.monster && /boss|dragon|lich|demon lord/i.test(e.monster) ? 'boss' : 'monster',
+  }));
+  const players = (connectedPlayers || []).filter(p => !placedKeys.has('player:' + p.uid)).map(p => ({ kind: 'player', refUid: String(p.uid), icon: 'player' }));
+  return monsters.concat(players);
+}
+function commitBattleMapTokens() {
+  if (typeof scheduleSave === 'function') scheduleSave();
+  if (typeof window.pushBattleMapState === 'function') window.pushBattleMapState(activeBattleMap(), battleMapTokens);
+}
+function placeBattleMapToken(kind, refUid, icon) {
+  if (!activeBattleMap()) return;
+  battleMapTokens.push({ id: 'tok-' + Math.random().toString(36).slice(2, 8), kind, refUid, icon, x: 0, y: 0, label: battleMapLabelFor(kind, refUid) });
+  renderCombatBattleMap();
+  commitBattleMapTokens();
+}
+function removeBattleMapToken(id) {
+  battleMapTokens = battleMapTokens.filter(t => t.id !== id);
+  renderCombatBattleMap();
+  commitBattleMapTokens();
+}
+function renderCombatBattleMap() {
+  const wrap = document.getElementById('combatBattleMapPanel');
+  if (!wrap) return;
+  const map = activeBattleMap();
+  if (!map) {
+    wrap.innerHTML = `<div class="mapbuilder-props-panel"><p style="color:var(--text-dim);font-size:0.85rem;margin:0;">No battle map chosen yet — pick one under 🎛 DM Controls → 🗺 Maps.</p></div>`;
+    return;
+  }
+  const unplaced = battleMapUnplacedCombatants();
+  wrap.innerHTML = `
+    <div class="mapbuilder-toolbar">
+      <span class="mapbuilder-tool-label">🗺 Battle Map</span>
+      <span style="color:var(--text);font-size:0.9rem;">${escapeHtml(map.name)}</span>
+      <span style="color:var(--text-dim);font-size:0.8rem;margin-left:auto;">Drag a token to move it. Right-click (or long-press) a token to remove it. Change maps under DM Controls → Maps.</span>
+    </div>
+    ${unplaced.length ? `
+    <div class="mapbuilder-props-panel">
+      <span class="mapbuilder-tool-label">Unplaced — click to drop it on the map, then drag into position</span>
+      <div class="interactions-check-row">
+        ${unplaced.map(u => `<button class="mapbuilder-prop-btn" onclick="placeBattleMapToken('${u.kind}','${u.refUid}','${u.icon}')" title="${escapeHtml(battleMapLabelFor(u.kind, u.refUid))}">${pixelIconSvg(MAP_ICONS[u.icon], MAP_ICONS[u.icon].colors, 26)}</button>`).join('')}
+      </div>
+    </div>` : ''}
+    <div class="inv-grid-wrap mapbuilder-canvas-wrap" id="combatBattleMapCanvasWrap">${battleMapCanvasSvg(map, battleMapTokens, 'combatBattleMapCanvasSvg')}</div>
+  `;
+  attachBattleMapPointerHandlers(map);
+}
+// Same pointer-to-cell math as Map Builder's own attachMapBuilderPointerHandlers, adapted to pick
+// up and drag whichever token is nearest the cursor instead of painting terrain. Purely local
+// while dragging (re-renders only this DM's own canvas) -- the new position is only pushed to
+// players once, on release, via commitBattleMapTokens.
+// Tracked at module scope, NOT as a local inside attachBattleMapPointerHandlers -- each drag step
+// re-renders the canvas (a fresh <svg> element, same reasoning as Map Builder's own painting) and
+// re-runs this whole function to reattach handlers to it, which would otherwise reset any local
+// "which token is being dragged" variable back to null on every single pointermove.
+let _draggingBattleMapToken = null;
+function attachBattleMapPointerHandlers(map) {
+  const svg = document.getElementById('combatBattleMapCanvasSvg');
+  if (!svg) return;
+  const cellPx = map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX;
+  const cellFromEvent = (evt) => {
+    const rect = svg.getBoundingClientRect();
+    const scale = svg.viewBox.baseVal.width / rect.width;
+    const px = (evt.clientX - rect.left) * scale;
+    const py = (evt.clientY - rect.top) * scale;
+    return {
+      x: Math.max(0, Math.min(map.w - 1, Math.floor(px / cellPx))),
+      y: Math.max(0, Math.min(map.h - 1, Math.floor(py / cellPx))),
+    };
+  };
+  const nearestToken = (cell) => battleMapTokens.find(t => t.x === cell.x && t.y === cell.y);
+  svg.onpointerdown = (evt) => {
+    const cell = cellFromEvent(evt);
+    _draggingBattleMapToken = nearestToken(cell) || null;
+  };
+  svg.onpointermove = (evt) => {
+    if (!_draggingBattleMapToken) return;
+    const cell = cellFromEvent(evt);
+    if (_draggingBattleMapToken.x === cell.x && _draggingBattleMapToken.y === cell.y) return;
+    _draggingBattleMapToken.x = cell.x;
+    _draggingBattleMapToken.y = cell.y;
+    const wrapEl = document.getElementById('combatBattleMapCanvasWrap');
+    if (wrapEl) wrapEl.innerHTML = battleMapCanvasSvg(map, battleMapTokens, 'combatBattleMapCanvasSvg');
+    attachBattleMapPointerHandlers(map);
+  };
+  svg.onpointerup = () => {
+    if (_draggingBattleMapToken) commitBattleMapTokens();
+    _draggingBattleMapToken = null;
+  };
+  svg.onpointerleave = () => { _draggingBattleMapToken = null; };
+  svg.oncontextmenu = (evt) => {
+    evt.preventDefault();
+    const cell = cellFromEvent(evt);
+    const token = nearestToken(cell);
+    if (token) removeBattleMapToken(token.id);
+  };
 }
 
 function mapBuilderToolsAndCanvasHtml(map) {
@@ -5695,7 +5855,7 @@ function showTab(tab, btn) {
   // showCompendiumSub) — re-entering the tab just re-initializes whichever sub-panel was
   // last active instead of always resetting to Items.
   if (tab === 'compendium') initCompendiumSub(activeCompendiumSub);
-  if (tab === 'combat') { loadMonsterDatabase(false).then(renderCombatPicker); renderCombatRoster(); renderCombatLog(); renderCombatLootSettings(); renderPendingAttacksPanel(); }
+  if (tab === 'combat') { loadMonsterDatabase(false).then(renderCombatPicker); renderCombatRoster(); renderCombatLog(); renderCombatLootSettings(); renderPendingAttacksPanel(); renderCombatBattleMap(); }
   if (tab === 'store') { renderStoreTab(); renderInventoryGrid(); }
   if (tab === 'players' && typeof renderPlayersTab === 'function') renderPlayersTab();
   if (tab === 'battlefield' && typeof renderBattlefieldForPlayer === 'function') renderBattlefieldForPlayer();
@@ -18599,7 +18759,19 @@ window.applyRemoteBattlefieldState = function (roster, log) {
   battlefieldLog = log || [];
   renderBattlefieldForPlayer();
 };
+// The DM's chosen battle map + token positions, mirrored from push_battle_map/battle_map_update
+// (see multiplayer-sync.js) -- a read-only view, so no pointer handlers ever get attached here,
+// unlike the DM's own editable copy on the Combat tab (renderCombatBattleMap).
+let battlefieldMap = null;
+let battlefieldMapTokens = [];
+window.applyRemoteBattleMapState = function (map, tokens) {
+  battlefieldMap = map || null;
+  battlefieldMapTokens = tokens || [];
+  renderBattlefieldForPlayer();
+};
 function renderBattlefieldForPlayer() {
+  const mapWrap = document.getElementById('battlefieldMapWrap');
+  if (mapWrap) mapWrap.innerHTML = battlefieldMap ? `<div class="inv-grid-wrap mapbuilder-canvas-wrap">${battleMapCanvasSvg(battlefieldMap, battlefieldMapTokens, 'battlefieldMapCanvasSvg')}</div>` : '';
   reconcileRosterCards(document.getElementById('battlefieldRosterEl'), battlefieldRoster, 'player', true);
 }
 // Player's "⚔ Attack" button on an undefeated monster card — rolls with whatever's in their
@@ -22364,7 +22536,7 @@ function saveAppState() {
       recentlyLooted, savedLoadouts,
       activeTimedEffects, activeEffectCounter,
       currentMerchant, merchantDailyItems, merchantDailySold, merchantStapleStock, merchantTills,
-      battleRoster, battleLog, battleUidCounter,
+      battleRoster, battleLog, battleUidCounter, battleMapTokens,
       _battleActionTextMap, _battleActionCounter,
       activeBounties, bountyCounter,
       manglerFinishedWork, manglerPartKey, manglerItemKey, manglerFocus,
@@ -22421,6 +22593,7 @@ function applyStateBlob(data) {
   if (data.battleRoster) battleRoster = data.battleRoster;
   if (data.battleLog) battleLog = data.battleLog;
   if (typeof data.battleUidCounter === 'number') battleUidCounter = data.battleUidCounter;
+  if (data.battleMapTokens) battleMapTokens = data.battleMapTokens;
   if (data._battleActionTextMap) _battleActionTextMap = data._battleActionTextMap;
   if (typeof data._battleActionCounter === 'number') _battleActionCounter = data._battleActionCounter;
   if (data.activeBounties) activeBounties = data.activeBounties;

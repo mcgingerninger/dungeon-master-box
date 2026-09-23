@@ -38,6 +38,9 @@
 //       -- the DM claiming on someone else's behalf (a gift) — matching dmGiveLootItem's own
 //       -- permission check in the original.
 //     { type: 'push_battlefield', battleRoster, battleLog }        -- DM only
+//     { type: 'push_battle_map', activeBattleMap, battleMapTokens } -- DM only; the chosen Map
+//       -- Builder map (or null) and every placed token's position, merged into the same
+//       -- battlefield_broadcast row push_battlefield writes to
 //     { type: 'push_puzzle_log', puzzleLog }                       -- DM only
 //     { type: 'submit_attack_request', attack }                    -- any player, their own attack
 //     { type: 'resolve_attack_request', requestId }                -- DM only (apply/dismiss both
@@ -87,6 +90,10 @@
 //       -- published, so a reconnecting/late-joining player catches up immediately rather than
 //       -- waiting for the next DM action — matching what Firestore's onSnapshot already did by
 //       -- firing immediately with whatever the doc already held on subscribe.
+//     { type: 'push_battle_map_ack' } / { type: 'battle_map_update', activeBattleMap,
+//       -- battleMapTokens } -- same push/broadcast/catch-up shape as push_battlefield above, kept
+//       -- as its own message type since the map/tokens change on a different rhythm than the
+//       -- roster and don't need any loot-style filtering.
 //     { type: 'puzzle_log_update', puzzleLog }                    -- same broadcast/catch-up shape
 //     { type: 'roster_update', roster }                           -- sent to the DM's live connection
 //       -- only, whenever a connected player's stats might have changed (their own push, or a
@@ -363,6 +370,9 @@ export function createWebSocketServer(db, httpServer) {
           // immediately with the doc's current contents the moment a listener subscribes.
           const battlefield = loadSubsystemState(db, campaignId, 'battlefield_broadcast');
           if (battlefield) send(ws, { type: 'battlefield_update', battleRoster: battlefield.battleRoster, battleLog: battlefield.battleLog });
+          if (battlefield && (battlefield.activeBattleMap || (battlefield.battleMapTokens || []).length)) {
+            send(ws, { type: 'battle_map_update', activeBattleMap: battlefield.activeBattleMap || null, battleMapTokens: battlefield.battleMapTokens || [] });
+          }
           const puzzleLog = loadSubsystemState(db, campaignId, 'puzzle_log_broadcast');
           if (puzzleLog) send(ws, { type: 'puzzle_log_update', puzzleLog: puzzleLog.puzzleLog });
           // Phase 6d: same catch-up spirit — a player joining/reconnecting mid-hand should see
@@ -533,9 +543,27 @@ export function createWebSocketServer(db, httpServer) {
         if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can push battlefield state' });
         const battleRoster = filterBattleRosterForPlayers(msg.battleRoster);
         const battleLog = (msg.battleLog || []).slice(-50);
-        saveSubsystemState(db, identity.campaignId, 'battlefield_broadcast', { battleRoster, battleLog });
+        // Read-modify-write on the same subsystem row push_battle_map also writes to, so
+        // whichever pushes last doesn't clobber the other's fields, and reconnect catch-up
+        // (below) only needs one read to hand a rejoining player everything at once.
+        const existing = loadSubsystemState(db, identity.campaignId, 'battlefield_broadcast') || {};
+        saveSubsystemState(db, identity.campaignId, 'battlefield_broadcast', { ...existing, battleRoster, battleLog });
         broadcastToPlayers(identity.campaignId, { type: 'battlefield_update', battleRoster, battleLog });
         send(ws, { type: 'push_battlefield_ack' });
+        return;
+      }
+
+      // The DM's chosen battle map + token positions -- a separate message from push_battlefield
+      // (roster/HP/loot) since it changes on a completely different rhythm (picking a map, or
+      // dragging a token) and has nothing sensitive to filter out for players, unlike loot.
+      if (msg.type === 'push_battle_map') {
+        if (identity.role !== 'dm') return send(ws, { type: 'error', message: 'Only the DM can update the battle map' });
+        const activeBattleMap = msg.activeBattleMap || null;
+        const battleMapTokens = Array.isArray(msg.battleMapTokens) ? msg.battleMapTokens : [];
+        const existing = loadSubsystemState(db, identity.campaignId, 'battlefield_broadcast') || {};
+        saveSubsystemState(db, identity.campaignId, 'battlefield_broadcast', { ...existing, activeBattleMap, battleMapTokens });
+        broadcastToPlayers(identity.campaignId, { type: 'battle_map_update', activeBattleMap, battleMapTokens });
+        send(ws, { type: 'push_battle_map_ack' });
         return;
       }
 
