@@ -106,7 +106,7 @@
   .combat-subtab-btn.active { background: var(--surface2); border-color: var(--gold); color: var(--gold-bright); }
   .combat-subpanel { display: none; }
   .combat-subpanel.active { display: block; }
-  /* DM Controls' sub-tabs (Lore / Lists / Interactions / Reference / Geomorphs) reuse this same
+  /* DM Controls' sub-tabs (Lore / Lists / Interactions / Reference / Maps) reuse this same
      exact visual style under their own class names too — see showDmControlsSub() — same reason
      Combat's own sub-tabs above got a dedicated class rather than sharing .compendium-subpanel:
      a global querySelectorAll('.compendium-subpanel') elsewhere can never also toggle these off. */
@@ -1734,6 +1734,12 @@
     color:var(--text); font-size:0.8rem; width:24px; height:24px; line-height:1; cursor:pointer; border-radius:3px;
   }
   .geomorph-reroll-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .mapbuilder-battlemap-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:0.7rem; }
+  .mapbuilder-battlemap-card { background:var(--surface); border:1px solid var(--border); padding:0.5rem; display:flex; flex-direction:column; gap:0.4rem; }
+  .mapbuilder-battlemap-card.active { border-color:var(--gold); }
+  .mapbuilder-battlemap-thumb svg { width:100%; height:auto; display:block; border:1px solid var(--border); }
+  .mapbuilder-battlemap-name { font-size:0.85rem; color:var(--text); text-align:center; }
+  .mapbuilder-battlemap-card button { width:100%; }
   .unlock-item-card { background:var(--surface); border:1px solid var(--border); padding:0.6rem 0.7rem; margin-bottom:0.6rem; }
   .unlock-item-name { color:var(--gold-bright); font-weight:600; margin-bottom:0.4rem; }
   .unlock-tier-row { border-top:1px solid var(--border); padding-top:0.4rem; margin-top:0.4rem; }
@@ -3211,7 +3217,7 @@
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('traps',this)">💀 Traps &amp; Hazards</button>
     <button class="compendium-subtab-btn" onclick="showCompendiumSub('cults',this)">🩸 Cults</button>
   </div>
-  <p style="color:var(--text-dim);font-size:0.8rem;font-style:italic;margin:-0.6rem 0 0.8rem;">Interactions, Reference, and Geomorphs moved to the DM Controls tab.</p>
+  <p style="color:var(--text-dim);font-size:0.8rem;font-style:italic;margin:-0.6rem 0 0.8rem;">Interactions, Reference, and Maps moved to the DM Controls tab.</p>
 
   <div id="compendium-items" class="compendium-subpanel active">
   <div class="items-layout">
@@ -3640,7 +3646,7 @@
   </div>
 </div>
 
-<!-- Large view of a single geomorph tile — see renderGeomorphsPanel/openGeomorphLarge. -->
+<!-- Large view of a single geomorph tile — see renderGeomorphTileGallery/openGeomorphLarge. -->
 <div id="geomorphViewModal" class="edit-modal-overlay" onclick="if(event.target===this) closeGeomorphLarge()">
   <div class="edit-modal" style="width:min(560px,100%);">
     <div class="edit-modal-header"><h3 id="geomorphViewTitle">🗺 Geomorph Tile</h3><button class="edit-modal-close" onclick="closeGeomorphLarge()">×</button></div>
@@ -3857,14 +3863,17 @@
      Compendium/etc. already are, see multiplayer-sync.js's injectStyles). Now a sub-tabbed panel
      (see showDmControlsSub) — Lore (the campaign's own big-picture summary), Lists (generation
      toggles + the read-only list inspector, this tab's original content), and Interactions/
-     Reference/Geomorphs, all three relocated here from the Item Compendium tab. -->
+     Reference/Maps, all three relocated here from the Item Compendium tab. Maps (formerly
+     "Geomorphs") now also lists every Map Builder map alongside the procedural tile gallery,
+     since both are "a map the DM might want to use," and lets the DM designate one as the
+     current battle map (see activeBattleMapId). -->
 <div id="tab-dmcontrols" class="tab-content">
   <div class="dmcontrols-subtabs">
     <button class="dmcontrols-subtab-btn active" onclick="showDmControlsSub('lore',this)">📖 Lore</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('lists',this)">🎛 Lists</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('interactions',this)">⚙ Interactions</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('reference',this)">📜 Reference</button>
-    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('geomorphs',this)">🗺 Geomorphs</button>
+    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('maps',this)">🗺 Maps</button>
   </div>
 
   <!-- LORE — the campaign's own big-picture summary: the Ashcrown Empire, the Broken Crown, who
@@ -3954,8 +3963,16 @@
     <div id="referenceListWrap" class="reference-list"></div>
   </div>
 
-  <!-- Relocated from the Item Compendium tab -- see showDmControlsSub()'s own comment above. -->
-  <div id="dmcontrols-geomorphs" class="dmcontrols-subpanel">
+  <!-- Relocated from the Item Compendium tab -- see showDmControlsSub()'s own comment above.
+       Two galleries: the DM's own Map Builder maps (with a "Use as Battle Map" designation) on
+       top, and the procedural geomorph tile cards below -- both are "a map," just from two
+       different sources/data shapes, so they're browsed in one place rather than two. -->
+  <div id="dmcontrols-maps" class="dmcontrols-subpanel">
+    <h4 style="color:var(--gold);font-size:0.9rem;letter-spacing:0.04em;margin-bottom:0.4rem;">Your Maps</h4>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.6rem;">Maps built in the Map Builder tab. Pick one as the current battle map to show it (with movable tokens) on the Combat and Battlefield tabs.</p>
+    <div id="mapsBattleMapGrid" class="mapbuilder-battlemap-grid"></div>
+
+    <h4 style="color:var(--gold);font-size:0.9rem;letter-spacing:0.04em;margin:1.2rem 0 0.4rem;">Geomorph Tiles</h4>
     <div class="token-toolbar">
       <span style="color:var(--text-dim);font-size:0.85rem;">Procedurally-generated dungeon-tile cards — click one to view it large. Rerolling a tile replaces it with a freshly generated layout.</span>
       <button class="deck-draw-btn" style="margin-left:auto;" onclick="rerollAllGeomorphTiles()">🔄 Reroll All</button>
@@ -5094,7 +5111,47 @@ function geomorphTileSvg(grid, cellPx) {
 function ensureGeomorphTiles() {
   while (geomorphTiles.length < GEOMORPH_TILE_COUNT) geomorphTiles.push(generateGeomorphGrid());
 }
-function renderGeomorphsPanel() {
+
+// The DM's chosen "current battle map" -- one of mapBuilderMaps, designated from this same
+// Maps panel. Local-only like activeMapBuilderId (its own tiny key rather than the big
+// saveAppState blob), but ALSO pushed to players once chosen -- see Phase 3's sync wiring in
+// setActiveBattleMap() and pushBattlefieldState().
+let activeBattleMapId = null;
+function loadActiveBattleMapId() {
+  try { activeBattleMapId = localStorage.getItem('dmActiveBattleMapId') || null; } catch (e) { activeBattleMapId = null; }
+}
+loadActiveBattleMapId();
+function activeBattleMap() {
+  return mapBuilderMaps.find(m => m.id === activeBattleMapId) || null;
+}
+function setActiveBattleMap(id) {
+  activeBattleMapId = id;
+  try { localStorage.setItem('dmActiveBattleMapId', id); } catch (e) {}
+  renderBattleMapGallery();
+}
+
+// Renders both galleries in the Maps sub-tab: the DM's own Map Builder maps (with the "Use as
+// Battle Map" designation) and the procedural geomorph tile cards -- two different data shapes
+// that are both "a map," browsed in one panel.
+function renderMapsPanel() {
+  renderBattleMapGallery();
+  renderGeomorphTileGallery();
+}
+function renderBattleMapGallery() {
+  const wrap = document.getElementById('mapsBattleMapGrid');
+  if (!wrap) return;
+  wrap.innerHTML = mapBuilderMaps.length ? mapBuilderMaps.map(m => {
+    const isActive = m.id === activeBattleMapId;
+    return `
+    <div class="mapbuilder-battlemap-card ${isActive ? 'active' : ''}">
+      <div class="mapbuilder-battlemap-thumb">${mapBuilderThumbSvg(m, 6)}</div>
+      <div class="mapbuilder-battlemap-name">${escapeHtml(m.name)}</div>
+      <button class="combat-danger-btn" style="${isActive ? 'background:var(--gold);color:#1a1410;border-color:var(--gold);' : ''}" onclick="setActiveBattleMap('${m.id}')">${isActive ? '⚔ Current Battle Map' : '⚔ Use as Battle Map'}</button>
+    </div>
+  `;
+  }).join('') : '<p style="color:var(--text-dim);font-size:0.85rem;">No Map Builder maps yet — create one in the Map Builder tab.</p>';
+}
+function renderGeomorphTileGallery() {
   ensureGeomorphTiles();
   const wrap = document.getElementById('geomorphGrid');
   if (!wrap) return;
@@ -5107,12 +5164,12 @@ function renderGeomorphsPanel() {
 }
 function rerollGeomorphTile(i) {
   geomorphTiles[i] = generateGeomorphGrid();
-  renderGeomorphsPanel();
+  renderGeomorphTileGallery();
   if (typeof scheduleSave === 'function') scheduleSave();
 }
 function rerollAllGeomorphTiles() {
   geomorphTiles = Array.from({ length: GEOMORPH_TILE_COUNT }, generateGeomorphGrid);
-  renderGeomorphsPanel();
+  renderGeomorphTileGallery();
   if (typeof scheduleSave === 'function') scheduleSave();
 }
 function openGeomorphLarge(i) {
@@ -21007,7 +21064,7 @@ function formatGenListValue(value) {
 function humanizeGenListKey(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
-// DM Controls holds five sub-panels now (Lore/Lists/Interactions/Reference/Geomorphs, see
+// DM Controls holds five sub-panels now (Lore/Lists/Interactions/Reference/Maps, see
 // showDmControlsSub) -- same pattern as the Item Compendium's own sub-tabs (showCompendiumSub),
 // with its own dedicated dmcontrols-subtab-btn/dmcontrols-subpanel classes so this querySelectorAll
 // never collides with the Compendium or Combat tabs' identically-shaped sub-tab bars.
@@ -21020,7 +21077,7 @@ function initDmControlsSub(sub) {
   else if (sub === 'lists') { renderGenerationTogglesPanel(); renderGenerationListsViewer(); }
   else if (sub === 'interactions') renderInteractionsCompendium();
   else if (sub === 'reference') renderReferenceSection();
-  else if (sub === 'geomorphs') renderGeomorphsPanel();
+  else if (sub === 'maps') renderMapsPanel();
 }
 function showDmControlsSub(sub, btn) {
   activeDmControlsSub = sub;
