@@ -1573,6 +1573,7 @@
   .npc-card-field { font-size:0.86rem; line-height:1.45; margin-bottom:0.4rem; color:var(--text); }
   .npc-card-field strong { color:var(--gold); }
   .npc-card-appearance { font-size:0.85rem; line-height:1.45; margin-bottom:0.5rem; color:var(--text-dim); font-style:italic; }
+  .npc-card-traits { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem; }
   .npc-web-table-wrap { overflow-x:auto; }
   .npc-web-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
   .npc-web-table th { text-align:left; color:var(--gold); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; padding:0.5rem 0.7rem; border-bottom:1px solid var(--border); white-space:nowrap; }
@@ -3869,6 +3870,7 @@
       <label>Weapon</label><input id="editNpcWeapon" type="text">
       <label>Attacks (one per line, as "Name: text")</label><textarea id="editNpcAttacks" style="min-height:70px"></textarea>
       <label>Appearance</label><textarea id="editNpcAppearance" style="min-height:70px" placeholder="Race, height, build, and physical details a player would notice on sight"></textarea>
+      <label>Traits (comma-separated)</label><input id="editNpcTraits" type="text" placeholder="e.g. Blunt, Never raises his voice, Distrusts strangers on sight">
       <label>Backstory</label><textarea id="editNpcBackstory" style="min-height:90px"></textarea>
       <label>Secrets (DM-only)</label><textarea id="editNpcSecrets" style="min-height:70px"></textarea>
       <label>Cult Tie (optional)</label><input id="editNpcCultTie" type="text" placeholder="e.g. The Queen's Legion">
@@ -3913,11 +3915,11 @@
       <p class="lore-p">The Empire doesn't run on any one person's cruelty — it runs on a handful of institutions that each seemed reasonable when they started, and that a party can pull apart one at a time:</p>
       <ul class="lore-list">
         <li><strong>The Ashbond</strong> publicly guides the faithful toward genuine mastery of magic's deeper truths, and holds the Empire's fire-licensing charter — hearths, forges, signal beacons — as the legitimate, lucrative backbone of that mission. Its founder, <strong>Zaharos</strong>, is entirely sincere and entirely unaware that a hidden circle inside his own temples, led by <strong>Firewarden Cassia Emberlyn</strong>, has spent years quietly "Deepening" its most devoted followers — a magical rite that consumes the willing in pursuit of a revelation the circle has never once actually produced.</li>
-        <li><strong>The Queen's Legion</strong> no longer needs to infiltrate the civil service — it effectively <em>is</em> the civil service, embedding loyal judges, tax assessors, and guild registrars until the throne's official rulings and a hidden patron's private interests become impossible to tell apart. Its founder, <strong>Magistrate Odessa Faircross</strong>, ran the experiment on a real town once. It worked exactly as advertised, and the town stopped producing anyone ambitious enough to want to stay.</li>
-        <li><strong>The Black Books</strong> hold manufactured leverage over a growing number of sitting court officials, and have spent nearly a decade patiently engineering debts against the palace itself. Its local face, <strong>Auditor Voss Ferrand</strong>, doesn't know the "First Creditor" he answers to isn't a person at all — but he knows exactly whose interests his most sensitive collections actually serve, and has decided not asking further is its own kind of mercy.</li>
+        <li><strong>The Queen's Legion</strong> no longer needs to infiltrate the civil service — it effectively <em>is</em> the civil service, embedding loyal judges, tax assessors, and guild registrars until the throne's official rulings and a hidden patron's private interests become impossible to tell apart. Its founder and architect, <strong>Grand Inquisitor Darrow Vane</strong>, built it the same way he built his own religious authority: by deciding what counted as necessary, then never questioning himself again.</li>
+        <li><strong>The Black Books</strong> hold manufactured leverage over a growing number of sitting court officials, and have spent nearly a decade patiently engineering debts against the palace itself. Its local face, <strong>Auditor Voss Ferrand</strong>, doesn't know the "First Creditor" he answers to isn't a person at all — but he knows exactly whose interests his most sensitive collections actually serve.</li>
       </ul>
-      <p class="lore-p">None of the three answer to each other, and none of them think of themselves as tyranny's instruments. What almost nobody in any of the three realizes is that they share a single, unnamed set of patrons: a quiet cabal of Karvossa's wealthiest merchant-lords and old nobility, who use the Black Books' leverage and the Queen's Legion's embedded hands to run the Empire from underneath it — and who found, nearly a decade ago, that the surest way to secure everything else was to make sure the throne itself never asked too many questions again.</p>
-      <p class="lore-p">That project has two hands, and both belong to men who'd tell you, and half-believe it themselves, that they're doing something righteous. <strong>Grand Inquisitor Darrow Vane</strong> personally conducts the Empress's private "loyalty devotions" — a rite he was taught secures a monarch's soul, using tinctures <strong>Auditor Voss Ferrand</strong> quietly supplies through the Black Books' network. Some part of Darrow has always known a rite that leaves its subject a little dimmer each time isn't protecting anything. He has redefined that thought the same way he's redefined everything else that might otherwise make him a hypocrite.</p>
+      <p class="lore-p">None of the three answer to each other. What almost nobody in any of them realizes is that they share a single, unnamed set of patrons: a quiet cabal of Karvossa's wealthiest merchant-lords and old nobility, who use the Black Books' leverage and the Queen's Legion's embedded hands to run the Empire from underneath it.</p>
+      <p class="lore-p">That project has two hands. <strong>Grand Inquisitor Darrow Vane</strong> personally conducts the Empress's private "loyalty devotions" using tinctures <strong>Auditor Voss Ferrand</strong> supplies through the Black Books' network — the same two men who between them founded the Legion and secured the cabal's grip on the throne. Neither has ever discussed with the other what the rite actually does to her. Neither has stopped.</p>
 
       <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin:1.3rem 0 0.5rem;">The Empire's Reluctant Powerhouse</h3>
       <p class="lore-p"><strong>Lord Commander Bastian Reave</strong> is, by a wide margin, the single most dangerous weapon the Ashcrown Empire fields — rivaled only by <strong>General Thessaly Korrin's</strong> own battlefield ruthlessness. The two could not be more different underneath. Reave despises nearly everything he's ordered to do and stays only because his younger sister Sela's survival depends on Imperial patronage he's too afraid to risk losing; he's started keeping a private journal of orders he considers dishonorable, less as a plan than as quiet proof, someday, that he never actually believed in any of it. Korrin, by contrast, is a fierce and genuine true believer in the Crown's strength — which has made her enormously useful to the same hidden cabal that manages the throne, who keep her supplied with land, coin, and favors well beyond her official commission. She's decided she doesn't want to know exactly whose money that is.</p>
@@ -3935,7 +3937,7 @@
         <li><strong>Old Marrow</strong> is a Cinder Coast rebellion survivor Imperial records still list as executed twenty years ago — under General Korrin's own signature.</li>
         <li><strong>Sela Reave</strong> — Lord Commander Bastian Reave's chronically ill younger sister, not an NPC entry of her own but the whole reason he's still in Imperial service: her survival depends on physicians and patronage that stop the moment he stops being useful to the Crown. She's his one real vulnerability, and the only leverage that could plausibly turn the Empire's most feared soldier, if anyone ever worked out she exists.</li>
       </ul>
-      <p class="lore-p" style="margin-bottom:0;">See the <strong>NPCs tab</strong> for the full roster (backstories, stats, and DM-only secrets for all twenty-nine), the <strong>Cults</strong> sub-tab under Compendium for the Ashbond/Queen's Legion/Black Books writeups this page references, and the <strong>Fragments of Suffering</strong> and pantheon entries under Reference below if you want to tie divine or Court-of-Sin patronage into any of the above.</p>
+      <p class="lore-p" style="margin-bottom:0;">See the <strong>NPCs tab</strong> for the full roster (backstories, stats, and DM-only secrets for all twenty-eight), the <strong>Cults</strong> sub-tab under Compendium for the Ashbond/Queen's Legion/Black Books writeups this page references, and the <strong>Fragments of Suffering</strong> and pantheon entries under Reference below if you want to tie divine or Court-of-Sin patronage into any of the above.</p>
     </div>
   </div>
 
@@ -5373,6 +5375,7 @@ function createMapBuilderMap() {
     cells: blankMapBuilderGrid(w, h),
     edges: {},
     props: [],
+    backdrop: null,
   };
   mapBuilderMaps.push(map);
   activeMapBuilderId = map.id;
@@ -5425,6 +5428,77 @@ function zoomMapBuilder(delta) {
   renderMapBuilderTab();
 }
 
+// ---------- Backdrop import (Map Builder "trace over an imported map" feature) ----------
+// A backdrop is a foreign SVG (exported from a third-party map tool) embedded as a plain
+// <image> with a data: URI -- deliberately NOT parsed/inlined as live SVG DOM, since arbitrary
+// foreign markup could carry colliding ids, stray <style>/<script> content, or just be malformed
+// in ways that would break the rest of this canvas. An <image> tag asks the browser to rasterize/
+// render it in its own isolated context instead, which is both simpler and safer. Stored on the
+// map object itself (so it saves, duplicates, and exports along with everything else) as
+// { dataUrl, x, y, w, h, opacity, visible } in the same grid-pixel coordinate space cells/props
+// already use, defaulting to filling the whole grid. See mapGridBaseSvgParts() for how 'void'
+// cells become transparent (instead of their usual solid fill) whenever a visible backdrop is
+// present, so tracing over it only requires painting the cells you actually want to keep.
+const MAP_BUILDER_BACKDROP_WARN_BYTES = 3 * 1024 * 1024;
+function importMapBuilderBackdrop(inputEl) {
+  const map = activeMapBuilderMap();
+  const file = inputEl && inputEl.files && inputEl.files[0];
+  if (!map || !file) return;
+  if (file.size > MAP_BUILDER_BACKDROP_WARN_BYTES) {
+    const mb = (file.size / (1024 * 1024)).toFixed(1);
+    if (!confirm(`This SVG is ${mb} MB — large backdrops can slow down saving and multiplayer sync. Import anyway?`)) { inputEl.value = ''; return; }
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const viewW = map.w * (map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX);
+    const viewH = map.h * (map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX);
+    map.backdrop = { dataUrl: reader.result, x: 0, y: 0, w: viewW, h: viewH, opacity: 0.85, visible: true };
+    saveMapBuilderMaps();
+    renderMapBuilderTab();
+  };
+  reader.readAsDataURL(file);
+  inputEl.value = '';
+}
+function removeMapBuilderBackdrop() {
+  const map = activeMapBuilderMap();
+  if (!map || !map.backdrop) return;
+  if (!confirm('Remove the imported backdrop? The traced terrain/walls/props stay.')) return;
+  map.backdrop = null;
+  saveMapBuilderMaps();
+  renderMapBuilderTab();
+}
+function toggleMapBuilderBackdropVisible() {
+  const map = activeMapBuilderMap();
+  if (!map || !map.backdrop) return;
+  map.backdrop.visible = !map.backdrop.visible;
+  saveMapBuilderMaps();
+  renderMapBuilderTab();
+}
+function fitMapBuilderBackdropToGrid() {
+  const map = activeMapBuilderMap();
+  if (!map || !map.backdrop) return;
+  map.backdrop.x = 0;
+  map.backdrop.y = 0;
+  map.backdrop.w = map.w * (map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX);
+  map.backdrop.h = map.h * (map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX);
+  saveMapBuilderMaps();
+  renderMapBuilderTab();
+}
+// Shared setter for the backdrop's numeric placement/opacity fields -- one function instead of
+// four nearly-identical ones, since every control here is "parse this input, clamp it, re-render."
+function updateMapBuilderBackdropField(field, rawValue) {
+  const map = activeMapBuilderMap();
+  if (!map || !map.backdrop) return;
+  const n = parseFloat(rawValue);
+  if (Number.isNaN(n)) return;
+  if (field === 'opacity') map.backdrop.opacity = Math.max(0, Math.min(1, n));
+  else map.backdrop[field] = Math.max(0, n);
+  saveMapBuilderMaps();
+  const wrapEl = document.getElementById('mapBuilderCanvasWrap');
+  if (wrapEl) wrapEl.innerHTML = mapBuilderCanvasSvg(map);
+  attachMapBuilderPointerHandlers(map);
+}
+
 // A shared wall/door edge belongs to two adjacent cells at once -- canonicalizing S/E onto the
 // neighboring cell's N/W keeps each edge stored exactly once instead of as two entries that could
 // disagree with each other.
@@ -5437,6 +5511,14 @@ function mapBuilderEdgeKey(x, y, dir) {
 function mapBuilderThumbSvg(map, cellPx) {
   cellPx = cellPx || 5;
   const viewW = map.w * cellPx, viewH = map.h * cellPx;
+  const hasBackdrop = !!(map.backdrop && map.backdrop.visible !== false);
+  // Backdrop x/y/w/h are stored in the full-size editing canvas's own cellPx scale -- rescale
+  // into this thumbnail's much smaller one rather than storing (and having to keep in sync)
+  // two separate coordinate spaces for the same backdrop.
+  const scale = cellPx / (map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX);
+  const backdrop = hasBackdrop
+    ? `<image href="${map.backdrop.dataUrl}" x="${(map.backdrop.x || 0) * scale}" y="${(map.backdrop.y || 0) * scale}" width="${map.backdrop.w * scale}" height="${map.backdrop.h * scale}" opacity="${map.backdrop.opacity != null ? map.backdrop.opacity : 0.85}" preserveAspectRatio="none"/>`
+    : '';
   let cells = '';
   for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
     const key = map.cells[y][x];
@@ -5445,7 +5527,7 @@ function mapBuilderThumbSvg(map, cellPx) {
     cells += `<rect x="${x * cellPx}" y="${y * cellPx}" width="${cellPx}" height="${cellPx}" fill="${terrain.color}"/>`;
   }
   return `<svg viewBox="0 0 ${viewW} ${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
-    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${cells}
+    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}
   </svg>`;
 }
 
@@ -5455,9 +5537,15 @@ function mapBuilderThumbSvg(map, cellPx) {
 // (edit affordances vs. combatant tokens) on top of the identical base.
 function mapGridBaseSvgParts(map) {
   const cellPx = map.cellPx || MAP_BUILDER_DEFAULT_CELL_PX;
+  const hasBackdrop = !!(map.backdrop && map.backdrop.visible !== false);
+  const backdrop = hasBackdrop
+    ? `<image href="${map.backdrop.dataUrl}" x="${map.backdrop.x || 0}" y="${map.backdrop.y || 0}" width="${map.backdrop.w}" height="${map.backdrop.h}" opacity="${map.backdrop.opacity != null ? map.backdrop.opacity : 0.85}" preserveAspectRatio="none"/>`
+    : '';
   let cells = '';
   for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
-    const terrain = MAP_BUILDER_TERRAIN[map.cells[y][x]] || MAP_BUILDER_TERRAIN.void;
+    const key = map.cells[y][x];
+    if (hasBackdrop && key === 'void') continue; // let the backdrop show through unpainted cells
+    const terrain = MAP_BUILDER_TERRAIN[key] || MAP_BUILDER_TERRAIN.void;
     cells += `<rect x="${x * cellPx}" y="${y * cellPx}" width="${cellPx}" height="${cellPx}" fill="${terrain.color}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
   }
   let edges = '';
@@ -5487,13 +5575,13 @@ function mapGridBaseSvgParts(map) {
     const rects = shape.rects.map(([rx, ry, rw, rh], i) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${palette[i] || palette[palette.length - 1]}"/>`).join('');
     props += `<svg x="${p.x * cellPx + pad}" y="${p.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}">${rects}</svg>`;
   });
-  return { cellPx, cells, edges, props };
+  return { cellPx, cells, edges, props, backdrop };
 }
 function mapBuilderCanvasSvg(map) {
-  const { cellPx, cells, edges, props } = mapGridBaseSvgParts(map);
+  const { cellPx, cells, edges, props, backdrop } = mapGridBaseSvgParts(map);
   const viewW = map.w * cellPx, viewH = map.h * cellPx;
   return `<svg id="mapBuilderCanvasSvg" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
-    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${cells}${edges}${props}
+    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${props}
   </svg>`;
 }
 // The live battle map: same base rendering as mapBuilderCanvasSvg, plus one icon per placed
@@ -5502,7 +5590,7 @@ function mapBuilderCanvasSvg(map) {
 // Tokens outside the current grid (e.g. left over after switching to a smaller map) are skipped
 // rather than clipped/crashing.
 function battleMapCanvasSvg(map, tokens, svgId) {
-  const { cellPx, cells, edges, props } = mapGridBaseSvgParts(map);
+  const { cellPx, cells, edges, props, backdrop } = mapGridBaseSvgParts(map);
   const viewW = map.w * cellPx, viewH = map.h * cellPx;
   let tokenSvg = '';
   (tokens || []).forEach(t => {
@@ -5515,7 +5603,7 @@ function battleMapCanvasSvg(map, tokens, svgId) {
     tokenSvg += `<svg x="${t.x * cellPx + pad}" y="${t.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}" data-token-id="${t.id}"><title>${escapeHtml(t.label || '')}</title>${rects}</svg>`;
   });
   return `<svg id="${svgId}" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
-    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${cells}${edges}${props}${tokenSvg}
+    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${props}${tokenSvg}
   </svg>`;
 }
 
@@ -5663,6 +5751,23 @@ function mapBuilderToolsAndCanvasHtml(map) {
       </div>
       <div class="mapbuilder-tool-group">
         <button class="combat-danger-btn" onclick="exportMapBuilderSvg()">⬇ Export SVG</button>
+      </div>
+    </div>
+    <div class="mapbuilder-props-panel">
+      <span class="mapbuilder-tool-label">Backdrop — import an SVG map from another tool and trace over it. Painted cells cover it; empty (void) cells let it show through.</span>
+      <div class="interactions-check-row" style="align-items:center;">
+        <label class="combat-danger-btn" style="cursor:pointer;">📥 Import SVG<input type="file" accept=".svg,image/svg+xml" style="display:none;" onchange="importMapBuilderBackdrop(this)"></label>
+        ${map.backdrop ? `
+          <button class="combat-danger-btn" onclick="toggleMapBuilderBackdropVisible()">${map.backdrop.visible !== false ? '👁 Visible' : '🚫 Hidden'}</button>
+          <button class="combat-danger-btn" onclick="fitMapBuilderBackdropToGrid()">⛶ Fit to Grid</button>
+          <button class="combat-danger-btn" onclick="removeMapBuilderBackdrop()">🗑 Remove</button>
+          <span class="mapbuilder-tool-label">Opacity</span>
+          <input type="range" min="0" max="1" step="0.05" value="${map.backdrop.opacity != null ? map.backdrop.opacity : 0.85}" oninput="updateMapBuilderBackdropField('opacity', this.value)" style="width:100px;">
+          <span class="mapbuilder-tool-label">X</span><input type="number" value="${map.backdrop.x || 0}" onchange="updateMapBuilderBackdropField('x', this.value)" style="width:4.5rem;">
+          <span class="mapbuilder-tool-label">Y</span><input type="number" value="${map.backdrop.y || 0}" onchange="updateMapBuilderBackdropField('y', this.value)" style="width:4.5rem;">
+          <span class="mapbuilder-tool-label">W</span><input type="number" value="${map.backdrop.w}" onchange="updateMapBuilderBackdropField('w', this.value)" style="width:4.5rem;">
+          <span class="mapbuilder-tool-label">H</span><input type="number" value="${map.backdrop.h}" onchange="updateMapBuilderBackdropField('h', this.value)" style="width:4.5rem;">
+        ` : ''}
       </div>
     </div>
     <div class="mapbuilder-props-panel">
@@ -6156,6 +6261,7 @@ function npcCardHtml(npc) {
     ${statsLine ? `<div class="npc-card-stats">${escapeHtml(statsLine)}</div>` : ''}
     <div class="npc-card-field"><strong>Role:</strong> ${escapeHtml(n.role)} · <strong>Alignment:</strong> ${escapeHtml(n.alignment)}</div>
     ${n.appearance ? `<div class="npc-card-appearance">${escapeHtml(n.appearance)}</div>` : ''}
+    ${n.traits && n.traits.length ? `<div class="npc-card-traits">${n.traits.map(t => `<span class="tt-prop-chip">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
     ${n.weapon ? `<div class="npc-card-field"><strong>Weapon:</strong> ${escapeHtml(n.weapon)}</div>` : ''}
     ${attacksHtml}
     <div class="npc-card-field">${escapeHtml(n.backstory)}</div>
@@ -6175,7 +6281,7 @@ function renderNpcsTab() {
     const n = effectiveNpc(npc);
     if (factionFilter !== 'all' && n.faction !== factionFilter) return false;
     if (!search) return true;
-    const haystack = [n.name, n.title, n.role, n.appearance, n.backstory, n.location, n.cultTie].filter(Boolean).join(' ').toLowerCase();
+    const haystack = [n.name, n.title, n.role, n.appearance, ...(n.traits || []), n.backstory, n.location, n.cultTie].filter(Boolean).join(' ').toLowerCase();
     return haystack.includes(search);
   });
   const countEl = document.getElementById('npcCount');
@@ -6200,6 +6306,7 @@ function editNpc(id) {
   document.getElementById('editNpcWeapon').value = n.weapon || '';
   document.getElementById('editNpcAttacks').value = (n.attacks || []).map(a => `${a.name}: ${a.text}`).join('\n');
   document.getElementById('editNpcAppearance').value = n.appearance || '';
+  document.getElementById('editNpcTraits').value = (n.traits || []).join(', ');
   document.getElementById('editNpcBackstory').value = n.backstory || '';
   document.getElementById('editNpcSecrets').value = n.secrets || '';
   document.getElementById('editNpcCultTie').value = n.cultTie || '';
@@ -6234,6 +6341,7 @@ function saveEditedNpc() {
     weapon: document.getElementById('editNpcWeapon').value.trim(),
     attacks: parseNpcAttacksInput(document.getElementById('editNpcAttacks').value),
     appearance: document.getElementById('editNpcAppearance').value.trim(),
+    traits: document.getElementById('editNpcTraits').value.split(',').map(t => t.trim()).filter(Boolean),
     backstory: document.getElementById('editNpcBackstory').value.trim(),
     secrets: document.getElementById('editNpcSecrets').value.trim(),
     cultTie: document.getElementById('editNpcCultTie').value.trim() || null,
