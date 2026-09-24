@@ -143,7 +143,7 @@ const JOURNEY_ENCOUNTERS = [
     people: [], situation: "This is one of \"Big\" Tam Wexley's rural rebel supply caches — Tam alone knows the full map of them, and this one hasn't been collected yet.",
     approaches: [
       { label: "Take the cache", outcome: "Rations, a little coin, and a few usable supplies — clearly meant for someone who never came.", consequence: { type: "loot", rarity: "uncommon" } },
-      { label: "Leave it, but mark the location", outcome: "You leave it untouched, filing away exactly where it is. Might matter later.", consequence: { type: "note", text: "You've located one of the Broken Crown's rural supply caches without touching it — a future favor or a future problem, depending who finds out." } },
+      { label: "Leave it, but mark the location", outcome: "You leave it untouched, filing away exactly where it is. Might matter later.", consequence: { type: "note", text: "You've located one of the Second Flame's rural supply caches without touching it — a future favor or a future problem, depending who finds out." } },
       { label: "Report it (to whoever will pay)", outcome: "You'd need to find a buyer for this information first — nobody official is nearby to sell it to right now.", consequence: { type: "none" } },
     ] },
 
@@ -180,13 +180,13 @@ const JOURNEY_ENCOUNTERS = [
       { label: "Offer to help mark trail", outcome: "The work goes faster with two. She's genuinely grateful and shares a trail ration.", consequence: { type: "gold", amount: 4 } },
       { label: "Leave her to it", outcome: "You continue on. She barely looks up.", consequence: { type: "none" } },
     ] },
-  { id: "fo-rhoswen-raiders", category: "hostile", settings: ["forest", "mountains"], title: "A Broken Crown Patrol, On Edge",
+  { id: "fo-rhoswen-raiders", category: "hostile", settings: ["forest", "mountains"], title: "A Second Flame Patrol, On Edge",
     scene: { environment: "A small camp half-hidden under a rock overhang, cold fire pit, packed gear ready to move fast.", atmosphere: "Tense, wary — these people expect trouble and are braced for it." },
     people: [{ name: "Captain Rhoswen Ash", npcId: "field-commander-ash", appearance: "Lean, scarred, a soldier's economy of movement.", personality: "Suspicious of strangers first, reasonable once she's sure you're not Imperial.", wants: "To know exactly who you are before anything else happens.", hides: "A twenty-year grudge against General Korrin that's about to turn personal." }],
-    situation: "This is a Broken Crown raiding patrol, not bandits — if the party can prove they aren't Imperial, this doesn't have to end in a fight.",
+    situation: "This is a Second Flame raiding patrol, not bandits — if the party can prove they aren't Imperial, this doesn't have to end in a fight.",
     sourceRef: { type: "npc", ref: "field-commander-ash" },
     approaches: [
-      { label: "Identify yourselves peacefully", outcome: "Rhoswen sizes you up hard, then stands down. Cautious, but not hostile.", consequence: { type: "note", text: "Captain Rhoswen Ash now knows your faces — a wary, potential future contact with the Broken Crown." } },
+      { label: "Identify yourselves peacefully", outcome: "Rhoswen sizes you up hard, then stands down. Cautious, but not hostile.", consequence: { type: "note", text: "Captain Rhoswen Ash now knows your faces — a wary, potential future contact with the Second Flame." } },
       { label: "Claim to be Imperial scouts (lie)", outcome: "The lie doesn't hold — Rhoswen's people know real Imperial gear on sight.", consequence: { type: "monster", crBand: [2, 5] } },
       { label: "Attack first", outcome: "A costly mistake — these are trained soldiers, not opportunists.", consequence: { type: "namedNpc", npcName: "Captain Rhoswen Ash" } },
       { label: "Withdraw quietly", outcome: "You back away before anyone commits to anything. Rhoswen lets you go.", consequence: { type: "none" } },
@@ -673,7 +673,7 @@ const JOURNEY_ENCOUNTERS = [
     ] },
   { id: "ci-old-yura-fortune", category: "peaceful", settings: ["city"], title: "Old Yura's Fortune-Telling Stall",
     scene: { environment: "A small, cluttered stall in the market square, hung with charms and dried herbs, an old woman seated behind a worn table.", atmosphere: "Warm, theatrical, faintly mysterious in a way that could be entirely an act." },
-    people: [{ name: "Old Yura", npcId: "hedge-mage-yura", appearance: "Wrinkled, sharp-eyed, dressed in layers of mismatched colorful cloth.", personality: "Playful, deliberately cryptic, watches reactions more than she watches cards.", wants: "To seem harmless and forgettable.", hides: "She is secretly the Cinderwright, the Broken Crown's most effective propagandist, hiding in plain sight from three separate Inquisitorial investigations." }],
+    people: [{ name: "Old Yura", npcId: "hedge-mage-yura", appearance: "Wrinkled, sharp-eyed, dressed in layers of mismatched colorful cloth.", personality: "Playful, deliberately cryptic, watches reactions more than she watches cards.", wants: "To seem harmless and forgettable.", hides: "She is secretly the Cinderwright, the Second Flame's most effective propagandist, hiding in plain sight from three separate Inquisitorial investigations." }],
     situation: "Yura's fortune-telling is genuinely half-real, half-performance — and entirely a cover for who she actually is.",
     sourceRef: { type: "npc", ref: "hedge-mage-yura" },
     approaches: [
