@@ -5973,20 +5973,94 @@ function removeBattleMapToken(id) {
   renderCombatBattleMap();
   commitBattleMapTokens();
 }
+// ---------- Battle map view-zoom (DM Combat tab + player Battlefield tab, mobile and desktop)
+// ----------
+// Per-VIEWER local UI state only -- like scroll position, never written to `map`, never part of
+// saveAppState or pushBattleMapState, never synced to anyone else. A pure CSS `transform: scale`
+// layer on the already-rendered <svg>, so it needs no cooperation from the paint/drag logic at
+// all: attachBattleMapPointerHandlers/attachMapBuilderPointerHandlers already recompute their
+// pixel-to-cell scale from the SVG's live (post-transform) getBoundingClientRect() on every
+// event, so a zoomed view is transparent to them automatically.
+const MAP_ZOOM_MIN = 0.5, MAP_ZOOM_MAX = 3;
+const _mapZoomState = {}; // wrapElId -> current zoom level, keyed per canvas instance (DM vs player)
+function touchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX, dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+function applyMapZoom(wrapElId, svgId, zoom) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  // Resizing width/height (viewBox stays fixed, so the browser scales the rendered content to
+  // fit) rather than a CSS transform: a transform doesn't reliably grow the element's LAYOUT box,
+  // so the wrapping .mapbuilder-canvas-wrap's overflow:auto never saw anything to scroll to --
+  // zoomed-in content was clipped, not scrollable. Explicit width/height participates in layout
+  // normally, so the wrap correctly gains scrollbars once the map is bigger than its viewport.
+  const baseW = svg.viewBox.baseVal.width, baseH = svg.viewBox.baseVal.height;
+  svg.style.width = (baseW * zoom) + 'px';
+  svg.style.height = (baseH * zoom) + 'px';
+  _mapZoomState[wrapElId] = zoom;
+  const label = document.getElementById(wrapElId + '-zoomLabel');
+  if (label) label.textContent = Math.round(zoom * 100) + '%';
+}
+function setMapZoom(wrapElId, svgId, zoom) {
+  applyMapZoom(wrapElId, svgId, Math.max(MAP_ZOOM_MIN, Math.min(MAP_ZOOM_MAX, zoom)));
+}
+function nudgeMapZoom(wrapElId, svgId, delta) {
+  setMapZoom(wrapElId, svgId, (_mapZoomState[wrapElId] || 1) + delta);
+}
+// Call once right after the map SVG's markup is written into the DOM (id=svgId, inside a
+// scrollable wrapper id=wrapElId). `toolbarElId`, if given, gets +/- buttons and a live
+// percentage label. Desktop: mouse wheel over the map. Mobile: the same +/- buttons (large tap
+// targets, reliable regardless of touch precision) plus real two-finger pinch -- pinch handling
+// only engages at exactly 2 touch points, so a single finger passes straight through to the DM
+// canvas's own token-drag pointer handlers untouched.
+function attachMapZoomControls(wrapElId, svgId, toolbarElId) {
+  const wrapEl = document.getElementById(wrapElId);
+  if (!wrapEl || !document.getElementById(svgId)) return;
+  applyMapZoom(wrapElId, svgId, _mapZoomState[wrapElId] || 1);
+  const toolbar = toolbarElId && document.getElementById(toolbarElId);
+  if (toolbar) {
+    toolbar.innerHTML = `
+      <button class="mapbuilder-tool-btn" style="width:auto;padding:0 0.5rem;" onclick="nudgeMapZoom('${wrapElId}','${svgId}',-0.25)">−</button>
+      <span class="mapbuilder-tool-label" id="${wrapElId}-zoomLabel">${Math.round((_mapZoomState[wrapElId] || 1) * 100)}%</span>
+      <button class="mapbuilder-tool-btn" style="width:auto;padding:0 0.5rem;" onclick="nudgeMapZoom('${wrapElId}','${svgId}',0.25)">+</button>
+    `;
+  }
+  wrapEl.onwheel = (evt) => { evt.preventDefault(); nudgeMapZoom(wrapElId, svgId, evt.deltaY < 0 ? 0.15 : -0.15); };
+  let pinchStartDist = null, pinchStartZoom = 1;
+  wrapEl.ontouchstart = (evt) => {
+    if (evt.touches.length !== 2) { pinchStartDist = null; return; }
+    pinchStartDist = touchDistance(evt.touches);
+    pinchStartZoom = _mapZoomState[wrapElId] || 1;
+  };
+  wrapEl.ontouchmove = (evt) => {
+    if (evt.touches.length !== 2 || pinchStartDist == null) return;
+    evt.preventDefault();
+    setMapZoom(wrapElId, svgId, pinchStartZoom * (touchDistance(evt.touches) / pinchStartDist));
+  };
+  wrapEl.ontouchend = (evt) => { if (evt.touches.length < 2) pinchStartDist = null; };
+}
+
+let _lastCombatBattleMapId = null;
 function renderCombatBattleMap() {
   const wrap = document.getElementById('combatBattleMapPanel');
   if (!wrap) return;
   const map = activeBattleMap();
   if (!map) {
     wrap.innerHTML = `<div class="mapbuilder-props-panel"><p style="color:var(--text-dim);font-size:0.85rem;margin:0;">No battle map chosen yet — pick one under 🎛 DM Controls → 🗺 Maps.</p></div>`;
+    _lastCombatBattleMapId = null;
     return;
   }
+  if (map.id !== _lastCombatBattleMapId) { _mapZoomState.combatBattleMapCanvasWrap = 1; _lastCombatBattleMapId = map.id; }
   const unplaced = battleMapUnplacedCombatants();
   wrap.innerHTML = `
     <div class="mapbuilder-toolbar">
       <span class="mapbuilder-tool-label">🗺 Battle Map</span>
       <span style="color:var(--text);font-size:0.9rem;">${escapeHtml(map.name)}</span>
-      <span style="color:var(--text-dim);font-size:0.8rem;margin-left:auto;">Drag a token to move it. Right-click (or long-press) a token to remove it. Change maps under DM Controls → Maps.</span>
+      <div class="mapbuilder-tool-group" id="combatBattleMapZoomToolbar" style="margin-left:auto;"></div>
+    </div>
+    <div class="mapbuilder-toolbar">
+      <span style="color:var(--text-dim);font-size:0.8rem;">Drag a token to move it. Right-click (or long-press) a token to remove it. Pinch or scroll to zoom. Change maps under DM Controls → Maps.</span>
     </div>
     ${unplaced.length ? `
     <div class="mapbuilder-props-panel">
@@ -5998,6 +6072,7 @@ function renderCombatBattleMap() {
     <div class="inv-grid-wrap mapbuilder-canvas-wrap" id="combatBattleMapCanvasWrap">${battleMapCanvasSvg(map, battleMapTokens, 'combatBattleMapCanvasSvg')}</div>
   `;
   attachBattleMapPointerHandlers(map);
+  attachMapZoomControls('combatBattleMapCanvasWrap', 'combatBattleMapCanvasSvg', 'combatBattleMapZoomToolbar');
 }
 // Same pointer-to-cell math as Map Builder's own attachMapBuilderPointerHandlers, adapted to pick
 // up and drag whichever token is nearest the cursor instead of painting terrain. Purely local
@@ -6036,6 +6111,7 @@ function attachBattleMapPointerHandlers(map) {
     const wrapEl = document.getElementById('combatBattleMapCanvasWrap');
     if (wrapEl) wrapEl.innerHTML = battleMapCanvasSvg(map, battleMapTokens, 'combatBattleMapCanvasSvg');
     attachBattleMapPointerHandlers(map);
+    applyMapZoom('combatBattleMapCanvasWrap', 'combatBattleMapCanvasSvg', _mapZoomState.combatBattleMapCanvasWrap || 1);
   };
   svg.onpointerup = () => {
     if (_draggingBattleMapToken) commitBattleMapTokens();
@@ -19284,9 +19360,24 @@ window.applyRemoteBattleMapState = function (map, tokens) {
   battlefieldMapTokens = tokens || [];
   renderBattlefieldForPlayer();
 };
+let _lastBattlefieldMapId = null;
 function renderBattlefieldForPlayer() {
   const mapWrap = document.getElementById('battlefieldMapWrap');
-  if (mapWrap) mapWrap.innerHTML = battlefieldMap ? `<div class="inv-grid-wrap mapbuilder-canvas-wrap">${battleMapCanvasSvg(battlefieldMap, battlefieldMapTokens, 'battlefieldMapCanvasSvg')}</div>` : '';
+  if (mapWrap) {
+    if (battlefieldMap) {
+      if (battlefieldMap.id !== _lastBattlefieldMapId) { _mapZoomState.battlefieldMapCanvasWrap = 1; _lastBattlefieldMapId = battlefieldMap.id; }
+      mapWrap.innerHTML = `
+        <div class="mapbuilder-toolbar"><span class="mapbuilder-tool-label">🗺 ${escapeHtml(battlefieldMap.name)}</span>
+          <div class="mapbuilder-tool-group" id="battlefieldMapZoomToolbar" style="margin-left:auto;"></div>
+        </div>
+        <div class="inv-grid-wrap mapbuilder-canvas-wrap" id="battlefieldMapCanvasWrap">${battleMapCanvasSvg(battlefieldMap, battlefieldMapTokens, 'battlefieldMapCanvasSvg')}</div>
+      `;
+      attachMapZoomControls('battlefieldMapCanvasWrap', 'battlefieldMapCanvasSvg', 'battlefieldMapZoomToolbar');
+    } else {
+      mapWrap.innerHTML = '';
+      _lastBattlefieldMapId = null;
+    }
+  }
   renderBattlefieldLog();
   reconcileRosterCards(document.getElementById('battlefieldRosterEl'), battlefieldRoster, 'player', true);
 }
