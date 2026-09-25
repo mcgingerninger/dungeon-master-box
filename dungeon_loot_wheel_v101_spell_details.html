@@ -5266,72 +5266,106 @@ const MAP_BUILDER_DEFAULT_CELL_PX = 28;
 // a parallel `colors` array (one fill per rect, in rect order) for a bit of shading/detail --
 // see pixelIconSvg()'s extended signature below. Rendered with that same shared helper, just
 // placed on the map grid instead of an inventory slot.
+// Every entry redesigned at a much bigger rect budget (roughly 6-12, up from 2-6) plus an
+// outlineColor (see renderIconRects) -- this is the "less 8-bit, more detail" pass: still pure
+// flat-color SVG rects, no new rendering technology, just meaningfully more of them per shape.
 const MAP_ICONS = {
-  torch:      { viewBox: '0 0 8 14',  rects: [[3,6,2,8],[2,4,4,2],[3,1,2,3],[3,0,2,1]],
-                colors: ['#5a3d22','#3a3a3a','#e8963a','#f7d774'] },
-  chest:      { viewBox: '0 0 14 10', rects: [[0,3,14,7],[0,3,14,2],[6,1,2,3],[0,6,14,1]],
-                colors: ['#5a3d22','#6b4a30','#c9a84c','#3a2a18'] },
-  table:      { viewBox: '0 0 14 10', rects: [[0,0,14,2],[1,2,2,8],[11,2,2,8]],
-                colors: ['#7a5230','#4a3218','#4a3218'] },
-  barrel:     { viewBox: '0 0 10 14', rects: [[1,0,8,14],[0,3,10,1],[0,10,10,1]],
-                colors: ['#6b4a30','#3a2a18','#3a2a18'] },
-  stairsUp:   { viewBox: '0 0 14 14', rects: [[0,11,14,3],[2,8,10,3],[4,5,8,3],[6,2,6,3]],
-                colors: ['#5a4a3a','#6b5a48','#7a6858','#8a7868'] },
-  stairsDown: { viewBox: '0 0 14 14', rects: [[0,0,14,3],[2,3,10,3],[4,6,8,3],[6,9,6,3]],
-                colors: ['#8a7868','#7a6858','#6b5a48','#5a4a3a'] },
-  trap:       { viewBox: '0 0 12 12', rects: [[0,0,12,2],[0,10,12,2],[0,0,2,12],[10,0,2,12],[4,4,4,4]],
-                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#a83232'] },
-  altar:      { viewBox: '0 0 14 10', rects: [[2,0,10,2],[0,2,14,2],[3,4,8,6]],
-                colors: ['#c9a84c','#8a8070','#5a5040'] },
-  statue:     { viewBox: '0 0 10 14', rects: [[3,0,4,4],[2,4,6,6],[0,10,10,4]],
-                colors: ['#9a9a9a','#8a8a8a','#6a6a6a'] },
-  campfire:   { viewBox: '0 0 12 12', rects: [[1,9,10,2],[4,4,1,5],[7,4,1,5],[5,1,2,6]],
-                colors: ['#4a3218','#e8963a','#e8963a','#f7d774'] },
-  bookshelf:  { viewBox: '0 0 12 14', rects: [[0,0,12,14],[0,4,12,1],[0,9,12,1],[1,1,2,3],[4,1,2,3],[7,1,2,3]],
-                colors: ['#4a3218','#2a1a10','#2a1a10','#a83232','#3a6ba8','#4a7a3a'] },
-  rug:        { viewBox: '0 0 14 10', rects: [[0,0,14,10],[1,1,12,8],[2,2,10,6]],
-                colors: ['#7a2a2a','#9a3a3a','#7a2a2a'] },
-  well:       { viewBox: '0 0 12 12', rects: [[0,0,12,2],[1,0,10,2],[2,4,8,8],[3,5,6,6]],
-                colors: ['#5a3d22','#5a3d22','#7a7a7a','#1a2a3a'] },
-  cage:       { viewBox: '0 0 12 12', rects: [[0,0,2,12],[10,0,2,12],[5,0,2,12],[0,0,12,2],[0,10,12,2]],
-                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a'] },
-  anvil:      { viewBox: '0 0 14 10', rects: [[3,0,8,3],[5,3,4,4],[0,7,14,3]],
-                colors: ['#4a4a4a','#3a3a3a','#2a2a2a'] },
-  cauldron:   { viewBox: '0 0 12 10', rects: [[4,0,1,3],[7,0,1,3],[0,2,12,1],[2,3,8,6]],
-                colors: ['#4a4a4a','#4a4a4a','#3a3a3a','#2a2a2a'] },
-  banner:     { viewBox: '0 0 8 14',  rects: [[3,0,2,14],[0,2,8,8],[2,10,4,2]],
-                colors: ['#5a3d22','#7a2a2a','#4a1a1a'] },
-  tree:       { viewBox: '0 0 12 14', rects: [[5,8,2,6],[1,2,10,7]],
-                colors: ['#4a3218','#3f6b34'] },
-  rock:       { viewBox: '0 0 12 8',  rects: [[2,2,8,6],[0,5,3,3],[9,5,3,3]],
-                colors: ['#6a6a6a','#5a5a5a','#5a5a5a'] },
-  bridge:     { viewBox: '0 0 16 8',  rects: [[0,6,16,2],[1,0,2,4],[13,0,2,4],[0,4,16,2]],
-                colors: ['#3a2a18','#4a3218','#4a3218','#6b4a30'] },
-  pillar:     { viewBox: '0 0 8 14',  rects: [[0,0,8,2],[2,2,4,10],[0,12,8,2]],
-                colors: ['#8a8a8a','#7a7a7a','#8a8a8a'] },
-  rubble:     { viewBox: '0 0 14 8',  rects: [[0,4,4,4],[5,5,3,3],[9,3,5,5],[3,2,2,2]],
-                colors: ['#5a5a5a','#6a6a6a','#4a4a4a','#7a7a7a'] },
-  fountain:   { viewBox: '0 0 12 10', rects: [[1,6,10,3],[3,2,6,4],[5,0,2,2]],
-                colors: ['#7a7a7a','#7a7a7a','#3a7a9a'] },
-  bones:      { viewBox: '0 0 14 8',  rects: [[0,3,14,2],[1,0,2,2],[1,6,2,2],[11,0,2,2],[11,6,2,2]],
-                colors: ['#e8dfc8','#e8dfc8','#e8dfc8','#e8dfc8','#e8dfc8'] },
-  ladder:     { viewBox: '0 0 8 14',  rects: [[0,0,1,14],[7,0,1,14],[0,2,8,1],[0,6,8,1],[0,10,8,1]],
-                colors: ['#6b4a30','#6b4a30','#6b4a30','#6b4a30','#6b4a30'] },
-  portcullis: { viewBox: '0 0 12 14', rects: [[0,0,2,14],[3,0,2,14],[6,0,2,14],[9,0,2,14],[0,4,12,1],[0,9,12,1]],
-                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#2a2a2a','#2a2a2a'] },
-  lever:      { viewBox: '0 0 8 12',  rects: [[0,8,8,4],[3,0,2,9],[1,0,2,2]],
-                colors: ['#4a4a4a','#6a6a6a','#a83232'] },
-  monster:    { viewBox: '0 0 10 10', rects: [[1,1,8,8],[2,3,2,2],[6,3,2,2]],
-                colors: ['#5a3a5a','#e83232','#e83232'] },
-  player:     { viewBox: '0 0 8 12',  rects: [[2,0,4,4],[1,4,6,5],[0,9,3,3],[5,9,3,3]],
-                colors: ['#e8dfc8','#3a6ba8','#2a2a2a','#2a2a2a'] },
-  boss:       { viewBox: '0 0 12 12', rects: [[1,1,10,10],[2,3,2,2],[8,3,2,2],[3,8,6,1]],
-                colors: ['#3a1a3a','#e8d060','#e8d060','#e83232'] },
-  npcAlly:    { viewBox: '0 0 8 12',  rects: [[2,0,4,4],[1,4,6,5],[0,9,3,3],[5,9,3,3]],
-                colors: ['#e8dfc8','#4a7a3a','#2a2a2a','#2a2a2a'] },
+  torch:      { viewBox: '0 0 8 14', outlineColor: '#2a1a10',
+                rects: [[3,7,2,7],[3,7,1,7],[2,9,4,1],[2,12,4,1],[1,5,6,2],[1,5,6,1],[2,2,4,3],[3,1,2,3],[3,0,2,1],[3,1,1,2]],
+                colors: ['#5a3d22','#7a5838','#3a2a18','#3a2a18','#4a4a4a','#5a5a5a','#e8963a','#f0a840','#f7d774','#fce9a8'] },
+  chest:      { viewBox: '0 0 14 10', outlineColor: '#1a1008',
+                rects: [[0,3,14,7],[1,4,12,5],[0,3,14,2],[1,3,12,1],[5,1,4,3],[6,2,2,1],[1,3,1,7],[12,3,1,7],[0,6,14,1]],
+                colors: ['#4a3218','#6b4a30','#5a3d22','#7a5838','#c9a84c','#2a1a10','#3a2a18','#3a2a18','#2a1a10'] },
+  table:      { viewBox: '0 0 14 10', outlineColor: '#2a1a10',
+                rects: [[0,0,14,2],[0,0,14,1],[1,2,2,8],[11,2,2,8],[1,2,1,8],[11,2,1,8],[3,6,8,1]],
+                colors: ['#7a5230','#8a6238','#4a3218','#4a3218','#5a4020','#5a4020','#4a3218'] },
+  barrel:     { viewBox: '0 0 10 14', outlineColor: '#2a1a10',
+                rects: [[1,0,8,14],[2,0,1,14],[6,0,1,14],[0,2,10,1],[0,6,10,1],[0,10,10,1],[1,0,8,1],[1,13,8,1]],
+                colors: ['#6b4a30','#7a5838','#7a5838','#3a2a18','#3a2a18','#3a2a18','#5a3d22','#5a3d22'] },
+  stairsUp:   { viewBox: '0 0 14 14', outlineColor: '#2a2018',
+                rects: [[0,11,14,3],[0,11,14,1],[2,8,10,3],[2,8,10,1],[4,5,8,3],[4,5,8,1],[6,2,6,3],[6,2,6,1]],
+                colors: ['#5a4a3a','#6a5848','#6b5a48','#7b6858','#7a6858','#8a7868','#8a7868','#9a8878'] },
+  stairsDown: { viewBox: '0 0 14 14', outlineColor: '#2a2018',
+                rects: [[0,0,14,3],[0,0,14,1],[2,3,10,3],[2,3,10,1],[4,6,8,3],[4,6,8,1],[6,9,6,3],[6,9,6,1]],
+                colors: ['#8a7868','#9a8878','#7a6858','#8a7868','#6b5a48','#7b6858','#5a4a3a','#6a5848'] },
+  trap:       { viewBox: '0 0 12 12', outlineColor: '#1a1a1a',
+                rects: [[0,0,12,2],[0,10,12,2],[0,0,2,12],[10,0,2,12],[2,2,1,8],[9,2,1,8],[4,4,4,4],[5,5,2,2],[4,4,4,1]],
+                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#2a2a2a','#2a2a2a','#a83232','#e05050','#c94242'] },
+  altar:      { viewBox: '0 0 14 10', outlineColor: '#2a2418',
+                rects: [[2,0,10,2],[2,0,10,1],[0,2,14,2],[0,2,14,1],[3,4,8,6],[3,4,8,1],[4,5,6,4],[6,3,2,1]],
+                colors: ['#c9a84c','#e0c070','#8a8070','#9a9080','#5a5040','#6a6050','#4a4030','#f0e090'] },
+  statue:     { viewBox: '0 0 10 14', outlineColor: '#2a2a2a',
+                rects: [[3,0,4,4],[3,0,4,1],[2,4,6,6],[2,4,2,6],[0,10,10,4],[0,10,10,1],[4,1,1,1],[6,1,1,1]],
+                colors: ['#9a9a9a','#aaaaaa','#8a8a8a','#7a7a7a','#6a6a6a','#7a7a7a','#4a4a4a','#4a4a4a'] },
+  campfire:   { viewBox: '0 0 12 12', outlineColor: '#2a1508',
+                rects: [[1,9,10,2],[1,9,10,1],[4,4,1,5],[7,4,1,5],[5,1,2,6],[5,5,2,4],[5,3,2,2],[5,1,2,2]],
+                colors: ['#4a3218','#5a4020','#3a2a18','#3a2a18','#e8963a','#f0a840','#f7d774','#fce9a8'] },
+  bookshelf:  { viewBox: '0 0 12 14', outlineColor: '#1a1008',
+                rects: [[0,0,12,14],[0,0,12,1],[0,4,12,1],[0,9,12,1],[1,1,2,3],[4,1,2,3],[7,1,2,3],[1,5,2,3],[4,5,2,3],[7,5,2,3],[1,10,2,3],[4,10,2,3]],
+                colors: ['#4a3218','#5a4020','#2a1a10','#2a1a10','#a83232','#3a6ba8','#4a7a3a','#8a5a2a','#5a3a8a','#a89040','#3a6ba8','#a83232'] },
+  rug:        { viewBox: '0 0 14 10', outlineColor: '#3a0a0a',
+                rects: [[0,0,14,10],[1,1,12,8],[2,2,10,6],[3,3,8,4],[6,4,2,2]],
+                colors: ['#5a1a1a','#7a2a2a','#9a3a3a','#7a2a2a','#c9a84c'] },
+  well:       { viewBox: '0 0 12 12', outlineColor: '#2a1a10',
+                rects: [[0,0,12,2],[1,0,10,2],[2,4,8,8],[2,4,8,1],[3,5,6,6],[2,2,1,2],[9,2,1,2],[0,2,3,1],[9,2,3,1]],
+                colors: ['#5a3d22','#6b4a30','#8a8a8a','#9a9a9a','#1a2a3a','#5a3d22','#5a3d22','#4a3218','#4a3218'] },
+  cage:       { viewBox: '0 0 12 12', outlineColor: '#1a1a1a',
+                rects: [[0,0,2,12],[3,0,2,12],[6,0,2,12],[9,0,2,12],[0,0,12,1],[0,11,12,1],[5,5,2,2]],
+                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#2a2a2a','#2a2a2a','#6a5a2a'] },
+  anvil:      { viewBox: '0 0 14 10', outlineColor: '#1a1a1a',
+                rects: [[3,0,8,3],[3,0,8,1],[5,3,4,4],[0,7,14,3],[0,7,14,1],[1,3,2,1],[11,3,2,1]],
+                colors: ['#4a4a4a','#6a6a6a','#3a3a3a','#2a2a2a','#3a3a3a','#4a4a4a','#4a4a4a'] },
+  cauldron:   { viewBox: '0 0 12 10', outlineColor: '#1a1a1a',
+                rects: [[4,0,1,3],[7,0,1,3],[0,2,12,1],[2,3,8,6],[3,4,6,4],[1,9,1,1],[10,9,1,1],[5,4,2,2]],
+                colors: ['#4a4a4a','#4a4a4a','#3a3a3a','#2a2a2a','#1a1a1a','#2a2a2a','#2a2a2a','#3a7a4a'] },
+  banner:     { viewBox: '0 0 8 14', outlineColor: '#3a1a10',
+                rects: [[3,0,2,14],[3,0,1,14],[0,2,8,8],[0,2,8,1],[2,10,4,2],[3,4,2,3],[1,2,1,8],[6,2,1,8]],
+                colors: ['#5a3d22','#7a5838','#7a2a2a','#9a3a3a','#4a1a1a','#c9a84c','#5a1a1a','#5a1a1a'] },
+  tree:       { viewBox: '0 0 12 14', outlineColor: '#1a2a10',
+                rects: [[5,8,2,6],[5,8,1,6],[1,2,10,7],[2,3,8,5],[1,2,3,3],[7,5,4,3]],
+                colors: ['#4a3218','#5a4020','#2a4a20','#3f6b34','#4a7a3e','#356028'] },
+  rock:       { viewBox: '0 0 12 8', outlineColor: '#2a2a2a',
+                rects: [[2,2,8,6],[2,2,8,2],[0,5,3,3],[9,5,3,3],[4,4,1,3],[3,2,1,1]],
+                colors: ['#6a6a6a','#7a7a7a','#5a5a5a','#5a5a5a','#4a4a4a','#8a8a8a'] },
+  bridge:     { viewBox: '0 0 16 8', outlineColor: '#1a1008',
+                rects: [[0,6,16,2],[1,0,2,4],[13,0,2,4],[0,4,16,2],[0,4,16,1],[3,4,1,2],[6,4,1,2],[9,4,1,2],[12,4,1,2]],
+                colors: ['#3a2a18','#4a3218','#4a3218','#6b4a30','#7a5838','#3a2a18','#3a2a18','#3a2a18','#3a2a18'] },
+  pillar:     { viewBox: '0 0 8 14', outlineColor: '#3a3a3a',
+                rects: [[0,0,8,2],[0,0,8,1],[2,2,4,10],[2,2,1,10],[5,2,1,10],[0,12,8,2],[0,12,8,1]],
+                colors: ['#8a8a8a','#9a9a9a','#7a7a7a','#8a8a8a','#6a6a6a','#8a8a8a','#9a9a9a'] },
+  rubble:     { viewBox: '0 0 14 8', outlineColor: '#2a2a2a',
+                rects: [[0,4,4,4],[5,5,3,3],[9,3,5,5],[3,2,2,2],[1,1,2,2],[11,1,2,2]],
+                colors: ['#5a5a5a','#6a6a6a','#4a4a4a','#7a7a7a','#5a5a5a','#6a6a6a'] },
+  fountain:   { viewBox: '0 0 12 10', outlineColor: '#3a3a3a',
+                rects: [[1,6,10,3],[1,6,10,1],[3,2,6,4],[3,2,6,1],[5,0,2,2],[5,0,2,1],[2,7,1,1],[9,7,1,1]],
+                colors: ['#7a7a7a','#8a8a8a','#7a7a7a','#8a8a8a','#3a7a9a','#5a9ac0','#4a8ab0','#4a8ab0'] },
+  bones:      { viewBox: '0 0 14 8', outlineColor: '#8a8068',
+                rects: [[0,3,14,2],[0,3,14,1],[1,0,2,2],[1,6,2,2],[11,0,2,2],[11,6,2,2],[6,2,2,4]],
+                colors: ['#e8dfc8','#f5edd8','#d8cfb8','#d8cfb8','#d8cfb8','#d8cfb8','#c8bfa8'] },
+  ladder:     { viewBox: '0 0 8 14', outlineColor: '#2a1a10',
+                rects: [[0,0,1,14],[7,0,1,14],[0,2,8,1],[0,6,8,1],[0,10,8,1],[1,0,1,14],[6,0,1,14]],
+                colors: ['#6b4a30','#6b4a30','#5a3d22','#5a3d22','#5a3d22','#7a5838','#7a5838'] },
+  portcullis: { viewBox: '0 0 12 14', outlineColor: '#1a1a1a',
+                rects: [[0,0,2,14],[3,0,2,14],[6,0,2,14],[9,0,2,14],[0,4,12,1],[0,9,12,1],[1,0,1,14]],
+                colors: ['#3a3a3a','#3a3a3a','#3a3a3a','#3a3a3a','#2a2a2a','#2a2a2a','#4a4a4a'] },
+  lever:      { viewBox: '0 0 8 12', outlineColor: '#1a1a1a',
+                rects: [[0,8,8,4],[0,8,8,1],[3,0,2,9],[4,0,1,9],[1,0,2,2],[1,0,1,1]],
+                colors: ['#4a4a4a','#5a5a5a','#6a6a6a','#7a7a7a','#a83232','#c94242'] },
+  monster:    { viewBox: '0 0 10 10', outlineColor: '#1a0a1a',
+                rects: [[1,1,8,8],[1,1,8,2],[2,3,2,2],[6,3,2,2],[3,3,1,1],[7,3,1,1],[3,7,4,1],[0,4,1,2],[9,4,1,2]],
+                colors: ['#5a3a5a','#6a4a6a','#e83232','#e83232','#f05050','#f05050','#2a1a2a','#5a3a5a','#5a3a5a'] },
+  player:     { viewBox: '0 0 8 12', outlineColor: '#1a1410',
+                rects: [[2,0,4,4],[2,0,4,1],[1,4,6,5],[3,4,2,1],[0,9,3,3],[5,9,3,3],[3,1,1,1],[4,1,1,1]],
+                colors: ['#e8dfc8','#f0e8d8','#3a6ba8','#4a7bb8','#2a2a2a','#2a2a2a','#2a2a2a','#2a2a2a'] },
+  boss:       { viewBox: '0 0 12 12', outlineColor: '#1a0a1a',
+                rects: [[1,1,10,10],[1,1,10,2],[2,3,2,2],[8,3,2,2],[3,8,6,1],[3,0,1,1],[6,0,1,2],[9,0,1,1]],
+                colors: ['#3a1a3a','#4a2a4a','#e8d060','#e8d060','#e83232','#e8d060','#e8d060','#e8d060'] },
+  npcAlly:    { viewBox: '0 0 8 12', outlineColor: '#1a1410',
+                rects: [[2,0,4,4],[2,0,4,1],[1,4,6,5],[3,4,2,1],[0,9,3,3],[5,9,3,3],[3,1,1,1],[4,1,1,1]],
+                colors: ['#e8dfc8','#f0e8d8','#4a7a3a','#5a8a4a','#2a2a2a','#2a2a2a','#2a2a2a','#2a2a2a'] },
 };
 const MAP_ICON_GROUPS = [
-  { label: 'Dungeon Dressing', keys: ['torch','chest','table','barrel','altar','statue','campfire','bookshelf','rug','well','cage','anvil','cauldron','banner'] },
+  { label: 'Dungeon Dressing', keys: ['torch','chest','table','barrel','altar','statue','campfire','bookshelf','rug','well','cage','anvil','cauldron','banner','bones'] },
   { label: 'Terrain Features', keys: ['tree','rock','bridge','pillar','rubble','fountain'] },
   { label: 'Passage', keys: ['stairsUp','stairsDown','trap','ladder','portcullis','lever'] },
   { label: 'Tokens', keys: ['monster','boss','player','npcAlly'] },
@@ -5571,9 +5605,7 @@ function mapGridBaseSvgParts(map) {
     if (!shape) return;
     const pad = cellPx * 0.12;
     const size = cellPx - pad * 2;
-    const palette = shape.colors || ['#f0e6c8'];
-    const rects = shape.rects.map(([rx, ry, rw, rh], i) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${palette[i] || palette[palette.length - 1]}"/>`).join('');
-    props += `<svg x="${p.x * cellPx + pad}" y="${p.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}">${rects}</svg>`;
+    props += `<svg x="${p.x * cellPx + pad}" y="${p.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}">${renderIconRects(shape, '#f0e6c8')}</svg>`;
   });
   return { cellPx, cells, edges, props, backdrop };
 }
@@ -5598,9 +5630,7 @@ function battleMapCanvasSvg(map, tokens, svgId) {
     const shape = MAP_ICONS[t.icon] || MAP_ICONS.monster;
     const pad = cellPx * 0.08;
     const size = cellPx - pad * 2;
-    const palette = shape.colors || ['#e8dfc8'];
-    const rects = shape.rects.map(([rx, ry, rw, rh], i) => `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${palette[i] || palette[palette.length - 1]}"/>`).join('');
-    tokenSvg += `<svg x="${t.x * cellPx + pad}" y="${t.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}" data-token-id="${t.id}"><title>${escapeHtml(t.label || '')}</title>${rects}</svg>`;
+    tokenSvg += `<svg x="${t.x * cellPx + pad}" y="${t.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}" data-token-id="${t.id}"><title>${escapeHtml(t.label || '')}</title>${renderIconRects(shape, '#e8dfc8')}</svg>`;
   });
   return `<svg id="${svgId}" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
     <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${props}${tokenSvg}
@@ -10507,20 +10537,33 @@ const FLESH_LIMB_ICONS = {
   heart:  { viewBox:'0 0 8 6',  rects:[[1,0,2,1],[5,0,2,1],[0,1,8,2],[1,3,6,1],[2,4,4,1],[3,5,2,1]] },
   tongue: { viewBox:'0 0 8 10', rects:[[2,0,4,3],[2,3,4,5],[3,8,2,2]] },
 };
-// Generic renderer shared by every pixel-icon set in the app (limbs, store goods, ...):
-// takes an {viewBox, rects:[[x,y,w,h],...]} definition and fills every rect with one color.
+// Generic rect markup shared by EVERY pixel-icon rendering site in the app (limbs, store goods,
+// map props, map tokens, structures, ...) -- one place so an icon-format addition never has to be
+// hand-copied into three separate call sites again (it used to be duplicated in pixelIconSvg, the
+// Map Builder's prop renderer, and its token renderer, and they could silently drift apart).
 // `color` is normally a single fill string shared by every rect (item icons, limb icons --
 // unchanged behavior). If the shape def itself carries a `colors` array (one fill per rect, see
-// MAP_ICONS), or `color` is passed as an array directly, each rect gets its own fill instead --
-// this is what gives map props their shading/detail without a separate rendering path.
-function pixelIconSvg(def, color, px = 56) {
-  if (!def) return '';
+// MAP_ICONS), or `color` is passed as an array directly, each rect gets its own fill instead.
+// If the def carries `outlineColor`, every rect is drawn once more FIRST, inflated 1 unit on
+// every side, in that color -- touching/overlapping inflated rects merge into one continuous
+// drawn border around the silhouette, which is what makes a flat-rect shape read as a sprite
+// instead of a pile of loose floating blocks, with zero new rendering technology.
+function renderIconRects(def, color) {
+  if (!def || !def.rects) return '';
   const palette = Array.isArray(color) ? color : (def.colors || color);
-  const rects = def.rects.map(([x,y,w,h], i) => {
+  let out = '';
+  if (def.outlineColor) {
+    out += def.rects.map(([x, y, w, h]) => `<rect x="${x - 1}" y="${y - 1}" width="${w + 2}" height="${h + 2}" fill="${def.outlineColor}"/>`).join('');
+  }
+  out += def.rects.map(([x, y, w, h], i) => {
     const fill = Array.isArray(palette) ? (palette[i] || palette[palette.length - 1]) : palette;
     return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`;
   }).join('');
-  return `<svg class="pixel-svg" viewBox="${def.viewBox}" width="${px}" height="${px}" style="image-rendering:pixelated;">${rects}</svg>`;
+  return out;
+}
+function pixelIconSvg(def, color, px = 56) {
+  if (!def) return '';
+  return `<svg class="pixel-svg" viewBox="${def.viewBox}" width="${px}" height="${px}" style="image-rendering:pixelated;">${renderIconRects(def, color)}</svg>`;
 }
 function fleshLimbIconSvg(category, color) {
   return pixelIconSvg(FLESH_LIMB_ICONS[category] || FLESH_LIMB_ICONS.finger, color);
