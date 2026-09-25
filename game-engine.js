@@ -998,15 +998,33 @@ export function refillDailyItemCharges(item, rand = Math.random) {
   return item;
 }
 
+// Resets every structured item.abilities[].usesLeft back to its uses.max for 'longRest'/
+// 'shortRest' recharge types -- 'never' (narrative-only, no auto-refill) and 'turn' (resets on
+// the caster's own next turn, not tracked by this app's manual/DM-adjudicated combat) are left
+// untouched. Mutates and returns `item`, matching refillDailyItemCharges's own convention.
+export function refillAbilityUses(item) {
+  if (!item || !item.abilities || !item.abilities.length) return item;
+  item.abilities.forEach(a => {
+    if (a.uses && (a.uses.recharge === 'longRest' || a.uses.recharge === 'shortRest')) {
+      a.usesLeft = a.uses.max;
+    }
+  });
+  return item;
+}
+
 // A long rest for one player's persisted state: full HP, every temporary effect ends, death
-// save counters clear, and every per-day-charged item in savedGeneratedItems recharges. Returns
-// a NEW state object (the one exception, per this file's convention, is each item object inside
+// save counters clear, every per-day-charged item in savedGeneratedItems recharges (plus any
+// structured item.abilities uses), and spell slot usage resets to zero. Returns a NEW state
+// object (the one exception, per this file's convention, is each item object inside
 // savedGeneratedItems, which is mutated in place like every other item-mutating function here).
 export function applyLongRestToPlayerState(state, rand = Math.random) {
   if (!state) return state;
   const maxHp = typeof state.characterMaxHpEffective === 'number' ? state.characterMaxHpEffective
     : (typeof state.characterMaxHp === 'number' ? state.characterMaxHp : state.characterCurrentHp);
-  const savedGeneratedItems = (state.savedGeneratedItems || []).map(it => refillDailyItemCharges({ ...it }, rand));
+  const savedGeneratedItems = (state.savedGeneratedItems || []).map(it => refillAbilityUses(refillDailyItemCharges({ ...it }, rand)));
+  const characterSpellSlotsUsed = state.characterSpellSlotsUsed
+    ? Object.fromEntries(Object.keys(state.characterSpellSlotsUsed).map(lvl => [lvl, 0]))
+    : state.characterSpellSlotsUsed;
   return {
     ...state,
     characterCurrentHp: maxHp != null ? maxHp : state.characterCurrentHp,
@@ -1014,6 +1032,7 @@ export function applyLongRestToPlayerState(state, rand = Math.random) {
     deathSaveSuccesses: 0,
     deathSaveFailures: 0,
     savedGeneratedItems,
+    characterSpellSlotsUsed,
   };
 }
 

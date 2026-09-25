@@ -1781,6 +1781,16 @@
   .sheet-section-title { color:var(--gold); font-size:0.9rem; letter-spacing:0.04em; margin:0 0 0.3rem; padding-bottom:0.2rem; border-bottom:1px solid var(--border); }
   .sheet-line-row { display:flex; justify-content:space-between; align-items:center; padding:0.18rem 0; border-bottom:1px solid var(--border); font-size:0.84rem; }
   .sheet-feats-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:0.3rem 0.8rem; }
+  .spellbook-slots-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(70px, 1fr)); gap:0.5rem; margin-bottom:1rem; }
+  .spellbook-slot-box { display:flex; flex-direction:column; align-items:center; gap:0.2rem; background:var(--surface); border:1px solid var(--border); padding:0.4rem; border-radius:4px; }
+  .spellbook-slot-box label { font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.03em; }
+  .spellbook-slot-box input { width:2.6rem; text-align:center; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'Crimson Text',serif; font-size:0.95rem; padding:0.15rem; }
+  .spellbook-slot-box input.spellbook-slot-used-input { color:var(--gold); border-color:var(--gold); margin-top:0.15rem; }
+  .spellbook-slot-used { font-size:0.65rem; color:var(--text-dim); }
+  .spellbook-search-results, .spellbook-known-list { display:flex; flex-direction:column; gap:0.3rem; margin-bottom:1rem; max-height:320px; overflow-y:auto; }
+  .spellbook-search-row, .spellbook-known-row { display:flex; align-items:center; gap:0.6rem; background:var(--surface); border:1px solid var(--border); padding:0.4rem 0.6rem; }
+  .spellbook-search-name { font-weight:600; color:var(--gold-bright); flex:1; font-size:0.88rem; }
+  .spellbook-search-level { color:var(--text-dim); font-size:0.78rem; white-space:nowrap; }
   .sheet-feat-row { display:flex; align-items:center; gap:0.4rem; font-size:0.84rem; padding:0.15rem 0; cursor:help; }
   .sheet-line-row label { display:flex; align-items:center; gap:0.4rem; cursor:pointer; }
   .sheet-line-val { color:var(--gold); font-family:'Share Tech Mono',monospace; }
@@ -2212,6 +2222,8 @@
   .tt-stats span { background:var(--surface); border:1px solid var(--border); padding:0.1rem 0.4rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--gold); }
   .tt-desc { font-style:italic; color:var(--text-dim); margin-bottom:0.4rem; white-space:pre-line; }
   .tt-effect { color:var(--text); margin-bottom:0.3rem; }
+  .tt-effect-bullets { color:var(--text); margin:0 0 0.3rem; padding-left:1.1rem; }
+  .tt-effect-bullets li { margin-bottom:0.15rem; line-height:1.35; }
   .tt-mods { margin-top:0.4rem; }
   .tt-mod { font-size:0.82rem; color:var(--text-dim); margin-bottom:0.2rem; }
   .mod-monster-stats { font-size:0.78rem; color:var(--text-dim); font-family:'Share Tech Mono',monospace; border-left:2px solid var(--border); padding-left:0.5rem; margin:0.15rem 0 0.4rem; }
@@ -4073,6 +4085,7 @@
   <div class="spin-source-toggle">
     <button class="spin-mode-btn active" id="invModeEquipBtn" onclick="setInventoryViewMode('equip')">🎒 Equipment</button>
     <button class="spin-mode-btn" id="invModeSheetBtn" onclick="setInventoryViewMode('sheet')">📜 Character Sheet</button>
+    <button class="spin-mode-btn" id="invModeSpellbookBtn" onclick="setInventoryViewMode('spellbook')">📘 Spellbook</button>
   </div>
 
   <div id="invEquipPanel">
@@ -4226,6 +4239,27 @@
     <h3 class="sheet-section-title">Feats</h3>
     <div id="sheetFeatsList" class="sheet-feats-list"></div>
     <p class="sheet-note">A feat's numeric bonus (e.g. "+1 Constitution") is picked up automatically the same way an item's effect text is — see the Compendium's Reference tab for the full list and what each one does.</p>
+  </div>
+
+  <!-- SPELLBOOK PANEL — spell slots are set directly here (DM or player, same as ability scores
+       and HP already work — this app has no finer permission split than that) rather than
+       derived from Class/Level, since no 5e class-progression table is modeled anywhere. Known
+       spells are added from the live Compendium spell database; each known spell becomes its
+       own ability-bar icon on the Equipment tab (see renderSpellbookAbilityIcons). -->
+  <div id="invSpellbookPanel" style="display:none;">
+    <p class="sheet-note">Set your available spell slots per level below, then search the spell database to learn spells. Every known spell you have an open slot for shows up as its own icon on the Equipment tab's ability bar.</p>
+    <h3 class="sheet-section-title">Spell Slots</h3>
+    <div class="spellbook-slots-grid" id="spellbookSlotsGrid"></div>
+
+    <h3 class="sheet-section-title">Learn a Spell</h3>
+    <div class="token-toolbar">
+      <input type="text" id="spellbookSearch" class="token-search" placeholder="Search the spell database…" oninput="renderSpellbookSearchResults()">
+      <span class="token-count" id="spellbookSearchCount"></span>
+    </div>
+    <div id="spellbookSearchResults" class="spellbook-search-results"></div>
+
+    <h3 class="sheet-section-title">Known Spells</h3>
+    <div id="spellbookKnownList" class="spellbook-known-list"></div>
   </div>
 
   <details class="collapsible loadouts-collapsible">
@@ -4800,6 +4834,37 @@ function handleItemActivation(entry, evt) {
   return true;
 }
 
+// ===================== ABILITY ICONS (structured item.abilities) =====================
+// Type icons, not per-spell icons -- the live spell compendium has hundreds of spells, so a
+// bespoke icon per spell name isn't maintainable. Every spell-kind ability gets its school's
+// icon; every non-spell ability gets a kind icon. Same flat-color pixel-rect {viewBox,rects}
+// shape MAP_ICONS/FLESH_LIMB_ICONS already use, rendered through the same pixelIconSvg().
+const ABILITY_ICONS = {
+  attack:  { viewBox: '0 0 10 10', rects: [[1,7,2,2],[3,5,2,2],[5,3,2,2],[7,1,2,2]], colors: ['#8a8a8a','#8a8a8a','#e8dfc8','#c9a84c'] },
+  heal:    { viewBox: '0 0 10 10', rects: [[4,1,2,8],[1,4,8,2]], colors: ['#e05252','#e05252'] },
+  buff:    { viewBox: '0 0 10 10', rects: [[4,0,2,6],[2,4,2,2],[6,4,2,2],[1,6,2,2],[7,6,2,2]], colors: ['#4caf7d','#4caf7d','#4caf7d','#4caf7d','#4caf7d'] },
+  debuff:  { viewBox: '0 0 10 10', rects: [[4,4,2,6],[2,4,2,2],[6,4,2,2],[1,2,2,2],[7,2,2,2]], colors: ['#a83232','#a83232','#a83232','#a83232','#a83232'] },
+  utility: { viewBox: '0 0 10 10', rects: [[4,0,2,2],[4,8,2,2],[0,4,2,2],[8,4,2,2],[3,3,4,4]], colors: ['#7de7ff','#7de7ff','#7de7ff','#7de7ff','#5b9cf6'] },
+  evocation:     { viewBox: '0 0 10 12', rects: [[4,9,2,3],[3,6,1,4],[6,6,1,4],[4,3,2,5]], colors: ['#4a3218','#e8963a','#e8963a','#f7d774'] },
+  necromancy:    { viewBox: '0 0 10 10', rects: [[2,1,6,5],[0,7,10,3],[3,3,1,1],[6,3,1,1],[3,6,4,1]], colors: ['#d8d8d8','#c8c8c8','#1a1015','#1a1015','#1a1015'] },
+  abjuration:    { viewBox: '0 0 10 12', rects: [[1,1,8,6],[2,7,6,2],[3,9,4,2],[4,11,2,1]], colors: ['#5b9cf6','#5b9cf6','#5b9cf6','#5b9cf6'] },
+  conjuration:   { viewBox: '0 0 10 10', rects: [[3,0,4,1],[1,1,2,1],[7,1,2,1],[0,3,1,4],[9,3,1,4],[1,8,2,1],[7,8,2,1],[3,9,4,1]], colors: ['#c47cf5','#c47cf5','#c47cf5','#c47cf5','#c47cf5','#c47cf5','#c47cf5','#c47cf5'] },
+  transmutation: { viewBox: '0 0 10 10', rects: [[1,1,3,2],[6,1,3,2],[1,7,3,2],[6,7,3,2],[4,4,2,2]], colors: ['#4caf7d','#4caf7d','#4caf7d','#4caf7d','#e8d060'] },
+  divination:    { viewBox: '0 0 12 8',  rects: [[0,3,12,2],[4,1,4,6],[5,3,2,2]], colors: ['#7de7ff','#7de7ff','#1a1015'] },
+  enchantment:   { viewBox: '0 0 10 10', rects: [[2,1,2,2],[6,1,2,2],[1,3,8,3],[2,6,6,2],[4,8,2,2]], colors: ['#e87cc4','#e87cc4','#e87cc4','#e87cc4','#e87cc4'] },
+  illusion:      { viewBox: '0 0 12 8',  rects: [[0,0,12,6],[2,2,2,2],[8,2,2,2],[4,4,4,1]], colors: ['#9a6ad8','#1a1015','#1a1015','#1a1015'] },
+  universal:     { viewBox: '0 0 10 10', rects: [[4,0,2,10],[0,4,10,2]], colors: ['#c9a84c','#c9a84c'] },
+};
+// `ability.icon` is either {school:'evocation'} (spell-kind) or {kind:'attack'} (everything
+// else) -- resolves to a real ABILITY_ICONS entry either way, falling back to `universal`/
+// `utility` for an unrecognized value rather than rendering nothing.
+function resolveAbilityIconDef(ability) {
+  const icon = ability && ability.icon;
+  if (icon && icon.school) return ABILITY_ICONS[icon.school] || ABILITY_ICONS.universal;
+  if (icon && icon.kind) return ABILITY_ICONS[icon.kind] || ABILITY_ICONS.utility;
+  return ability && ability.kind === 'spell' ? ABILITY_ICONS.universal : ABILITY_ICONS.utility;
+}
+
 // ===================== INVENTORY ABILITY BAR =====================
 // Per direct request: an equipped item granting a usable power (a spell, a natural attack like
 // a graft's bite, anything with charges or a duration — the exact same "would this do anything
@@ -4813,6 +4878,7 @@ function handleItemActivation(entry, evt) {
 // anything" — one is just the read-only version of the other.
 function itemHasUsableAbility(item) {
   if (!item) return false;
+  if (item.abilities && item.abilities.length) return true;
   if (parseUsablePowers(item)) return true;
   const text = getItemEffectText(item);
   return !!parseDurationMs(text) || !!item.charges;
@@ -4874,6 +4940,23 @@ function renderAbilityBar() {
       </button>`);
       return;
     }
+    // Structured abilities (item.abilities) each get their own icon+button, ahead of and
+    // instead of the legacy one-icon-per-item free-text path below — an item with both would
+    // be unusual, but abilities.length check happens first so a converted item never shows a
+    // redundant second, generic-pixel-art button alongside its real ability icons.
+    if (item.abilities && item.abilities.length) {
+      item.abilities.forEach(ability => {
+        const usesLeft = ability.usesLeft != null ? ability.usesLeft : (ability.uses ? ability.uses.max : null);
+        const outOfUses = usesLeft != null && usesLeft <= 0;
+        const iconDef = resolveAbilityIconDef(ability);
+        html.push(`<button class="ability-btn${outOfUses ? ' ability-btn-disabled' : ''}" ${outOfUses ? 'disabled' : `onclick="activateStructuredAbility('${slotId}','${ability.id}')"`}
+          title="${escapeHtml(ability.name + (ability.effectText ? ' — ' + ability.effectText : '') + (outOfUses ? ' (no uses left)' : ''))}">
+          ${pixelIconSvg(iconDef, iconDef.colors, 26)}<span class="ability-btn-label">${escapeHtml(ability.name.slice(0, 10))}</span>
+          ${usesLeft != null ? `<span class="ability-btn-cooldown">${usesLeft}</span>` : ''}
+        </button>`);
+      });
+      return;
+    }
     if (!itemHasUsableAbility(item)) return;
     const text = getItemEffectText(item);
     const chargesLeft = itemChargesLeft(item);
@@ -4888,7 +4971,188 @@ function renderAbilityBar() {
       ${cooldownMs != null ? `<span class="ability-btn-cooldown">${abilityCooldownLabel(cooldownMs)}</span>` : ''}
     </button>`);
   });
+  renderSpellbookAbilityIcons(html);
   bar.innerHTML = html.join('');
+}
+// ===================== SPELLBOOK (Part B) =====================
+// Reuses the Compendium's own live spellDatabase (see loadSpellDatabase further below, patched
+// to also work with no #spellTableWrap in the DOM) as the source of truth for spell data.
+// characterKnownSpells stores a plain SNAPSHOT of each learned spell's fields at add-time, not a
+// live reference -- so the Spellbook still renders correctly even if a later session's spell
+// fetch fails offline.
+function renderSpellbookTab() {
+  renderSpellbookSlotsGrid();
+  renderSpellbookKnownList();
+  if (typeof spellDatabase !== 'undefined' && spellDatabase.length) renderSpellbookSearchResults();
+  else if (typeof loadSpellDatabase === 'function') loadSpellDatabase();
+}
+function renderSpellbookSlotsGrid() {
+  const wrap = document.getElementById('spellbookSlotsGrid');
+  if (!wrap) return;
+  wrap.innerHTML = Object.keys(characterSpellSlots).map(lvl => `
+    <div class="spellbook-slot-box">
+      <label>Lvl ${lvl}</label>
+      <input type="number" min="0" max="9" value="${characterSpellSlots[lvl]}" onchange="updateSpellSlotMax(${lvl}, this.value)" title="Max slots at this level">
+      <input type="number" min="0" max="9" value="${characterSpellSlotsUsed[lvl] || 0}" onchange="updateSpellSlotUsed(${lvl}, this.value)" class="spellbook-slot-used-input" title="Currently used — editable directly for effects like Pearl of Power that hand a slot back">
+      <span class="spellbook-slot-used">used</span>
+    </div>
+  `).join('');
+}
+// Setting a new (lower) max also clamps the used-count down to match, so the sheet never shows
+// e.g. "3 used" against a max of 1 after a DM/player lowers it mid-session.
+function updateSpellSlotMax(level, value) {
+  const max = Math.max(0, Math.min(9, parseInt(value, 10) || 0));
+  characterSpellSlots[level] = max;
+  if ((characterSpellSlotsUsed[level] || 0) > max) characterSpellSlotsUsed[level] = max;
+  renderSpellbookSlotsGrid();
+  renderPlayerSlots();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+// Directly editable rather than only ever incremented by casting/decremented by a long rest --
+// covers anything that hands a slot back mid-session (Pearl of Power, a DM ruling, undoing a
+// misclick) without needing a bespoke mechanic wired to that one specific item.
+function updateSpellSlotUsed(level, value) {
+  const used = Math.max(0, Math.min(characterSpellSlots[level] || 0, parseInt(value, 10) || 0));
+  characterSpellSlotsUsed[level] = used;
+  renderSpellbookSlotsGrid();
+  renderPlayerSlots();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+function renderSpellbookSearchResults() {
+  const wrap = document.getElementById('spellbookSearchResults');
+  if (!wrap) return;
+  const searchEl = document.getElementById('spellbookSearch');
+  const search = (searchEl ? searchEl.value : '').toLowerCase().trim();
+  const countEl = document.getElementById('spellbookSearchCount');
+  if (!search) { wrap.innerHTML = ''; if (countEl) countEl.textContent = ''; return; }
+  if (typeof spellDatabase === 'undefined' || !spellDatabase.length) {
+    wrap.innerHTML = '<div class="empty-results">Loading spell database…</div>';
+    if (typeof loadSpellDatabase === 'function') loadSpellDatabase();
+    return;
+  }
+  const matches = spellDatabase.filter(s => s.name.toLowerCase().includes(search)).slice(0, 40);
+  if (countEl) countEl.textContent = matches.length + (matches.length === 40 ? '+' : '') + ' match' + (matches.length !== 1 ? 'es' : '');
+  wrap.innerHTML = matches.length ? matches.map(s => `
+    <div class="spellbook-search-row">
+      <span class="spellbook-search-name">${escapeHtml(s.name)}</span>
+      <span class="spellbook-search-level">${s.level === 0 ? 'Cantrip' : 'Lvl ' + s.level} · ${escapeHtml(s.schoolName || '')}</span>
+      <button class="ic-action-btn" onclick="addKnownSpell('${s.name.replace(/'/g, "\\'")}')">+ Learn</button>
+    </div>
+  `).join('') : '<div class="empty-results">No spells match.</div>';
+}
+function addKnownSpell(name) {
+  if (characterKnownSpells.some(s => s.name === name)) { flashInvMessage(`${name} is already known.`, true); return; }
+  const spell = (typeof spellDatabase !== 'undefined' ? spellDatabase : []).find(s => s.name === name);
+  if (!spell) return;
+  characterKnownSpells.push({ name: spell.name, level: spell.level, schoolName: spell.schoolName, description: spell.description, concentration: spell.concentration, ritual: spell.ritual });
+  renderSpellbookKnownList();
+  renderPlayerSlots();
+  if (typeof scheduleSave === 'function') scheduleSave();
+  flashInvMessage(`${spell.name} added to your Spellbook.`);
+}
+function removeKnownSpell(name) {
+  characterKnownSpells = characterKnownSpells.filter(s => s.name !== name);
+  renderSpellbookKnownList();
+  renderPlayerSlots();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+function renderSpellbookKnownList() {
+  const wrap = document.getElementById('spellbookKnownList');
+  if (!wrap) return;
+  if (!characterKnownSpells.length) { wrap.innerHTML = '<div class="empty-results">No spells learned yet — search above to add some.</div>'; return; }
+  const sorted = [...characterKnownSpells].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+  wrap.innerHTML = sorted.map(s => `
+    <div class="spellbook-known-row">
+      <span class="spellbook-search-name">${escapeHtml(s.name)}</span>
+      <span class="spellbook-search-level">${s.level === 0 ? 'Cantrip' : 'Lvl ' + s.level} · ${escapeHtml(s.schoolName || '')}</span>
+      <button class="ic-action-btn" onclick="removeKnownSpell('${s.name.replace(/'/g, "\\'")}')">✕ Forget</button>
+    </div>
+  `).join('');
+}
+// One ability-bar icon per known spell, appended to the same html array renderAbilityBar
+// already built equipped-item icons into — a spell icon sits right alongside weapon/item
+// ability icons in one row rather than a second, separate one. A cantrip (level 0) is always
+// castable (no slot cost); a leveled spell grays out once no slot at or above its own level is
+// open.
+function renderSpellbookAbilityIcons(html) {
+  (characterKnownSpells || []).forEach(spell => {
+    const iconDef = ABILITY_ICONS[(spell.schoolName || '').toLowerCase()] || ABILITY_ICONS.universal;
+    const isCantrip = spell.level === 0;
+    const availableLevels = isCantrip ? [] : Object.keys(characterSpellSlots).map(Number)
+      .filter(lvl => lvl >= spell.level && (characterSpellSlots[lvl] || 0) > (characterSpellSlotsUsed[lvl] || 0));
+    const outOfSlots = !isCantrip && availableLevels.length === 0;
+    html.push(`<button class="ability-btn${outOfSlots ? ' ability-btn-disabled' : ''}" ${outOfSlots ? 'disabled' : `onclick="castKnownSpell('${spell.name.replace(/'/g, "\\'")}')"`}
+      title="${escapeHtml(spell.name + (isCantrip ? ' (cantrip)' : '') + (outOfSlots ? ' — no open slot' : ''))}">
+      ${pixelIconSvg(iconDef, iconDef.colors, 26)}<span class="ability-btn-label">${escapeHtml(spell.name.slice(0, 10))}</span>
+    </button>`);
+  });
+}
+// Cantrips need no slot choice and fire immediately. A leveled spell with exactly one open slot
+// level skips the picker too (nothing to choose); 2+ open levels opens the shared power-picker
+// modal (same DOM element openPowerPicker/#powerPickerModal already uses for multi-power items)
+// so the player can choose to upcast.
+function castKnownSpell(name) {
+  const spell = characterKnownSpells.find(s => s.name === name);
+  if (!spell) return;
+  if (spell.level === 0) { flashInvMessage(`${spell.name}: ${(spell.description || '').slice(0, 300)}`); return; }
+  const levels = Object.keys(characterSpellSlots).map(Number)
+    .filter(lvl => lvl >= spell.level && (characterSpellSlots[lvl] || 0) > (characterSpellSlotsUsed[lvl] || 0));
+  if (!levels.length) { flashInvMessage(`No open slot for ${spell.name}.`, true); return; }
+  if (levels.length === 1) { confirmCastSpell(spell.name, levels[0]); return; }
+  openSpellSlotPicker(spell, levels);
+}
+function openSpellSlotPicker(spell, levels) {
+  const modal = document.getElementById('powerPickerModal');
+  const title = document.getElementById('powerPickerTitle');
+  const body = document.getElementById('powerPickerBody');
+  if (!modal || !body) return;
+  if (title) title.textContent = `✦ Cast ${spell.name} — Choose a Slot Level`;
+  body.innerHTML = levels.map(lvl => `<button class="power-picker-option" onclick="confirmCastSpell('${spell.name.replace(/'/g, "\\'")}', ${lvl})">Level ${lvl} slot (${(characterSpellSlots[lvl] || 0) - (characterSpellSlotsUsed[lvl] || 0)} left)</button>`).join('')
+    + `<p style="color:var(--text-dim);font-size:0.82rem;font-style:italic;margin-top:0.4rem;">Casting at a higher level spends that level's slot instead of the spell's own — read its "at higher levels" text below to resolve the extra effect yourselves.</p>`;
+  modal.classList.add('open');
+}
+function confirmCastSpell(name, level) {
+  closePowerPicker();
+  const spell = characterKnownSpells.find(s => s.name === name);
+  if (!spell) return;
+  if ((characterSpellSlots[level] || 0) <= (characterSpellSlotsUsed[level] || 0)) { flashInvMessage(`No open level ${level} slot.`, true); return; }
+  characterSpellSlotsUsed[level] = (characterSpellSlotsUsed[level] || 0) + 1;
+  renderPlayerSlots();
+  renderSpellbookSlotsGrid();
+  if (typeof scheduleSave === 'function') scheduleSave();
+  const upcastNote = level > spell.level ? ` (cast at level ${level})` : '';
+  flashInvMessage(`${spell.name}${upcastNote}: ${(spell.description || '').slice(0, 300)}`);
+}
+// Click handler for a structured item.abilities entry (see resolveAbilityIconDef above).
+// Decrements usesLeft, flashes the ability's own text (or the live spell description for a
+// spell-kind grant), and for spell-kind abilities that ALSO specify a buff duration still
+// routes through the existing startTimedEffect -- same countdown system a potion already uses,
+// so a granted buff spell shows up in Active Effects exactly like any other timed buff would.
+function activateStructuredAbility(slotId, abilityId) {
+  const key = playerSlots[slotId];
+  const entry = key && TOKEN_INDEX[key];
+  if (!entry) return;
+  const item = entry.item;
+  const ability = (item.abilities || []).find(a => a.id === abilityId);
+  if (!ability) return;
+  if (ability.usesLeft == null && ability.uses) ability.usesLeft = ability.uses.max;
+  if (ability.usesLeft != null) {
+    if (ability.usesLeft <= 0) return;
+    ability.usesLeft -= 1;
+  }
+  let message = `${ability.name} used.`;
+  if (ability.kind === 'spell' && ability.spellName) {
+    const spell = (typeof spellDatabase !== 'undefined' ? spellDatabase : []).find(s => s.name === ability.spellName);
+    message = spell ? `${spell.name}: ${spell.description || ability.effectText || ''}`.slice(0, 400) : `${ability.spellName} cast. ${ability.effectText || ''}`;
+  } else if (ability.effectText) {
+    message = `${ability.name}: ${ability.effectText}`;
+  }
+  const dur = parseDurationMs(ability.effectText || '');
+  if (dur) startTimedEffect(item, entry.key + ':' + ability.id, entry.rarity, ability.effectText, dur);
+  renderPlayerSlots();
+  renderActiveEffects();
+  scheduleSave();
+  flashInvMessage(message);
 }
 // Click handler for a granted-ability icon on the bar — reuses handleItemActivation (the exact
 // same logic a right-click on the equip slot already ran) so activating it here spends the same
@@ -11115,6 +11379,12 @@ const FLESH_GRAFT_EFFECT_POOL = {
     { id:'nimblegrip', label:'Nimble Grip', text:m => `+${m} to Sleight of Hand checks and Dexterity-based weapon attack rolls.` },
     { id:'ironclaw', label:'Iron Claw', text:m => `+${m * 2} damage on unarmed strikes.` },
     { id:'lockbreaker', label:'Lockbreaker', text:m => `+${m} to checks made to pick locks or disarm traps.` },
+    // The one grafted effect in this pool that also grants a real castable ability, not just a
+    // numeric bonus — see rollFleshGraftEffects below, which collects any `grantAbility` factory
+    // into the built item's own `abilities` array (the same structured shape a hand-authored
+    // item like NPC_WEAPONS can carry) rather than leaving it as flavor text only.
+    { id:'cindergrasp', label:'Cindergrasp', text:() => `Your palm carries a permanent, banked heat — the flesh itself remembers how to make it grow.`,
+      grantAbility: () => ({ id: 'cindergrasp-fireball', name: 'Fireball', kind: 'spell', icon: { school: 'evocation' }, spellName: 'Fireball', effectText: 'Cast Fireball from the graft itself.', uses: { max: 1, recharge: 'longRest' }, usesLeft: 1 }) },
   ],
   leg: [
     { id:'swiftgait', label:'Swift Gait', text:m => `+${m * 5} ft. to walking speed.` },
@@ -11156,12 +11426,19 @@ const FLESH_GRAFT_EFFECT_POOL = {
 // own rarity magnitude, capped at however many that category actually has), each scaled by
 // that same magnitude — a common part becomes one modest bonus, a celestial part becomes up
 // to four meaningfully stacked ones, same shape as MANGLER_RARITY_MAGNITUDE everywhere else.
+// Returns { mods, abilities } instead of a bare mods array — a rolled effect can optionally
+// carry a `grantAbility` factory (see 'cindergrasp' above) producing a real structured ability
+// entry, collected separately here so the caller can attach it to the built item's own
+// `abilities` array rather than it only ever showing up as flavor text in `mods`.
 function rollFleshGraftEffects(limbCategory, partRarity) {
   const pool = FLESH_GRAFT_EFFECT_POOL[limbCategory] || FLESH_GRAFT_EFFECT_POOL.arm;
   const magnitude = MANGLER_RARITY_MAGNITUDE[partRarity] || 1;
   const count = Math.min(magnitude, pool.length);
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count).map(t => ({ type: t.label, text: t.text(magnitude) }));
+  const picked = shuffled.slice(0, count);
+  const mods = picked.map(t => ({ type: t.label, text: t.text(magnitude) }));
+  const abilities = picked.filter(t => t.grantAbility).map(t => t.grantAbility(magnitude));
+  return { mods, abilities };
 }
 
 let fleshMaterialKey = null;
@@ -11247,7 +11524,7 @@ function reworkPartIntoGraft() {
     flashFleshWorkshopMessage(`Reworking this costs ${cost} gp — you have ${coinPouchGpText(getPlayerGold())}.`, true);
     return;
   }
-  const mods = rollFleshGraftEffects(category, partRarity);
+  const { mods, abilities } = rollFleshGraftEffects(category, partRarity);
   const effectText = mods.map(m => m.text).join(' ');
   const partLabel = (MONSTER_PART_TYPE_LABEL[part.anatomicalId] || 'monstrous remains').toLowerCase();
   const item = {
@@ -11258,6 +11535,7 @@ function reworkPartIntoGraft() {
     flavor: `Reworked from ${part.name}.`,
     tags: [],
   };
+  if (abilities.length) item.abilities = abilities;
   item.weight = computeItemWeight(item);
   _pendingFleshItem = item;
   removeTokenEverywhere(fleshMaterialKey);
@@ -12143,11 +12421,12 @@ function simulateADay() {
   if (isRealPlayerAccount()) return;
   if (!confirm('Simulate a day passing? Every player fully heals, every temporary effect ends, and per-day item charges recharge. Shops restock. This cannot be undone.')) return;
   const rested = window.applyLongRestToPlayerState({
-    characterCurrentHp, characterMaxHp, characterMaxHpEffective, activeTimedEffects, savedGeneratedItems,
+    characterCurrentHp, characterMaxHp, characterMaxHpEffective, activeTimedEffects, savedGeneratedItems, characterSpellSlotsUsed,
   });
   characterCurrentHp = rested.characterCurrentHp;
   activeTimedEffects = rested.activeTimedEffects;
   savedGeneratedItems = rested.savedGeneratedItems;
+  if (rested.characterSpellSlotsUsed) characterSpellSlotsUsed = rested.characterSpellSlotsUsed;
   DAILY_WARES_MERCHANT_KEYS().forEach(key => restockMerchant(key));
   buildTokenIndex();
   refreshAllViewsAfterStateApply();
@@ -12460,6 +12739,13 @@ function merchantTradeDescription(merchantKey) {
 function placeItemIntoInventory(item) {
   if (!item) return { item: null, placed: false };
   const saved = { ...item, id: Date.now() + Math.random() };
+  // { ...item } is a SHALLOW copy — an array field (like abilities below) would otherwise stay
+  // the exact same array object as the template's, so every player's copy of the same template
+  // item would share one usesLeft counter and decrementing one would silently affect them all.
+  // abilities.usesLeft mutates per-instance constantly (every cast), so it needs its own deep
+  // clone here specifically; other array fields (mods, attacks, unlocks) don't currently mutate
+  // per-instance the same way, so they're left alone rather than widening this fix unasked.
+  if (saved.abilities) saved.abilities = saved.abilities.map(a => ({ ...a, uses: a.uses ? { ...a.uses } : a.uses }));
   inferItemMetadata(saved);
   savedGeneratedItems.unshift(saved);
   if (typeof renderSavedItems === 'function') renderSavedItems();
@@ -14982,11 +15268,25 @@ function deleteLoadout(id) {
 // A lightweight D&D 5e "core stat block" — ability scores, skills, saving throws, HP/AC,
 // hit dice — shared by both DM and player accounts and synced through the exact same
 // save/load pipeline as everything else (see saveAppState/applyStateBlob). Deliberately does
-// NOT model spellcasting, feats, class features, or multiclassing; `characterClass` is stored
-// but not read by any logic anywhere yet — it's a reserved hook for a future feature (e.g.
-// class- or alignment-biased monster targeting) that doesn't exist yet.
+// NOT model feats, class features, or multiclassing; `characterClass` is stored but not read by
+// any logic anywhere yet — it's a reserved hook for a future feature (e.g. class- or alignment-
+// biased monster targeting) that doesn't exist yet.
 let characterAbilityScores = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
 let characterLevel = 1;
+// ---------- Spellbook (Part B) ----------
+// Spell slots are set directly on the sheet rather than derived from characterClass/Level --
+// this app doesn't model the ~13 different 5e class-casting progressions (and characterClass is
+// free text a DM could type anything into), so a DM/player-set table is both simpler and works
+// for any homebrew class. characterSpellSlots is the max per level; characterSpellSlotsUsed is
+// the live count, reset to 0 by the same long-rest pipeline that already restores HP and clears
+// activeTimedEffects (see applyLongRestToPlayerState in game-engine.js). characterKnownSpells
+// are spells added from the live Compendium spell database (see loadSpellDatabase/
+// spellDatabase) -- each entry is a plain snapshot of that spell's fields at the time it was
+// added, not a live reference, so it still renders correctly even if the compendium fetch fails
+// on a later session.
+let characterSpellSlots = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+let characterSpellSlotsUsed = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+let characterKnownSpells = [];
 let skillProficiencies = [];
 let saveProficiencies = [];
 let characterCurrentHp = 10;
@@ -15475,13 +15775,18 @@ function syncCharacterSpeed(sheet) {
 function setInventoryViewMode(mode) {
   const equipBtn = document.getElementById('invModeEquipBtn');
   const sheetBtn = document.getElementById('invModeSheetBtn');
+  const spellbookBtn = document.getElementById('invModeSpellbookBtn');
   const equipPanel = document.getElementById('invEquipPanel');
   const sheetPanel = document.getElementById('invSheetPanel');
+  const spellbookPanel = document.getElementById('invSpellbookPanel');
   if (equipBtn) equipBtn.classList.toggle('active', mode === 'equip');
   if (sheetBtn) sheetBtn.classList.toggle('active', mode === 'sheet');
+  if (spellbookBtn) spellbookBtn.classList.toggle('active', mode === 'spellbook');
   if (equipPanel) equipPanel.style.display = mode === 'equip' ? '' : 'none';
   if (sheetPanel) sheetPanel.style.display = mode === 'sheet' ? '' : 'none';
+  if (spellbookPanel) spellbookPanel.style.display = mode === 'spellbook' ? '' : 'none';
   if (mode === 'sheet') renderCharacterSheet();
+  if (mode === 'spellbook') renderSpellbookTab();
 }
 // Bridge for multiplayer-sync.js's connectAsRole — fires exactly once, right when a brand-new
 // player account first joins a campaign (never on a later login, and never for the DM), so
@@ -15788,6 +16093,27 @@ function renderActiveEffectsDisplay() {
 }
 
 // ---------- Shared hover tooltip ----------
+// Heuristic sentence-split of an item's existing free-text effect string, so the tooltip reads
+// as short bullets instead of one dense paragraph — purely a display re-format, not a re-parse
+// of meaning, so it works on every existing item immediately with no per-item backfill. Splits
+// on ". "/"; " followed by a capital letter, digit, or quote (a new clause), which correctly
+// breaks "2d4+2 fire damage. Once per long rest..." without also breaking on a stray abbreviation
+// or a decimal that happens to sit mid-sentence. A single resulting sentence renders as one line
+// as before — bulleting a single item adds nothing.
+function effectTextToBullets(text) {
+  if (!text) return [];
+  const parts = text.split(/(?<=[.;])\s+(?=[A-Z0-9"'])/).map(s => s.trim()).filter(Boolean);
+  return parts.length > 1 ? parts : [text];
+}
+// Shared render helper — a `<ul>` of bullets for a multi-sentence effect, or the original
+// single-line `<div class="tt-effect">` for anything that doesn't actually benefit from
+// bulleting. Used anywhere an item's effect text renders (the tooltip below, and equip-slot
+// hover elsewhere) so both stay visually consistent.
+function effectBulletsHtml(text) {
+  const bullets = effectTextToBullets(text);
+  if (bullets.length > 1) return `<ul class="tt-effect-bullets">${bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`;
+  return `<div class="tt-effect">${escapeHtml(text)}</div>`;
+}
 function buildTooltipHtml(entry) {
   const item = entry.item;
   const rarity = entry.rarity;
@@ -15843,7 +16169,7 @@ function buildTooltipHtml(entry) {
     ${statsLine}
     ${propsHtml}
     ${item.desc ? `<div class="tt-desc">${escapeHtml(item.desc)}</div>` : ''}
-    <div class="tt-effect">${escapeHtml(effect)}</div>
+    ${(item.abilities && item.abilities.length) ? '' : effectBulletsHtml(effect)}
     ${modsHtml}
     ${tagsHtml}
     ${interactionsHtml}
@@ -16165,11 +16491,17 @@ async function fetchSpellSet(ruleset){
   }));
   return results.flat();
 }
+// `wrap`/`spellCount` are the Compendium Spells sub-tab's own loading-state elements -- this
+// function is also the Spellbook panel's (Part B) load trigger now, and that panel has no
+// spell TABLE of its own to render into, so every touch of those two elements is now optional
+// (`wrap &&`/`document.getElementById(...)?.`) rather than an early-return precondition. A
+// caller with nowhere to show the table (Spellbook) still gets spellDatabase populated and
+// spellDatabaseLoaded flipped; it just re-renders its OWN view afterward instead of the table.
 async function loadSpellDatabase(force=false){
   const token=++spellLoadToken;
-  const wrap=document.getElementById('spellTableWrap'); if(!wrap)return;
-  if(spellDatabaseLoaded && !force){renderSpellTable();return;}
-  wrap.innerHTML='<div class="spell-loading">Loading spell source indexes and official supplement data…</div>';
+  const wrap=document.getElementById('spellTableWrap');
+  if(spellDatabaseLoaded && !force){ if (wrap) renderSpellTable(); if (typeof renderSpellbookSearchResults === 'function') renderSpellbookSearchResults(); return; }
+  if (wrap) wrap.innerHTML='<div class="spell-loading">Loading spell source indexes and official supplement data…</div>';
   try{
     const ruleset=document.getElementById('spellRuleset')?.value||'2014';
     let all=[];
@@ -16180,11 +16512,13 @@ async function loadSpellDatabase(force=false){
     const seen=new Set();
     spellDatabase=all.filter(s=>{const key=[s.ruleset,s.name,s.source].join('|');if(seen.has(key))return false;seen.add(key);return true;});
     spellDatabaseLoaded=true;
-    populateSpellSourceFilter();
-    renderSpellTable();
+    if (wrap) { populateSpellSourceFilter(); renderSpellTable(); }
+    if (typeof renderSpellbookSearchResults === 'function') renderSpellbookSearchResults();
   }catch(err){
-    wrap.innerHTML='<div class="spell-loading">Unable to load the spell database. This tab needs an internet connection to retrieve the structured source records. Try Refresh Spell Data.</div>';
-    document.getElementById('spellCount').textContent='Spell database unavailable';
+    if (wrap) wrap.innerHTML='<div class="spell-loading">Unable to load the spell database. This tab needs an internet connection to retrieve the structured source records. Try Refresh Spell Data.</div>';
+    const countEl = document.getElementById('spellCount'); if (countEl) countEl.textContent='Spell database unavailable';
+    const sbResults = document.getElementById('spellbookSearchResults');
+    if (sbResults) sbResults.innerHTML = '<div class="empty-results">Unable to load the spell database — needs an internet connection.</div>';
     console.error(err);
   }
 }
@@ -22737,6 +23071,7 @@ function saveAppState() {
       manglerFinishedWork, manglerPartKey, manglerItemKey, manglerFocus,
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights, npcEdits,
       characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
+      characterSpellSlots, characterSpellSlotsUsed, characterKnownSpells,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
       characterRace, characterAffinity, characterInitiative, characterSpeed, characterSpeedEffective, deckOfManyThingsLog, geomorphTiles, achievedUnlocks,
       appliedGamblingPayoutIds,
@@ -22816,6 +23151,9 @@ function applyStateBlob(data) {
   if (data.npcEdits) npcEdits = data.npcEdits;
   if (data.characterAbilityScores) characterAbilityScores = data.characterAbilityScores;
   if (typeof data.characterLevel === 'number') characterLevel = data.characterLevel;
+  if (data.characterSpellSlots) characterSpellSlots = data.characterSpellSlots;
+  if (data.characterSpellSlotsUsed) characterSpellSlotsUsed = data.characterSpellSlotsUsed;
+  if (data.characterKnownSpells) characterKnownSpells = data.characterKnownSpells;
   if (data.skillProficiencies) skillProficiencies = data.skillProficiencies;
   if (data.saveProficiencies) saveProficiencies = data.saveProficiencies;
   if (data.feats) feats = data.feats;
@@ -22909,6 +23247,9 @@ window.resetMainAppStateToBlank = function () {
   recentlyLooted = [];
   characterAbilityScores = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
   characterLevel = 1;
+  characterSpellSlots = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+  characterSpellSlotsUsed = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+  characterKnownSpells = [];
   skillProficiencies = [];
   saveProficiencies = [];
   feats = [];
