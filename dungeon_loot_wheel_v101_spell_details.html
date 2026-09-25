@@ -5275,6 +5275,8 @@ const MAP_BUILDER_TERRAIN = {
   grass: { label: 'Grass', color: '#3f6b34' },
   water: { label: 'Water', color: '#2b5470' },
   wood:  { label: 'Wood',  color: '#7a5230' },
+  stone: { label: 'Stone/Mountain', color: '#6a6a6a' },
+  sand:  { label: 'Sand',  color: '#c9a86a' },
 };
 const MAP_BUILDER_MAX_DIM = 60;
 const MAP_BUILDER_DEFAULT_CELL_PX = 28;
@@ -5643,9 +5645,10 @@ function battleMapIconForMonster(monster) {
 
 let mapBuilderMaps = [];
 let activeMapBuilderId = null;
-let mapBuilderTool = 'floor'; // a MAP_BUILDER_TERRAIN key, 'eraser', 'wall', 'door', 'prop', or 'structure'
+let mapBuilderTool = 'floor'; // a MAP_BUILDER_TERRAIN key, 'eraser', 'wall', 'door', 'prop', 'structure', or 'label'
 let mapBuilderStructureChoice = 'smallHouse';
 let mapBuilderPropChoice = 'torch';
+let mapBuilderLabelText = '';
 let _mapBuilderPainting = false;
 
 function loadMapBuilderMaps() {
@@ -5681,6 +5684,7 @@ function createMapBuilderMap() {
     edges: {},
     props: [],
     structures: [],
+    labels: [],
     backdrop: null,
   };
   mapBuilderMaps.push(map);
@@ -5750,6 +5754,31 @@ function removeMapBuilderStructureAt(map, x, y) {
   });
   if (idx < 0) return false;
   map.structures.splice(idx, 1);
+  return true;
+}
+function setMapBuilderLabelText(value) {
+  mapBuilderLabelText = value;
+}
+function activateMapBuilderLabelTool() {
+  mapBuilderTool = 'label';
+  renderMapBuilderTab();
+}
+// Places whatever text currently sits in the label toolbar input at (x,y) -- a no-op if that
+// input is empty, so clicking the map with the label tool selected but nothing typed does
+// nothing rather than dropping blank labels everywhere.
+function placeMapBuilderLabel(map, x, y) {
+  const text = (mapBuilderLabelText || '').trim();
+  if (!text) return false;
+  if (!map.labels) map.labels = [];
+  map.labels.push({ id: 'label-' + Math.random().toString(36).slice(2, 8), x, y, text });
+  return true;
+}
+// Same "click it again to remove it" convention as props/structures -- exact-cell match, since a
+// label's anchor is a single point, not a footprint.
+function removeMapBuilderLabelAt(map, x, y) {
+  const idx = (map.labels || []).findIndex(l => l.x === x && l.y === y);
+  if (idx < 0) return false;
+  map.labels.splice(idx, 1);
   return true;
 }
 function zoomMapBuilder(delta) {
@@ -5915,13 +5944,23 @@ function mapGridBaseSvgParts(map) {
     const size = cellPx - pad * 2;
     props += `<svg x="${p.x * cellPx + pad}" y="${p.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}">${renderIconRects(shape, '#f0e6c8')}</svg>`;
   });
-  return { cellPx, cells, edges, structures, props, backdrop };
+  // Labels render last/on top of everything -- a place name needs to stay legible over whatever
+  // terrain/structures/props sit underneath it. Anchored at a cell's center but free to overflow
+  // past that cell's own box (SVG text isn't clipped to it), since a real place name is almost
+  // always wider than one grid cell. The stroke+paint-order pair gives a cheap readable halo
+  // without needing a separate background rect per label.
+  let labels = '';
+  (map.labels || []).forEach(l => {
+    const fontSize = Math.max(10, Math.round(cellPx * 0.55));
+    labels += `<text x="${l.x * cellPx + cellPx / 2}" y="${l.y * cellPx + cellPx / 2}" font-size="${fontSize}" font-family="Georgia, 'Crimson Text', serif" font-weight="700" fill="#f5ecd8" stroke="#1a1208" stroke-width="${(fontSize * 0.14).toFixed(1)}" paint-order="stroke" text-anchor="middle" dominant-baseline="middle" data-label-id="${l.id}">${escapeHtml(l.text)}</text>`;
+  });
+  return { cellPx, cells, edges, structures, props, labels, backdrop };
 }
 function mapBuilderCanvasSvg(map) {
-  const { cellPx, cells, edges, structures, props, backdrop } = mapGridBaseSvgParts(map);
+  const { cellPx, cells, edges, structures, props, labels, backdrop } = mapGridBaseSvgParts(map);
   const viewW = map.w * cellPx, viewH = map.h * cellPx;
   return `<svg id="mapBuilderCanvasSvg" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
-    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${structures}${props}
+    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${structures}${props}${labels}
   </svg>`;
 }
 // The live battle map: same base rendering as mapBuilderCanvasSvg, plus one icon per placed
@@ -5930,7 +5969,7 @@ function mapBuilderCanvasSvg(map) {
 // Tokens outside the current grid (e.g. left over after switching to a smaller map) are skipped
 // rather than clipped/crashing.
 function battleMapCanvasSvg(map, tokens, svgId) {
-  const { cellPx, cells, edges, structures, props, backdrop } = mapGridBaseSvgParts(map);
+  const { cellPx, cells, edges, structures, props, labels, backdrop } = mapGridBaseSvgParts(map);
   const viewW = map.w * cellPx, viewH = map.h * cellPx;
   let tokenSvg = '';
   (tokens || []).forEach(t => {
@@ -5941,7 +5980,7 @@ function battleMapCanvasSvg(map, tokens, svgId) {
     tokenSvg += `<svg x="${t.x * cellPx + pad}" y="${t.y * cellPx + pad}" width="${size}" height="${size}" viewBox="${shape.viewBox}" data-token-id="${t.id}"><title>${escapeHtml(t.label || '')}</title>${renderIconRects(shape, '#e8dfc8')}</svg>`;
   });
   return `<svg id="${svgId}" viewBox="0 0 ${viewW} ${viewH}" width="${viewW}" height="${viewH}" xmlns="http://www.w3.org/2000/svg" style="background:${MAP_BUILDER_TERRAIN.void.color};">
-    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${structures}${props}${tokenSvg}
+    <rect width="${viewW}" height="${viewH}" fill="${MAP_BUILDER_TERRAIN.void.color}"/>${backdrop}${cells}${edges}${structures}${props}${tokenSvg}${labels}
   </svg>`;
 }
 
@@ -6201,6 +6240,13 @@ function mapBuilderToolsAndCanvasHtml(map) {
       ${structureGroups}
     </div>
     <div class="mapbuilder-props-panel">
+      <span class="mapbuilder-tool-label">Labels — type a place name, then click the map to plant it there (click an existing label's exact cell to remove it).</span>
+      <div class="interactions-check-row" style="align-items:center;">
+        <input type="text" placeholder="e.g. Karvossa" value="${escapeHtml(mapBuilderLabelText)}" oninput="setMapBuilderLabelText(this.value)" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0.3rem 0.5rem;font-family:'Share Tech Mono',monospace;flex:1 1 160px;">
+        <button class="mapbuilder-tool-btn" style="width:auto;padding:0 0.6rem;${mapBuilderTool === 'label' ? 'border-color:var(--gold);' : ''}" onclick="activateMapBuilderLabelTool()">🏷 Place Label</button>
+      </div>
+    </div>
+    <div class="mapbuilder-props-panel">
       <span class="mapbuilder-tool-label">Props — pick one, then click the map to place or remove it</span>
       ${propGroups}
     </div>
@@ -6296,6 +6342,11 @@ function attachMapBuilderPointerHandlers(map) {
       // exact anchor cell.
       if (!removeMapBuilderStructureAt(map, x, y)) placeMapBuilderStructure(map, mapBuilderStructureChoice, x, y);
       rerender();
+    } else if (mapBuilderTool === 'label') {
+      if (evt.type !== 'pointerdown') return;
+      const { x, y } = cellFromEvent(evt);
+      if (!removeMapBuilderLabelAt(map, x, y)) placeMapBuilderLabel(map, x, y);
+      rerender();
     } else {
       const { x, y } = cellFromEvent(evt);
       const value = mapBuilderTool === 'eraser' ? 'void' : mapBuilderTool;
@@ -6307,7 +6358,7 @@ function attachMapBuilderPointerHandlers(map) {
   svg.onpointerdown = (evt) => { _mapBuilderPainting = true; applyPaint(evt); };
   svg.onpointermove = (evt) => {
     if (!_mapBuilderPainting) return;
-    if (mapBuilderTool === 'wall' || mapBuilderTool === 'door' || mapBuilderTool === 'prop' || mapBuilderTool === 'structure') return;
+    if (mapBuilderTool === 'wall' || mapBuilderTool === 'door' || mapBuilderTool === 'prop' || mapBuilderTool === 'structure' || mapBuilderTool === 'label') return;
     applyPaint(evt);
   };
   svg.onpointerup = () => { _mapBuilderPainting = false; saveMapBuilderMaps(); };
