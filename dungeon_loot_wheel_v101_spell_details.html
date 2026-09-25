@@ -5199,6 +5199,10 @@ function activeBattleMap() {
 // placed or dragged, not a live binding, so the map stays a position tracker, not another HP feed.
 let battleMapTokens = [];
 function setActiveBattleMap(id) {
+  // Tokens are grid coordinates with no map id of their own, so switching to a genuinely
+  // different map has to clear them -- otherwise a token placed on a 5x5 map could reappear at
+  // the same raw x,y on a 50x30 map with nothing there, or worse, outside the new map's bounds.
+  if (id !== activeBattleMapId) battleMapTokens = [];
   activeBattleMapId = id;
   try { localStorage.setItem('dmActiveBattleMapId', id); } catch (e) {}
   renderBattleMapGallery();
@@ -5216,13 +5220,20 @@ function renderMapsPanel() {
 function renderBattleMapGallery() {
   const wrap = document.getElementById('mapsBattleMapGrid');
   if (!wrap) return;
+  // Duplicate/rename/delete live here too, not just in the Map Builder tab's own sidebar list --
+  // this gallery is the far more natural place a DM would look to manage battle maps, and having
+  // no delete control here at all was the actual "maps don't let me delete them" bug.
   wrap.innerHTML = mapBuilderMaps.length ? mapBuilderMaps.map(m => {
     const isActive = m.id === activeBattleMapId;
     return `
     <div class="mapbuilder-battlemap-card ${isActive ? 'active' : ''}">
       <div class="mapbuilder-battlemap-thumb">${mapBuilderThumbSvg(m, 6)}</div>
-      <div class="mapbuilder-battlemap-name">${escapeHtml(m.name)}</div>
+      <input type="text" class="mapbuilder-battlemap-name" value="${escapeHtml(m.name)}" onchange="renameMapBuilderMap('${m.id}', this.value)" style="background:transparent;border:none;color:var(--text);text-align:center;font-family:'Crimson Text',serif;width:100%;">
       <button class="combat-danger-btn" style="${isActive ? 'background:var(--gold);color:#1a1410;border-color:var(--gold);' : ''}" onclick="setActiveBattleMap('${m.id}')">${isActive ? '⚔ Current Battle Map' : '⚔ Use as Battle Map'}</button>
+      <div class="mapbuilder-map-actions" style="justify-content:center;">
+        <button onclick="duplicateMapBuilderMap('${m.id}');renderBattleMapGallery();" title="Duplicate">⎘</button>
+        <button onclick="deleteMapBuilderMap('${m.id}')" title="Delete">🗑</button>
+      </div>
     </div>
   `;
   }).join('') : '<p style="color:var(--text-dim);font-size:0.85rem;">No Map Builder maps yet — create one in the Map Builder tab.</p>';
@@ -5760,8 +5771,20 @@ function deleteMapBuilderMap(id) {
   if (!confirm('Delete this map? This cannot be undone.')) return;
   mapBuilderMaps = mapBuilderMaps.filter(m => m.id !== id);
   if (activeMapBuilderId === id) activeMapBuilderId = (mapBuilderMaps[0] && mapBuilderMaps[0].id) || null;
+  // If the deleted map was the current BATTLE map, clear that designation and its tokens too --
+  // otherwise activeBattleMapId is left pointing at a map that no longer exists, and connected
+  // players never get told (push_battle_map is only ever sent from setActiveBattleMap/a token
+  // move, neither of which delete triggers on its own).
+  if (activeBattleMapId === id) {
+    activeBattleMapId = null;
+    try { localStorage.setItem('dmActiveBattleMapId', ''); } catch (e) {}
+    battleMapTokens = [];
+    if (typeof window.pushBattleMapState === 'function') window.pushBattleMapState(null, []);
+  }
   saveMapBuilderMaps();
   renderMapBuilderTab();
+  if (typeof renderBattleMapGallery === 'function') renderBattleMapGallery();
+  if (typeof renderCombatBattleMap === 'function') renderCombatBattleMap();
 }
 function renameMapBuilderMap(id, name) {
   const map = mapBuilderMaps.find(m => m.id === id);
