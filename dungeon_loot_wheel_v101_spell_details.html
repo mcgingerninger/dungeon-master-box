@@ -5663,6 +5663,59 @@ function saveMapBuilderMaps() {
 }
 loadMapBuilderMaps();
 
+// A lore reference map for "the Ashlands" (see DM Controls -> Lore -> Geography & History),
+// auto-seeded exactly once -- same "push it in if a fixed id isn't already present" pattern
+// ensureGeomorphTiles() already uses for procedural tiles. After seeding, it's a completely
+// ordinary Map Builder map: editable, deletable, duplicable, selectable as a battle map, no
+// special-cased second rendering path anywhere.
+const WORLD_MAP_ID = 'map-world-ashlands';
+function buildWorldMapData() {
+  const w = 50, h = 34;
+  const cells = blankMapBuilderGrid(w, h);
+  const fill = (x0, y0, x1, y1, terrain) => {
+    for (let y = Math.max(0, y0); y <= Math.min(h - 1, y1); y++)
+      for (let x = Math.max(0, x0); x <= Math.min(w - 1, x1); x++)
+        cells[y][x] = terrain;
+  };
+  fill(2, 2, 47, 30, 'grass');           // the Ashlands' base countryside
+  fill(0, 28, 49, 33, 'water');          // the southern ocean
+  fill(0, 24, 49, 27, 'sand');           // the Cinder Coast, along the coastline
+  fill(4, 2, 18, 9, 'stone');            // the Greywatch Peaks, in the north
+  fill(2, 14, 14, 22, 'grass');          // the Hollow Fen's base, patchy wetland below
+  for (let y = 14; y <= 22; y++) for (let x = 2; x <= 14; x++) { if ((x + y) % 3 === 0) cells[y][x] = 'water'; }
+  fill(22, 15, 34, 24, 'dirt');          // the Amber Vale's farmland, ringing Karvossa
+  return {
+    id: WORLD_MAP_ID,
+    name: 'The Ashlands — World Map',
+    w, h,
+    cellPx: 18,
+    cells,
+    edges: {},
+    props: [],
+    structures: [
+      { id: 'ws-karvossa-1', type: 'largeHall', x: 27, y: 18 },
+      { id: 'ws-karvossa-2', type: 'smallHouse', x: 24, y: 19 },
+      { id: 'ws-greywatch', type: 'watchtower', x: 6, y: 3 },
+      { id: 'ws-frontier', type: 'palisade', x: 20, y: 6 },
+    ],
+    labels: [
+      { id: 'wl-karvossa', x: 28, y: 17, text: 'Karvossa' },
+      { id: 'wl-cinder', x: 10, y: 26, text: 'The Cinder Coast' },
+      { id: 'wl-greywatch', x: 8, y: 5, text: 'The Greywatch Peaks' },
+      { id: 'wl-fen', x: 6, y: 17, text: 'The Hollow Fen' },
+      { id: 'wl-vale', x: 26, y: 21, text: 'The Amber Vale' },
+      { id: 'wl-frontier', x: 20, y: 4, text: 'The Contested Frontier' },
+    ],
+    backdrop: null,
+  };
+}
+function ensureWorldMapSeeded() {
+  if (mapBuilderMaps.some(m => m.id === WORLD_MAP_ID)) return;
+  mapBuilderMaps.push(buildWorldMapData());
+  saveMapBuilderMaps();
+}
+ensureWorldMapSeeded();
+
 function activeMapBuilderMap() {
   return mapBuilderMaps.find(m => m.id === activeMapBuilderId) || null;
 }
