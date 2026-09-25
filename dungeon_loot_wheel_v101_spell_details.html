@@ -4040,12 +4040,16 @@
   <div id="mapBuilderRoot"></div>
 </div>
 
-<!-- BATTLEFIELD TAB — player-only, read-only live view of the DM's combat roster (and, if the DM
-     has picked one, the current battle map with everyone's token positions). Populated entirely
-     from multiplayer-sync.js's window.applyRemoteBattlefieldState/applyRemoteBattleMapState
-     bridges; nothing here does anything if those never fire (e.g. no DM connected yet). -->
+<!-- BATTLEFIELD TAB — player-only, read-only live view of the DM's combat roster, the current
+     battle map with everyone's token positions (if the DM has picked one), and the attack feed --
+     map and attacks together on one page, not just tokens with no context for what's happening.
+     Populated entirely from multiplayer-sync.js's window.applyRemoteBattlefieldState/
+     applyRemoteBattleMapState bridges; nothing here does anything if those never fire (e.g. no
+     DM connected yet). -->
 <div id="tab-battlefield" class="tab-content">
   <div id="battlefieldMapWrap"></div>
+  <h3 style="color:var(--gold);font-size:1.05rem;margin-bottom:.6rem;letter-spacing:.05em;">📜 Attack Feed</h3>
+  <div class="combat-log" id="battlefieldLogEl"><div class="combat-log-empty">No attacks rolled yet.</div></div>
   <div class="combat-roster" id="battlefieldRosterEl"><div class="combat-empty-roster">Nothing happening yet.</div></div>
 </div>
 
@@ -19283,7 +19287,17 @@ window.applyRemoteBattleMapState = function (map, tokens) {
 function renderBattlefieldForPlayer() {
   const mapWrap = document.getElementById('battlefieldMapWrap');
   if (mapWrap) mapWrap.innerHTML = battlefieldMap ? `<div class="inv-grid-wrap mapbuilder-canvas-wrap">${battleMapCanvasSvg(battlefieldMap, battlefieldMapTokens, 'battlefieldMapCanvasSvg')}</div>` : '';
+  renderBattlefieldLog();
   reconcileRosterCards(document.getElementById('battlefieldRosterEl'), battlefieldRoster, 'player', true);
+}
+// Same markup as the DM's own renderCombatLog(), just against battlefieldLog instead of
+// battleLog -- players receive this data on every push already (applyRemoteBattlefieldState)
+// but it was never actually rendered anywhere until now.
+function renderBattlefieldLog() {
+  const wrap = document.getElementById('battlefieldLogEl');
+  if (!wrap) return;
+  if (!battlefieldLog.length) { wrap.innerHTML = '<div class="combat-log-empty">No attacks rolled yet.</div>'; return; }
+  wrap.innerHTML = battlefieldLog.map(r => `<div class="combat-result ${r.cls}${r.isLegendary ? ' legendary-action' : ''}"><div class="combat-result-title ${r.cls}">${r.isLegendary ? '<span class="legendary-action-badge">👑 Legendary</span> ' : ''}${escapeHtml(r.title)}</div>${r.detail}</div>`).join('');
 }
 // Player's "⚔ Attack" button on an undefeated monster card — rolls with whatever's in their
 // main weapon slot (see computeWeaponAttackRoll), shows them the exact same breakdown popup the
