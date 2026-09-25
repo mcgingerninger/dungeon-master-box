@@ -5407,6 +5407,223 @@ const STRUCTURE_GROUPS = [
   { label: 'Structures', keys: ['smallHouse', 'cottage', 'watchtower', 'ruinedWall', 'palisade', 'barn', 'largeHall', 'marketStall'] },
 ];
 
+// ---------- Recognizable monster/creature tokens ----------
+// Specific, detailed silhouettes for the most iconic creature names (same {viewBox, rects,
+// colors, outlineColor} shape as MAP_ICONS, merged straight into it below so every existing
+// render/lookup path just works unchanged). Dragons are generated once from a shared body shape
+// plus ten color palettes rather than hand-writing the same rects ten times.
+const DRAGON_BODY_RECTS = [[4,4,8,5],[0,2,5,6],[11,2,5,6],[10,1,4,4],[13,0,1,2],[11,0,1,2],[2,7,3,3],[0,8,2,2],[5,9,2,3],[9,9,2,3],[13,2,1,1]];
+const DRAGON_COLOR_SETS = {
+  red:    ['#8a2020','#a83030','#a83030','#8a2020','#6a1818','#6a1818','#8a2020','#6a1818','#5a1414','#5a1414','#f7d774'],
+  blue:   ['#20408a','#3050a8','#3050a8','#20408a','#182f6a','#182f6a','#20408a','#182f6a','#141f5a','#141f5a','#a0e0ff'],
+  green:  ['#2a6a2a','#3a8a3a','#3a8a3a','#2a6a2a','#1a4a1a','#1a4a1a','#2a6a2a','#1a4a1a','#143a14','#143a14','#c0f0a0'],
+  black:  ['#1a2a1a','#2a3a2a','#2a3a2a','#1a2a1a','#0a1a0a','#0a1a0a','#1a2a1a','#0a1a0a','#050f05','#050f05','#80c080'],
+  white:  ['#c8d8e0','#d8e8f0','#d8e8f0','#c8d8e0','#a8c0cc','#a8c0cc','#c8d8e0','#a8c0cc','#98b0bc','#98b0bc','#f0f8ff'],
+  gold:   ['#c9a020','#e8c040','#e8c040','#c9a020','#a88010','#a88010','#c9a020','#a88010','#987010','#987010','#fff0c0'],
+  silver: ['#a8b0b8','#c8d0d8','#c8d0d8','#a8b0b8','#8890a0','#8890a0','#a8b0b8','#8890a0','#787890','#787890','#f0f8ff'],
+  bronze: ['#8a6a3a','#a88a4a','#a88a4a','#8a6a3a','#6a4a2a','#6a4a2a','#8a6a3a','#6a4a2a','#5a3a1a','#5a3a1a','#e0c080'],
+  copper: ['#a86a3a','#c88a4a','#c88a4a','#a86a3a','#885a2a','#885a2a','#a86a3a','#885a2a','#784a1a','#784a1a','#e8b060'],
+  brass:  ['#a8843a','#c8a44a','#c8a44a','#a8843a','#886428','#886428','#a8843a','#886428','#785418','#785418','#f0d080'],
+};
+const MONSTER_TOKEN_ICONS = Object.assign(
+  Object.fromEntries(Object.entries(DRAGON_COLOR_SETS).map(([c, colors]) => [
+    'dragon' + c[0].toUpperCase() + c.slice(1),
+    { viewBox: '0 0 16 12', outlineColor: '#1a1008', rects: DRAGON_BODY_RECTS, colors },
+  ])),
+  {
+    skeleton: { viewBox: '0 0 8 12', outlineColor: '#8a8068',
+      rects: [[2,0,4,3],[2,3,4,4],[2,4,4,1],[2,7,4,1],[2,8,1,4],[5,8,1,4],[0,3,1,4],[7,3,1,4],[3,1,1,1]],
+      colors: ['#e8e0c8','#d8d0b8','#3a3a3a','#c8c0a8','#c8c0a8','#c8c0a8','#c8c0a8','#c8c0a8','#1a1a1a'] },
+    zombie: { viewBox: '0 0 8 12', outlineColor: '#1a2a10',
+      rects: [[2,0,4,3],[1,3,6,5],[1,3,6,2],[0,4,1,5],[7,4,1,5],[2,8,2,4],[4,8,2,4],[3,1,1,1],[4,1,1,1]],
+      colors: ['#5a7a4a','#4a6a3a','#3a5a2a','#5a7a4a','#5a7a4a','#3a2a20','#3a2a20','#e83232','#e83232'] },
+    ghoul: { viewBox: '0 0 8 10', outlineColor: '#2a3a20',
+      rects: [[2,0,4,3],[1,3,6,4],[0,3,1,5],[7,3,1,5],[0,7,1,1],[7,7,1,1],[2,7,2,3],[4,7,2,3],[3,1,2,1]],
+      colors: ['#7a8a6a','#6a7a5a','#5a6a4a','#5a6a4a','#e8dfc8','#e8dfc8','#5a6a4a','#5a6a4a','#e83232'] },
+    vampire: { viewBox: '0 0 8 12', outlineColor: '#0a0510',
+      rects: [[0,3,8,8],[2,0,4,3],[2,3,4,6],[1,3,6,1],[2,9,2,3],[4,9,2,3],[3,2,1,1],[4,2,1,1]],
+      colors: ['#1a0a1a','#e8dfc8','#2a2a3a','#c9a84c','#1a0a1a','#1a0a1a','#f0f0f0','#f0f0f0'] },
+    lich: { viewBox: '0 0 8 14', outlineColor: '#1a0a20',
+      rects: [[1,4,6,10],[1,4,3,10],[2,0,4,3],[3,1,1,1],[4,1,1,1],[0,0,1,14],[0,0,1,2],[2,3,4,1]],
+      colors: ['#4a2a5a','#3a1a4a','#e8dfc8','#a0e0ff','#a0e0ff','#3a2a18','#c090ff','#2a1a10'] },
+    mummy: { viewBox: '0 0 8 12', outlineColor: '#4a3a20',
+      rects: [[2,0,4,3],[1,3,6,6],[1,5,6,1],[1,7,6,1],[0,3,1,6],[7,3,1,6],[2,9,2,3],[4,9,2,3]],
+      colors: ['#c9b890','#d8c8a0','#b0a078','#b0a078','#c9b890','#c9b890','#a89870','#a89870'] },
+    ghost: { viewBox: '0 0 10 12', outlineColor: '#7a9aa8',
+      rects: [[3,0,4,4],[2,4,6,6],[2,10,2,2],[4,10,2,1],[6,10,2,2],[4,2,1,1],[5,2,1,1]],
+      colors: ['#c8e8f0','#b8d8e8','#a8c8d8','#a8c8d8','#a8c8d8','#2a2a2a','#2a2a2a'] },
+    goblin: { viewBox: '0 0 8 10', outlineColor: '#1a2a10',
+      rects: [[2,0,4,3],[1,0,1,2],[6,0,1,2],[2,3,4,5],[1,3,1,4],[6,3,1,4],[2,8,2,2],[4,8,2,2],[3,1,2,1]],
+      colors: ['#4a7a3a','#4a7a3a','#4a7a3a','#3a6a2a','#4a7a3a','#4a7a3a','#2a1a10','#2a1a10','#e83232'] },
+    hobgoblin: { viewBox: '0 0 8 12', outlineColor: '#2a1a10',
+      rects: [[2,0,4,3],[1,3,6,6],[1,3,3,2],[0,3,1,5],[7,3,1,5],[2,9,2,3],[4,9,2,3],[3,1,2,1]],
+      colors: ['#c07a4a','#5a5a5a','#7a7a7a','#c07a4a','#c07a4a','#3a3a3a','#3a3a3a','#e8d060'] },
+    kobold: { viewBox: '0 0 8 8', outlineColor: '#3a1a08',
+      rects: [[2,0,3,2],[1,2,5,4],[6,4,2,1],[7,5,1,1],[0,2,1,3],[6,2,1,3],[2,6,2,2],[4,6,2,2]],
+      colors: ['#8a4a2a','#7a3a1a','#7a3a1a','#6a2a10','#8a4a2a','#8a4a2a','#5a2a10','#5a2a10'] },
+    orc: { viewBox: '0 0 8 12', outlineColor: '#1a2a10',
+      rects: [[2,0,4,3],[2,2,1,1],[5,2,1,1],[1,3,6,6],[0,3,1,6],[7,3,1,6],[2,9,2,3],[4,9,2,3],[3,1,2,1]],
+      colors: ['#6a7a5a','#e8e0c8','#e8e0c8','#5a6a4a','#6a7a5a','#6a7a5a','#3a3a3a','#3a3a3a','#e83232'] },
+    troll: { viewBox: '0 0 10 14', outlineColor: '#1a2a10',
+      rects: [[3,0,4,3],[2,3,6,7],[0,3,2,8],[8,3,2,8],[3,10,2,4],[5,10,2,4],[4,1,1,1],[6,4,1,1]],
+      colors: ['#5a7a4a','#4a6a3a','#5a7a4a','#5a7a4a','#3a5a2a','#3a5a2a','#2a4a1a','#2a4a1a'] },
+    ogre: { viewBox: '0 0 10 12', outlineColor: '#2a1a10',
+      rects: [[3,0,4,3],[1,3,8,6],[8,0,2,7],[1,7,8,1],[3,9,2,3],[5,9,2,3],[4,1,2,1]],
+      colors: ['#a08060','#907050','#5a3d22','#3a2a18','#7a5838','#7a5838','#e83232'] },
+    giant: { viewBox: '0 0 10 14', outlineColor: '#2a2010',
+      rects: [[3,0,4,3],[1,3,8,7],[0,3,1,7],[9,3,1,7],[3,10,3,4],[6,10,3,4],[1,9,8,1]],
+      colors: ['#a89878','#988868','#a89878','#a89878','#786848','#786848','#5a4a30'] },
+    wolf: { viewBox: '0 0 14 8', outlineColor: '#2a2a2a',
+      rects: [[3,3,8,4],[10,1,4,3],[10,0,1,1],[13,0,1,1],[3,7,1,1],[5,7,1,1],[8,7,1,1],[10,7,1,1],[0,2,3,2]],
+      colors: ['#6a6a6a','#7a7a7a','#5a5a5a','#5a5a5a','#4a4a4a','#4a4a4a','#4a4a4a','#4a4a4a','#5a5a5a'] },
+    spider: { viewBox: '0 0 12 10', outlineColor: '#0a0a0a',
+      rects: [[4,3,4,4],[0,2,3,1],[0,4,3,1],[0,6,3,1],[9,2,3,1],[9,4,3,1],[9,6,3,1],[3,1,1,2],[8,1,1,2]],
+      colors: ['#1a1a1a','#2a2a2a','#2a2a2a','#2a2a2a','#2a2a2a','#2a2a2a','#2a2a2a','#e83232','#e83232'] },
+    rat: { viewBox: '0 0 10 6', outlineColor: '#3a2a20',
+      rects: [[2,2,5,3],[6,1,3,2],[6,0,1,1],[8,0,1,1],[0,3,2,1],[2,5,1,1],[5,5,1,1]],
+      colors: ['#7a6a5a','#8a7a6a','#8a7a6a','#8a7a6a','#6a5a4a','#4a3a2a','#4a3a2a'] },
+    bat: { viewBox: '0 0 10 8', outlineColor: '#150a15',
+      rects: [[4,3,2,3],[0,1,4,4],[6,1,4,4],[4,2,1,1],[5,2,1,1],[1,2,2,2],[7,2,2,2]],
+      colors: ['#3a2a3a','#2a1a2a','#2a1a2a','#3a2a3a','#3a2a3a','#4a3a4a','#4a3a4a'] },
+    owlbear: { viewBox: '0 0 12 12', outlineColor: '#2a1a08',
+      rects: [[2,4,8,6],[3,0,6,4],[5,3,2,2],[3,0,1,1],[8,0,1,1],[3,10,2,2],[7,10,2,2],[4,1,2,1],[7,1,2,1]],
+      colors: ['#6a4a2a','#7a5a3a','#e8963a','#6a4a2a','#6a4a2a','#5a3a1a','#5a3a1a','#e8d060','#e8d060'] },
+    beholder: { viewBox: '0 0 12 12', outlineColor: '#2a1a2a',
+      rects: [[2,2,8,8],[4,4,4,4],[5,5,2,2],[0,1,2,2],[10,1,2,2],[1,0,2,2],[9,0,2,2],[0,1,1,1],[11,1,1,1]],
+      colors: ['#5a3a5a','#f0f0f0','#1a1a1a','#5a3a5a','#5a3a5a','#5a3a5a','#5a3a5a','#e83232','#e83232'] },
+    gargoyle: { viewBox: '0 0 10 12', outlineColor: '#2a2a2a',
+      rects: [[3,0,4,3],[3,0,1,1],[6,0,1,1],[2,3,6,6],[0,2,3,5],[7,2,3,5],[3,9,2,3],[5,9,2,3]],
+      colors: ['#7a7a7a','#5a5a5a','#5a5a5a','#6a6a6a','#5a5a5a','#5a5a5a','#4a4a4a','#4a4a4a'] },
+    minotaur: { viewBox: '0 0 10 12', outlineColor: '#2a1508',
+      rects: [[3,0,4,3],[2,0,1,2],[7,0,1,2],[1,3,8,6],[0,3,1,6],[9,3,1,6],[3,9,2,3],[5,9,2,3],[4,2,2,1]],
+      colors: ['#6a4a30','#e8e0c8','#e8e0c8','#5a3a20','#6a4a30','#6a4a30','#4a2a10','#4a2a10','#c9a84c'] },
+    golem: { viewBox: '0 0 10 14', outlineColor: '#2a2418',
+      rects: [[3,0,4,3],[1,3,8,8],[0,3,1,8],[9,3,1,8],[2,11,3,3],[5,11,3,3],[1,6,8,1],[1,9,8,1]],
+      colors: ['#8a8070','#7a7060','#8a8070','#8a8070','#6a6050','#6a6050','#4a4030','#4a4030'] },
+    ooze: { viewBox: '0 0 12 8', outlineColor: '#1a3a1a',
+      rects: [[2,2,8,5],[0,4,3,3],[9,4,3,3],[3,2,4,2],[4,4,1,1],[7,3,1,1]],
+      colors: ['#3a7a3a','#3a7a3a','#3a7a3a','#5a9a5a','#2a5a2a','#5a9a5a'] },
+    harpy: { viewBox: '0 0 10 10', outlineColor: '#4a3a18',
+      rects: [[3,0,4,3],[3,3,4,4],[0,2,3,4],[7,2,3,4],[3,7,2,3],[5,7,2,3],[3,9,1,1],[6,9,1,1]],
+      colors: ['#e8dfc8','#c9a84c','#8a6a3a','#8a6a3a','#c9a84c','#c9a84c','#3a3a3a','#3a3a3a'] },
+    werewolf: { viewBox: '0 0 10 14', outlineColor: '#1a1008',
+      rects: [[3,0,4,3],[3,0,1,1],[6,0,1,1],[2,3,6,7],[0,3,2,7],[8,3,2,7],[3,10,2,4],[5,10,2,4],[4,2,2,1]],
+      colors: ['#5a4a3a','#5a4a3a','#5a4a3a','#4a3a2a','#5a4a3a','#5a4a3a','#3a2a18','#3a2a18','#2a1a10'] },
+    angel: { viewBox: '0 0 10 14', outlineColor: '#8a7a50',
+      rects: [[3,0,4,1],[3,1,4,3],[2,4,6,6],[0,3,3,6],[7,3,3,6],[3,10,2,4],[5,10,2,4]],
+      colors: ['#f0e090','#f0e8d8','#e8dfc8','#f0f0f0','#f0f0f0','#d8c8a0','#d8c8a0'] },
+    mimic: { viewBox: '0 0 12 10', outlineColor: '#2a1a10',
+      rects: [[0,3,12,7],[0,3,12,3],[1,5,10,1],[5,6,2,3],[2,4,1,1],[9,4,1,1]],
+      colors: ['#5a3d22','#7a5230','#f0f0f0','#c94242','#e8d060','#e8d060'] },
+  }
+);
+// Generic-but-still-detailed fallback icons, one per CREATURE_FAMILIES id (see getCreatureFamily
+// in the monster-parts section below) -- the safety net that guarantees every one of the ~1,900
+// live bestiary creatures gets a reasonable icon even with zero specific keyword coverage above.
+// Several intentionally alias an existing specific icon that already reads as "generic enough."
+const MONSTER_FAMILY_ICONS = {
+  familySpirit: MONSTER_TOKEN_ICONS.ghost,
+  familyDragon: { viewBox: '0 0 16 12', outlineColor: '#1a1008', rects: DRAGON_BODY_RECTS,
+    colors: ['#6a5a4a','#8a7a6a','#8a7a6a','#6a5a4a','#4a3a2a','#4a3a2a','#6a5a4a','#4a3a2a','#3a2a1a','#3a2a1a','#c8b8a0'] },
+  familyUndead: MONSTER_TOKEN_ICONS.zombie,
+  familyFiend: { viewBox: '0 0 8 12', outlineColor: '#3a0a0a',
+    rects: [[2,0,4,3],[2,0,1,1],[5,0,1,1],[1,3,6,6],[0,3,1,6],[7,3,1,6],[2,9,2,3],[4,9,2,3],[7,8,1,1],[8,9,1,1]],
+    colors: ['#a83232','#3a1a1a','#3a1a1a','#8a2a2a','#a83232','#a83232','#6a1818','#6a1818','#a83232','#a83232'] },
+  familyCelestial: MONSTER_TOKEN_ICONS.angel,
+  familyFey: { viewBox: '0 0 8 8', outlineColor: '#4a3a70',
+    rects: [[3,2,2,4],[0,1,3,3],[5,1,3,3],[3,0,2,2],[3,6,2,2],[1,2,1,1],[6,2,1,1]],
+    colors: ['#c9a84c','#8ac0d8','#8ac0d8','#e8dfc8','#f0e090','#f0f0f0','#f0f0f0'] },
+  familyElemental: { viewBox: '0 0 10 12', outlineColor: '#2a2018',
+    rects: [[3,3,4,6],[1,1,3,3],[6,1,3,3],[0,6,3,3],[7,6,3,3],[3,9,4,3]],
+    colors: ['#6a5a4a','#8a6a4a','#8a6a4a','#7a5a3a','#7a5a3a','#5a4a3a'] },
+  familyGiant: MONSTER_TOKEN_ICONS.giant,
+  familyConstruct: MONSTER_TOKEN_ICONS.golem,
+  familyPlant: { viewBox: '0 0 10 14', outlineColor: '#1a2a10',
+    rects: [[1,0,8,5],[3,5,4,7],[2,12,3,2],[5,12,3,2],[4,7,1,1],[6,7,1,1]],
+    colors: ['#3f6b34','#5a4020','#4a3218','#4a3218','#e8d060','#e8d060'] },
+  familyOoze: MONSTER_TOKEN_ICONS.ooze,
+  familyAberration: { viewBox: '0 0 10 10', outlineColor: '#2a1530',
+    rects: [[3,2,4,4],[4,3,2,2],[5,4,1,1],[1,6,1,3],[3,7,1,3],[6,7,1,3],[8,6,1,3]],
+    colors: ['#5a3a6a','#f0f0f0','#1a1a1a','#4a2a5a','#4a2a5a','#4a2a5a','#4a2a5a'] },
+  familyMonstrosity: MONSTER_TOKEN_ICONS.owlbear,
+  familySwarm: { viewBox: '0 0 10 10', outlineColor: '#2a1a10',
+    rects: [[1,1,2,2],[4,0,2,2],[7,1,2,2],[0,4,2,2],[3,4,2,2],[6,4,2,2],[8,4,2,2],[2,7,2,2],[5,7,2,2]],
+    colors: ['#4a3a2a','#4a3a2a','#4a3a2a','#4a3a2a','#4a3a2a','#4a3a2a','#4a3a2a','#4a3a2a','#4a3a2a'] },
+  familyHumanoid: { viewBox: '0 0 8 12', outlineColor: '#2a2418',
+    rects: [[2,0,4,4],[1,4,6,5],[2,9,2,3],[4,9,2,3],[1,8,6,1]],
+    colors: ['#c8bca0','#7a7268','#4a4238','#4a4238','#3a342a'] },
+  familyBeast: MONSTER_TOKEN_ICONS.wolf,
+};
+Object.assign(MAP_ICONS, MONSTER_TOKEN_ICONS, MONSTER_FAMILY_ICONS);
+const MONSTER_ICON_GROUPS = [
+  { label: 'Creatures — Undead', keys: ['skeleton', 'zombie', 'ghoul', 'vampire', 'lich', 'mummy', 'ghost', 'mimic'] },
+  { label: 'Creatures — Humanoids', keys: ['goblin', 'hobgoblin', 'kobold', 'orc', 'troll', 'ogre', 'giant', 'minotaur', 'werewolf'] },
+  { label: 'Creatures — Beasts', keys: ['wolf', 'spider', 'rat', 'bat', 'owlbear'] },
+  { label: 'Creatures — Dragons', keys: Object.keys(DRAGON_COLOR_SETS).map(c => 'dragon' + c[0].toUpperCase() + c.slice(1)) },
+  { label: 'Creatures — Other', keys: ['beholder', 'gargoyle', 'golem', 'ooze', 'harpy', 'angel'] },
+];
+const DRAGON_COLOR_KEYWORDS = Object.keys(DRAGON_COLOR_SETS);
+// Keyword vocabulary intentionally mirrors CREATURE_SUBTYPES' own keyword lists further below
+// (dragon colors, vampire/zombie/lich/etc.) so "does this name match a specific icon" and "does
+// this name match a specific mechanical theme" never disagree with each other.
+const MONSTER_ICON_KEYWORDS = [
+  { keywords: ['skeleton'], icon: 'skeleton' },
+  { keywords: ['zombie'], icon: 'zombie' },
+  { keywords: ['ghoul', 'ghast'], icon: 'ghoul' },
+  { keywords: ['vampire'], icon: 'vampire' },
+  { keywords: ['lich'], icon: 'lich' },
+  { keywords: ['mummy'], icon: 'mummy' },
+  { keywords: ['ghost', 'specter', 'spectre', 'wraith', 'phantom', 'shade', 'banshee'], icon: 'ghost' },
+  { keywords: ['hobgoblin'], icon: 'hobgoblin' },
+  { keywords: ['goblin'], icon: 'goblin' },
+  { keywords: ['kobold'], icon: 'kobold' },
+  { keywords: ['orc'], icon: 'orc' },
+  { keywords: ['troll'], icon: 'troll' },
+  { keywords: ['ogre'], icon: 'ogre' },
+  { keywords: ['giant'], icon: 'giant' },
+  { keywords: ['wolf'], icon: 'wolf' },
+  { keywords: ['spider'], icon: 'spider' },
+  { keywords: ['rat'], icon: 'rat' },
+  { keywords: ['bat'], icon: 'bat' },
+  { keywords: ['owlbear'], icon: 'owlbear' },
+  { keywords: ['beholder'], icon: 'beholder' },
+  { keywords: ['gargoyle'], icon: 'gargoyle' },
+  { keywords: ['minotaur'], icon: 'minotaur' },
+  { keywords: ['golem'], icon: 'golem' },
+  { keywords: ['ooze', 'slime', 'jelly', 'pudding'], icon: 'ooze' },
+  { keywords: ['harpy'], icon: 'harpy' },
+  { keywords: ['werewolf'], icon: 'werewolf' },
+  { keywords: ['angel', 'deva', 'planetar', 'solar'], icon: 'angel' },
+  { keywords: ['mimic'], icon: 'mimic' },
+];
+const FAMILY_TO_ICON_KEY = {
+  spirit: 'familySpirit', dragon: 'familyDragon', undead: 'familyUndead', fiend: 'familyFiend',
+  celestial: 'familyCelestial', fey: 'familyFey', elemental: 'familyElemental', giant: 'familyGiant',
+  construct: 'familyConstruct', plant: 'familyPlant', ooze: 'familyOoze', aberration: 'familyAberration',
+  monstrosity: 'familyMonstrosity', swarm: 'familySwarm', humanoid: 'familyHumanoid', beast: 'familyBeast',
+};
+// The tiered selection chain: a specific named match (including dragon-by-color) beats a
+// family-generic fallback beats the old plain 'monster' blob -- see battleMapUnplacedCombatants,
+// which is the one caller (this runs DM-side only, where the full monster record is available).
+function battleMapIconForMonster(monster) {
+  const name = ((monster && monster.name) || '').toLowerCase();
+  if (name.includes('dragon')) {
+    const colorMatch = DRAGON_COLOR_KEYWORDS.find(c => name.includes(c));
+    const chosen = colorMatch || 'red';
+    return 'dragon' + chosen[0].toUpperCase() + chosen.slice(1);
+  }
+  const specific = MONSTER_ICON_KEYWORDS.find(entry => entry.keywords.some(k => name.includes(k)));
+  if (specific) return specific.icon;
+  if (monster && typeof getCreatureFamily === 'function') {
+    try {
+      const family = getCreatureFamily(monster);
+      const key = family && FAMILY_TO_ICON_KEY[family.id];
+      if (key && MAP_ICONS[key]) return key;
+    } catch (e) { /* getCreatureFamily expects a real monster record; fall through on anything malformed */ }
+  }
+  return 'monster';
+}
+
 let mapBuilderMaps = [];
 let activeMapBuilderId = null;
 let mapBuilderTool = 'floor'; // a MAP_BUILDER_TERRAIN key, 'eraser', 'wall', 'door', 'prop', or 'structure'
@@ -5728,8 +5945,11 @@ function battleMapLabelFor(kind, refUid) {
 // (adding a monster to the fight doesn't force an immediate map position).
 function battleMapUnplacedCombatants() {
   const placedKeys = new Set(battleMapTokens.map(t => t.kind + ':' + t.refUid));
+  // e.monster is the full monster record (not just its name -- see buildBattleEntry), so the old
+  // regex here was actually testing "[object Object]" and never matched anything. Fixed to use
+  // the real name/family-based icon selection chain instead of a single always-generic fallback.
   const monsters = (battleRoster || []).filter(e => !e.defeated && !placedKeys.has('monster:' + e.uid)).map(e => ({
-    kind: 'monster', refUid: String(e.uid), icon: e.monster && /boss|dragon|lich|demon lord/i.test(e.monster) ? 'boss' : 'monster',
+    kind: 'monster', refUid: String(e.uid), icon: battleMapIconForMonster(e.monster),
   }));
   const players = (connectedPlayers || []).filter(p => !placedKeys.has('player:' + p.uid)).map(p => ({ kind: 'player', refUid: String(p.uid), icon: 'player' }));
   return monsters.concat(players);
@@ -5830,7 +6050,7 @@ function mapBuilderToolsAndCanvasHtml(map) {
   const terrainBtns = Object.entries(MAP_BUILDER_TERRAIN).filter(([key]) => key !== 'void').map(([key, t]) => `
     <button class="mapbuilder-tool-btn ${mapBuilderTool === key ? 'active' : ''}" style="background:${t.color};" onclick="setMapBuilderTool('${key}')" title="${t.label}"></button>
   `).join('');
-  const propGroups = MAP_ICON_GROUPS.map(g => `
+  const propGroups = MAP_ICON_GROUPS.concat(MONSTER_ICON_GROUPS).map(g => `
     <div class="interactions-check-group-label">${g.label}</div>
     <div class="interactions-check-row">
       ${g.keys.map(k => `<button class="mapbuilder-prop-btn ${mapBuilderTool === 'prop' && mapBuilderPropChoice === k ? 'active' : ''}" onclick="setMapBuilderPropChoice('${k}')" title="${k}">${pixelIconSvg(MAP_ICONS[k], '#e8dfc8', 26)}</button>`).join('')}
