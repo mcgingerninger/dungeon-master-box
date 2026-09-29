@@ -877,10 +877,16 @@ the live regex path it replaces (Phase 13, all above). What's left:
    stat-increase mechanic (itemType `wondrous`, not `tool`) — see Phase 15 for the full writeup.
 2. The rest of `npc-data.js` (creature stat blocks, combat definitions, relationship/connection
    data — `NPC_LIBRARY`/`NPC_COMBAT_DEFS`/`NPC_CONNECTIONS` and similar), journeys/puzzles/traps
-   (`journey-data.js`/`puzzle-data.js`/`trap-data.js` — traps are already fully structured today,
-   likely the easiest slice), `reference-data.js`, and `cult-data.js`, plus the modifier/enhancement
-   content pool for magic items beyond mundane weapons/armor. None of this is item content, so none
-   of it fits this migration's `Item` schema directly — each needs its own scoping pass.
+   (`journey-data.js`/`puzzle-data.js`/`trap-data.js`), `reference-data.js`, and `cult-data.js`, plus
+   the modifier/enhancement content pool for magic items beyond mundane weapons/armor. None of this
+   is item content, so none of it fits this migration's `Item` schema directly — each needed its own
+   scoping pass. **That scoping is now done — see `docs/NON_ITEM_CONTENT_SCOPE.md`.** Headline
+   finding: V2 has no mechanics engine for any of this content at all (confirmed directly against
+   its source, not assumed), and most of dungeon-master-box's own content turns out to already be
+   fully structured and mechanically live (`trap-data.js`, `journey-data.js`, `NPC_COMBAT_DEFS`) —
+   there mostly isn't a migration to do. The two real, small, genuinely-optional findings
+   (`NPC_LIBRARY`/`NPC_COMBAT_DEFS` reconciliation; a possible structured puzzle-consequence schema,
+   new design work with no template to follow) are documented there, not started.
 3. The rest of `mechanics/engine/**`, beyond Phases 7-11's equip/AC/weapon-attack/consumable-heal/
    save-compatibility/monster-part-generation slice — two items resolved by inspection (no code
    needed), one genuinely still open:
