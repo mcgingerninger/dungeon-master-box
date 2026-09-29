@@ -1,12 +1,11 @@
 // Ported from dungeonboxnewVersion2_rework's src/engine/items/validate-item.js — see
 // docs/V2_MECHANICS_MIGRATION.md. V2's own weapon/armor/consumable/material/tool rules are
-// unchanged; this migration's Phase 3 adds the `wondrous` type (rings/amulets/cloaks/attuned
-// trinkets — see item-schema.js's header comment for why it's a new type rather than forcing this
-// content into 'tool' or 'armor'). Remaining legacy-only types (companion/treasure/questitem/
-// document) are still correctly rejected by "unknown or unsupported itemType" until a later phase
-// adds them, per Section 18's "extend the validator, don't force content into the wrong shape".
+// unchanged. This migration's Phase 3 added `wondrous` (rings/amulets/cloaks/attuned trinkets) and
+// Phase 4 adds `companion` (pets/mounts — see item-schema.js's header comment for the rationale on
+// both). treasure/questitem/document (Phase 4, 18 items) map onto the existing `tool` type rather
+// than getting their own — dungeon-master-box's own data describes them as mechanically inert.
 
-const FACET_KEYS = ['weapon', 'armor', 'consumable', 'material', 'tool', 'wondrous', 'passive', 'abilities', 'grants'];
+const FACET_KEYS = ['weapon', 'armor', 'consumable', 'material', 'tool', 'wondrous', 'companion', 'passive', 'abilities', 'grants'];
 
 const RULES = {
   weapon: { required: ['weapon'], allowed: ['weapon', 'passive', 'abilities', 'grants'] },
@@ -15,6 +14,7 @@ const RULES = {
   material: { required: ['material'], allowed: ['material'] },
   tool: { required: ['tool'], allowed: ['tool', 'passive'] },
   wondrous: { required: ['wondrous'], allowed: ['wondrous', 'passive', 'abilities', 'grants'] },
+  companion: { required: ['companion'], allowed: ['companion', 'passive'] },
 };
 
 function presentFacets(item) {
@@ -32,7 +32,7 @@ export function validateItem(item) {
 
   const rules = RULES[item.itemType];
   if (!rules) {
-    errors.push(`unknown or unsupported itemType "${item.itemType}" — only weapon/armor/consumable/material/tool/wondrous are modeled so far`);
+    errors.push(`unknown or unsupported itemType "${item.itemType}" — only weapon/armor/consumable/material/tool/wondrous/companion are modeled so far`);
     return { valid: false, errors };
   }
 
@@ -70,6 +70,9 @@ export function validateItem(item) {
   }
   if (item.itemType === 'tool' && item.tool) {
     if (!item.tool.toolCategory) errors.push('tool.toolCategory is required');
+  }
+  if (item.itemType === 'companion' && item.companion) {
+    if (!['pet', 'mount'].includes(item.companion.companionType)) errors.push('companion.companionType must be "pet" or "mount"');
   }
 
   return { valid: errors.length === 0, errors };

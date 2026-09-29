@@ -15,6 +15,7 @@ import {
   slugify, makeIdGenerator, migrateWeapon, migrateArmor,
   deriveConsumableCategory, resolveConsumableUses, migrateConsumable,
   deriveWondrousSlot, deriveToolCategory, migrateMisc,
+  extractSpeeds, narrativeToolCategory, migrateCompanion, migrateNarrativeTool,
 } from './migrate-legacy-content.js';
 import { validateItem } from '../mechanics/engine/items/validate-item.js';
 import { equipmentSlotsForItem } from '../mechanics/engine/character/equipment.js';
@@ -396,7 +397,76 @@ describe('migrateMisc — wondrous/tool split', () => {
   });
 });
 
-const MIGRATORS_FOR_TEST = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc };
+describe('extractSpeeds', () => {
+  test('extracts base/fly/swim/climb speeds without cross-matching each other', () => {
+    assert.deepEqual(extractSpeeds('Speed 40 ft. Climb speed 40 ft., including upside-down.'), { speed: 40, climbSpeed: 40 });
+    assert.deepEqual(extractSpeeds('Speed 60 ft., fly speed 90 ft.'), { speed: 60, flySpeed: 90 });
+    assert.deepEqual(extractSpeeds('Swim speed 60 ft. Cannot leave the water.'), { swimSpeed: 60 });
+  });
+  test('no speed language produces no fields', () => {
+    assert.deepEqual(extractSpeeds('Advantage on Wisdom (Perception) checks.'), {});
+  });
+});
+
+describe('migrateCompanion', () => {
+  test('a mount with ac/speed/attack-bonus gets real structured mechanics', () => {
+    const item = { name: 'Test Warhorse', desc: 'A trained charger.', type: 'companion', subcategory: 'mount', gp: '400 gp', ac: '11', effect: 'Speed 60 ft. Rider gains +1 to attack rolls made while mounted.' };
+    const result = migrateCompanion(item, 'uncommon', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'companion');
+    assert.deepEqual(result.companion, { companionType: 'mount', ac: 11, speed: 60 });
+    assert.deepEqual(result.passive, [{ stat: 'attackRoll', value: 1 }]);
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('a pet with only narrative effects gets identity/flavor preserved with no fabricated mechanics', () => {
+    const item = { name: 'Test Barn Cat', desc: 'A lean tabby.', type: 'companion', subcategory: 'pet', gp: '5 gp', effect: 'Advantage on Wisdom (Perception) checks to notice rodents.' };
+    const result = migrateCompanion(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.deepEqual(result.companion, { companionType: 'pet' });
+    assert.equal(result.passive, undefined);
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('companions weigh 0, matching dungeon-master-box\'s own convention (you carry them, not the other way around)', () => {
+    const item = { name: 'Test Pony', desc: '', type: 'companion', subcategory: 'mount', gp: '30 gp', ac: '10', effect: 'Speed 40 ft.' };
+    const result = migrateCompanion(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.equal(result.weight, 0);
+  });
+});
+
+describe('migrateNarrativeTool (treasure/questitem/document)', () => {
+  test('a quest item without authored extraInteractions gets unlock/quest_item/turn_in synthesized for a key', () => {
+    const item = { name: 'Test Vault Key', desc: 'An iron key.', type: 'questitem', gp: '—', effect: 'GM determines what lock this fits.' };
+    const result = migrateNarrativeTool(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'tool');
+    assert.deepEqual(result.extraInteractions, ['unlock', 'quest_item', 'turn_in']);
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('a non-key quest item gets quest_item/turn_in but not unlock', () => {
+    const item = { name: 'Test Evidence Cloth', desc: '', type: 'questitem', gp: '—', effect: 'Physical evidence.' };
+    const result = migrateNarrativeTool(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.deepEqual(result.extraInteractions, ['quest_item', 'turn_in']);
+  });
+
+  test('a document with its own authored extraInteractions keeps them verbatim rather than resynthesizing', () => {
+    const item = { name: 'Test Royal Decree', desc: '', type: 'document', gp: '10 gp', effect: 'An official decree.', extraInteractions: ['quest_item'] };
+    const result = migrateNarrativeTool(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.deepEqual(result.extraInteractions, ['quest_item']);
+  });
+
+  test('treasure gets a real category and no value of "—"', () => {
+    const item = { name: 'Test Gold Coins', desc: '', type: 'treasure', gp: '50 gp', effect: 'Pure currency — no mechanical effect.' };
+    const result = migrateNarrativeTool(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'tool');
+    assert.equal(result.tool.toolCategory, 'coin');
+    assert.ok(validateItem(result).valid);
+  });
+});
+
+const MIGRATORS_FOR_TEST = {
+  weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc,
+  companion: migrateCompanion, treasure: migrateNarrativeTool, questitem: migrateNarrativeTool, document: migrateNarrativeTool,
+};
 
 describe('full migration determinism (real loot-data.js)', () => {
   test('running the migration end-to-end twice produces byte-identical canonical output', () => {
@@ -418,7 +488,7 @@ describe('full migration determinism (real loot-data.js)', () => {
     const run1 = migrateAll(nextId1);
     const run2 = migrateAll(nextId2);
     assert.deepEqual(run1, run2);
-    assert.ok(run1.length > 1100, `expected the bulk of 1157 weapon+armor+consumable+misc items to migrate, got ${run1.length}`);
+    assert.ok(run1.length > 1200, `expected the bulk of loot-data.js's 1243 items to migrate, got ${run1.length}`);
   });
 
   test('every canonical item in the committed output validates cleanly', () => {
@@ -436,6 +506,6 @@ describe('full migration determinism (real loot-data.js)', () => {
         checked++;
       });
     }
-    assert.ok(checked > 1100);
+    assert.ok(checked > 1200);
   });
 });

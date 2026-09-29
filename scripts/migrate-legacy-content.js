@@ -5,11 +5,12 @@
 //
 // SCOPE (confirmed narrow-start, expanded phase by phase): Phase 1 covered type === 'weapon' and
 // type === 'armor' (688 of loot-data.js's 1,243 items). Phase 2 added type === 'consumable' (65
-// items). Phase 3 adds type === 'misc' (404 items), split between a new 'wondrous' itemType and
-// the existing 'tool' itemType (see the Phase 3 comment above migrateMisc for why). Every remaining
-// type (companion/treasure/questitem/document) is untouched and stays exactly as authored in
-// loot-data.js — this script never writes to that file. Later migration phases extend this same
-// approach to those types.
+// items). Phase 3 added type === 'misc' (404 items), split between a new 'wondrous' itemType and
+// the existing 'tool' itemType (see the Phase 3 comment above migrateMisc for why). Phase 4 adds the
+// remaining types — type === 'companion' (68 items, a new 'companion' itemType — pets/mounts) and
+// type === 'treasure'/'questitem'/'document' (86 items total, mapped onto the existing 'tool'
+// itemType since dungeon-master-box's own data describes them as mechanically inert). Every
+// loot-data.js item is now migrated. This script never writes to loot-data.js itself.
 //
 // THIS IS NOT PART OF THE RUNTIME APP. Run it manually (`node scripts/migrate-legacy-content.js`)
 // whenever loot-data.js's migrated-type entries change; it is deterministic (no Math.random
@@ -107,6 +108,31 @@ function classifySubcategory(name, type, rarity, desc) {
     if (/\bring\b/.test(n)) return 'ring';
     if (/amulet|necklace|pendant|periapt|\btorc\b|gorget|holy symbol|talisman|locket|brooch|medallion/.test(n)) return 'amulet';
     return miscTierSubcategory(rarity);
+  }
+  if (type === 'treasure') {
+    if (/\bgem\b|ruby|quartz|sapphire|emerald|diamond|opal|topaz|garnet/.test(n)) return 'gem';
+    if (/crown|scepter|circlet|tiara|regalia/.test(n)) return 'regalia';
+    if (/necklace|bracelet|earring|jewel/.test(n)) return 'jewelry';
+    if (/statue|painting|sculpture|tapestry/.test(n)) return 'art';
+    if (/\bbar\b|ingot/.test(n)) return 'currencybar';
+    return 'currency';
+  }
+  if (type === 'questitem') {
+    if (/\bkey\b/.test(n)) return 'key';
+    if (/sigil|seal|pass\b|token/.test(n)) return 'accesstoken';
+    if (/rune|puzzle|mechanism|\bsymbol\b/.test(n)) return 'puzzleobject';
+    return 'questobject';
+  }
+  if (type === 'document') {
+    if (/journal|diary/.test(n)) return 'journal';
+    if (/letter/.test(n)) return 'letter';
+    if (/\bmap\b/.test(n)) return 'map';
+    if (/recipe|blueprint|formula|contract|decree/.test(n)) return 'formula';
+    return 'book';
+  }
+  if (type === 'companion') {
+    if (/mount|steed|charger|warhorse|destrier|palfrey|pony/.test(n)) return 'mount';
+    return 'pet';
   }
   return '';
 }
@@ -784,6 +810,126 @@ function migrateMisc(item, tier, index, nextId, ambiguous, fixes) {
   return { ...base, itemType: 'tool', tool: { toolCategory: deriveToolCategory(classification) } };
 }
 
+// ============================== Companions (Phase 4) ==============================================
+// Pets and mounts are a genuinely distinct concept from every other item type migrated so far —
+// summoned/ridden, never equipped to a body slot. Mounts commonly carry real mechanics (their own
+// AC, one or more movement speeds, a flat "+N to attack rolls made while mounted" granted to their
+// RIDER) that pets mostly don't (mostly narrative advantage-granting effects, e.g. "Advantage on
+// Wisdom (Perception) checks..." — preserved as flavorText, not force-fit into a StatModifier).
+
+function extractSpeeds(effect) {
+  const t = effect || '';
+  const flyMatch = /fly speed\s+(\d+)\s*ft/i.exec(t);
+  const swimMatch = /swim speed\s+(\d+)\s*ft/i.exec(t);
+  const climbMatch = /climb speed\s+(\d+)\s*ft/i.exec(t);
+  // Negative lookbehind so the base "Speed N ft." doesn't also match inside "Fly speed N ft.".
+  const baseMatch = /(?<!fly |swim |climb )\bspeed\s+(\d+)\s*ft/i.exec(t);
+  const out = {};
+  if (baseMatch) out.speed = parseInt(baseMatch[1], 10);
+  if (flyMatch) out.flySpeed = parseInt(flyMatch[1], 10);
+  if (swimMatch) out.swimSpeed = parseInt(swimMatch[1], 10);
+  if (climbMatch) out.climbSpeed = parseInt(climbMatch[1], 10);
+  return out;
+}
+
+function migrateCompanion(item, tier, index, nextId, ambiguous, fixes) {
+  const name = item.name;
+  const desc = item.desc || '';
+  const effect = item.effect || '';
+  const companionType = item.subcategory === 'mount' ? 'mount' : item.subcategory === 'pet' ? 'pet' : classifySubcategory(name, 'companion', tier, desc);
+
+  const acMatch = /^\s*(\d+)\s*$/.exec(String(item.ac ?? ''));
+  if (item.ac && !acMatch) {
+    ambiguous.push({ name, tier, reason: `companion.ac ("${item.ac}") is not a plain number — left unset`, legacyAc: item.ac });
+  }
+  const speeds = extractSpeeds(effect);
+
+  const requiresAttunement = itemRequiresAttunement(item);
+  const deltas = extractStatDeltasFromText(effect);
+  const setOverrides = findSetValueOverrides(effect);
+  if (setOverrides.length) {
+    ambiguous.push({ name, tier, reason: `effect text sets an absolute ability score ("${setOverrides.map(o => `${o.stat} to ${o.value}`).join(', ')}") — no direct StatModifier equivalent, needs manual review`, effect });
+  }
+  const passive = toStatModifiers(deltas);
+  const mountedAttackMatch = /\+(\d+)\s+to attack rolls\b/i.exec(effect);
+  if (mountedAttackMatch) passive.push({ stat: 'attackRoll', value: parseInt(mountedAttackMatch[1], 10) });
+
+  if (scanResidualLanguage(effect, [])) {
+    ambiguous.push({ name, tier, reason: 'effect text contains mechanical-sounding language (per-rest/per-day abilities, conditional riders, etc.) beyond AC/speed/a mounted attack bonus this migration extracts — full text preserved in flavorText, needs manual review', effect });
+  }
+
+  const companion = {
+    companionType,
+    ...(acMatch ? { ac: parseInt(acMatch[1], 10) } : {}),
+    ...speeds,
+  };
+
+  return {
+    id: nextId(name),
+    name,
+    itemType: 'companion',
+    rarity: tier,
+    weight: computeItemWeight(item, companionType),
+    ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
+    ...(desc ? { flavorText: desc } : {}),
+    ...(requiresAttunement ? { requiresAttunement: true } : {}),
+    companion,
+    ...(passive.length ? { passive } : {}),
+    ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
+    legacySource: { tier, index, name },
+  };
+}
+
+// ============================== Treasure / quest item / document (Phase 4) =========================
+// dungeon-master-box's own data describes every item in these three types as mechanically inert
+// ("Pure currency — no mechanical effect, just spendable wealth", "GM determines what lock this key
+// fits", "GM discretion on relevance") — there is no numeric mechanic to extract, so these map onto
+// the EXISTING 'tool' itemType (identity/content/category, nothing more) rather than getting their
+// own new type each for only a handful of items apiece. `classifyItemHierarchy` already has a
+// dedicated, correct branch for each of these three legacy `type` values (unlike misc's cruder
+// cascade), so unlike migrateMisc's deriveToolCategory this trusts that classification directly
+// rather than treating an unfamiliar top-level branch as a red flag.
+function narrativeToolCategory(classification) {
+  return slugify(classification[classification.length - 1]);
+}
+
+function migrateNarrativeTool(item, tier, index, nextId, ambiguous, fixes) {
+  const name = item.name;
+  const desc = item.desc || '';
+  const effect = item.effect || '';
+  const subcategory = classifySubcategory(name, item.type, tier, desc);
+  const classification = classifyItemHierarchy({ ...item, subcategory }, tier);
+
+  // Matches the old engine's own INTERACTIONS table, which grants quest_item/turn_in to every
+  // questitem automatically and unlock additionally to key-subcategory ones — synthesized here
+  // since (unlike some document entries) questitem entries in the source never author
+  // extraInteractions explicitly themselves.
+  const extraInteractions = item.extraInteractions
+    ? [...item.extraInteractions]
+    : item.type === 'questitem'
+      ? (subcategory === 'key' ? ['unlock', 'quest_item', 'turn_in'] : ['quest_item', 'turn_in'])
+      : [];
+  // No residual-language ambiguity scan here, unlike every other migrator: dungeon-master-box's own
+  // data explicitly describes every item of these three types as mechanically inert/GM-adjudicated
+  // ("no mechanical effect", "GM determines..."), so narrative-sounding effect text is the EXPECTED
+  // shape for this content, not a sign this migration missed something — flagging every single one
+  // would be noise, not signal.
+
+  return {
+    id: nextId(name),
+    name,
+    itemType: 'tool',
+    rarity: tier,
+    weight: computeItemWeight(item, subcategory),
+    ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
+    ...(desc ? { flavorText: desc } : {}),
+    tool: { toolCategory: narrativeToolCategory(classification) },
+    ...(extraInteractions.length ? { extraInteractions } : {}),
+    ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
+    legacySource: { tier, index, name },
+  };
+}
+
 // ============================== Main =============================================================
 function main() {
   const lootData = loadLootData();
@@ -793,8 +939,11 @@ function main() {
   const canonicalItems = [];
   const materialsSummary = {};
   let excludedCount = 0;
-  const counts = { weapon: 0, armor: 0, consumable: 0, misc: 0 };
-  const MIGRATORS = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc };
+  const counts = { weapon: 0, armor: 0, consumable: 0, misc: 0, companion: 0, treasure: 0, questitem: 0, document: 0 };
+  const MIGRATORS = {
+    weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc,
+    companion: migrateCompanion, treasure: migrateNarrativeTool, questitem: migrateNarrativeTool, document: migrateNarrativeTool,
+  };
 
   for (const tier of Object.keys(lootData)) {
     lootData[tier].forEach((item, index) => {
@@ -840,9 +989,9 @@ function main() {
   const report = buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes });
   fs.writeFileSync(path.join(outDir, 'migration-report.md'), report);
 
-  const legacyTotal = counts.weapon + counts.armor + counts.consumable + counts.misc;
+  const legacyTotal = Object.values(counts).reduce((a, b) => a + b, 0);
   console.log(`Migrated ${canonicalItems.length}/${legacyTotal} items.`);
-  console.log(`  weapon: ${counts.weapon}, armor: ${counts.armor}, consumable: ${counts.consumable}, misc: ${counts.misc}, excluded: ${excludedCount}`);
+  console.log(`  ${Object.entries(counts).map(([k, v]) => `${k}: ${v}`).join(', ')}, excluded: ${excludedCount}`);
   console.log(`  ambiguous flags raised: ${ambiguous.length}`);
   console.log(`  bugs found and fixed: ${fixes.length}`);
   console.log(`  material modifiers applied: ${JSON.stringify(materialsSummary)}`);
@@ -852,17 +1001,21 @@ function main() {
 function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes }) {
   const totalLegacyItems = Object.values(lootData).reduce((s, arr) => s + arr.length, 0);
   const lines = [];
-  lines.push('# V2 Mechanics Migration Report — Phases 1-3 (weapons + armor + consumables + misc)');
+  lines.push('# V2 Mechanics Migration Report — Phases 1-4 (weapons + armor + consumables + misc + companion/treasure/questitem/document)');
   lines.push('');
   lines.push(`Generated by \`scripts/migrate-legacy-content.js\`. Source: \`loot-data.js\` (untouched — this script never writes to it).`);
   lines.push('');
   lines.push('## Content preservation (Section 20)');
   lines.push('');
-  lines.push(`- Legacy catalog total (all types): ${totalLegacyItems} items`);
+  lines.push(`- Legacy catalog total (all types): ${totalLegacyItems} items — every type is now migrated`);
   lines.push(`- Legacy weapon items: ${counts.weapon}`);
   lines.push(`- Legacy armor items: ${counts.armor}`);
   lines.push(`- Legacy consumable items: ${counts.consumable}`);
   lines.push(`- Legacy misc items: ${counts.misc} (split into the new \`wondrous\` and existing \`tool\` itemTypes — see "Misc -> wondrous/tool split" below)`);
+  lines.push(`- Legacy companion items: ${counts.companion} (new \`companion\` itemType — pets/mounts)`);
+  lines.push(`- Legacy treasure items: ${counts.treasure} (existing \`tool\` itemType — mechanically inert by the source data's own description)`);
+  lines.push(`- Legacy quest items: ${counts.questitem} (existing \`tool\` itemType, tagged with quest_item/turn_in/unlock interactions)`);
+  lines.push(`- Legacy document items: ${counts.document} (existing \`tool\` itemType)`);
   lines.push(`- Migrated to canonical structured items: ${canonicalItems.length}`);
   lines.push(`- Excluded this pass (no parseable base dmg/ac/hp — see "Excluded items" below): ${excludedCount}`);
   lines.push(`- Added: 0 — Removed: 0 — Renamed: 0 (every migrated item keeps its exact original \`name\`)`);
@@ -925,7 +1078,7 @@ function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguou
   }
   lines.push('## Not yet migrated (explicitly out of scope so far, not lost)');
   lines.push('');
-  lines.push('Every other legacy content type is untouched by this script and remains exactly as authored: companion/treasure/questitem/document items (86 of loot-data.js\'s items), reference-data.js, npc-data.js, journey-data.js, puzzle-data.js, trap-data.js, cult-data.js, and monster/spell data (fetched live from the 5etools mirror, never stored locally). See docs/V2_MECHANICS_MIGRATION.md for the planned follow-up phases.');
+  lines.push('Every `loot-data.js` item type is now migrated (Phases 1-4). Everything else in the repository is untouched and remains exactly as authored: reference-data.js, npc-data.js, journey-data.js, puzzle-data.js, trap-data.js, cult-data.js, and monster/spell data (fetched live from the 5etools mirror, never stored locally). See docs/V2_MECHANICS_MIGRATION.md for the planned follow-up phases.');
   lines.push('');
   return lines.join('\n');
 }
@@ -941,6 +1094,6 @@ export {
   deriveWeaponMechanics, deriveWeaponProperties, toStatModifiers, findSetValueOverrides,
   scanResidualLanguage, applyMaterialModifiers, slugify, makeIdGenerator,
   deriveConsumableCategory, resolveConsumableUses,
-  deriveWondrousSlot, deriveToolCategory,
-  migrateWeapon, migrateArmor, migrateConsumable, migrateMisc, main,
+  deriveWondrousSlot, deriveToolCategory, extractSpeeds, narrativeToolCategory,
+  migrateWeapon, migrateArmor, migrateConsumable, migrateMisc, migrateCompanion, migrateNarrativeTool, main,
 };

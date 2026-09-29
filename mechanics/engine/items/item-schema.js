@@ -11,8 +11,15 @@
 //     Genuinely mundane misc gear (a torch, rope, thieves' tools) maps onto the EXISTING 'tool'
 //     itemType instead of a third new type — ToolData's own doc comment already anticipated this
 //     ("5e's own tool list is open-ended"), and 'tool' already allows a `passive` facet for exactly
-//     the "a masterwork tool grants a small skill bonus" case. Remaining legacy-only types
-//     (companion/treasure/questitem/document) are a later migration phase's job — NOT invented here.
+//     the "a masterwork tool grants a small skill bonus" case.
+//   - 'companion' is Phase 4's addition — pets/mounts, a genuinely distinct concept (summoned/
+//     ridden, never equipped to a body slot) rather than a wondrous-item variant. Mounts commonly
+//     carry real mechanics (their own AC, movement speeds, a flat attack-roll bonus granted to
+//     their rider) that pets mostly don't (mostly narrative advantage-granting effects, preserved
+//     as flavorText). treasure/questitem/document (Phase 4, 18 items total) map onto the EXISTING
+//     'tool' itemType — dungeon-master-box's own data explicitly describes these as mechanically
+//     inert ("Pure currency — no mechanical effect", "GM determines..."), so there's no real
+//     mechanic to model beyond identity/content/category, which 'tool' already covers.
 //   - WeaponData gains `bonusDamage` (informally used by V2's own modifiers.js already) as a real
 //     documented field: extra damage dice bundled onto a weapon instance (an elemental-damage
 //     rider migrated from legacy free text, or one added by a Modifier).
@@ -157,6 +164,17 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  */
 
 /**
+ * @typedef {Object} CompanionData
+ * @property {'pet'|'mount'} companionType
+ * @property {number} [ac]          // the companion's own combat stat — common on mounts (a Riding
+ *   Horse, a Hippogriff), rare on pets; parsed directly from the same numeric `ac` field armor uses.
+ * @property {number} [speed]       // walking speed in ft.
+ * @property {number} [flySpeed]
+ * @property {number} [swimSpeed]
+ * @property {number} [climbSpeed]
+ */
+
+/**
  * @typedef {Object} LegacySource   // traceability back to dungeon-master-box's existing
  *   loot-data.js catalog — not a V2/mechanics concept, carried so a later save-compatibility phase
  *   can map a player's existing saved item (referenced by name/tier today) onto its new canonical
@@ -170,7 +188,7 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @typedef {Object} Item
  * @property {string} id
  * @property {string} name
- * @property {'weapon'|'armor'|'consumable'|'material'|'tool'|'wondrous'} itemType   // enum will grow in later migration phases
+ * @property {'weapon'|'armor'|'consumable'|'material'|'tool'|'wondrous'|'companion'} itemType   // enum will grow in later migration phases
  * @property {string} rarity        // keeps dungeon-master-box's existing loot-table rarity tiers verbatim
  * @property {number} [weight]
  * @property {string} [value]       // gp, matches existing loot-table formatting
@@ -183,7 +201,10 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @property {MaterialData} [material]    // material only, required for material
  * @property {ToolData} [tool]            // tool only, required for tool
  * @property {WondrousData} [wondrous]    // wondrous only, required for wondrous
- * @property {StatModifier[]} [passive]   // weapon/armor/tool/wondrous only
+ * @property {CompanionData} [companion]  // companion only, required for companion
+ * @property {StatModifier[]} [passive]   // weapon/armor/tool/wondrous/companion only — a mount's
+ *   "+N to attack rolls made while mounted" is the one recurring companion mechanic this migration
+ *   extracts, via the standard 'attackRoll' StatModifier key.
  * @property {Ability[]} [abilities]      // weapon/armor/wondrous only
  * @property {Grants} [grants]            // weapon/armor/wondrous only
  * @property {string[]} [appliedModifiers] // ids of Modifiers (see modifiers.js) baked into this instance
@@ -202,5 +223,6 @@ export function blankItem(itemType) {
   if (itemType === 'material') return { ...base, material: { materialTags: [] } };
   if (itemType === 'tool') return { ...base, tool: { toolCategory: '' } };
   if (itemType === 'wondrous') return { ...base, wondrous: {} };
+  if (itemType === 'companion') return { ...base, companion: { companionType: 'pet' } };
   return base;
 }
