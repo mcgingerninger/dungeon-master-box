@@ -884,9 +884,14 @@ the live regex path it replaces (Phase 13, all above). What's left:
    finding: V2 has no mechanics engine for any of this content at all (confirmed directly against
    its source, not assumed), and most of dungeon-master-box's own content turns out to already be
    fully structured and mechanically live (`trap-data.js`, `journey-data.js`, `NPC_COMBAT_DEFS`) —
-   there mostly isn't a migration to do. The two real, small, genuinely-optional findings
-   (`NPC_LIBRARY`/`NPC_COMBAT_DEFS` reconciliation; a possible structured puzzle-consequence schema,
-   new design work with no template to follow) are documented there, not started.
+   there mostly isn't a migration to do. Of the two remaining findings: `NPC_LIBRARY`/
+   `NPC_COMBAT_DEFS` reconciliation is **done** (a real 46-mismatch drift across 21 of 26 NPCs, fixed
+   and permanently guarded by `npc-data.test.js`); a structured puzzle-consequence schema is **scoped
+   and not recommended** — a full read of all 13 puzzle categories found real shared narrative
+   structure in 9 of them, but also a structural reason automation doesn't pay off (a puzzle's
+   "solved or not" is a DM judgment call with no discrete signal to build a resolve button around,
+   unlike a trap's save roll or a journey's chosen approach) — see that doc for the full account and
+   the much smaller, optional alternative it suggests instead.
 3. The rest of `mechanics/engine/**`, beyond Phases 7-11's equip/AC/weapon-attack/consumable-heal/
    save-compatibility/monster-part-generation slice — two items resolved by inspection (no code
    needed), one genuinely still open:

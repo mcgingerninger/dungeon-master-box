@@ -63,7 +63,7 @@ hand (there's no "you contracted a disease" trigger anywhere in the app that wou
 auto-resolve into), the same way a real sourcebook's disease writeup doesn't "run" itself. `cult-data.js`
 has no mechanical fields at all — pure narrative. Neither needs a schema; they aren't mechanics.
 
-### `puzzle-data.js` (13 categories, 313 entries total) — the one real gap, and it's a design problem, not a preservation one
+### `puzzle-data.js` (13 categories, 313 entries total) — scoped in full; not a preservation gap, and full structuring is not recommended
 
 Structured at the top level (`{q, a, tier, hook}` for riddles; `{title, prompt, solution, note}` for
 the other 12 categories), but the actual mechanical content — a DC, a damage die, a condition, a
@@ -80,12 +80,78 @@ real, present player-facing consequences. Puzzles have no such regex path: nothi
 wrong today, because nothing currently tries to resolve a puzzle's consequence automatically at all.
 "Migrating" this would mean **designing a new consequence schema from scratch** — and unlike
 `OnUseEffect` (which only ever had to model 5e's well-worn vocabulary: attack rolls, damage, saves,
-stat bonuses), a puzzle's consequence space here is genuinely open-ended by design (313 examples
-range from "a wall of animate razor-grass" to "a time-locked door," "a sound-ward," "a scale-vault
-door," and dozens of shapes that don't reduce to a small enum the way `journey-data.js`'s 9
-consequence types cleanly did). This is new design work with no existing template to follow, not a
-bounded preservation fix — closer in kind to designing `journey-data.js`'s own consequence system
-was, the first time, than to anything this migration branch has done so far.
+stat bonuses), a puzzle's consequence space here is genuinely open-ended by design.
+
+#### Full scoping pass: read every one of the 13 categories directly, not just riddles
+
+The finding above was written from `RIDDLE_LIBRARY` alone. Reading a representative sample of all 13
+categories' actual `note`/`hook` text changes the picture — there's more shared structure than that
+first pass gave credit for, but also a real, structural reason auto-resolution doesn't pay off here
+the way it did for traps and journeys.
+
+**More internal structure than expected.** 9 of the 13 categories (Riddles, Logic, Cipher,
+Astronomical, Environmental, Sequence, Illusion, Timeloop, Antipuzzle) consistently write their
+`note`/`hook` field as the same loose three-part narrative, in the same order, every time: a **hint**
+clause (a skill + DC to nudge a stuck table, or "no roll needed" for a pure-reasoning puzzle), a
+**failure consequence** clause (what happens on a wrong attempt — commonly "no penalty, just retry,"
+sometimes a small damage roll, sometimes an alarm/wandering-encounter trigger, sometimes lost time),
+and a **reward** clause (what the puzzle yields once solved). That's a real, consistent authoring
+pattern, not noise.
+
+**But 4 of the 13 don't fit that same shape at all**, and can't be forced into it without losing what
+makes them work:
+- `CHARACTER_GATED_PUZZLES` opens with a **gate** (a specific class feature/proficiency/racial trait
+  that solves it outright) plus a **fallback** (an alternate, harder path for a party without it) —
+  structurally a gate+fallback+reward triple, not a hint+failure+reward one.
+- `MORAL_PUZZLES` is explicit, in-text, that there is **no correct answer** ("Deliberately no
+  'correct' verdict" — The Dryad's Orchard) — resolution is open-ended roleplay judgment the DM
+  weighs case-by-case; there is no failure state or fixed reward to encode.
+- `RESOURCE_PUZZLES` demands a **real, permanent cost** (actual gold burned, actual current HP lost,
+  an actual expended spell slot) with no hint-DC at all and often no separate reward clause — the
+  reward IS passage.
+- `COOPERATIVE_PUZZLES` has the hint/failure shape but routinely has **no explicit reward clause** —
+  solving it simply lets the scene continue.
+
+**Even within the 9 "standard-shape" categories, the values inside each clause are too heterogeneous
+for a small closed enum** the way `journey-data.js`'s 9 consequence types worked. A journey's
+`consequence.type: 'gold'` always means the same thing: a `{amount}` the engine adds to the player's
+sheet. A puzzle's "reward" clause might be a flat gp value, a fully-invented one-off magic item
+described in prose ("a sunstone — functions as a continual light pebble, or sells for 50 gp"), an
+ability grant ("advantage on the party's next saving throw"), or explicitly left to improvisation
+("a minor magic trinket, DM's choice"; "whatever the festival lock protects, ideally something
+thematically tied to that holiday's meaning"). Structuring that last, common case would mean either
+inventing specificity the content deliberately doesn't commit to, or falling back to a free-text
+escape hatch often enough that the schema stops earning its keep.
+
+**The deeper reason automation doesn't pay off here, structurally, not just as a content-messiness
+problem:** a trap's trigger is mechanical (a creature steps on a plate) and its outcome is a die roll
+(a saving throw) — software can own the whole thing. A journey's consequence is chosen by the player
+picking one of several pre-written approaches — still a discrete, software-knowable input. A puzzle's
+"solved or not" is neither: it's whether the players actually reasoned out the answer at the table,
+in conversation, in their own words — an inherently DM-judged call with no structured signal for any
+tool to read. Even a perfect consequence schema wouldn't give a "click to resolve" button the way the
+Trap tool has, because there's no equivalent trigger moment; the DM still has to decide "did they get
+it" before anything could fire.
+
+**Current live behavior, confirmed directly:** `note`/`hook` renders as one flat prose line (a single
+🎲-prefixed paragraph) shown after "Reveal Solution/Answer" — never split, never parsed. The Puzzle
+Log (the DM's "what's active right now" tracker) is completely decoupled from the library: there is
+no "send this to the log" action; a DM using a canned library puzzle re-types its title/prompt/answer
+into the log by hand if they want to track it.
+
+**Recommendation: don't build a full structured, auto-resolving consequence schema — it's a poor fit
+for most of this content and the automation payoff is structurally weak.** If anything is worth
+doing, it's much smaller than originally framed: splitting the single `note`/`hook` field into
+labeled sub-fields (`hint`/`onFail`/`onSolve` for the 9 standard-shape categories; `gate`/`fallback`/
+`reward` for `CHARACTER_GATED_PUZZLES`; leaving `RESOURCE_PUZZLES`' cost and `MORAL_PUZZLES`' judgment
+guidance as single free-text fields, since they don't decompose the same way) — a pure readability/
+display improvement (the DM scans three short labeled lines instead of one dense paragraph), still
+entirely free text inside each field, no enum, no auto-resolution attempted. A genuinely separate,
+smaller, and more clearly valuable improvement — unrelated to consequence-structuring — would be
+wiring a "send to Puzzle Log" action from the library so the DM doesn't have to retype a canned
+puzzle's title/prompt/answer by hand. Neither is started here; both are optional content/UX work, not
+preservation fixes, and the call on whether either is worth doing belongs to whoever's driving the
+project.
 
 ### `npc-data.js` (`NPC_LIBRARY`: 29, `NPC_COMBAT_DEFS`: 26, `NPC_CONNECTIONS`: 29, `NPC_WEAPONS`: 8) — reconciled (see below); update to this section's original finding
 
@@ -150,11 +216,17 @@ are reference/narrative/already-live content with nothing to fix. Of the two rem
    numbers from `NPC_COMBAT_DEFS`, guarded going forward by a new permanent test
    (`npc-data.test.js`). See the `npc-data.js` section above for the full account, including a first
    attempt that was caught and reverted for silently deleting content.
-2. **A structured puzzle-consequence schema** — still not started. A real, open-ended design task
-   with no template to follow (V2 has nothing for this, and `journey-data.js`'s consequence system —
-   the closest precedent in this codebase — is a much narrower, closed vocabulary by comparison).
-   Worth doing only if there's an actual feature it would unlock (e.g. a "resolve this puzzle's
-   consequence" button the DM could click, mirroring the trap tool) — not valuable as preservation
-   for its own sake, since nothing is currently lost or broken by puzzles staying DM-adjudicated
-   prose. Whether to build this is a call for whoever's driving the project, not something to
-   default into.
+2. **A structured puzzle-consequence schema** — **scoped, not recommended.** A full read of all 13
+   categories (not just riddles) found more shared narrative structure than first assumed (9 of 13
+   consistently write a hint/failure/reward pattern), but also a structural reason automation doesn't
+   pay off here even where that pattern holds: a puzzle's "solved or not" is a DM's own judgment call
+   about the players' table talk, with no discrete signal any schema could read the way a trap's save
+   roll or a journey's chosen approach gives one — so there's no clean "click to resolve" moment to
+   build a Trap-tool-style button around even with a perfect schema. 4 of 13 categories also don't
+   fit any single shape at all (gated/fallback, open-ended moral judgment, hard resource cost, no
+   fixed reward). Recommendation: don't build the full schema. The only piece that might still be
+   worth doing is much smaller — splitting the single `note`/`hook` field into a few labeled free-text
+   sub-fields per category-family, purely for DM readability at the table, no enum or resolution logic
+   involved — and, separately, a "send to Puzzle Log" convenience action. See the `puzzle-data.js`
+   section above for the full account. Neither is started; whether either is worth doing is a call for
+   whoever's driving the project.
