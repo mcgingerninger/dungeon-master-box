@@ -4374,7 +4374,16 @@
      migration phase required. -->
 <script type="module">
   import * as GameEngine from './game-engine.js';
-  Object.assign(window, GameEngine);
+  // Phase 11 (docs/V2_MECHANICS_MIGRATION.md): a monster-part drop from an actual Combat kill
+  // (rollMonsterCombatLoot -> generateMonsterPartV2) now builds its REAL mechanics through these
+  // two engine functions instead of the monolith's own buildMonsterPartItemV2 — the monolith's own
+  // MONSTER_PARTS/family/subtype tables still do the picking (unchanged, verified byte-for-byte
+  // identical to this engine's own copy), only the actual Item construction moved. The bulk
+  // premade-catalog pass (generatePremadeMonsterPartsV2, up to ~34,000 calls at startup, a known
+  // perf cost — see buildTokenIndex's own comment) deliberately keeps using the old builder as-is;
+  // doubling that bulk work for a purely-browsable catalog wasn't worth the risk.
+  import { buildMonsterPartMaterial, buildMonsterPartWondrous } from './mechanics/engine/items/monster-parts.js';
+  Object.assign(window, GameEngine, { buildMonsterPartMaterial, buildMonsterPartWondrous });
 </script>
 <script>
 // Bump this whenever the file is saved as a new version (filename should match, e.g. v96).
@@ -18888,10 +18897,58 @@ function buildMonsterPartItemV2(monster, tier, partDef) {
   classifyItemFull(part, tier);
   return part;
 }
+// Phase 11 (docs/V2_MECHANICS_MIGRATION.md): the actual Item construction for a real Combat-kill
+// part drop now goes through mechanics/engine/items/monster-parts.js's buildMonsterPartMaterial/
+// buildMonsterPartWondrous instead of duplicating that math here — the ONE thing V2 completed that
+// this monolith never had before (a real passive StatModifier for an equip-mode "charm" part,
+// instead of prose only extractStatDeltasFromText happens to parse). Picking still uses this
+// file's own MONSTER_PARTS/getCreatureFamily/getCreatureSubtype/PART_THEMES (verified byte-for-byte
+// identical to the engine's own copy — see monster-parts.js's own header) so there's exactly ONE
+// random pick, not two independently-rolled generators that could disagree with each other.
+// The result is still a legacy-shaped item (name/type/subcategory/partType/anatomicalId/effect
+// text) so every existing system that touches a monster part unchanged — the Monster Mangler, the
+// Fleshmancer, the Compendium's tooltip, TOKEN_INDEX/playerSlots — keeps working exactly as before;
+// __canonical is attached alongside it so game-engine.js's bridge (Phase 7) picks up the REAL
+// StatModifier for AC math instead of regexing the display text below, which only needs to read
+// right for a human, not be mechanically authoritative anymore.
+function buildMonsterPartItemV3(monster, tier, partDef) {
+  const family = getCreatureFamily(monster);
+  const subtype = getCreatureSubtype(monster, family);
+  const theme = PART_THEMES[(subtype && subtype.theme) || family.baseTheme] || PART_THEMES.primal_strength;
+  const themeLabel = subtype ? subtype.label : family.label;
+  const canonical = partDef.mode === 'equip'
+    ? buildMonsterPartWondrous(monster, tier, partDef)
+    : buildMonsterPartMaterial(monster, tier, partDef);
+  // Deliberately NOT re-deriving partLabel via partDef.variants(monster) here — the engine's own
+  // builder just resolved that internally (to build canonical.name/flavorText), and a variant
+  // picker is randomized (e.g. a snake's fang: "Hollow Fang" vs "Venom Fang" vs "Needle Fang"). A
+  // second independent call here could roll a DIFFERENT variant than the one canonical.name already
+  // reflects, so the display name and the effect text would describe two different-sounding parts
+  // from the same drop. canonical.name is the one resolved variant — reused as-is below instead.
+  const gp = formatGpAmount(parseInt(canonical.value, 10) || 0);
+  let effect, subcategory;
+  if (partDef.mode === 'equip') {
+    effect = `${describeV2EquipEffect(theme, tier)} Worn as a charm. (${rarityNames[tier] || tier} ${canonical.name}.)`;
+    subcategory = 'charm';
+  } else {
+    effect = `Raw crafting material — no effect on its own, but the Monster Mangler can work it into a compatible weapon or piece of armor, imbuing a ${theme.combineDmgType} effect themed to ${themeLabel} and scaled by its own rarity (${rarityNames[tier] || tier}).`;
+    subcategory = 'monsterpart';
+  }
+  const part = {
+    id: 'partv2_' + (++monsterPartV2Counter), name: canonical.name, type: 'craftable', subcategory,
+    partType: (subtype && subtype.theme) || family.baseTheme,
+    anatomicalId: partDef.id,
+    rarity: tier, weight: canonical.weight, gp, slotSize: 1,
+    desc: canonical.flavorText, effect, sourceMonster: monster.name, creatureFamily: family.id,
+    __canonical: canonical,
+  };
+  classifyItemFull(part, tier);
+  return part;
+}
 function generateMonsterPartV2(monster, tier) {
   const eligible = MONSTER_PARTS.filter(p => { try { return p.eligible(monster); } catch { return false; } });
   const pick = eligible.length ? ri(eligible) : ri(MONSTER_PARTS);
-  return buildMonsterPartItemV2(monster, tier, pick);
+  return buildMonsterPartItemV3(monster, tier, pick);
 }
 let premadeMonsterPartsV2Generated = false;
 function generatePremadeMonsterPartsV2() {

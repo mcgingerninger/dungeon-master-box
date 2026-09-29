@@ -432,14 +432,62 @@ that runs every saved item through the same `name`+`rarity` lookup `inferItemMet
 the fix; only an already-owned instance is what's still uncovered, and it degrades to exactly
 today's (pre-Phase-7) behavior for that one item, not an error or a worse regression.
 
+## Phase 11: monster-part generation now builds through the real engine
+
+A monster-part drop from an actual Combat kill (`rollMonsterCombatLoot` -> `generateMonsterPartV2`)
+now constructs its Item through `mechanics/engine/items/monster-parts.js`'s
+`buildMonsterPartMaterial`/`buildMonsterPartWondrous` — completing what Phase 5 built and tested but
+never actually wired into anything live. This is the one place monster-parts.js's genuinely NEW code
+(`buildMonsterPartWondrous`, a real `passive` StatModifier for an equip-mode "charm" part — V2 itself
+never wired this up) becomes load-bearing rather than dormant.
+
+**Design, and why the earlier "too risky" assessment changed.** This was flagged twice before as
+not worth attempting blind, for two concrete reasons: (1) a procedurally-generated part has no
+`legacySource`, so there's no existing legacy item to attach `__canonical` onto — bridging it means
+building a legacy-shaped PROJECTION from the canonical output instead (the mirror image of what the
+migration script does for real content), and (2) correlating it with the monolith's existing
+display builder so the two can never disagree needs both to consume randomness identically, which
+they didn't. Both are solved the same way: the monolith's own `MONSTER_PARTS`/`getCreatureFamily`/
+`getCreatureSubtype`/`PART_THEMES` (unchanged, still verified byte-for-byte identical to the
+engine's own copy) still do the ONE random part-selection pick, exactly as before; the picked
+`partDef` is then handed to the engine's builder to construct the REAL Item (weight/gp/name/
+flavorText/mechanics all computed there now, not duplicated), and a thin legacy-shaped wrapper
+(`buildMonsterPartItemV3`) is built around it for display/compatibility, with `__canonical` attached
+to the wrapper. There is exactly one random generator now, not two running in parallel.
+
+One subtle bug caught before it shipped, while building this: `buildMonsterPartItemV3`'s first draft
+independently re-derived the part's variant-flavored label (e.g. a snake's fang could be "Hollow
+Fang", "Venom Fang", or "Needle Fang" — `partDef.variants(monster)`, itself randomized) for the
+effect text, SEPARATELY from the engine builder's own internal call to the same variant picker for
+`canonical.name`. Two independent random picks of the same variant can disagree — the display name
+and the effect text could have ended up describing two different-sounding parts from the same drop.
+Fixed by never re-deriving it: the wrapper reuses `canonical.name` (the engine's own single resolved
+variant) everywhere, rather than rolling its own second guess at what the flavor text should say.
+
+**Deliberately scoped to real combat drops only, not the bulk premade catalog.**
+`generatePremadeMonsterPartsV2` (the Item Compendium's browsable catalog — up to ~34,000 calls at
+startup across every creature x every eligible part, already flagged elsewhere as this app's single
+biggest known perf cost) keeps using the original `buildMonsterPartItemV2` unchanged. Doubling that
+bulk work for a purely-browsable catalog that's never actually equipped or played wasn't worth the
+performance risk for an architectural-only benefit — a real Combat-kill drop (one item, a real
+gameplay moment) is the actual high-value target, and that's what changed.
+
+Verified live: generated 40 sample drops for a test monster (a mix of both modes, matching the real
+eligibility split), confirmed every single one carries a matching `__canonical` with zero name
+disagreements, and equipped a sample "Wolf Eye" (a real +2 Dexterity StatModifier) to confirm the
+character sheet reflects the REAL canonical passive value through the Phase 7 bridge, not a
+re-parse of the display text (which happens to say the same thing, by design, but is no longer the
+source of truth).
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
 completed (Phase 5), `npc-data.js`'s 8 `NPC_WEAPONS` — the one place in the legacy catalog already
 using a structured `abilities[]` pattern — are migrated (Phase 6), equip-time stat bonuses/AC,
 weapon attack rolls, and consumable healing for migrated items are wired into the live app (Phases
-7-9), and that bridge now follows a looted item into a player's actual inventory, not just the
-catalog (Phase 10, all above). What's left:
+7-9), that bridge now follows a looted item into a player's actual inventory, not just the catalog
+(Phase 10), and a real Combat-kill monster-part drop now builds through the real engine (Phase 11,
+all above). What's left:
 
 1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
    different type than authored (ability-score-boosting "Manual of ___" tomes classified as
@@ -451,9 +499,9 @@ catalog (Phase 10, all above). What's left:
    likely the easiest slice), `reference-data.js`, and `cult-data.js`, plus the modifier/enhancement
    content pool for magic items beyond mundane weapons/armor. None of this is item content, so none
    of it fits this migration's `Item` schema directly — each needs its own scoping pass.
-3. The rest of `mechanics/engine/**`, beyond Phases 7-10's equip/AC/weapon-attack/consumable-heal/
-   save-compatibility slice — two items resolved by inspection (no code needed), two genuinely
-   still open:
+3. The rest of `mechanics/engine/**`, beyond Phases 7-11's equip/AC/weapon-attack/consumable-heal/
+   save-compatibility/monster-part-generation slice — two items resolved by inspection (no code
+   needed), one genuinely still open:
    - **Interactions need no bridge — verified, not assumed.** Every rule in the live app's
      `INTERACTIONS` table (`game-engine.js`) reads ONLY legacy fields (`item.type`/`.subcategory`/
      `.effect`/`.name`/`.partType`/`.classification`/`.charges`) — none of which this migration ever
@@ -470,24 +518,11 @@ catalog (Phase 10, all above). What's left:
      cap-checking code) — `itemRequiresAttunement`/`requiresAttunement` exist on both sides but the
      live app never reads the flag for anything beyond an inert `INTERACTIONS` table entry. Adding
      real enforcement is legitimate future work, just not "wiring the engine in."
-   - **Monster-part generation** — `generateMonsterPartV2`/`buildMonsterPartItemV2` (the monolith,
-     called from `rollMonsterCombatLoot` when a monster's loot is rolled in Combat, and from
-     `generatePremadeMonsterPartsV2` for catalog browsing) still build a legacy-shaped
-     `craftable`/`charm` item with prose `.effect`, not `mechanics/engine/items/monster-parts.js`'s
-     `generateMonsterPartMaterial`/`generateMonsterPartWondrous`. Looked at closely this session:
-     this is NOT a simple call-site swap the way Phases 7-9 were, for two reasons. First, a
-     procedurally-generated part has no `legacySource` — it isn't a migrated catalog entry, so
-     there's no legacy-shaped item to attach `__canonical` onto; making it bridgeable means
-     synthesizing a NEW legacy-shaped projection (name/type/subcategory/effect/ac text) FROM the
-     canonical output, the mirror image of what the migration script does, and getting that
-     projection's prose to agree with the real mechanics it's standing in for. Second, correlating
-     it with the existing `buildMonsterPartItemV2` (so the two never disagree on which part/theme/
-     magnitude got rolled) needs both builders to consume randomness in the exact same order, which
-     they don't today. Neither risk is worth taking on blind — `buildMonsterPartItemV2` has no known
-     bug (unlike the weapon/armor double-counts), so the value here is architectural, not
-     correctness, and a wrong projection would be a worse regression than leaving it alone. The
-     Fleshmancer's own graft-crafting system (which CONSUMES a monster part) also has no
-     canonical-schema equivalent at all yet.
+   - **The Fleshmancer's own graft-crafting system** (which CONSUMES a monster part to produce a
+     wearable limb graft — a separate mechanic from generating the part itself, see Phase 11 above)
+     has no canonical-schema equivalent at all yet. It keeps accepting whatever shape of item it's
+     handed (the Phase 11 wrapper is still legacy-shaped, so this already works unchanged) — genuine
+     new design work if it's ever worth modeling grafts as their own canonical concept.
 4. Save-compatibility for an item already sitting in an OLDER save file, from before Phase 10
    existed. Phase 10 covers every item looted/purchased/saved from now on (it resolves
    `__canonical` at the moment an item is actually saved, not just when browsing the catalog); an
