@@ -1,21 +1,22 @@
 #!/usr/bin/env node
-// One-time developer migration tool: converts dungeon-master-box's existing weapon/armor catalog
-// (loot-data.js) into canonical structured items on the V2 mechanics schema (mechanics/engine).
+// One-time developer migration tool: converts dungeon-master-box's existing catalog (loot-data.js)
+// into canonical structured items on the V2 mechanics schema (mechanics/engine).
 // See docs/V2_MECHANICS_MIGRATION.md for the full plan this implements.
 //
-// SCOPE (Phase 1, confirmed narrow-start): type === 'weapon' and type === 'armor' entries only
-// (688 of loot-data.js's 1,243 items). Every other type (misc/consumable/companion/treasure/
-// questitem/document) is untouched and stays exactly as authored in loot-data.js — this script
-// never writes to that file. Later migration phases extend this same approach to those types.
+// SCOPE (confirmed narrow-start, expanded phase by phase): Phase 1 covered type === 'weapon' and
+// type === 'armor' (688 of loot-data.js's 1,243 items). Phase 2 adds type === 'consumable' (65
+// items). Every other type (misc/companion/treasure/questitem/document) is untouched and stays
+// exactly as authored in loot-data.js — this script never writes to that file. Later migration
+// phases extend this same approach to those types.
 //
 // THIS IS NOT PART OF THE RUNTIME APP. Run it manually (`node scripts/migrate-legacy-content.js`)
-// whenever loot-data.js's weapon/armor entries change; it is deterministic (no Math.random
+// whenever loot-data.js's migrated-type entries change; it is deterministic (no Math.random
 // anywhere in the derivation — computeItemWeight's "randomness" is a stable hash of the item's own
-// name, matching the existing app's own convention) — running it twice against the same source
-// produces byte-identical output. It writes:
-//   - mechanics/canonical/weapons-armor.json   — the canonical structured items (the new runtime
-//     source for these 688 items once a later phase wires the app onto it; nothing reads this file
-//     today)
+// name, matching the existing app's own convention; a dice-notation charges count is likewise
+// resolved with a deterministic hash roll instead of a true random one, flagged when it happens) —
+// running it twice against the same source produces byte-identical output. It writes:
+//   - mechanics/canonical/items.json   — the canonical structured items (the new runtime source
+//     for these items once a later phase wires the app onto it; nothing reads this file today)
 //   - mechanics/canonical/migration-report.md  — Section 20/27 report: counts, every ambiguous
 //     item found, every material modifier applied, and content-preservation confirmation
 //
@@ -94,13 +95,32 @@ function classifySubcategory(name, type, rarity, desc) {
     if (/bow\b|crossbow|\bpike\b|halberd|glaive|trident|\bspear\b|warhammer|great.?axe|great.?sword|great.?club|maul\b|zweihander|polearm|lance\b/.test(n)) return 'twohanded';
     return 'onehanded';
   }
+  if (type === 'consumable') {
+    if (/scroll/.test(n)) return 'scroll';
+    if (/potion|draught|elixir|tonic|\bvial\b|\boil\b|philter|\bbrew\b/.test(n)) return 'potion';
+    if (/bomb|grenade|flask|\bdart\b|\bdust\b|powder/.test(n)) return 'throwable';
+    return 'food';
+  }
   return '';
 }
 
+// Full verbatim table (dungeon_loot_wheel_v102_spell_details.html) — only the weapon/armor entries
+// were needed for Phase 1; potion/scroll/food/throwable are used starting with Phase 2
+// (consumables). Ported in full now rather than patched piecemeal, to keep this a genuine verbatim
+// copy of the source rather than a hand-picked subset.
 const WEIGHT_RANGE_BY_SUBCATEGORY = {
   head: [1, 4], facewear: [0.2, 1], chest: [6, 40], cloak: [1, 3], belt: [0.5, 2],
   boots: [1, 4], leggings: [2, 8], handwear: [0.5, 2], offhand: [4, 12],
   onehanded: [1, 8], twohanded: [6, 20],
+  potion: [0.5, 1.5], scroll: [0.02, 0.1], food: [0.3, 3], throwable: [0.5, 2],
+  ring: [0.05, 0.3], amulet: [0.2, 1], charm: [0.1, 2], commonMisc: [0.1, 2], rareMisc: [0.1, 2.5], wondrousMisc: [0.1, 3],
+  pet: [0, 0], mount: [0, 0],
+  arm: [4, 15], hand: [1, 4], leg: [5, 18], foot: [1, 4],
+  eye: [0.1, 1], ear: [0.1, 1], finger: [0.1, 0.5], heart: [0.3, 1.5], tongue: [0.2, 1],
+  monsterpart: [0.2, 12],
+  journal: [0.5, 2], letter: [0.02, 0.2], map: [0.05, 0.5], book: [1, 5], formula: [0.05, 0.5],
+  gem: [0.02, 0.3], jewelry: [0.1, 1], art: [5, 25], currency: [0.1, 2], currencybar: [1, 10], regalia: [0.5, 3],
+  key: [0.05, 0.5], accesstoken: [0.02, 0.3], puzzleobject: [0.2, 3], questobject: [0.2, 5],
 };
 const HEAVY_WEAPON_KEYWORDS = /massive|giant'?s|titan|colossal|great.?axe|great.?sword|great.?club|maul|warhammer|zweihander|bonecrusher|earthbreaker|juggernaut|siege/i;
 const HEAVY_WEAPON_RANGE = [15, 50];
@@ -527,6 +547,120 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
   return canonical;
 }
 
+// ============================== Consumables (Phase 2) ============================================
+// Consumables are meaningfully messier than weapons/armor: most legacy entries have no `charges`
+// field at all, and `effect` text is frequently branching/conditional prose (skill checks, saving
+// throws, multi-clause "if X then Y, else Z" descriptions) that V2's OnUseEffect — a single
+// {kind, healDice|damageDice+damageType|statMods, durationMs} shape — was never designed to
+// represent. Rather than force-fitting that complexity into a kind it doesn't fit (Section 27:
+// "do not invent a new mechanic merely to eliminate the warning"), this migration extracts ONLY
+// what it can do with real confidence — a clean heal from a dice-notation `item.hp` field — and
+// falls back to a flagged, mechanically-inert 'utility' effect (full original text preserved in
+// flavorText) for everything else. This is intentionally narrower mechanical coverage than
+// weapons/armor got; buff/debuff extraction from effect text and multi-effect items (e.g. a potion
+// that both heals AND buffs simultaneously, which OnUseEffect's single-kind-per-entry shape can't
+// represent as one effect) are explicitly left for a later phase — see docs/V2_MECHANICS_MIGRATION.md.
+
+const CONSUMABLE_SUBCATEGORY_MAP = { potion: 'potion', scroll: 'scroll', food: 'food', throwable: 'thrown' };
+const TOPICAL_PATTERN = /salve|ointment|balm|unguent/i;
+const WOUND_APPLICATION_PATTERN = /appl(?:y|ied|ying)\s+(?:to|over)\s+(?:a\s+)?(?:wound|skin)/i;
+const COATING_PATTERN = /^oil of|weapon (?:oil|coating)|coat(?:ed|ing)?\s+(?:a\s+|your\s+)?(?:weapon|blade)|appl(?:y|ied|ying)?.*(?:to a weapon|to your weapon|over.*blade)/i;
+
+function deriveConsumableCategory(name, effect, subcategory) {
+  const base = CONSUMABLE_SUBCATEGORY_MAP[subcategory] || 'other';
+  // A clear topical/coating naming signal overrides classifySubcategory's coarse legacy bucket
+  // (which has no topical/coating concept at all and falls back to 'food' for anything that isn't
+  // obviously a potion/scroll/throwable — e.g. "Tinned Salve" would otherwise land in 'food').
+  // Only ever overrides scroll/food/other buckets in practice, never 'thrown' — a coating/topical
+  // item is never also a thrown weapon in this catalog.
+  if (COATING_PATTERN.test(name) || COATING_PATTERN.test(effect || '')) return 'coating';
+  if (TOPICAL_PATTERN.test(name) || WOUND_APPLICATION_PATTERN.test(effect || '')) return 'topical';
+  return base;
+}
+
+// Legacy's own charges pipeline (ensureChargeFormat/rollChargeDiceText, monolith HTML) rolls a
+// dice-notation charge count ONCE, the first time the item is touched, using true Math.random —
+// and that roll becomes the item's fixed live count from then on. This migration needs the SAME
+// "roll once, then fixed" outcome but must stay deterministic across runs (a hard requirement for
+// this script), so it seeds that one-time roll from hashItemName instead of Math.random — the same
+// deterministic-hash convention computeItemWeight already uses for exactly this reason. Every item
+// whose charges required this substitution is flagged in the report for transparency, not hidden.
+function resolveConsumableUses(charges, name, ambiguous, tier) {
+  if (!charges) return { max: 1, note: null };
+  const flat = /^\s*(\d+)\s*$/.exec(String(charges));
+  if (flat) return { max: parseInt(flat[1], 10), note: null };
+  const perPeriod = /^\s*(\d+)\s*\/\s*\w+/.exec(String(charges)); // e.g. "1/week"
+  if (perPeriod) {
+    ambiguous.push({ name, tier, reason: `charges "${charges}" implies a periodic refill (no V2 recharge concept for consumables) — used the flat count (${perPeriod[1]}) with no refill, matching dungeon-master-box's own current charge-counting behavior (it doesn't enforce the refill period either), needs manual review if refill matters`, charges });
+    return { max: parseInt(perPeriod[1], 10), note: 'periodic' };
+  }
+  const diceMatch = /(\d+)\s*d\s*(\d+)\s*([+-]\s*\d+)?/i.exec(String(charges));
+  if (diceMatch) {
+    const n = parseInt(diceMatch[1], 10), sides = parseInt(diceMatch[2], 10);
+    const mod = diceMatch[3] ? parseInt(diceMatch[3].replace(/\s+/g, ''), 10) : 0;
+    // Deterministic stand-in for legacy's one-time random roll — see function comment.
+    const roll = (hashItemName(name + ':charges') % sides) + 1;
+    const total = Math.max(1, n * roll + mod); // n*roll is an approximation of an n-die sum, not a
+    // true sum of n independent dice — acceptable for a one-time flavor quantity (how many
+    // applications/beads an item has), not a live gameplay roll; flagged below regardless.
+    ambiguous.push({ name, tier, reason: `charges "${charges}" is dice notation — legacy rolls this once with true randomness on first use; this migration rolled it once deterministically instead (result: ${total}) to keep the migration itself reproducible, needs manual review/reroll if the exact starting count matters`, charges });
+    return { max: total, note: 'dice' };
+  }
+  const useWord = /^\s*(\d+)\s*use/i.exec(String(charges));
+  if (useWord) return { max: parseInt(useWord[1], 10), note: null };
+  return { max: 1, note: 'unparsed' };
+}
+
+function migrateConsumable(item, tier, index, nextId, ambiguous, fixes) {
+  const name = item.name;
+  const desc = item.desc || '';
+  const effect = item.effect || '';
+  const subcategory = classifySubcategory(name, 'consumable', tier, desc);
+  const consumableCategory = deriveConsumableCategory(name, effect, subcategory);
+
+  const { max: usesMax, note: usesNote } = resolveConsumableUses(item.charges, name, ambiguous, tier);
+  if (usesNote === 'unparsed' && item.charges) {
+    ambiguous.push({ name, tier, reason: `charges "${item.charges}" could not be parsed as a flat count, dice notation, or "N/period" — defaulted to 1 use, needs manual review`, charges: item.charges });
+  }
+
+  let effects = [];
+  const healDiceMatch = /^\s*(\d+)d(\d+)\s*(?:([+-])\s*(\d+))?\s*$/i.exec(String(item.hp || ''));
+  if (item.hp && healDiceMatch) {
+    const mod = healDiceMatch[3] ? `${healDiceMatch[3]}${healDiceMatch[4]}` : '';
+    effects.push({ kind: 'heal', healDice: `${healDiceMatch[1]}d${healDiceMatch[2]}${mod}` });
+  } else if (item.hp) {
+    // "10 temp HP", "Full HP" — not dice notation; OnUseEffect's heal kind only adds healDice to
+    // currentHp capped at maxHp, which can't represent temporary HP or "restore to full" (both real,
+    // distinct 5e mechanics). Flagged rather than approximated as a plain heal (a plain heal of an
+    // arbitrary die would misrepresent "full HP", and temp HP stacking has its own rules a simple
+    // additive heal would get wrong).
+    ambiguous.push({ name, tier, reason: `item.hp ("${item.hp}") is not plain dice notation (temporary HP or a full-heal phrasing) — OnUseEffect's heal kind can't represent this correctly, left as a utility placeholder, needs a schema extension or manual handling`, hp: item.hp });
+    effects.push({ kind: 'utility' });
+  } else {
+    effects.push({ kind: 'utility' });
+  }
+
+  if (scanResidualLanguage(effect, [])) {
+    ambiguous.push({ name, tier, reason: 'effect text contains mechanical-sounding language (damage/save/condition/duration) this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review', effect });
+  }
+
+  const canonical = {
+    id: nextId(name),
+    name,
+    itemType: 'consumable',
+    rarity: tier,
+    weight: computeItemWeight(item, subcategory),
+    ...(item.gp ? { value: item.gp } : {}),
+    ...(desc ? { flavorText: desc } : {}),
+    ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
+    consumable: { consumableCategory, effects, uses: { max: usesMax }, usesLeft: usesMax },
+    ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
+    legacySource: { tier, index, name },
+  };
+
+  return canonical;
+}
+
 // ============================== Main =============================================================
 function main() {
   const lootData = loadLootData();
@@ -536,15 +670,15 @@ function main() {
   const canonicalItems = [];
   const materialsSummary = {};
   let excludedCount = 0;
-  const counts = { weapon: 0, armor: 0 };
+  const counts = { weapon: 0, armor: 0, consumable: 0 };
+  const MIGRATORS = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable };
 
   for (const tier of Object.keys(lootData)) {
     lootData[tier].forEach((item, index) => {
-      if (item.type !== 'weapon' && item.type !== 'armor') return;
+      const migrator = MIGRATORS[item.type];
+      if (!migrator) return;
       counts[item.type]++;
-      const result = item.type === 'weapon'
-        ? migrateWeapon(item, tier, index, nextId, ambiguous, fixes)
-        : migrateArmor(item, tier, index, nextId, ambiguous, fixes);
+      const result = migrator(item, tier, index, nextId, ambiguous, fixes);
       if (!result) { excludedCount++; return; }
       canonicalItems.push(result);
       for (const modId of result.appliedModifiers || []) {
@@ -568,7 +702,7 @@ function main() {
   const outDir = path.join(ROOT, 'mechanics', 'canonical');
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(
-    path.join(outDir, 'weapons-armor.json'),
+    path.join(outDir, 'items.json'),
     JSON.stringify(canonicalItems, null, 2) + '\n',
   );
 
@@ -583,28 +717,30 @@ function main() {
   const report = buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes });
   fs.writeFileSync(path.join(outDir, 'migration-report.md'), report);
 
-  console.log(`Migrated ${canonicalItems.length}/${counts.weapon + counts.armor} weapon+armor items.`);
-  console.log(`  weapon: ${counts.weapon}, armor: ${counts.armor}, excluded: ${excludedCount}`);
+  const legacyTotal = counts.weapon + counts.armor + counts.consumable;
+  console.log(`Migrated ${canonicalItems.length}/${legacyTotal} items.`);
+  console.log(`  weapon: ${counts.weapon}, armor: ${counts.armor}, consumable: ${counts.consumable}, excluded: ${excludedCount}`);
   console.log(`  ambiguous flags raised: ${ambiguous.length}`);
   console.log(`  bugs found and fixed: ${fixes.length}`);
   console.log(`  material modifiers applied: ${JSON.stringify(materialsSummary)}`);
-  console.log(`Wrote mechanics/canonical/weapons-armor.json and mechanics/canonical/migration-report.md`);
+  console.log(`Wrote mechanics/canonical/items.json and mechanics/canonical/migration-report.md`);
 }
 
 function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes }) {
   const totalLegacyItems = Object.values(lootData).reduce((s, arr) => s + arr.length, 0);
   const lines = [];
-  lines.push('# V2 Mechanics Migration Report — Phase 1 (weapons + armor)');
+  lines.push('# V2 Mechanics Migration Report — Phases 1-2 (weapons + armor + consumables)');
   lines.push('');
   lines.push(`Generated by \`scripts/migrate-legacy-content.js\`. Source: \`loot-data.js\` (untouched — this script never writes to it).`);
   lines.push('');
   lines.push('## Content preservation (Section 20)');
   lines.push('');
-  lines.push(`- Legacy catalog total (all types, unaffected by this phase): ${totalLegacyItems} items`);
+  lines.push(`- Legacy catalog total (all types): ${totalLegacyItems} items`);
   lines.push(`- Legacy weapon items: ${counts.weapon}`);
   lines.push(`- Legacy armor items: ${counts.armor}`);
+  lines.push(`- Legacy consumable items: ${counts.consumable}`);
   lines.push(`- Migrated to canonical structured items: ${canonicalItems.length}`);
-  lines.push(`- Excluded this pass (no parseable base dmg/ac — see "Excluded items" below): ${excludedCount}`);
+  lines.push(`- Excluded this pass (no parseable base dmg/ac/hp — see "Excluded items" below): ${excludedCount}`);
   lines.push(`- Added: 0 — Removed: 0 — Renamed: 0 (every migrated item keeps its exact original \`name\`)`);
   lines.push(`- Changed: authored content (name/desc/gp/rarity) copied verbatim; only the MECHANICAL representation changed, as intended. See "Ambiguous / needs review" for anything not migrated with full confidence.`);
   lines.push('');
@@ -655,9 +791,9 @@ function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguou
     }
     lines.push('');
   }
-  lines.push('## Not yet migrated (explicitly out of Phase 1 scope, not lost)');
+  lines.push('## Not yet migrated (explicitly out of scope so far, not lost)');
   lines.push('');
-  lines.push('Every other legacy content type is untouched by this script and remains exactly as authored: misc/consumable/companion/treasure/questitem/document items (555 of loot-data.js\'s items), reference-data.js, npc-data.js, journey-data.js, puzzle-data.js, trap-data.js, cult-data.js, and monster/spell data (fetched live from the 5etools mirror, never stored locally). See docs/V2_MECHANICS_MIGRATION.md for the planned follow-up phases.');
+  lines.push('Every other legacy content type is untouched by this script and remains exactly as authored: misc/companion/treasure/questitem/document items (490 of loot-data.js\'s items), reference-data.js, npc-data.js, journey-data.js, puzzle-data.js, trap-data.js, cult-data.js, and monster/spell data (fetched live from the 5etools mirror, never stored locally). See docs/V2_MECHANICS_MIGRATION.md for the planned follow-up phases.');
   lines.push('');
   return lines.join('\n');
 }
@@ -672,5 +808,6 @@ export {
   loadLootData, classifySubcategory, computeItemWeight, hashItemName, parseWeaponEffectBonuses,
   deriveWeaponMechanics, deriveWeaponProperties, toStatModifiers, findSetValueOverrides,
   scanResidualLanguage, applyMaterialModifiers, slugify, makeIdGenerator,
-  migrateWeapon, migrateArmor, main,
+  deriveConsumableCategory, resolveConsumableUses,
+  migrateWeapon, migrateArmor, migrateConsumable, main,
 };

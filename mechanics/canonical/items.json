@@ -1,5 +1,31 @@
 [
   {
+    "id": "iron-rations-1-day",
+    "name": "Iron Rations (1 day)",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 2,
+    "value": "5 sp",
+    "flavorText": "Hard tack and dried salted meat in a wax block.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 2,
+      "name": "Iron Rations (1 day)"
+    }
+  },
+  {
     "id": "wooden-stake",
     "name": "Wooden Stake",
     "itemType": "weapon",
@@ -78,6 +104,58 @@
       "tier": "common",
       "index": 15,
       "name": "Sling"
+    }
+  },
+  {
+    "id": "flask-of-oil",
+    "name": "Flask of Oil",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 0.7,
+    "value": "1 sp",
+    "flavorText": "A small clay flask of lamp oil.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 23,
+      "name": "Flask of Oil"
+    }
+  },
+  {
+    "id": "dried-mushroom",
+    "name": "Dried Mushroom",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 0.5,
+    "value": "1 sp",
+    "flavorText": "A large mushroom, dried. May be edible — or mildly toxic.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 34,
+      "name": "Dried Mushroom"
     }
   },
   {
@@ -298,6 +376,214 @@
       "tier": "common",
       "index": 69,
       "name": "Pocket Knife"
+    }
+  },
+  {
+    "id": "tinned-salve",
+    "name": "Tinned Salve",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 2,
+    "value": "5 cp",
+    "flavorText": "A small round tin containing a waxy yellowish salve. It smells medicinal — pine tar and something sharper.",
+    "consumable": {
+      "consumableCategory": "topical",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 77,
+      "name": "Tinned Salve"
+    }
+  },
+  {
+    "id": "half-eaten-ration",
+    "name": "Half-Eaten Ration",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 2.5,
+    "value": "2 cp",
+    "flavorText": "A wax-wrapped block of salt meat and hard biscuit, half consumed. The remaining portion is still sealed and edible.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 81,
+      "name": "Half-Eaten Ration"
+    }
+  },
+  {
+    "id": "piece-of-dried-fruit",
+    "name": "Piece of Dried Fruit",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 3,
+    "value": "2 cp",
+    "flavorText": "A handful of dried plums or apricots in a small cloth bag, sticky and dense. Someone packed these for the road.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 82,
+      "name": "Piece of Dried Fruit"
+    }
+  },
+  {
+    "id": "wax-wrapped-cheese",
+    "name": "Wax-Wrapped Cheese",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 2.5,
+    "value": "3 cp",
+    "flavorText": "A wedge of hard cheese, wrapped in cloth and sealed with wax. Pungent but edible. Probably better than most things found in a dungeon.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 83,
+      "name": "Wax-Wrapped Cheese"
+    }
+  },
+  {
+    "id": "corked-vial-of-spirits",
+    "name": "Corked Vial of Spirits",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 1.5,
+    "value": "3 cp",
+    "flavorText": "A finger-sized glass vial of clear or amber spirits, tightly corked. Strong enough to sterilize a wound.",
+    "consumable": {
+      "consumableCategory": "topical",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 84,
+      "name": "Corked Vial of Spirits"
+    }
+  },
+  {
+    "id": "lump-of-hard-candy",
+    "name": "Lump of Hard Candy",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 1.5,
+    "value": "1 cp",
+    "flavorText": "A knot of dark brown sugar candy wrapped in waxed paper. Slightly sticky at the seams.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 85,
+      "name": "Lump of Hard Candy"
+    }
+  },
+  {
+    "id": "pouch-of-trail-mix",
+    "name": "Pouch of Trail Mix",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 2,
+    "value": "3 cp",
+    "flavorText": "A small drawstring pouch holding a handful of dried nuts, seeds, and raisins.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 86,
+      "name": "Pouch of Trail Mix"
+    }
+  },
+  {
+    "id": "pouch-of-pipe-weed",
+    "name": "Pouch of Pipe Weed",
+    "itemType": "consumable",
+    "rarity": "common",
+    "weight": 2,
+    "value": "5 cp",
+    "flavorText": "A small leather pouch of dried, shredded herb. Opens to a mild, sweet smell. Enough for several pipes.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "common",
+      "index": 107,
+      "name": "Pouch of Pipe Weed"
     }
   },
   {
@@ -587,6 +873,60 @@
     }
   },
   {
+    "id": "potion-of-healing",
+    "name": "Potion of Healing",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.85,
+    "value": "150 gp",
+    "flavorText": "A glass vial of faintly glowing pink liquid with a sweet, coppery taste.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "2d4+2"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 0,
+      "name": "Potion of Healing"
+    }
+  },
+  {
+    "id": "potion-of-greater-healing",
+    "name": "Potion of Greater Healing",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "150 gp",
+    "flavorText": "A vibrant red potion, noticeably warmer than it should be.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "4d4+4"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 1,
+      "name": "Potion of Greater Healing"
+    }
+  },
+  {
     "id": "silver-dagger",
     "name": "Silver Dagger",
     "itemType": "weapon",
@@ -621,6 +961,32 @@
     ]
   },
   {
+    "id": "potion-of-darkvision",
+    "name": "Potion of Darkvision",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.55,
+    "value": "150 gp",
+    "flavorText": "A murky grey liquid in a stoppered bottle.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 6,
+      "name": "Potion of Darkvision"
+    }
+  },
+  {
     "id": "amulet-of-natural-armor-1",
     "name": "Amulet of Natural Armor +1",
     "itemType": "armor",
@@ -640,6 +1006,136 @@
       "tier": "uncommon",
       "index": 9,
       "name": "Amulet of Natural Armor +1"
+    }
+  },
+  {
+    "id": "vial-of-antitoxin",
+    "name": "Vial of Antitoxin",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1,
+    "value": "150 gp",
+    "flavorText": "A clear bitter liquid that neutralizes common poisons.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 11,
+      "name": "Vial of Antitoxin"
+    }
+  },
+  {
+    "id": "oil-of-slipperiness",
+    "name": "Oil of Slipperiness",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "480 gp",
+    "flavorText": "A viscous clear oil. Applied to skin or surface, grip becomes near impossible.",
+    "consumable": {
+      "consumableCategory": "coating",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 12,
+      "name": "Oil of Slipperiness"
+    }
+  },
+  {
+    "id": "dust-of-disappearance",
+    "name": "Dust of Disappearance",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.95,
+    "value": "300 gp",
+    "flavorText": "Iridescent grey powder in a wax envelope.",
+    "consumable": {
+      "consumableCategory": "thrown",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 13,
+      "name": "Dust of Disappearance"
+    }
+  },
+  {
+    "id": "potion-of-water-breathing",
+    "name": "Potion of Water Breathing",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.7,
+    "value": "180 gp",
+    "flavorText": "A blue slightly fizzy liquid.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 18,
+      "name": "Potion of Water Breathing"
+    }
+  },
+  {
+    "id": "potion-of-climbing",
+    "name": "Potion of Climbing",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "180 gp",
+    "flavorText": "A thick amber potion smelling of pine sap.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 19,
+      "name": "Potion of Climbing"
     }
   },
   {
@@ -725,6 +1221,162 @@
     ]
   },
   {
+    "id": "scroll-of-fireball",
+    "name": "Scroll of Fireball",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.05,
+    "value": "300 gp",
+    "flavorText": "Parchment inscribed with a glowing sigil. Reading it unleashes a sphere of flame.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 25,
+      "name": "Scroll of Fireball"
+    }
+  },
+  {
+    "id": "scroll-of-invisibility",
+    "name": "Scroll of Invisibility",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.05,
+    "value": "300 gp",
+    "flavorText": "A vellum scroll turning one creature invisible for up to one hour.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 26,
+      "name": "Scroll of Invisibility"
+    }
+  },
+  {
+    "id": "alchemists-fire-flask",
+    "name": "Alchemist's Fire (flask)",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.55,
+    "value": "150 gp",
+    "flavorText": "A volatile green liquid that ignites when shattered.",
+    "consumable": {
+      "consumableCategory": "thrown",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 29,
+      "name": "Alchemist's Fire (flask)"
+    }
+  },
+  {
+    "id": "thunderstone",
+    "name": "Thunderstone",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 2.5,
+    "value": "100 gp",
+    "flavorText": "A grey stone that detonates with a concussive thunderclap when thrown.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 30,
+      "name": "Thunderstone"
+    }
+  },
+  {
+    "id": "tanglefoot-bag",
+    "name": "Tanglefoot Bag",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 3,
+    "value": "150 gp",
+    "flavorText": "A sack of viscous goo. When burst it roots the target in place.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 31,
+      "name": "Tanglefoot Bag"
+    }
+  },
+  {
+    "id": "smokestick",
+    "name": "Smokestick",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1,
+    "value": "100 gp",
+    "flavorText": "A wax-coated rod that produces dense grey smoke when snapped.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 32,
+      "name": "Smokestick"
+    }
+  },
+  {
     "id": "masterwork-longsword",
     "name": "Masterwork Longsword",
     "itemType": "weapon",
@@ -797,6 +1449,32 @@
     ]
   },
   {
+    "id": "potion-of-heroism",
+    "name": "Potion of Heroism",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "180 gp",
+    "flavorText": "A bright red potion that tastes of iron and pepper.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 37,
+      "name": "Potion of Heroism"
+    }
+  },
+  {
     "id": "bracers-of-armor-1",
     "name": "Bracers of Armor (+1)",
     "itemType": "armor",
@@ -819,6 +1497,84 @@
     }
   },
   {
+    "id": "potion-of-enlarge",
+    "name": "Potion of Enlarge",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "100 gp",
+    "flavorText": "A red syrupy liquid.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 40,
+      "name": "Potion of Enlarge"
+    }
+  },
+  {
+    "id": "potion-of-reduce",
+    "name": "Potion of Reduce",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "100 gp",
+    "flavorText": "A blue watery potion.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 41,
+      "name": "Potion of Reduce"
+    }
+  },
+  {
+    "id": "necklace-of-fireballs",
+    "name": "Necklace of Fireballs",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 3,
+    "value": "500 gp",
+    "flavorText": "A beaded necklace with 1d6+1 beads that explode as fireballs.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 2
+      },
+      "usesLeft": 2
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 42,
+      "name": "Necklace of Fireballs"
+    }
+  },
+  {
     "id": "javelin-of-lightning",
     "name": "Javelin of Lightning",
     "itemType": "weapon",
@@ -835,6 +1591,58 @@
       "tier": "uncommon",
       "index": 51,
       "name": "Javelin of Lightning"
+    }
+  },
+  {
+    "id": "potion-of-gaseous-form",
+    "name": "Potion of Gaseous Form",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.9,
+    "value": "300 gp",
+    "flavorText": "A misty shifting liquid. The drinker becomes a cloud of gas.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 55,
+      "name": "Potion of Gaseous Form"
+    }
+  },
+  {
+    "id": "potion-of-growth",
+    "name": "Potion of Growth",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.65,
+    "value": "270 gp",
+    "flavorText": "A bubbling orange draught.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 56,
+      "name": "Potion of Growth"
     }
   },
   {
@@ -868,6 +1676,32 @@
     "appliedModifiers": [
       "material-mithral"
     ]
+  },
+  {
+    "id": "oil-of-etherealness",
+    "name": "Oil of Etherealness",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.65,
+    "value": "1900 gp",
+    "flavorText": "A shimmering translucent oil.",
+    "consumable": {
+      "consumableCategory": "coating",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 71,
+      "name": "Oil of Etherealness"
+    }
   },
   {
     "id": "silvered-longsword",
@@ -936,6 +1770,58 @@
     }
   },
   {
+    "id": "spell-scroll-1st-level",
+    "name": "Spell Scroll (1st Level)",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.1,
+    "value": "150 gp",
+    "flavorText": "A sealed scroll containing a single 1st-level spell.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 86,
+      "name": "Spell Scroll (1st Level)"
+    }
+  },
+  {
+    "id": "spell-scroll-2nd-level",
+    "name": "Spell Scroll (2nd Level)",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.05,
+    "value": "250 gp",
+    "flavorText": "A parchment bearing a 2nd-level spell.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 87,
+      "name": "Spell Scroll (2nd Level)"
+    }
+  },
+  {
     "id": "armor-of-gleaming",
     "name": "Armor of Gleaming",
     "itemType": "armor",
@@ -957,6 +1843,58 @@
     }
   },
   {
+    "id": "bead-of-nourishment",
+    "name": "Bead of Nourishment",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "—",
+    "flavorText": "A tiny, tasteless, slightly translucent bead.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 90,
+      "name": "Bead of Nourishment"
+    }
+  },
+  {
+    "id": "bead-of-refreshment",
+    "name": "Bead of Refreshment",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.5,
+    "value": "—",
+    "flavorText": "A tiny blue bead, slightly moist to the touch.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 91,
+      "name": "Bead of Refreshment"
+    }
+  },
+  {
     "id": "cast-off-armor",
     "name": "Cast-Off Armor",
     "itemType": "armor",
@@ -975,6 +1913,85 @@
       "tier": "uncommon",
       "index": 94,
       "name": "Cast-Off Armor"
+    }
+  },
+  {
+    "id": "keoghtoms-ointment",
+    "name": "Keoghtom's Ointment",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "500 gp",
+    "flavorText": "A small clay pot containing a sweet-smelling amber unguent.",
+    "consumable": {
+      "consumableCategory": "topical",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "2d8+2"
+        }
+      ],
+      "uses": {
+        "max": 3
+      },
+      "usesLeft": 3
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 110,
+      "name": "Keoghtom's Ointment"
+    }
+  },
+  {
+    "id": "perfume-of-bewitching",
+    "name": "Perfume of Bewitching",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 2.5,
+    "value": "—",
+    "flavorText": "A small crystal vial of dark pink perfume.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 114,
+      "name": "Perfume of Bewitching"
+    }
+  },
+  {
+    "id": "pressure-capsule",
+    "name": "Pressure Capsule",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 3,
+    "value": "—",
+    "flavorText": "A small sealed iron flask that rattles faintly when shaken.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 118,
+      "name": "Pressure Capsule"
     }
   },
   {
@@ -1162,6 +2179,84 @@
     }
   },
   {
+    "id": "potion-of-maximum-power",
+    "name": "Potion of Maximum Power",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 1,
+    "value": "1500 gp",
+    "flavorText": "A luminous indigo potion that sparkles even in darkness.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 148,
+      "name": "Potion of Maximum Power"
+    }
+  },
+  {
+    "id": "spell-scroll-3rd-level",
+    "name": "Spell Scroll (3rd Level)",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.05,
+    "value": "500 gp",
+    "flavorText": "A tightly rolled scroll inscribed with a complex 3rd-level spell sigil.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 149,
+      "name": "Spell Scroll (3rd Level)"
+    }
+  },
+  {
+    "id": "spell-scroll-4th-level",
+    "name": "Spell Scroll (4th Level)",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.1,
+    "value": "1000 gp",
+    "flavorText": "A densely inscribed vellum scroll bearing a 4th-level spell.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 150,
+      "name": "Spell Scroll (4th Level)"
+    }
+  },
+  {
     "id": "acheron-blade",
     "name": "Acheron Blade",
     "itemType": "weapon",
@@ -1207,6 +2302,58 @@
       "tier": "uncommon",
       "index": 153,
       "name": "Hunter's Coat"
+    }
+  },
+  {
+    "id": "potion-of-comprehension",
+    "name": "Potion of Comprehension",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.7,
+    "value": "250 gp",
+    "flavorText": "A clear liquid with floating silver threads that form letters.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 154,
+      "name": "Potion of Comprehension"
+    }
+  },
+  {
+    "id": "potion-of-possibility",
+    "name": "Potion of Possibility",
+    "itemType": "consumable",
+    "rarity": "uncommon",
+    "weight": 0.9,
+    "value": "2000 gp",
+    "flavorText": "A silvery-blue liquid that sloshes with mathematical precision.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 155,
+      "name": "Potion of Possibility"
     }
   },
   {
@@ -6648,6 +7795,84 @@
     }
   },
   {
+    "id": "oil-of-sharpness",
+    "name": "Oil of Sharpness",
+    "itemType": "consumable",
+    "rarity": "rare",
+    "weight": 1.5,
+    "value": "3000 gp",
+    "flavorText": "A thin iridescent oil.",
+    "consumable": {
+      "consumableCategory": "coating",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 29,
+      "name": "Oil of Sharpness"
+    }
+  },
+  {
+    "id": "potion-of-flying",
+    "name": "Potion of Flying",
+    "itemType": "consumable",
+    "rarity": "rare",
+    "weight": 0.65,
+    "value": "5000 gp",
+    "flavorText": "A light blue slightly frothy liquid.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 31,
+      "name": "Potion of Flying"
+    }
+  },
+  {
+    "id": "potion-of-invulnerability",
+    "name": "Potion of Invulnerability",
+    "itemType": "consumable",
+    "rarity": "rare",
+    "weight": 0.8,
+    "value": "3000 gp",
+    "flavorText": "A shimmering silver liquid.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 32,
+      "name": "Potion of Invulnerability"
+    }
+  },
+  {
     "id": "robe-of-eyes",
     "name": "Robe of Eyes",
     "itemType": "armor",
@@ -7520,6 +8745,59 @@
     "appliedModifiers": [
       "material-mithral"
     ]
+  },
+  {
+    "id": "potion-of-superior-healing",
+    "name": "Potion of Superior Healing",
+    "itemType": "consumable",
+    "rarity": "rare",
+    "weight": 1.5,
+    "value": "3000 gp",
+    "flavorText": "A brilliant red potion that sparkles when turned.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "8d4+8"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 85,
+      "name": "Potion of Superior Healing"
+    }
+  },
+  {
+    "id": "potion-of-mind-reading",
+    "name": "Potion of Mind Reading",
+    "itemType": "consumable",
+    "rarity": "rare",
+    "weight": 1.5,
+    "value": "3000 gp",
+    "flavorText": "A magenta liquid that seems to swirl against gravity.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 86,
+      "name": "Potion of Mind Reading"
+    }
   },
   {
     "id": "rapier-2",
@@ -13543,6 +14821,32 @@
     }
   },
   {
+    "id": "potion-of-storm-giant-strength",
+    "name": "Potion of Storm Giant Strength",
+    "itemType": "consumable",
+    "rarity": "superrare",
+    "weight": 1.5,
+    "value": "10000 gp",
+    "flavorText": "A crackling electrified blue-white liquid.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "superrare",
+      "index": 32,
+      "name": "Potion of Storm Giant Strength"
+    }
+  },
+  {
     "id": "rod-of-alertness",
     "name": "Rod of Alertness",
     "itemType": "weapon",
@@ -13818,6 +15122,32 @@
     }
   },
   {
+    "id": "potion-of-giant-strength-storm",
+    "name": "Potion of Giant Strength (Storm)",
+    "itemType": "consumable",
+    "rarity": "superrare",
+    "weight": 1,
+    "value": "30000 gp",
+    "flavorText": "A crackling blue-white liquid in a stout flask.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "superrare",
+      "index": 59,
+      "name": "Potion of Giant Strength (Storm)"
+    }
+  },
+  {
     "id": "robe-of-scintillating-colors",
     "name": "Robe of Scintillating Colors",
     "itemType": "armor",
@@ -13852,6 +15182,58 @@
       "tier": "superrare",
       "index": 61,
       "name": "Robe of Scintillating Colors"
+    }
+  },
+  {
+    "id": "spell-scroll-5th-level",
+    "name": "Spell Scroll (5th Level)",
+    "itemType": "consumable",
+    "rarity": "superrare",
+    "weight": 0.05,
+    "value": "15000 gp",
+    "flavorText": "A scroll sealed with an arcane wax disc bearing a complex 5th-level sigil.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "superrare",
+      "index": 62,
+      "name": "Spell Scroll (5th Level)"
+    }
+  },
+  {
+    "id": "spell-scroll-6th-level",
+    "name": "Spell Scroll (6th Level)",
+    "itemType": "consumable",
+    "rarity": "superrare",
+    "weight": 0.1,
+    "value": "20000 gp",
+    "flavorText": "A heavily reinforced vellum scroll containing a powerful 6th-level spell.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "legacySource": {
+      "tier": "superrare",
+      "index": 63,
+      "name": "Spell Scroll (6th Level)"
     }
   },
   {
@@ -18506,6 +19888,260 @@
     }
   },
   {
+    "id": "elixir-of-the-phoenixs-breath",
+    "name": "Elixir of the Phoenix's Breath",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 1,
+    "value": "—",
+    "flavorText": "Distilled from a single feather shed willingly by a phoenix.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "10d4+20"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — The Warmth Lingers",
+          "condition": "Use an Elixir of the Phoenix's Breath (or another found later) to stabilize or revive an ally on 3 separate occasions.",
+          "reward": "Future uses restore an additional 2d4 HP, and the harmless warm flame grants the target resistance to fire damage for 1 minute."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — Rising From Ash",
+          "condition": "Use the elixir on an ally who was reduced to 0 HP by fire damage.",
+          "reward": "When used on a creature at 0 HP, that creature also removes one exhaustion level and stands up with 1 temporary hit point that lingers until the start of their next turn."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 18,
+      "name": "Elixir of the Phoenix's Breath"
+    }
+  },
+  {
+    "id": "draught-of-a-thousand-faces",
+    "name": "Draught of a Thousand Faces",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 1.5,
+    "value": "—",
+    "flavorText": "An opalescent potion brewed for a client who was never named.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — A Face Worth Keeping",
+          "condition": "Successfully deceive 5 different creatures using a disguise granted by this draught (or another of its kind).",
+          "reward": "The disguise now also alters your voice to match, and lasts for 48 hours instead of 24."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — Nobody You've Ever Been",
+          "condition": "Use the draught's disguise to infiltrate a location you could not otherwise have entered.",
+          "reward": "You may now also mimic the exact voice and minor mannerisms of anyone you've spent at least 10 minutes observing, in addition to their appearance."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 19,
+      "name": "Draught of a Thousand Faces"
+    }
+  },
+  {
+    "id": "vial-of-borrowed-time",
+    "name": "Vial of Borrowed Time",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 1,
+    "value": "—",
+    "flavorText": "A silvery liquid that moves against the current of its vial.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — Time Well Spent",
+          "condition": "Use a Vial of Borrowed Time to directly turn the tide of a combat you would otherwise likely have lost.",
+          "reward": "The exhaustion level gained afterward is removed automatically after your next short rest instead of requiring a long rest."
+        },
+        {
+          "type": "cursed",
+          "tierLabel": "Tier II — Time Wants Repaying (Curse)",
+          "condition": "Use 3 Vials of Borrowed Time within the same 7-day period.",
+          "reward": "You may act twice on your next turn as normal, but immediately after your following turn, you gain 2 levels of exhaustion instead of 1 for that use only."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 20,
+      "name": "Vial of Borrowed Time"
+    }
+  },
+  {
+    "id": "scroll-of-the-final-verse",
+    "name": "Scroll of the Final Verse",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 0.1,
+    "value": "—",
+    "flavorText": "A scroll of singing script — the last spell a legendary archmage cast before retiring.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — One Verse More",
+          "condition": "Use the scroll to cast a spell that saves an ally's life.",
+          "reward": "You may cast the spell without needing to have personally witnessed anyone cast it, so long as you know of the spell by name and general effect."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — The Song Doesn't End",
+          "condition": "Successfully cast 3 different 6th-level spells using scrolls of this kind over the course of your adventures.",
+          "reward": "The musical-note ash the scroll leaves behind can be gathered and used as a divine focus for your next spell cast within 1 minute, granting a +1 bonus to its save DC."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 21,
+      "name": "Scroll of the Final Verse"
+    }
+  },
+  {
+    "id": "powdered-star-iron",
+    "name": "Powdered Star-Iron",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 1.5,
+    "value": "—",
+    "flavorText": "A pouch of silvery dust ground from a fragment of a fallen star.",
+    "consumable": {
+      "consumableCategory": "coating",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — Iron From the Sky",
+          "condition": "Use star-iron-coated weapons to deal a combined 100 damage to creatures normally resistant or immune to non-magical damage.",
+          "reward": "The coating now lasts 8 hours instead of 1, and the bonus damage increases to 1d8."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — The Weapon Remembers the Stars",
+          "condition": "Coat 5 different weapons with star-iron powder over the course of your adventures.",
+          "reward": "You can now coat two weapons from a single application (yours and one ally's, or two of your own), so long as both are coated within the same minute."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 22,
+      "name": "Powdered Star-Iron"
+    }
+  },
+  {
+    "id": "tears-of-the-unburied-queen",
+    "name": "Tears of the Unburied Queen",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 1,
+    "value": "—",
+    "flavorText": "A crystal vial of tears wept by a queen who refused to die before finishing her revenge.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "6d10+12"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — A Queen's Grief",
+          "condition": "Use the tears to cure a curse or disease on an ally, not yourself.",
+          "reward": "Future uses restore an additional 2d10 HP, and the weeping period no longer causes disadvantage on Perception checks during it."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — Buried No Longer",
+          "condition": "Use 3 vials of these tears over the course of your adventures.",
+          "reward": "The cure effect now also removes one level of exhaustion in addition to curing curses and disease."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 23,
+      "name": "Tears of the Unburied Queen"
+    }
+  },
+  {
     "id": "signet-of-the-forgotten-house",
     "name": "Signet of the Forgotten House",
     "itemType": "armor",
@@ -18649,6 +20285,151 @@
       "tier": "legendary",
       "index": 30,
       "name": "Hammer of Thunderbolts"
+    }
+  },
+  {
+    "id": "potion-of-supreme-healing",
+    "name": "Potion of Supreme Healing",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 0.55,
+    "value": "75000 gp",
+    "flavorText": "A brilliant ruby potion that practically glows with life.",
+    "consumable": {
+      "consumableCategory": "potion",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "10d4+20"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — More Than the Dose",
+          "condition": "Drink or administer a Potion of Supreme Healing (or another found later) 3 times over the course of your adventures.",
+          "reward": "Future potions of this kind restore an additional 2d4 HP and remove one level of exhaustion."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 32,
+      "name": "Potion of Supreme Healing"
+    }
+  },
+  {
+    "id": "spell-scroll-7th-level",
+    "name": "Spell Scroll (7th Level)",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 0.1,
+    "value": "75000 gp",
+    "flavorText": "A scroll inscribed on shimmering silver vellum, sealed with multiple overlapping wax seals.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — Well Studied",
+          "condition": "Successfully cast spells from 3 different 7th-level scrolls (found across your adventures).",
+          "reward": "The Arcana check required to cast from a 7th-level scroll not on your class list is reduced by 3, and failure no longer destroys the scroll."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 33,
+      "name": "Spell Scroll (7th Level)"
+    }
+  },
+  {
+    "id": "spell-scroll-8th-level",
+    "name": "Spell Scroll (8th Level)",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 0.05,
+    "value": "150000 gp",
+    "flavorText": "An immense scroll on stretched vellum with an 8th-level spell in golden script.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — Well Studied",
+          "condition": "Successfully cast spells from 3 different 8th-level scrolls (found across your adventures).",
+          "reward": "The Arcana check required to cast from an 8th-level scroll not on your class list is reduced by 3, and failure no longer destroys the scroll."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 34,
+      "name": "Spell Scroll (8th Level)"
+    }
+  },
+  {
+    "id": "spell-scroll-9th-level",
+    "name": "Spell Scroll (9th Level)",
+    "itemType": "consumable",
+    "rarity": "legendary",
+    "weight": 0.1,
+    "value": "50000 gp",
+    "flavorText": "A scroll contained in a sealed platinum tube. The inscription shifts as you read it.",
+    "consumable": {
+      "consumableCategory": "scroll",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — The Last Word",
+          "condition": "Successfully cast a spell from a 9th-level scroll.",
+          "reward": "The Arcana check required to cast a 9th-level scroll not on your class list is reduced by 3, and on a failed check the scroll is merely blank for 24 hours rather than destroyed."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "legendary",
+      "index": 35,
+      "name": "Spell Scroll (9th Level)"
     }
   },
   {
@@ -21117,6 +22898,49 @@
     }
   },
   {
+    "id": "chalice-of-endless-grace",
+    "name": "Chalice of Endless Grace",
+    "itemType": "consumable",
+    "rarity": "celestial",
+    "weight": 0.35,
+    "value": "—",
+    "flavorText": "A golden cup from a divine banquet where no guest ever left hungry.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "heal",
+          "healDice": "20d4+40"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — The Chalice Remembers",
+          "condition": "Drink from the Chalice on 10 separate occasions.",
+          "reward": "Each drink also removes up to 2 levels of exhaustion, and the Chalice refills twice per week instead of once."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — The Guest Who Never Leaves",
+          "condition": "Share a drink from the Chalice with 5 different allies over the course of your adventures.",
+          "reward": "Once per month, the Chalice can be shared: all creatures within 30 ft. when it is drunk receive the same restoration (HP, conditions removed, spell slots restored) simultaneously, without using an extra weekly refill."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "celestial",
+      "index": 12,
+      "name": "Chalice of Endless Grace"
+    }
+  },
+  {
     "id": "crown-of-the-first-dawn",
     "name": "Crown of the First Dawn",
     "itemType": "armor",
@@ -21202,6 +23026,48 @@
       "tier": "celestial",
       "index": 14,
       "name": "Wings of the Fallen Choir"
+    }
+  },
+  {
+    "id": "ashes-of-a-dying-god",
+    "name": "Ashes of a Dying God",
+    "itemType": "consumable",
+    "rarity": "celestial",
+    "weight": 2,
+    "value": "—",
+    "flavorText": "The cremated remains of a minor god who chose to die so that mortals might live a little longer. There is exactly one recorded account of a person drinking this and surviving to describe the taste — they described it as starlight and regret, and declined to elaborate further. The vial is always slightly warm.",
+    "consumable": {
+      "consumableCategory": "food",
+      "effects": [
+        {
+          "kind": "utility"
+        }
+      ],
+      "uses": {
+        "max": 1
+      },
+      "usesLeft": 1
+    },
+    "narrative": {
+      "unlocks": [
+        {
+          "type": "locked",
+          "tierLabel": "Tier I — Undrunk, It Waits",
+          "condition": "Survive being reduced to 0 hit points three times while still carrying the unused vial.",
+          "reward": "When finally consumed, the advantage on attack rolls, ability checks, and saving throws lasts 8 hours instead of 1, and immediately ends one ongoing curse or magical affliction affecting the drinker."
+        },
+        {
+          "type": "locked",
+          "tierLabel": "Tier II — The God Remembers Waiting",
+          "condition": "Carry the vial, unused, for at least 30 in-game days.",
+          "reward": "When finally consumed, the drinker also gains temporary hit points equal to 10 times their character level for the duration, and can pour a single drop for one dying ally, automatically stabilizing them."
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "celestial",
+      "index": 16,
+      "name": "Ashes of a Dying God"
     }
   },
   {

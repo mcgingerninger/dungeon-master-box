@@ -13,6 +13,7 @@ import {
   loadLootData, classifySubcategory, computeItemWeight, deriveWeaponMechanics,
   deriveWeaponProperties, toStatModifiers, findSetValueOverrides, applyMaterialModifiers,
   slugify, makeIdGenerator, migrateWeapon, migrateArmor,
+  deriveConsumableCategory, resolveConsumableUses, migrateConsumable,
 } from './migrate-legacy-content.js';
 import { validateItem } from '../mechanics/engine/items/validate-item.js';
 
@@ -235,6 +236,84 @@ describe('applyMaterialModifiers — real mechanics, not classification labels',
   });
 });
 
+describe('deriveConsumableCategory', () => {
+  test('a name/effect naming a salve/ointment is "topical" even though classifySubcategory has no such concept and would default to "food"', () => {
+    assert.equal(deriveConsumableCategory('Tinned Salve', 'Applied to a wound.', 'food'), 'topical');
+  });
+  test('an "Oil of X" name is "coating", not "potion" (it is applied to a weapon, not drunk)', () => {
+    assert.equal(deriveConsumableCategory('Oil of Sharpness', '+3 to attack and damage rolls.', 'potion'), 'coating');
+  });
+  test('plain potion/scroll/food/throwable map straight across', () => {
+    assert.equal(deriveConsumableCategory('Potion of Healing', 'Restores 2d4+2 hit points.', 'potion'), 'potion');
+    assert.equal(deriveConsumableCategory('Scroll of Fireball', '', 'scroll'), 'scroll');
+    assert.equal(deriveConsumableCategory('Iron Rations', '', 'food'), 'food');
+    assert.equal(deriveConsumableCategory('Thunderstone', '', 'throwable'), 'thrown');
+  });
+});
+
+describe('resolveConsumableUses', () => {
+  test('no charges field defaults to a single use', () => {
+    assert.deepEqual(resolveConsumableUses(undefined, 'x', [], 'common'), { max: 1, note: null });
+  });
+  test('a flat numeric string is used as-is', () => {
+    assert.deepEqual(resolveConsumableUses('3', 'x', [], 'common'), { max: 3, note: null });
+  });
+  test('"N use(s)" phrasing is parsed', () => {
+    assert.equal(resolveConsumableUses('2 uses', 'x', [], 'common').max, 2);
+  });
+  test('"N/period" is flagged and uses the flat count with no refill (matching current live behavior)', () => {
+    const ambiguous = [];
+    const result = resolveConsumableUses('1/week', 'x', ambiguous, 'common');
+    assert.equal(result.max, 1);
+    assert.equal(ambiguous.length, 1);
+    assert.ok(ambiguous[0].reason.includes('periodic refill'));
+  });
+  test('dice notation is rolled once, deterministically, and flagged', () => {
+    const ambiguous1 = []; const ambiguous2 = [];
+    const r1 = resolveConsumableUses('1d4+1 applications', "Keoghtom's Ointment", ambiguous1, 'rare');
+    const r2 = resolveConsumableUses('1d4+1 applications', "Keoghtom's Ointment", ambiguous2, 'rare');
+    assert.equal(r1.max, r2.max, 'must be deterministic across calls for the same item name');
+    assert.ok(r1.max >= 1);
+    assert.equal(ambiguous1.length, 1);
+    assert.ok(ambiguous1[0].reason.includes('dice notation'));
+  });
+});
+
+describe('migrateConsumable', () => {
+  test('clean dice-notation item.hp becomes a heal effect', () => {
+    const item = { name: 'Test Potion of Healing', desc: 'A pink vial.', type: 'consumable', gp: '150 gp', hp: '2d4+2', effect: 'Restores 2d4+2 hit points. Action to drink.' };
+    const result = migrateConsumable(item, 'uncommon', 0, makeIdGenerator(), [], []);
+    assert.deepEqual(result.consumable.effects, [{ kind: 'heal', healDice: '2d4+2' }]);
+    assert.equal(result.consumable.consumableCategory, 'potion');
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('non-dice item.hp ("10 temp HP", "Full HP") is flagged and falls back to utility, not approximated as a plain heal', () => {
+    const item = { name: 'Test Heroism Potion', desc: '', type: 'consumable', gp: '180 gp', hp: '10 temp HP', effect: 'Grants 10 temporary hit points.' };
+    const ambiguous = [];
+    const result = migrateConsumable(item, 'uncommon', 0, makeIdGenerator(), ambiguous, []);
+    assert.deepEqual(result.consumable.effects, [{ kind: 'utility' }]);
+    assert.ok(ambiguous.some(a => a.reason.includes('not plain dice notation')));
+  });
+
+  test('a consumable is never excluded — always produces a valid item even with no confidently-extractable mechanic', () => {
+    const item = { name: 'Test Weird Trinket Potion', desc: '', type: 'consumable', gp: '10 gp', effect: 'Does something strange when consumed.' };
+    const result = migrateConsumable(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.ok(result);
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('every migrated consumable passes validateItem (no passive/abilities/grants facet, which consumables cannot carry)', () => {
+    const item = { name: 'Test Ration', desc: 'Hard tack.', type: 'consumable', gp: '5 sp', effect: 'Provides one day of food.' };
+    const result = migrateConsumable(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.equal(result.passive, undefined);
+    assert.equal(result.abilities, undefined);
+    assert.ok(validateItem(result).valid);
+  });
+});
+
+const MIGRATORS_FOR_TEST = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable };
+
 describe('full migration determinism (real loot-data.js)', () => {
   test('running the migration end-to-end twice produces byte-identical canonical output', () => {
     const lootData = loadLootData();
@@ -244,10 +323,9 @@ describe('full migration determinism (real loot-data.js)', () => {
       const out = [];
       for (const tier of Object.keys(lootData)) {
         lootData[tier].forEach((item, index) => {
-          if (item.type !== 'weapon' && item.type !== 'armor') return;
-          const result = item.type === 'weapon'
-            ? migrateWeapon(item, tier, index, nextId, [], [])
-            : migrateArmor(item, tier, index, nextId, [], []);
+          const migrator = MIGRATORS_FOR_TEST[item.type];
+          if (!migrator) return;
+          const result = migrator(item, tier, index, nextId, [], []);
           if (result) out.push(result);
         });
       }
@@ -256,7 +334,7 @@ describe('full migration determinism (real loot-data.js)', () => {
     const run1 = migrateAll(nextId1);
     const run2 = migrateAll(nextId2);
     assert.deepEqual(run1, run2);
-    assert.ok(run1.length > 600, `expected the bulk of 688 weapon+armor items to migrate, got ${run1.length}`);
+    assert.ok(run1.length > 700, `expected the bulk of 753 weapon+armor+consumable items to migrate, got ${run1.length}`);
   });
 
   test('every canonical item in the committed output validates cleanly', () => {
@@ -265,16 +343,15 @@ describe('full migration determinism (real loot-data.js)', () => {
     let checked = 0;
     for (const tier of Object.keys(lootData)) {
       lootData[tier].forEach((item, index) => {
-        if (item.type !== 'weapon' && item.type !== 'armor') return;
-        const result = item.type === 'weapon'
-          ? migrateWeapon(item, tier, index, nextId, [], [])
-          : migrateArmor(item, tier, index, nextId, [], []);
+        const migrator = MIGRATORS_FOR_TEST[item.type];
+        if (!migrator) return;
+        const result = migrator(item, tier, index, nextId, [], []);
         if (!result) return;
         const { valid, errors } = validateItem(result);
         assert.ok(valid, `${result.name}: ${errors.join('; ')}`);
         checked++;
       });
     }
-    assert.ok(checked > 600);
+    assert.ok(checked > 700);
   });
 });
