@@ -16013,16 +16013,24 @@ function parseWeaponEffectBonuses(effect) {
   }
   return { atkBonus, dmgBonus, bonusDiceClauses };
 }
+// A migrated weapon (item.__canonical, see Phase 7's equip/AC bridge above) carries its dice/
+// bonuses as structured data instead of item.dmg/.effect prose — canonicalWeaponAttackData
+// (game-engine.js) reads it directly. This also fixes, for migrated weapons only, a real
+// already-live bug: item.dmg's embedded flat modifier (e.g. "1d8+1") and a redundant "+N to
+// attack and damage rolls" effect-text phrase used to sum independently here, double-counting the
+// same authored bonus (see docs/V2_MECHANICS_MIGRATION.md) — the migration reconciled that into a
+// single passive damageRoll entry, so bridged.damageDice never has a modifier left to double.
 function computeWeaponAttackRoll(item, sheet) {
-  const dmgRaw = String(item.dmg || '').trim();
+  const bridged = item.__canonical ? canonicalWeaponAttackData(item.__canonical) : null;
+  const dmgRaw = bridged ? bridged.damageDice : String(item.dmg || '').trim();
   const dmgMatch = dmgRaw.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
-  const finesse = /finesse/i.test(item.effect || '');
+  const finesse = bridged ? bridged.finesse : /finesse/i.test(item.effect || '');
   const strMod = sheet.abilities.str.mod;
   const dexMod = sheet.abilities.dex.mod;
   const useDex = finesse && dexMod > strMod;
   const abilityMod = useDex ? dexMod : strMod;
   const abilityLabel = useDex ? 'DEX' : 'STR';
-  const { atkBonus, dmgBonus, bonusDiceClauses } = parseWeaponEffectBonuses(item.effect);
+  const { atkBonus, dmgBonus, bonusDiceClauses } = bridged || parseWeaponEffectBonuses(item.effect);
   const d20 = rn(1, 20);
   const isCrit = d20 === 20;
   const isFumble = d20 === 1;

@@ -336,12 +336,40 @@ entries — 1215 migrated items minus the 8 `npc-data.js` ones, which aren't par
 equipped a migrated body-armor item and a migrated shield together, and confirmed the computed AC
 matches the expected base-replace-then-flat-add math with no console errors from the bridge itself.
 
+## Phase 8: wiring migrated weapons' attack rolls into the live app
+
+`computeWeaponAttackRoll` (the monolith — the "⚔ Attack" button on an equipped weapon, and the
+Battlefield tab's monster-targeting attack, both of which call this one function) now reads a
+migrated weapon's canonical `weapon.damageDice`/`bonusDamage`/`properties` and passive
+`attackRoll`/`damageRoll` mods via a new `canonicalWeaponAttackData` (`game-engine.js`), the same
+`item.__canonical`-first pattern Phase 7 established — a not-yet-migrated weapon's behavior is
+completely unchanged. `parseWeaponEffectBonuses` (the monolith's own `.effect`-regexing function)
+itself is untouched, just no longer called for a migrated weapon.
+
+This fixes, live, the exact double-counted-damage-bonus bug documented above: a migrated weapon's
+`weapon.damageDice` is deliberately the base dice only (the migration already reconciled `dmg`'s
+embedded flat modifier against a redundant "+N to damage rolls" text phrase into one passive
+`damageRoll` entry), so there is no modifier left in the dice string for `dmgBonus` to double.
+Verified directly against `"Longsword +1"` (`dmg:"1d8+1"`, `effect:"+1 to attack and damage
+rolls..."` — the same item the bug was originally found against) with a fixed d20/damage roll: the
+live app now computes 8 total damage where it previously computed 9.
+
+Reused, not reimplemented: `canonicalWeaponAttackData` reads the SAME `passive` array structure
+Phase 7's `canonicalPassiveDeltas` already consumes (just filtering for `attackRoll`/`damageRoll`
+instead of ability/AC/etc. keys) and the SAME `weapon.bonusDamage`/`properties` fields the migration
+script itself populates — no new data shape introduced. `mechanics/engine/combat/attack.js`'s
+`resolveAttack` (a full d20-vs-target-AC resolution) was deliberately NOT reused here: the live
+attack modal has no target to resolve against (it just rolls and shows a breakdown, the DM applies
+it manually), so adopting `resolveAttack` would mean a UI redesign, not a drop-in — out of scope for
+this bridge, which only replaces where the numbers come from, not the interaction model.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
 completed (Phase 5), `npc-data.js`'s 8 `NPC_WEAPONS` — the one place in the legacy catalog already
-using a structured `abilities[]` pattern — are migrated (Phase 6), and equip-time stat bonuses/AC
-for migrated items are wired into the live app (Phase 7, above). What's left:
+using a structured `abilities[]` pattern — are migrated (Phase 6), equip-time stat bonuses/AC for
+migrated items are wired into the live app (Phase 7), and so are migrated weapons' attack rolls
+(Phase 8, both above). What's left:
 
 1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
    different type than authored (ability-score-boosting "Manual of ___" tomes classified as
@@ -353,17 +381,8 @@ for migrated items are wired into the live app (Phase 7, above). What's left:
    likely the easiest slice), `reference-data.js`, and `cult-data.js`, plus the modifier/enhancement
    content pool for magic items beyond mundane weapons/armor. None of this is item content, so none
    of it fits this migration's `Item` schema directly — each needs its own scoping pass.
-3. The rest of wiring `mechanics/engine/**` into the live app, beyond Phase 7's equip/AC slice:
-   - **Weapon attack rolls** — `computeWeaponAttackRoll`/`parseWeaponEffectBonuses` (the monolith)
-     still regex `.dmg`/`.effect` for every weapon, migrated or not, including the still-live
-     double-counted-damage-bonus bug's ORIGINAL form for anything computed outside this migration's
-     data (the migration fixes it in `canonical/items.json`; the live attack-roll code path itself
-     is unchanged). Bridging this means reading `item.weapon.damageDice`/`bonusDamage`/passive
-     `attackRoll`/`damageRoll` mods for a migrated weapon instead — real reuse of
-     `mechanics/engine/combat/attack.js`'s `getAttackBonus`/`getDamageBonus` is possible, but
-     `resolveAttack`'s vs.-target-AC resolution model doesn't match the live attack modal's
-     no-target "roll and show the breakdown" shape, so this needs either a narrower dice/bonus-only
-     reuse or a UI change, not a drop-in.
+3. The rest of wiring `mechanics/engine/**` into the live app, beyond Phases 7-8's equip/AC/weapon-
+   attack slice:
    - **Consumable use** — `handleItemActivation` (the monolith) mutates `item.charges` as a
      free-text string (`"3 uses"` -> `"2 uses"`); the canonical schema's `consumable.uses.max`/
      `usesLeft` is a structured `{max, usesLeft}` pair. These are two incompatible charge

@@ -606,6 +606,26 @@ function canonicalAcContribution(canonicalItem) {
   return armor.additive ? { flatAmount: armor.baseAC } : { replaceBase: armor.baseAC };
 }
 
+// Structured equivalent of parseWeaponEffectBonuses (dungeon_loot_wheel_v102_spell_details.html)
+// for a migrated weapon's canonical `weapon` facet, consumed by that same file's
+// computeWeaponAttackRoll. Reads pre-computed atkBonus/dmgBonus/bonusDamage/finesse directly
+// instead of regexing .effect — and, unlike the live regex path, can never reproduce
+// dungeon-master-box's own confirmed double-counted-damage-bonus bug (see
+// docs/V2_MECHANICS_MIGRATION.md): the migration already reconciled a weapon's `dmg` field's
+// embedded flat modifier against a redundant "+N to damage rolls" effect-text phrase into a single
+// passive `damageRoll` entry (scripts/migrate-legacy-content.js's migrateWeapon), and
+// `weapon.damageDice` itself is deliberately the BASE dice only, with no modifier baked in, so
+// nothing here can double what a not-yet-migrated item's own live regex path still can.
+export function canonicalWeaponAttackData(canonicalItem) {
+  const weapon = (canonicalItem && canonicalItem.weapon) || {};
+  const passive = (canonicalItem && canonicalItem.passive) || [];
+  const atkBonus = passive.filter(m => m.stat === 'attackRoll').reduce((sum, m) => sum + m.value, 0);
+  const dmgBonus = passive.filter(m => m.stat === 'damageRoll').reduce((sum, m) => sum + m.value, 0);
+  const bonusDiceClauses = (weapon.bonusDamage || []).map(({ dice, type }) => ({ dice, type }));
+  const finesse = (weapon.properties || []).includes('finesse');
+  return { damageDice: weapon.damageDice || '', atkBonus, dmgBonus, bonusDiceClauses, finesse };
+}
+
 export function collectEquippedStatBreakdown(slots, resolveItem) {
   const breakdown = {};
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {

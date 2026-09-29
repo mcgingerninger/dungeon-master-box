@@ -164,6 +164,39 @@ describe('migrated-item bridge: computeCharacterSheetFor reads a canonical `pass
   });
 });
 
+describe('migrated-item bridge: canonicalWeaponAttackData (feeds computeWeaponAttackRoll in the monolith, not tested here directly — see game-engine.js\'s header comment on why the monolith stays outside this file)', () => {
+  test('sums attackRoll/damageRoll passive mods and passes bonusDamage/finesse through from the weapon facet', () => {
+    const canonical = {
+      weapon: { damageDice: '1d8', bonusDamage: [{ dice: '2d6', type: 'fire' }], properties: ['finesse'] },
+      passive: [{ stat: 'attackRoll', value: 1 }, { stat: 'damageRoll', value: 1 }],
+    };
+    assert.deepEqual(GE.canonicalWeaponAttackData(canonical), {
+      damageDice: '1d8', atkBonus: 1, dmgBonus: 1,
+      bonusDiceClauses: [{ dice: '2d6', type: 'fire' }],
+      finesse: true,
+    });
+  });
+  test('never double-counts: a weapon.dmg field embedding a "+1" (dungeon-master-box\'s own live bug) is not how a migrated item carries its bonus — damageDice is base dice only, the +1 lives solely in the damageRoll passive entry', () => {
+    // This is the exact "Longsword +1" shape the migration itself reconciles (dmg:"1d8+1",
+    // effect:"+1 to attack and damage rolls...") — by the time it's canonical, the dice string no
+    // longer carries the modifier at all, so there is nothing left to double.
+    const canonical = { weapon: { damageDice: '1d8' }, passive: [{ stat: 'attackRoll', value: 1 }, { stat: 'damageRoll', value: 1 }] };
+    const bridged = GE.canonicalWeaponAttackData(canonical);
+    assert.equal(bridged.damageDice, '1d8');
+    assert.equal(bridged.dmgBonus, 1); // applied once, not baked into damageDice AND counted again
+  });
+  test('a weapon with no attackRoll/damageRoll/bonusDamage/finesse returns all-zero/empty defaults, not undefined', () => {
+    assert.deepEqual(GE.canonicalWeaponAttackData({ weapon: { damageDice: '1d6' } }), {
+      damageDice: '1d6', atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [], finesse: false,
+    });
+  });
+  test('degrades gracefully (empty damageDice, no crash) for a canonical item with no weapon facet at all', () => {
+    assert.deepEqual(GE.canonicalWeaponAttackData({ itemType: 'wondrous' }), {
+      damageDice: '', atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [], finesse: false,
+    });
+  });
+});
+
 describe('battle: parsing, damage, effectiveness', () => {
   test('parses to-hit, multiple damage clauses with types, and save DC', () => {
     const parsed = GE.battleParseAttack('Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 19 (2d10+8) piercing damage plus 11 (2d10) psychic damage. If the target is a creature, it must succeed on a DC 15 Constitution saving throw.');
