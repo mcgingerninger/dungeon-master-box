@@ -827,6 +827,33 @@ Also not touched: the DM's offline "Apply to Player" tool (`applyItemEffectToSta
 (not even `npc-data.js`'s hand-authored ones), so this stays consistent with that existing, unrelated
 scope boundary rather than expanding it as a side effect of this fix.
 
+### The DM foreign-view `item.abilities` bridge — checked, no gap found (verified, not assumed)
+
+`ensureBridgedAbilities` above only matters where something actually reads `item.abilities` — worth
+checking directly whether the DM's Players-tab view of another player's gear (`resolveForeignItem`/
+`buildForeignDollHtml`/`buildForeignInventoryGridHtml`/`buildPlayerUnlocksHtml`) is such a place,
+the same way Phase 12/14b's `attachCanonicalIfMigrated` bridge genuinely was needed there for AC/
+weapon-attack/heal. It is not, and for a clean structural reason rather than an oversight this phase
+happened to dodge: none of those builders reference `.abilities` at all (confirmed by inspecting each
+function's own source, not just reasoning about it) — the DM's read-only view of a foreign player's
+equipped/inventory items only ever shows a name, an icon, and a "click to take" action
+(`dmTakeViewedPlayerSlotItem`/`dmTakeViewedPlayerInventoryItem`); there is no ability bar, no
+activate button, nothing that would ever need a bridged `item.abilities` array for a player who isn't
+the acting account. `activateStructuredAbility` itself only ever operates on `playerSlots`, which is
+always the acting account's own — this was already true before Phase 15, not something it changed.
+
+The one place this bridge's absence COULD have mattered — a DM taking a migrated item out of a
+foreign player's gear into their own inventory — turns out already correctly handled by an existing
+mechanism, `placeItemIntoInventory`'s own shallow-copy-plus-deep-clone-abilities step (predates this
+migration, originally written for hand-authored `npc-data.js` abilities). Verified live, both shapes:
+a tome the foreign player had ALREADY read (their own `ensureBridgedAbilities` already ran on their
+end, `usesLeft` already 0, synced normally like any other item field since it's a real, serialized
+per-instance property) keeps `usesLeft: 0` — not silently reset to usable again — when a DM takes it,
+via a genuinely independent cloned array, not a shared reference. A tome the foreign player never
+touched (still only `__canonical`-backed, exactly as Phase 14b's `applyViewedPlayerState` pass leaves
+it) correctly carries `__canonical` through the take, and bridges into a fresh, real, usable ability
+the first time the DM equips and reads it themselves. No code change needed; both paths already work.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
