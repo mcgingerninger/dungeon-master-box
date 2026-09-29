@@ -479,15 +479,41 @@ character sheet reflects the REAL canonical passive value through the Phase 7 br
 re-parse of the display text (which happens to say the same thing, by design, but is no longer the
 source of truth).
 
+## Phase 12: an already-existing save now upgrades itself the moment it loads
+
+Closes the one gap Phase 10 explicitly left open. `applyStateBlob` — the single load path for both
+`localStorage` and a remote multiplayer sync (same shape either way) — now runs every item in
+`data.savedGeneratedItems` through the same `attachCanonicalIfMigrated` lookup `inferItemMetadata`
+and `buildTokenIndex` already use, right where it assigns the array. A save written before Phase 7
+existed has no `__canonical` in its JSON at all (there was nothing to write it); this attaches it
+fresh, once, the first time that save loads, the same "clean up something an older save left behind"
+pattern this same function already uses for a stale `modWeights` field below it.
+
+The three attachment sites (`inferItemMetadata`, `buildTokenIndex`, and this one) were pulled into
+one shared `attachCanonicalIfMigrated(item, rarity)` helper at the same time, replacing three copies
+of the identical lookup with one.
+
+Verified live: built a plain object with the exact shape an old save's JSON would have (no
+`__canonical` property at all — "Longsword +1", legacy `dmg`/`effect` fields only), ran it through
+`applyStateBlob` as if it had just loaded from `localStorage`, and confirmed the item carries a real
+`__canonical.weapon` afterward.
+
+**Still not covered:** a DM viewing another player's sheet reads that player's items via
+`resolveForeignItem`/`foreignSavedGeneratedItems`, which arrives through the multiplayer sync layer
+(`multiplayer-sync.js`/`server/websocket.js`), not through `applyStateBlob` — tracing that entire
+call graph to attach the same upgrade there wasn't done this pass. It degrades the same way
+everything else here does when uncovered: the DM's view of that one item falls back to the original
+`.effect`/`.ac`/`.dmg` regex path, not an error or a crash, just not yet upgraded.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
 completed (Phase 5), `npc-data.js`'s 8 `NPC_WEAPONS` — the one place in the legacy catalog already
 using a structured `abilities[]` pattern — are migrated (Phase 6), equip-time stat bonuses/AC,
 weapon attack rolls, and consumable healing for migrated items are wired into the live app (Phases
-7-9), that bridge now follows a looted item into a player's actual inventory, not just the catalog
-(Phase 10), and a real Combat-kill monster-part drop now builds through the real engine (Phase 11,
-all above). What's left:
+7-9), that bridge now follows a looted item into a player's actual inventory (Phase 10) and an
+already-existing save (Phase 12), and a real Combat-kill monster-part drop now builds through the
+real engine (Phase 11, all above). What's left:
 
 1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
    different type than authored (ability-score-boosting "Manual of ___" tomes classified as
@@ -511,8 +537,9 @@ all above). What's left:
      also that `canInteract(item, 'equip')` itself is never actually called anywhere in the live
      app (equip is gated by `getTokenSlotType`/`SLOT_CATEGORY` instead), so there was never a live
      "equip" interaction to bridge in the first place. `mechanics/engine/items/interactions.js`'s
-     narrower table remains for when `mechanics/engine/character/equipment.js`'s own inventory model
-     is eventually adopted (see item 4) — it isn't a live gap today.
+     narrower table remains for when `mechanics/engine/character/equipment.js`'s own instanceId-based
+     inventory model is eventually adopted (see Phase 7's "What this is not" above) — it isn't a live
+     gap today.
    - **Attunement is a new feature, not a preservation gap, and was deliberately left out.** There
      is no attunement-limit enforcement anywhere in the live app today (no "Attune" button, no
      cap-checking code) — `itemRequiresAttunement`/`requiresAttunement` exist on both sides but the
@@ -523,16 +550,10 @@ all above). What's left:
      has no canonical-schema equivalent at all yet. It keeps accepting whatever shape of item it's
      handed (the Phase 11 wrapper is still legacy-shaped, so this already works unchanged) — genuine
      new design work if it's ever worth modeling grafts as their own canonical concept.
-4. Save-compatibility for an item already sitting in an OLDER save file, from before Phase 10
-   existed. Phase 10 covers every item looted/purchased/saved from now on (it resolves
-   `__canonical` at the moment an item is actually saved, not just when browsing the catalog); an
-   item already sitting in `savedGeneratedItems` from an existing save was persisted without it,
-   and `__canonical` isn't itself part of the saved JSON (it's re-attached fresh from
-   `CANONICAL_BY_LEGACY_KEY` on load, not serialized) — so an existing save's items load exactly as
-   they did before Phase 7, not broken, just not yet upgraded. A real fix is a one-time pass at load
-   time running every already-saved item through the same `name`+`rarity` lookup
-   `inferItemMetadata` now does — low-risk (same lookup, same idempotent `__canonical === undefined`
-   guard), just not done yet.
+4. A DM viewing another player's sheet via `resolveForeignItem`/`foreignSavedGeneratedItems` (the
+   multiplayer sync layer, not `applyStateBlob`) doesn't get Phase 12's upgrade pass — see Phase
+   12's "Still not covered" note above. Degrades to the pre-Phase-7 regex path for that one item,
+   for that one viewer, not an error.
 5. Shadow-mode comparison in the live app (old regex-computed result vs. new structured result) for
    a real validation pass before making the new engine authoritative for anything user-facing.
 
