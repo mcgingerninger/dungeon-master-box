@@ -13970,7 +13970,18 @@ function pickTier(arr,r){
 // not meant to be handed out by general loot sources. Parts are only ever meant to come from
 // actually defeating that specific monster (rollMonsterCombatLoot's own generateMonsterPart
 // call), so every random-pick pool drawn straight from lootData filters them back out first.
-function isMonsterPartItem(it) { return it.type === 'craftable' && it.subcategory === 'monsterpart'; }
+//
+// Real bug found in testing: this used to check subcategory === 'monsterpart' only, which is
+// the COMBINE-mode half of MONSTER_PARTS (raw crafting material, buildMonsterPartItemV2's
+// `else` branch) — the EQUIP-mode half (worn charms, subcategory 'charm') slipped straight
+// through every pool below unfiltered, since 'charm' never matched. With up to ~1,700
+// creatures × ~12 equip-eligible part defs each, that's potentially thousands of unfiltered
+// "charm" items diluting chest/corpse/random-loot rolls — exactly the reported symptom (rolls
+// mostly returning monster parts). type:'craftable' is never used by any hand-authored
+// loot-data.js item (confirmed directly, not assumed) — it's exclusively how a generated
+// monster part is tagged, both modes — so checking `type` alone is both correct and simpler
+// than re-listing every current and future part subcategory here.
+function isMonsterPartItem(it) { return it.type === 'craftable'; }
 // Wheel results now receive the same GP category and variable quality fields as generated items.
 function pickItem(rarity) {
   const pool=(lootData[rarity]||[]).filter(it => !isMonsterPartItem(it));
@@ -14914,7 +14925,7 @@ function setTokenSlotOverride(key, value) {
 function isTokenDiscardable(e) {
   if (!e || !e.key) return false;
   if (e.key.indexOf('gen:') === 0) return true;
-  return !!(e.item && e.item.type === 'craftable' && e.item.subcategory === 'monsterpart');
+  return !!(e.item && isMonsterPartItem(e.item));
 }
 
 // showSlotSelect defaults true (Trader sell grid, Monster Mangler's "Your Items" grid both
@@ -17908,7 +17919,7 @@ function monsterActionsHtml(list, label) {
 function monsterPossibleDropsHtml(monster) {
   const tier = monsterRarityTier(monster, null);
   const parts = (lootData[tier] || []).filter(it =>
-    it.type === 'craftable' && it.subcategory === 'monsterpart' && it.sourceMonster === monster.name);
+    isMonsterPartItem(it) && it.sourceMonster === monster.name);
   const body = parts.length
     ? `<div class="monster-drops-grid">${parts.map(it => {
         classifyItemFull(it, tier);
@@ -19042,7 +19053,7 @@ function rollMonsterCombatLoot(entry) {
     // premade parts mixed in with ordinary gear (see generatePremadeMonsterParts), so without
     // this an Owl kill could just as easily hand back a Water Elemental Tongue. Parts are
     // sourced from the actual monster below instead, via generateMonsterPart(entry.monster).
-    const pool = (lootData[r] || []).filter(it => !usedNames.has(it.name) && !(it.type === 'craftable' && it.subcategory === 'monsterpart'));
+    const pool = (lootData[r] || []).filter(it => !usedNames.has(it.name) && !isMonsterPartItem(it));
     if (!pool.length) continue;
     const raw = ri(pool);
     usedNames.add(raw.name);
@@ -23541,7 +23552,7 @@ function removeTokenEverywhere(key) {
     // _lastGenTokenKeys list before re-adding whatever's currently in savedGeneratedItems, so
     // deleting it here too is redundant but harmless.
     delete TOKEN_INDEX[key];
-  } else if (entry && entry.item && entry.item.type === 'craftable' && entry.item.subcategory === 'monsterpart' && lootData[entry.rarity]) {
+  } else if (entry && entry.item && isMonsterPartItem(entry.item) && lootData[entry.rarity]) {
     const idx = lootData[entry.rarity].indexOf(entry.item);
     if (idx !== -1) lootData[entry.rarity].splice(idx, 1);
     // lootData's total length just changed, so buildTokenIndex's cache-invalidation check
