@@ -547,22 +547,56 @@ that as expected rather than flag it. The other three were real bugs, found and 
   fix is narrow and only fires alongside an explicit "total" in the text: any `ac` passive entry
   still remaining after the existing exact-value dedup is dropped and flagged ambiguous for manual
   confirmation, rather than risk carrying a similarly-inflated phantom bonus into the schema.
-- **Found, not yet fixed — flagged here rather than expanded into scope:** `parseWeaponEffectBonuses`'s
-  guard clause (excluding "when/while/with/made/only" immediately after "to attack rolls") means the
-  live app already fails to parse "+1 to attack rolls only (not damage)" — the exact masterwork-
-  style phrasing — as ANY bonus at all, even though "only" here means "not also to damage," not a
-  condition the guard was meant to exclude. Separately, `"+4 attack and damage."` (no trailing
-  "rolls") doesn't match either the combo or single-stat regex, both of which require the literal
-  word "rolls" — `"The Fair Warning"` (`"+4 attack and damage. Range 200/800..."`) loses its entire
-  attack-roll bonus in both the live app AND the migrated data as a result (its damage bonus alone
-  survives, from `dmg`'s own embedded `+4`). Both are real, already-live gaps in `parseWeaponEffectBonuses`
-  itself — confirmed identical between old and new, so shadow-mode correctly does NOT flag them (old
-  and new agree) — but they're real bugs in the live regex path worth a dedicated look outside this
-  migration's own scope.
+- **`"+N attack and damage."` (no trailing "rolls") — a much bigger find than it first looked, fixed
+  in both copies.** `parseWeaponEffectBonuses`'s combo regex required the literal word "rolls" after
+  "attack and damage" — but 50 of this catalog's named magic weapons, nearly every iconic one
+  (Vorpal Sword, Holy Avenger, Luck Blade, Sword of Answering, Nine Lives Stealer, and more), are
+  phrased "+N attack and damage." with no "to" and no trailing "rolls" at all. That phrasing never
+  matched anything, so all 50 rolled with ZERO of their own stated bonus — in the live app AND the
+  migrated data alike. "to" and "rolls" are both optional now, in this function's monolith copy AND
+  its `scripts/migrate-legacy-content.js` copy identically; every existing "+N to attack and damage
+  rolls"-phrased item still matches exactly as before. Verified live against the real catalog entry:
+  "Vorpal Sword" now deals 11 damage on a fixed roll instead of the previous 8 (its own "+3" was
+  simply never applied before).
+  - **A real regex bug found while fixing this, in this migration's OWN new code, not a pre-existing
+    one — caught and fixed before it shipped.** Making "rolls" optional let the negative-lookahead
+    guard (`\b(?!\s*(when|while|with|made|only))`, embedded in the pattern) be backtracked around: for
+    text like "+2 to attack and damage rolls while raging.", failing the guard right after "rolls"
+    (since "while" follows) let the engine simply retry WITHOUT consuming "rolls" — landing right
+    before " rolls while raging", where the guard harmlessly sees "rolls" (not an excluded word) and
+    passes, silently applying a bonus the guard exists specifically to exclude. Fixed by moving the
+    guard out of the regex into a separate post-match check (`isGuardedSuffix`) against wherever the
+    match actually ended, greedy "rolls" included — no backtracking loophole possible.
+  - **A second, real gap found the same way: a CONDITIONAL bonus phrased as a PRECEDING clause, not
+    the trailing "when/while/..." the existing guard already excludes.** "Hammer of Thunderbolts":
+    `"...While attuned with Belt of Giant Strength AND Gauntlets of Ogre Power: +5 attack and
+    damage..."` is only active under that specific two-item condition, not always-on like the 50 the
+    "rolls"-optional fix was meant to help — the broadened regex would have matched it anyway.
+    `isConditionallyPrefixed` catches this shape (a while/if/when clause, ending in a colon,
+    immediately before the match, within the current sentence) and skips it — confirmed by scanning
+    the full catalog to be the only weapon phrased this way today.
+- **Found, not fixed — flagged here rather than expanded into further scope:**
+  - `parseWeaponEffectBonuses`'s trailing guard also excludes "+1 to attack rolls **only** (not
+    damage)" — the exact masterwork-style phrasing — since "only" is in the guard's exclusion list
+    (meant for "only when X", a real condition) but here means "not *also* to damage," a scope
+    clarification, not a condition. Confirmed to affect exactly 1 weapon in the catalog
+    ("Masterwork Longsword" — its real mechanic still applies correctly regardless, via the
+    materials system rather than this text).
+  - The separate `bonusDiceRe` regex (`/(\d+d\d+...)\s+([a-z]+)?\s*damage/gi`, extracting "bonus
+    elemental damage dice" riders like Flame Tongue's "+2d6 fire") has no way to distinguish a
+    genuine bonus-damage rider from a weapon's own BASE damage restated in flavor text — "Hammer of
+    Thunderbolts": `"Deals 2d6+1 bludgeoning damage..."` gets read as an extra `2d6+1` bonus dice
+    clause on top of its own (identical) `dmg` field, and `"Giant-slaying: +2d6 additional
+    damage..."` gets read with `type:"additional"` (the word right before "damage", not a real
+    damage type) instead of the intended `type:"force"`-or-similar. Discovered while writing this
+    phase's own tests (not something shadow-mode's current checks cover at all — this function isn't
+    part of the stat/AC/weapon-attack/consumable-heal comparisons yet) — real, but unknown in scope
+    across the catalog; not investigated further this pass.
 
 Current result: `npm run validate-migration` checks all 1207 loot-data.js-sourced migrated items and
-reports zero unexpected divergences (88 armor AC dedups, 291 weapon damage dedups, 1 AC "total"
-recap drop, 2 masterwork attackRoll additions — all individually confirmed, not just counted).
+reports zero unexpected divergences (88 armor AC dedups, 343 weapon damage dedups — up from 291 after
+the "rolls"-optional fix — 1 AC "total" recap drop, 2 masterwork attackRoll additions — all
+individually confirmed, not just counted).
 
 ## Not yet done (future phases, same approach)
 
@@ -614,12 +648,14 @@ the live regex path it replaces (Phase 13, all above). What's left:
    multiplayer sync layer, not `applyStateBlob`) doesn't get Phase 12's upgrade pass — see Phase
    12's "Still not covered" note above. Degrades to the pre-Phase-7 regex path for that one item,
    for that one viewer, not an error.
-5. `parseWeaponEffectBonuses`'s guard clause and its "rolls"-only phrasing requirement have real,
-   already-live gaps (found by Phase 13's shadow-mode validation, documented there in detail) — a
-   weapon phrased "+N to attack rolls only (not damage)" or "+N attack and damage." (no trailing
-   "rolls") loses its bonus entirely, in the live app and the migrated data alike. Confirmed
-   identical between old and new (so not a migration regression), but a real bug in the live regex
-   path worth its own fix outside this migration's scope.
+5. Two small residual gaps in `parseWeaponEffectBonuses`, found by Phase 13's shadow-mode
+   validation and documented there in detail (the "+N attack and damage" no-"rolls" gap affecting
+   50 weapons, and a conditional-prefix false-positive risk, were both found AND fixed in Phase 13
+   itself — these two are the ones that weren't): the guard clause's "only" exclusion means "+1 to
+   attack rolls only (not damage)" still parses as no bonus at all (affects exactly 1 weapon,
+   "Masterwork Longsword" — its real mechanic still applies via the materials system regardless);
+   and the separate bonus-elemental-damage-dice regex can't tell a genuine bonus rider apart from a
+   weapon's own base damage restated in flavor text (scope across the catalog not investigated).
 
 ## Running the migration tool
 

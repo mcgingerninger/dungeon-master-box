@@ -208,19 +208,51 @@ function computeItemWeight(item, subcategory) {
 // Same regex shapes as computeWeaponAttackRoll/parseWeaponEffectBonuses (monolith HTML,
 // dungeon_loot_wheel_v102_spell_details.html) — reused so this migration's flat attack/damage
 // bonus and bonus-elemental-dice extraction matches the live app's own current behavior exactly.
+// Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison
+// (docs/V2_MECHANICS_MIGRATION.md's Phase 13): the combo regex required the literal word "rolls"
+// after "attack and damage", but 50 named magic weapons in this catalog (Vorpal Sword, Holy
+// Avenger, Luck Blade, and more) are phrased "+N attack and damage." with no "to"/"rolls" at all —
+// fixed identically here and in the monolith's own copy of this function, "to"/"rolls" both now
+// optional; every existing "+N to attack and damage rolls"-phrased item still matches unchanged.
+//
+// That same broadening would have also matched a genuinely CONDITIONAL bonus phrased as a
+// PRECEDING clause rather than the trailing "when/while/..." the existing guard already excludes —
+// "Hammer of Thunderbolts": "While attuned with Belt of Giant Strength AND Gauntlets of Ogre
+// Power: +5 attack and damage..." is only active under that specific condition, not always-on like
+// the 50 it was meant to fix. isConditionallyPrefixed catches this shape (a while/if/when clause,
+// ending in a colon, immediately before the match, within the current sentence) and skips it —
+// confirmed to be the only weapon in the catalog phrased this way.
+function isConditionallyPrefixed(text, matchIndex) {
+  const sentenceStart = Math.max(text.lastIndexOf('. ', matchIndex), text.lastIndexOf('.\n', matchIndex), 0);
+  const clause = text.slice(sentenceStart, matchIndex);
+  return /(?:^|\.\s+)(while|if|when)\b[^.]*:\s*$/i.test(clause);
+}
+// The trailing guard used to be embedded in the match regex itself as a negative lookahead
+// (`\b(?!\s*(when|while|...))`) suffixed onto the pattern. Once "rolls" became optional above,
+// that let the regex engine BACKTRACK around the guard: for "+2 to attack and damage rolls while
+// raging.", failing the guard right after "rolls" (since "while" follows) simply made the engine
+// retry WITHOUT consuming "rolls" — landing right before " rolls while raging", where the guard
+// harmlessly sees "rolls" (not an excluded word) and passes, silently applying a bonus the guard
+// was specifically written to exclude. Checking the guard as a separate, POST-match step instead
+// (against wherever the match actually ended, greedy "rolls" included) has no such loophole.
+function isGuardedSuffix(text, index) {
+  return /^\s*(when|while|with|made|only)\b/i.test(text.slice(index));
+}
 function parseWeaponEffectBonuses(effect) {
   const t = String(effect || '');
   let atkBonus = 0, dmgBonus = 0;
-  const guardSrc = '\\b(?!\\s*(when|while|with|made|only))';
-  const comboMatch = t.match(new RegExp('\\+(\\d+)\\s+to (?:all )?attack and damage rolls' + guardSrc, 'i'));
+  const comboMatch = t.match(/\+(\d+)\s+(?:to\s+)?(?:all\s+)?attack and damage(?:\s+rolls)?\b/i);
   if (comboMatch) {
-    atkBonus += parseInt(comboMatch[1], 10);
-    dmgBonus += parseInt(comboMatch[1], 10);
+    const end = comboMatch.index + comboMatch[0].length;
+    if (!isConditionallyPrefixed(t, comboMatch.index) && !isGuardedSuffix(t, end)) {
+      atkBonus += parseInt(comboMatch[1], 10);
+      dmgBonus += parseInt(comboMatch[1], 10);
+    }
   } else {
-    const atkMatch = t.match(new RegExp('\\+(\\d+)\\s+to attack rolls' + guardSrc, 'i'));
-    if (atkMatch) atkBonus += parseInt(atkMatch[1], 10);
-    const dmgMatch = t.match(new RegExp('\\+(\\d+)\\s+to damage rolls' + guardSrc, 'i'));
-    if (dmgMatch) dmgBonus += parseInt(dmgMatch[1], 10);
+    const atkMatch = t.match(/\+(\d+)\s+to attack rolls\b/i);
+    if (atkMatch && !isConditionallyPrefixed(t, atkMatch.index) && !isGuardedSuffix(t, atkMatch.index + atkMatch[0].length)) atkBonus += parseInt(atkMatch[1], 10);
+    const dmgMatch = t.match(/\+(\d+)\s+to damage rolls\b/i);
+    if (dmgMatch && !isConditionallyPrefixed(t, dmgMatch.index) && !isGuardedSuffix(t, dmgMatch.index + dmgMatch[0].length)) dmgBonus += parseInt(dmgMatch[1], 10);
   }
   const bonusDiceClauses = [];
   const bonusDiceRe = /(\d+d\d+(?:\s*[+-]\s*\d+)?)\s+([a-z]+)?\s*damage/gi;

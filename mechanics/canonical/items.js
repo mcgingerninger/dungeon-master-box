@@ -6067,6 +6067,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -6225,6 +6229,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -13690,6 +13698,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -13726,6 +13738,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -13751,6 +13767,10 @@ const canonicalItems = [
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -13780,6 +13800,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -13996,6 +14020,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -14137,6 +14165,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14234,6 +14266,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14261,6 +14297,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14297,6 +14337,10 @@ const canonicalItems = [
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14345,6 +14389,10 @@ const canonicalItems = [
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14570,6 +14618,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14594,6 +14646,10 @@ const canonicalItems = [
       "weaponCategory": "simple"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14620,6 +14676,10 @@ const canonicalItems = [
       "weaponCategory": "simple"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14738,6 +14798,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -14864,6 +14928,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14899,6 +14967,10 @@ const canonicalItems = [
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14946,6 +15018,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -15016,6 +15092,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -15040,6 +15120,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -15103,6 +15187,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -15246,6 +15334,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -21471,6 +21563,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -21880,6 +21976,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -21998,6 +22098,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -22074,6 +22178,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -22117,6 +22225,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -22151,6 +22263,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -22467,6 +22583,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -22501,6 +22621,10 @@ const canonicalItems = [
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -22553,6 +22677,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -22616,6 +22744,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -22653,6 +22785,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -23042,6 +23178,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -23178,6 +23318,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -27259,6 +27403,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -27493,6 +27641,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27538,6 +27690,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -27589,6 +27745,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27634,6 +27794,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -27687,6 +27851,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27737,6 +27905,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27783,6 +27955,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27828,6 +28004,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -27881,6 +28061,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27930,6 +28114,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -29190,6 +29378,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -29380,6 +29572,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -31832,6 +32028,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 5
+      },
+      {
         "stat": "damageRoll",
         "value": 5
       }
@@ -31914,6 +32114,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 5
+      },
       {
         "stat": "damageRoll",
         "value": 5
@@ -32247,6 +32451,10 @@ const canonicalItems = [
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 5
+      },
       {
         "stat": "damageRoll",
         "value": 5
@@ -33166,6 +33374,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 5
       }
@@ -33223,6 +33435,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -33313,6 +33529,10 @@ const canonicalItems = [
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -33336,6 +33556,10 @@ const canonicalItems = [
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 4

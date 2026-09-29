@@ -15,7 +15,7 @@ import path from 'node:path';
 import {
   loadLootData, loadNpcWeapons, classifySubcategory, computeItemWeight, deriveWeaponMechanics,
   deriveWeaponProperties, toStatModifiers, findSetValueOverrides, applyMaterialModifiers,
-  slugify, makeIdGenerator, migrateWeapon, migrateArmor,
+  parseWeaponEffectBonuses, slugify, makeIdGenerator, migrateWeapon, migrateArmor,
   deriveConsumableCategory, resolveConsumableUses, migrateConsumable,
   deriveWondrousSlot, deriveToolCategory, migrateMisc,
   extractSpeeds, narrativeToolCategory, migrateCompanion, migrateNarrativeTool,
@@ -101,6 +101,37 @@ describe('slugify / makeIdGenerator', () => {
     assert.equal(nextId('Dagger'), 'dagger');
     assert.equal(nextId('Dagger'), 'dagger-2');
     assert.equal(nextId('Dagger'), 'dagger-3');
+  });
+});
+
+// Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison
+// (Phase 13, docs/V2_MECHANICS_MIGRATION.md): the combo regex required the literal word "rolls"
+// after "attack and damage", but 50 named magic weapons in the real catalog (Vorpal Sword, Holy
+// Avenger, Luck Blade, Sword of Answering, and more) are phrased "+N attack and damage." with no
+// "to" and no trailing "rolls" — every one of them rolled with ZERO of its own stated bonus, in
+// both the live app and the migrated data, until fixed identically in both copies of this function.
+describe('parseWeaponEffectBonuses', () => {
+  test('still matches the original "+N to attack and damage rolls" phrasing unchanged', () => {
+    assert.deepEqual(parseWeaponEffectBonuses('+1 to attack and damage rolls. Requires attunement.'), { atkBonus: 1, dmgBonus: 1, bonusDiceClauses: [] });
+  });
+  test('now also matches "+N attack and damage." with no "to" and no "rolls" (the real gap found in 50 catalog weapons)', () => {
+    assert.deepEqual(parseWeaponEffectBonuses('+3 attack and damage. Natural 20: severs target\'s head. Requires attunement.'), { atkBonus: 3, dmgBonus: 3, bonusDiceClauses: [] });
+  });
+  test('"+N attack and damage each" (paired weapons) still matches, ignoring the trailing word', () => {
+    assert.deepEqual(parseWeaponEffectBonuses('+4 attack and damage each. Finesse, light.'), { atkBonus: 4, dmgBonus: 4, bonusDiceClauses: [] });
+  });
+  // A genuinely conditional bonus phrased as a PRECEDING "While/If/When ...:" clause (not the
+  // trailing "when/while/..." the existing guard already excludes) must not be treated as always-on.
+  test('a "While attuned with X AND Y: +N attack and damage" conditional prefix is NOT treated as an always-on bonus', () => {
+    const effect = 'Deals 2d6+1 bludgeoning damage. While attuned with Belt of Giant Strength AND Gauntlets of Ogre Power: +5 attack and damage, giant hit DC 17 Wisdom or Frightened of you for 1 minute. Requires attunement.';
+    // bonusDiceClauses: [{dice:'2d6+1',...}] here is a separate, PRE-EXISTING quirk of the
+    // bonus-dice-clause regex (it matches any "NdM [type] damage" phrase, including the weapon's
+    // own base damage restated in flavor text) — unrelated to and unaffected by this fix, not
+    // asserted away here since that's a different, undocumented gap, not this test's subject.
+    assert.deepEqual(parseWeaponEffectBonuses(effect), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [{ dice: '2d6+1', type: 'bludgeoning' }] });
+  });
+  test('the existing trailing guard (when/while/with/made/only right after the phrase) still excludes a conditional suffix', () => {
+    assert.deepEqual(parseWeaponEffectBonuses('+2 to attack and damage rolls while raging.'), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [] });
   });
 });
 

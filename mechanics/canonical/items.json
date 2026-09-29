@@ -6065,6 +6065,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -6223,6 +6227,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -13688,6 +13696,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -13724,6 +13736,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -13749,6 +13765,10 @@
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -13778,6 +13798,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -13994,6 +14018,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -14135,6 +14163,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14232,6 +14264,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14259,6 +14295,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14295,6 +14335,10 @@
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14343,6 +14387,10 @@
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14568,6 +14616,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14592,6 +14644,10 @@
       "weaponCategory": "simple"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14618,6 +14674,10 @@
       "weaponCategory": "simple"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14736,6 +14796,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -14862,6 +14926,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -14897,6 +14965,10 @@
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -14944,6 +15016,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -15014,6 +15090,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -15038,6 +15118,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -15101,6 +15185,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -15244,6 +15332,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -21469,6 +21561,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -21878,6 +21974,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -21996,6 +22096,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -22072,6 +22176,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -22115,6 +22223,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 1
+      },
+      {
         "stat": "damageRoll",
         "value": 1
       }
@@ -22149,6 +22261,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 2
@@ -22465,6 +22581,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -22499,6 +22619,10 @@
       "weaponCategory": "martial"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -22551,6 +22675,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -22614,6 +22742,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -22651,6 +22783,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -23040,6 +23176,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -23176,6 +23316,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 1
+      },
       {
         "stat": "damageRoll",
         "value": 1
@@ -27257,6 +27401,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 2
       }
@@ -27491,6 +27639,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27536,6 +27688,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -27587,6 +27743,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27632,6 +27792,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -27685,6 +27849,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27735,6 +27903,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27781,6 +27953,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27826,6 +28002,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -27879,6 +28059,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 4
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -27928,6 +28112,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 4
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -29188,6 +29376,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 3
+      },
+      {
         "stat": "damageRoll",
         "value": 3
       }
@@ -29378,6 +29570,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 3
+      },
       {
         "stat": "damageRoll",
         "value": 3
@@ -31830,6 +32026,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 5
+      },
+      {
         "stat": "damageRoll",
         "value": 5
       }
@@ -31912,6 +32112,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 5
+      },
       {
         "stat": "damageRoll",
         "value": 5
@@ -32245,6 +32449,10 @@
       ]
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 5
+      },
       {
         "stat": "damageRoll",
         "value": 5
@@ -33164,6 +33372,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 5
       }
@@ -33221,6 +33433,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 4
@@ -33311,6 +33527,10 @@
     },
     "passive": [
       {
+        "stat": "attackRoll",
+        "value": 2
+      },
+      {
         "stat": "damageRoll",
         "value": 4
       }
@@ -33334,6 +33554,10 @@
       "damageType": "bludgeoning"
     },
     "passive": [
+      {
+        "stat": "attackRoll",
+        "value": 2
+      },
       {
         "stat": "damageRoll",
         "value": 4
