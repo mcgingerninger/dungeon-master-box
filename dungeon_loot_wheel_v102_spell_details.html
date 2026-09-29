@@ -21762,7 +21762,7 @@ function journeySourceContent(sourceRef) {
         if (p) {
           return p.q
             ? { kind: 'Riddle', name: ref, detail: p.q, mech: `Tier: ${p.tier}`, note: p.hook }
-            : { kind: 'Puzzle', name: p.title, detail: p.prompt, mech: p.solution, note: p.note };
+            : { kind: 'Puzzle', name: p.title, detail: p.prompt, mech: p.solution, note: puzzleDmNoteText(p) };
         }
       }
       return null;
@@ -22084,6 +22084,35 @@ function puzzleCategoryData(id) {
     default: return [];
   }
 }
+// Puzzle/riddle DM-note rendering: puzzle-data.js's 9 "standard-shape" categories carry
+// hint/onFail/onSolve, CHARACTER_GATED_PUZZLES carries gate/fallback/reward, and
+// MORAL_PUZZLES/RESOURCE_PUZZLES/RIDDLE_LIBRARY still carry a single flat note/hook (see
+// docs/NON_ITEM_CONTENT_SCOPE.md — those don't decompose the same way). These two helpers let
+// every caller handle whichever shape a given entry actually has without checking itself.
+function puzzleNoteLines(it) {
+  if (it.hint !== undefined || it.onFail !== undefined || it.onSolve !== undefined) {
+    return [
+      it.hint ? { icon: '🎲', label: 'Hint', text: it.hint } : null,
+      it.onFail ? { icon: '⚠️', label: 'On Fail', text: it.onFail } : null,
+      it.onSolve ? { icon: '🏆', label: 'Reward', text: it.onSolve } : null,
+    ].filter(Boolean);
+  }
+  if (it.gate !== undefined || it.fallback !== undefined || it.reward !== undefined) {
+    return [
+      it.gate ? { icon: '🔑', label: 'Gate', text: it.gate } : null,
+      it.fallback ? { icon: '🔓', label: 'Fallback', text: it.fallback } : null,
+      it.reward ? { icon: '🏆', label: 'Reward', text: it.reward } : null,
+    ].filter(Boolean);
+  }
+  const flat = it.note || it.hook;
+  return flat ? [{ icon: '🎲', label: '', text: flat }] : [];
+}
+function puzzleDmNoteHtml(it) {
+  return puzzleNoteLines(it).map(l => `<div class="puzzle-dm-note">${l.icon} ${l.label ? `<b>${l.label}:</b> ` : ''}${escapeHtml(l.text)}</div>`).join('');
+}
+function puzzleDmNoteText(it) {
+  return puzzleNoteLines(it).map(l => (l.label ? `${l.label}: ` : '') + l.text).join(' ');
+}
 let currentPuzzleCategory = 'riddles';
 function setPuzzleCategory(id) {
   currentPuzzleCategory = id;
@@ -22138,7 +22167,7 @@ function revealPuzzleCategoryAnswer(idx) {
   if (!wrap || !it) return;
   wrap.innerHTML = cat.isRiddle
     ? `<span class="riddle-answer">${escapeHtml(it.a)}</span>`
-    : `<div class="riddle-answer">${escapeHtml(it.solution)}</div>${it.note ? `<div class="puzzle-dm-note">🎲 ${escapeHtml(it.note)}</div>` : ''}`;
+    : `<div class="riddle-answer">${escapeHtml(it.solution)}</div>${puzzleDmNoteHtml(it)}`;
 }
 
 let puzzleLog = [];
