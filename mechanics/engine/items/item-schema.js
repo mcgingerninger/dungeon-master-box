@@ -1,0 +1,182 @@
+// Canonical structured item schema for dungeon-master-box's V2-mechanics migration — see
+// docs/V2_MECHANICS_MIGRATION.md.
+//
+// Based on dungeonboxnewVersion2_rework's src/engine/items/item-schema.js, extended for this
+// migration's confirmed scope:
+//   - itemType stays an open enum ('weapon'|'armor'|'consumable'|'material'|'tool' so far, same as
+//     V2). Legacy-only types (misc/companion/treasure/questitem/document) are a later migration
+//     phase's job (see the migration report's "not yet migrated" section) — NOT invented here.
+//   - WeaponData gains `bonusDamage` (informally used by V2's own modifiers.js already) as a real
+//     documented field: extra damage dice bundled onto a weapon instance (an elemental-damage
+//     rider migrated from legacy free text, or one added by a Modifier).
+//   - WeaponData/ArmorData gain the real materials-mechanics fields agreed for this migration
+//     (silvered/mithral/adamantine/masterwork are NOT free — legacy dungeon-master-box content has
+//     zero mechanical implementation of these today; see docs/V2_MECHANICS_MIGRATION.md's Materials
+//     section for the full ruleset and rationale):
+//       - `magical` (boolean, default true when omitted) — false only for a plain masterwork item
+//         or a purely-mundane silvered item; matters for anything that keys off "counts as magical"
+//         (e.g. bypassing certain damage resistance).
+//       - `ignoresNonmagicalResistance` (weapon only) — Silvered: standard 5e rule, a silvered
+//         weapon overcomes certain creatures' resistance/immunity to nonmagical B/P/S damage.
+//       - `autoCritVsObjects` (weapon only) — Adamantine: standard 5e rule, an adamantine weapon
+//         automatically critically hits objects (not creatures).
+//       - `critImmuneWhileWorn` (armor only) — Adamantine: standard 5e rule, any critical hit
+//         against the wearer becomes a normal hit while this armor is worn.
+//   - Every mechanical value here is a real typed field, never prose — dungeon-master-box's
+//     existing `effect` string (regex-scraped at runtime for bonuses) is replaced entirely for
+//     migrated items. `flavorText` still exists for display, but nothing in this engine ever
+//     parses it for mechanics.
+
+// ---------- Shared vocab ----------
+
+export const WEAPON_CATEGORIES = ['simple', 'martial'];
+export const ARMOR_TYPES = ['light', 'medium', 'heavy', 'shield'];
+export const CONSUMABLE_CATEGORIES = ['potion', 'food', 'scroll', 'thrown', 'coating', 'topical', 'other'];
+export const ON_USE_KINDS = ['heal', 'buff', 'debuff', 'damage', 'utility'];
+export const ABILITY_KINDS = ['spell', 'active_effect'];
+export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
+
+/**
+ * @typedef {Object} StatModifier
+ * @property {string} stat   // 'ac'|'hp_max'|'speed'|ability abbr|skill name|`save_<abbr>`|'attackRoll'|'damageRoll'
+ * @property {number} value
+ * @property {string} [condition]  // structured enum, reserved for future use; unrecognized = no effect yet
+ */
+
+/**
+ * @typedef {Object} OnUseEffect
+ * @property {'heal'|'buff'|'debuff'|'damage'|'utility'} kind
+ * @property {string} [healDice]        // 'heal' kind
+ * @property {string} [damageDice]      // 'damage' kind
+ * @property {string} [damageType]      // 'damage' kind
+ * @property {StatModifier[]} [statMods]
+ * @property {number} [durationMs]     // structured, not a parsed phrase; buff/debuff duration is
+ *   REPORTED by resolveConsumableEffect (consume.js) but not yet tracked by a persistent
+ *   active-effects timer — that's a separate system, not built in this migration phase.
+ */
+
+/**
+ * @typedef {Object} Ability
+ * @property {string} id
+ * @property {string} name
+ * @property {'spell'|'active_effect'} kind
+ * @property {OnUseEffect} effect
+ * @property {{max: number, recharge: 'short_rest'|'long_rest'|'dawn'|'charges'}} uses
+ * @property {number} usesLeft
+ */
+
+/**
+ * @typedef {Object} ProficiencyGrant
+ * @property {string[]} [skills]
+ * @property {string[]} [saves]           // ability abbreviations
+ * @property {string[]} [weaponCategories]  // subset of WEAPON_CATEGORIES
+ * @property {string[]} [armorTypes]        // subset of ARMOR_TYPES
+ */
+
+/**
+ * @typedef {Object} Grants   // non-numeric effects — granting something outright, not a flat bonus
+ * @property {ProficiencyGrant} [proficiencies]
+ * @property {Array<{id:string,name:string,description?:string,statMods:StatModifier[]}>} [traits]
+ */
+
+/**
+ * @typedef {Object} WeaponData
+ * @property {string} damageDice        // '1d8'
+ * @property {string} damageType        // 'slashing'|'piercing'|'bludgeoning'|'fire'|...
+ * @property {'simple'|'martial'} [weaponCategory]  // omitted when the migration couldn't
+ *   determine 5e proficiency category with confidence — see the migration report's ambiguous-item
+ *   list. Not required by validate-item.js.
+ * @property {string[]} [properties]    // ['light','finesse','thrown','versatile','two-handed','reach','ammunition']
+ * @property {string} [versatileDice]
+ * @property {number} [rangeNormal]
+ * @property {number} [rangeMax]
+ * @property {'weapon1'|'weapon2'|'offhand'} [slot]
+ * @property {{dice: string, type: string}[]} [bonusDamage]  // extra damage dice bundled onto this
+ *   instance (an elemental-damage rider migrated from legacy free text, e.g. "+2d6 fire damage",
+ *   or one added later by applying a Modifier — see modifiers.js).
+ * @property {boolean} [magical]  // default true when omitted; false only for a plain masterwork
+ *   weapon (a purely mundane +1-to-hit item).
+ * @property {boolean} [ignoresNonmagicalResistance]  // Silvered material.
+ * @property {boolean} [autoCritVsObjects]  // Adamantine material.
+ */
+
+/**
+ * @typedef {Object} ArmorData
+ * @property {'light'|'medium'|'heavy'|'shield'} armorType
+ * @property {number} baseAC
+ * @property {boolean} addsDexMod
+ * @property {number} [dexModCap]
+ * @property {'helmet'|'chest'|'handwear'|'boots'|'leggings'|'facewear'|'cloak'|'beltwaist'|'shield'} [slot]
+ * @property {number} [strengthRequirement]
+ * @property {boolean} [stealthDisadvantage]
+ * @property {boolean} [additive]  // true for a shield or an accessory piece whose baseAC ADDS to
+ *   whatever body armor already set; absent/false for body armor, whose baseAC REPLACES the
+ *   base-10 formula outright.
+ * @property {boolean} [magical]  // default true when omitted; false for plain masterwork armor.
+ * @property {boolean} [critImmuneWhileWorn]  // Adamantine material.
+ */
+
+/**
+ * @typedef {Object} ConsumableData
+ * @property {'potion'|'food'|'scroll'|'thrown'|'coating'|'topical'|'other'} consumableCategory
+ * @property {OnUseEffect[]} effects
+ * @property {{max: number}} uses
+ * @property {number} usesLeft
+ */
+
+/**
+ * @typedef {Object} MaterialData
+ * @property {string[]} materialTags   // 'reagent', 'craft_material', 'weapon_material', 'armor_material'
+ */
+
+/**
+ * @typedef {Object} ToolData
+ * @property {string} toolCategory
+ */
+
+/**
+ * @typedef {Object} LegacySource   // traceability back to dungeon-master-box's existing
+ *   loot-data.js catalog — not a V2/mechanics concept, carried so a later save-compatibility phase
+ *   can map a player's existing saved item (referenced by name/tier today) onto its new canonical
+ *   id without re-running the whole migration's derivation logic.
+ * @property {string} tier    // 'common'|'uncommon'|'rare'|'superrare'|'legendary'|'celestial'
+ * @property {number} index   // position within that tier's array in loot-data.js at migration time
+ * @property {string} name    // the item's original `name` field, verbatim
+ */
+
+/**
+ * @typedef {Object} Item
+ * @property {string} id
+ * @property {string} name
+ * @property {'weapon'|'armor'|'consumable'|'material'|'tool'} itemType   // enum will grow in later migration phases
+ * @property {string} rarity        // keeps dungeon-master-box's existing loot-table rarity tiers verbatim
+ * @property {number} [weight]
+ * @property {string} [value]       // gp, matches existing loot-table formatting
+ * @property {string} [flavorText]  // display only, NEVER parsed for mechanics
+ * @property {boolean} [requiresAttunement]
+ *
+ * @property {WeaponData} [weapon]        // weapon only, required for weapon
+ * @property {ArmorData} [armor]          // armor only, required for armor
+ * @property {ConsumableData} [consumable] // consumable only, required for consumable
+ * @property {MaterialData} [material]    // material only, required for material
+ * @property {ToolData} [tool]            // tool only, required for tool
+ * @property {StatModifier[]} [passive]   // weapon/armor/tool only
+ * @property {Ability[]} [abilities]      // weapon/armor only
+ * @property {Grants} [grants]            // weapon/armor only
+ * @property {string[]} [appliedModifiers] // ids of Modifiers (see modifiers.js) baked into this instance
+ *
+ * @property {LegacySource} [legacySource]  // migration traceability, see LegacySource above
+ * @property {{unlocks?: Array<Object>}} [narrative]  // preserved verbatim, presentation-only —
+ *   e.g. dungeon-master-box's "Hidden Power" `unlocks` tier system. Never read by any mechanics
+ *   function in this engine; the DM/UI layer is the only consumer.
+ */
+
+export function blankItem(itemType) {
+  const base = { id: '', name: '', itemType, rarity: 'common' };
+  if (itemType === 'weapon') return { ...base, weapon: { damageDice: '1d6', damageType: 'bludgeoning', weaponCategory: 'simple' } };
+  if (itemType === 'armor') return { ...base, armor: { armorType: 'light', baseAC: 11, addsDexMod: true } };
+  if (itemType === 'consumable') return { ...base, consumable: { consumableCategory: 'potion', effects: [] } };
+  if (itemType === 'material') return { ...base, material: { materialTags: [] } };
+  if (itemType === 'tool') return { ...base, tool: { toolCategory: '' } };
+  return base;
+}
