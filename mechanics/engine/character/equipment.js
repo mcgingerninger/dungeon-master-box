@@ -5,9 +5,13 @@
 // directly, but the actual math is real (structured item fields) instead of
 // collectEquippedAcBreakdown's runtime regex over "+N AC" strings.
 //
-// EQUIPMENT_SLOTS is a scoped-down subset of dungeon-master-box's real 24-slot SLOT_CATEGORY: only
-// the slots weapon/armor items can target today (no ring/amulet/charm/limb/companion — those
-// return once the still-deferred wondrous/Fleshmancer-equivalent item types are migrated).
+// EQUIPMENT_SLOTS originally shipped as a scoped-down subset of dungeon-master-box's real 24-slot
+// SLOT_CATEGORY (no ring/amulet/charm/limb/companion — deferred until a wondrous-equivalent item
+// type existed to occupy them). This migration's Phase 3 adds the `wondrous` itemType, so
+// ring/amulet/charm slots are restored here too, matching dungeon-master-box's own existing
+// precedent exactly (SLOT_CATEGORY's real counts: 4 ring slots, 2 amulet slots, 5 charm slots).
+// Grafted-limb/companion slots remain deferred — those need a Fleshmancer-equivalent mechanic this
+// migration hasn't built.
 //
 // Pure functions throughout — nothing here reads the DOM or persistence; a caller (the inventory
 // UI) is responsible for saving the resulting equippedSlots/inventory back to the character
@@ -21,6 +25,9 @@ export const EQUIPMENT_SLOTS = {
   armor: 'Armor (Body)', shield: 'Shield',
   helmet: 'Helmet', handwear: 'Hand Wear', boots: 'Boots', leggings: 'Leggings',
   facewear: 'Face Wear', cloak: 'Cloak', beltwaist: 'Belt',
+  ring1: 'Ring 1', ring2: 'Ring 2', ring3: 'Ring 3', ring4: 'Ring 4',
+  amulet1: 'Amulet 1', amulet2: 'Amulet 2',
+  charm1: 'Charm 1', charm2: 'Charm 2', charm3: 'Charm 3', charm4: 'Charm 4', charm5: 'Charm 5',
 };
 
 // ArmorData.slot uses 'chest' for body armor — the equivalent dungeon-master-box SLOT_CATEGORY
@@ -29,6 +36,18 @@ const ARMOR_SLOT_TO_EQUIPMENT_SLOT = {
   chest: 'armor', shield: 'shield', helmet: 'helmet', handwear: 'handwear',
   boots: 'boots', leggings: 'leggings', facewear: 'facewear', cloak: 'cloak', beltwaist: 'beltwaist',
 };
+
+// WondrousData.slot can name one of the SAME single body slots ArmorData does (a wondrous cloak
+// competes with an armor-type cloak for the one 'cloak' slot, correctly — you can't wear two), or
+// one of three multi-slot FAMILIES (ring/amulet/charm) where the caller picks which concrete slot,
+// same pattern as a one-handed weapon picking weapon1 or weapon2.
+const WONDROUS_DIRECT_SLOT = {
+  cloak: 'cloak', beltwaist: 'beltwaist', boots: 'boots', leggings: 'leggings',
+  handwear: 'handwear', helmet: 'helmet', facewear: 'facewear',
+};
+const RING_SLOTS = ['ring1', 'ring2', 'ring3', 'ring4'];
+const AMULET_SLOTS = ['amulet1', 'amulet2'];
+const CHARM_SLOTS = ['charm1', 'charm2', 'charm3', 'charm4', 'charm5'];
 
 function isTwoHanded(item) {
   return item.itemType === 'weapon' && (item.weapon?.properties || []).includes('two-handed');
@@ -39,6 +58,15 @@ export function equipmentSlotsForItem(item) {
   if (item.itemType === 'armor') {
     const slot = ARMOR_SLOT_TO_EQUIPMENT_SLOT[item.armor?.slot];
     return slot ? [slot] : [];
+  }
+  if (item.itemType === 'wondrous') {
+    const slot = item.wondrous?.slot;
+    if (!slot) return []; // a carried/attuned trinket with no body slot at all — never equippable
+    if (slot === 'ring') return RING_SLOTS;
+    if (slot === 'amulet') return AMULET_SLOTS;
+    if (slot === 'charm') return CHARM_SLOTS;
+    const direct = WONDROUS_DIRECT_SLOT[slot];
+    return direct ? [direct] : [];
   }
   return [];
 }

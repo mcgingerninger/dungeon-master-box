@@ -1,12 +1,12 @@
 // Ported from dungeonboxnewVersion2_rework's src/engine/items/validate-item.js — see
-// docs/V2_MECHANICS_MIGRATION.md. Unchanged from V2 for this migration phase: the facet rules
-// already correctly describe weapon/armor (this phase's scope). Extending RULES for
-// misc/companion/treasure/questitem/document is later migration-phase work, not done here — an
-// item of one of those types is correctly rejected by "unknown or unsupported itemType" until then,
-// matching Section 18's "extend the validator, don't force content into the wrong shape" rule
-// rather than silently misclassifying it as something it isn't.
+// docs/V2_MECHANICS_MIGRATION.md. V2's own weapon/armor/consumable/material/tool rules are
+// unchanged; this migration's Phase 3 adds the `wondrous` type (rings/amulets/cloaks/attuned
+// trinkets — see item-schema.js's header comment for why it's a new type rather than forcing this
+// content into 'tool' or 'armor'). Remaining legacy-only types (companion/treasure/questitem/
+// document) are still correctly rejected by "unknown or unsupported itemType" until a later phase
+// adds them, per Section 18's "extend the validator, don't force content into the wrong shape".
 
-const FACET_KEYS = ['weapon', 'armor', 'consumable', 'material', 'tool', 'passive', 'abilities', 'grants'];
+const FACET_KEYS = ['weapon', 'armor', 'consumable', 'material', 'tool', 'wondrous', 'passive', 'abilities', 'grants'];
 
 const RULES = {
   weapon: { required: ['weapon'], allowed: ['weapon', 'passive', 'abilities', 'grants'] },
@@ -14,6 +14,7 @@ const RULES = {
   consumable: { required: ['consumable'], allowed: ['consumable'] },
   material: { required: ['material'], allowed: ['material'] },
   tool: { required: ['tool'], allowed: ['tool', 'passive'] },
+  wondrous: { required: ['wondrous'], allowed: ['wondrous', 'passive', 'abilities', 'grants'] },
 };
 
 function presentFacets(item) {
@@ -31,7 +32,7 @@ export function validateItem(item) {
 
   const rules = RULES[item.itemType];
   if (!rules) {
-    errors.push(`unknown or unsupported itemType "${item.itemType}" — only weapon/armor/consumable/material/tool are modeled so far`);
+    errors.push(`unknown or unsupported itemType "${item.itemType}" — only weapon/armor/consumable/material/tool/wondrous are modeled so far`);
     return { valid: false, errors };
   }
 

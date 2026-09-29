@@ -3,9 +3,16 @@
 //
 // Based on dungeonboxnewVersion2_rework's src/engine/items/item-schema.js, extended for this
 // migration's confirmed scope:
-//   - itemType stays an open enum ('weapon'|'armor'|'consumable'|'material'|'tool' so far, same as
-//     V2). Legacy-only types (misc/companion/treasure/questitem/document) are a later migration
-//     phase's job (see the migration report's "not yet migrated" section) — NOT invented here.
+//   - itemType stays an open enum, now 'weapon'|'armor'|'consumable'|'material'|'tool'|'wondrous'.
+//     'wondrous' is this migration's own addition (Phase 3) — V2 had explicitly deferred it
+//     ("wondrous/quest/treasure are deliberately deferred... until their own subcategories get
+//     designed"). It covers rings/amulets/cloaks/attuned trinkets: dungeon-master-box's misc-typed
+//     items that have a body slot and/or grant a real bonus/ability and/or require attunement.
+//     Genuinely mundane misc gear (a torch, rope, thieves' tools) maps onto the EXISTING 'tool'
+//     itemType instead of a third new type — ToolData's own doc comment already anticipated this
+//     ("5e's own tool list is open-ended"), and 'tool' already allows a `passive` facet for exactly
+//     the "a masterwork tool grants a small skill bonus" case. Remaining legacy-only types
+//     (companion/treasure/questitem/document) are a later migration phase's job — NOT invented here.
 //   - WeaponData gains `bonusDamage` (informally used by V2's own modifiers.js already) as a real
 //     documented field: extra damage dice bundled onto a weapon instance (an elemental-damage
 //     rider migrated from legacy free text, or one added by a Modifier).
@@ -135,6 +142,21 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  */
 
 /**
+ * @typedef {Object} WondrousData
+ * @property {'ring'|'amulet'|'cloak'|'beltwaist'|'boots'|'leggings'|'handwear'|'helmet'|'facewear'|'charm'} [slot]
+ *   // absent for a wondrous item that isn't worn on a body slot at all (a whistle, a lucky coin
+ *   // carried in a pocket, etc.) — still meaningfully "wondrous" rather than a plain 'tool' because
+ *   // it requires attunement and/or grants a real mechanical bonus/ability. 'cloak'/'beltwaist'/
+ *   // 'boots'/'leggings'/'handwear'/'helmet'/'facewear' deliberately reuse the SAME slot names
+ *   // ArmorData uses (mechanics/character/equipment.js's EQUIPMENT_SLOTS) — a wondrous cloak and an
+ *   // armor-type cloak compete for the same equip slot, which is correct (you can't wear two). Only
+ *   // 'ring'/'amulet'/'charm' are new slot FAMILIES (each expands to several concrete slots —
+ *   // ring1-4, amulet1-2, charm1-5 — matching dungeon-master-box's own existing, larger SLOT_CATEGORY
+ *   // that the ported equipment.js had deliberately scoped down from until this type existed to
+ *   // occupy them; see equipment.js's own comment).
+ */
+
+/**
  * @typedef {Object} LegacySource   // traceability back to dungeon-master-box's existing
  *   loot-data.js catalog — not a V2/mechanics concept, carried so a later save-compatibility phase
  *   can map a player's existing saved item (referenced by name/tier today) onto its new canonical
@@ -148,7 +170,7 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @typedef {Object} Item
  * @property {string} id
  * @property {string} name
- * @property {'weapon'|'armor'|'consumable'|'material'|'tool'} itemType   // enum will grow in later migration phases
+ * @property {'weapon'|'armor'|'consumable'|'material'|'tool'|'wondrous'} itemType   // enum will grow in later migration phases
  * @property {string} rarity        // keeps dungeon-master-box's existing loot-table rarity tiers verbatim
  * @property {number} [weight]
  * @property {string} [value]       // gp, matches existing loot-table formatting
@@ -160,9 +182,10 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @property {ConsumableData} [consumable] // consumable only, required for consumable
  * @property {MaterialData} [material]    // material only, required for material
  * @property {ToolData} [tool]            // tool only, required for tool
- * @property {StatModifier[]} [passive]   // weapon/armor/tool only
- * @property {Ability[]} [abilities]      // weapon/armor only
- * @property {Grants} [grants]            // weapon/armor only
+ * @property {WondrousData} [wondrous]    // wondrous only, required for wondrous
+ * @property {StatModifier[]} [passive]   // weapon/armor/tool/wondrous only
+ * @property {Ability[]} [abilities]      // weapon/armor/wondrous only
+ * @property {Grants} [grants]            // weapon/armor/wondrous only
  * @property {string[]} [appliedModifiers] // ids of Modifiers (see modifiers.js) baked into this instance
  *
  * @property {LegacySource} [legacySource]  // migration traceability, see LegacySource above
@@ -178,5 +201,6 @@ export function blankItem(itemType) {
   if (itemType === 'consumable') return { ...base, consumable: { consumableCategory: 'potion', effects: [] } };
   if (itemType === 'material') return { ...base, material: { materialTags: [] } };
   if (itemType === 'tool') return { ...base, tool: { toolCategory: '' } };
+  if (itemType === 'wondrous') return { ...base, wondrous: {} };
   return base;
 }

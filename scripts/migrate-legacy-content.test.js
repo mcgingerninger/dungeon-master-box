@@ -14,8 +14,10 @@ import {
   deriveWeaponProperties, toStatModifiers, findSetValueOverrides, applyMaterialModifiers,
   slugify, makeIdGenerator, migrateWeapon, migrateArmor,
   deriveConsumableCategory, resolveConsumableUses, migrateConsumable,
+  deriveWondrousSlot, deriveToolCategory, migrateMisc,
 } from './migrate-legacy-content.js';
 import { validateItem } from '../mechanics/engine/items/validate-item.js';
+import { equipmentSlotsForItem } from '../mechanics/engine/character/equipment.js';
 
 describe('loadLootData', () => {
   test('loads the real loot-data.js without modifying it, and does not export from it', () => {
@@ -312,7 +314,89 @@ describe('migrateConsumable', () => {
   });
 });
 
-const MIGRATORS_FOR_TEST = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable };
+describe('deriveWondrousSlot', () => {
+  test('an accessory classification maps to the matching wondrous slot', () => {
+    assert.equal(deriveWondrousSlot(['Accessory', 'Ring', 'Signet Ring']), 'ring');
+    assert.equal(deriveWondrousSlot(['Accessory', 'Neck', 'Amulet']), 'amulet');
+    assert.equal(deriveWondrousSlot(['Accessory', 'Back', 'Cloak']), 'cloak');
+    assert.equal(deriveWondrousSlot(['Accessory', 'Feet', 'Boots']), 'boots');
+    assert.equal(deriveWondrousSlot(['Accessory', 'Hands', 'Gauntlets']), 'handwear');
+    assert.equal(deriveWondrousSlot(['Accessory', 'Waist', 'Belt']), 'beltwaist');
+  });
+  test('a non-accessory classification has no slot', () => {
+    assert.equal(deriveWondrousSlot(['Miscellaneous', 'Adventuring Gear', 'Container']), null);
+  });
+});
+
+describe('deriveToolCategory', () => {
+  test('Tool and Miscellaneous branches both produce a real, specific category', () => {
+    assert.equal(deriveToolCategory(['Tool', "Thieves' Tools", 'Lockpicks']), 'lockpicks');
+    assert.equal(deriveToolCategory(['Miscellaneous', 'Adventuring Gear', 'Container']), 'container');
+    assert.equal(deriveToolCategory(['Miscellaneous', 'Household', 'Cookware']), 'cookware');
+  });
+  test('an unrelated branch (e.g. Key/Quest Object) falls back to a generic category rather than a misleading specific one', () => {
+    assert.equal(deriveToolCategory(['Key / Quest Object', 'Key', 'Physical Key']), 'adventuring-gear');
+  });
+});
+
+describe('migrateMisc — wondrous/tool split', () => {
+  test('a ring gets itemType wondrous with a real, equippable slot', () => {
+    const item = { name: 'Test Signet Ring', desc: 'A gold signet ring.', type: 'misc', gp: '50 gp', effect: '' };
+    const result = migrateMisc(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+    assert.equal(result.wondrous.slot, 'ring');
+    assert.deepEqual(equipmentSlotsForItem(result), ['ring1', 'ring2', 'ring3', 'ring4']);
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('an item requiring attunement is wondrous even with no body slot at all', () => {
+    const item = { name: 'Test Lucky Coin', desc: 'A tarnished coin.', type: 'misc', gp: '—', effect: 'Requires attunement. Once per week, reroll a failed check.' };
+    const result = migrateMisc(item, 'legendary', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+    assert.deepEqual(result.wondrous, {});
+    assert.deepEqual(equipmentSlotsForItem(result), []);
+  });
+
+  test('a "+N stat" effect makes an otherwise slot-less item wondrous, and extracts the real bonus', () => {
+    const item = { name: 'Test Charm', desc: '', type: 'misc', gp: '100 gp', effect: '+1 Wisdom while carried.' };
+    const result = migrateMisc(item, 'uncommon', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+    assert.deepEqual(result.passive, [{ stat: 'wis', value: 1 }]);
+  });
+
+  test('an item classifyItemHierarchy itself calls a "Wondrous Item" is wondrous even with no slot/attunement/bonus/charges signal', () => {
+    // Matches the real gap this migration found: classifyItemHierarchy already flags any
+    // non-common item with effect text as magical ("Miscellaneous > Wondrous Item > ..."), but
+    // that alone doesn't set requiresAttunement/passive/charges/slot — without reusing this
+    // existing signal, a narratively-magical item with no other structural marker would be
+    // wrongly migrated as mundane 'tool' gear.
+    const item = { name: 'Test Orb of Whispers', desc: '', type: 'misc', gp: '500 gp', effect: 'Whispers secrets to its bearer under a full moon.' };
+    const result = migrateMisc(item, 'rare', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+  });
+
+  test('genuinely mundane gear with no magical signal at all becomes tool, not wondrous', () => {
+    const item = { name: 'Test Waterskin', desc: 'A leather pouch.', type: 'misc', gp: '2 sp' };
+    const result = migrateMisc(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'tool');
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('a misc item is never excluded — always produces a valid item', () => {
+    const item = { name: 'Test Weird Object', desc: '', type: 'misc', gp: '1 gp', effect: 'Does something DM-adjudicated.' };
+    const result = migrateMisc(item, 'common', 0, makeIdGenerator(), [], []);
+    assert.ok(result);
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('gp of "—" (no monetary value) is not carried through as a literal value string', () => {
+    const item = { name: 'Test Quest Trinket', desc: '', type: 'misc', gp: '—', effect: 'Requires attunement.' };
+    const result = migrateMisc(item, 'rare', 0, makeIdGenerator(), [], []);
+    assert.equal(result.value, undefined);
+  });
+});
+
+const MIGRATORS_FOR_TEST = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc };
 
 describe('full migration determinism (real loot-data.js)', () => {
   test('running the migration end-to-end twice produces byte-identical canonical output', () => {
@@ -334,7 +418,7 @@ describe('full migration determinism (real loot-data.js)', () => {
     const run1 = migrateAll(nextId1);
     const run2 = migrateAll(nextId2);
     assert.deepEqual(run1, run2);
-    assert.ok(run1.length > 700, `expected the bulk of 753 weapon+armor+consumable items to migrate, got ${run1.length}`);
+    assert.ok(run1.length > 1100, `expected the bulk of 1157 weapon+armor+consumable+misc items to migrate, got ${run1.length}`);
   });
 
   test('every canonical item in the committed output validates cleanly', () => {
@@ -352,6 +436,6 @@ describe('full migration determinism (real loot-data.js)', () => {
         checked++;
       });
     }
-    assert.ok(checked > 700);
+    assert.ok(checked > 1100);
   });
 });

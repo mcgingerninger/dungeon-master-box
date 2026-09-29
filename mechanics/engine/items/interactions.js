@@ -7,22 +7,26 @@
 //      attunement/i against flavor text; spell_focus/place/weapon_coating similarly regex
 //      names/descriptions) — exactly the pattern this migration exists to eliminate. Every rule
 //      here reads only structured fields.
-// Narrowed to weapon/armor/consumable/material/tool (this migration's Phase 1 scope is
-// weapon/armor only; consumable/material/tool interactions are carried over from V2 unchanged for
-// when those item types are migrated in a later phase). Legacy-only interactions this table does
-// NOT yet cover (socket/spell_focus/ritual_component/summon_component/monster_material/
-// fleshmancer_input/wearable_part/unwearable_part/component/sell/place/harvest/unlock/combine/wear)
-// are tracked as an explicit gap in docs/V2_MECHANICS_MIGRATION.md, not silently dropped — they
-// apply to item types (wondrous/quest/treasure/craftable monster parts) not yet in scope.
+// Narrowed to weapon/armor/consumable/material/tool/wondrous. `wondrous` (added this migration's
+// Phase 3) only gets `equip`/`attune` here, not `enchant`/`repair`/`salvage` — those are
+// specifically weapon/armor crafting actions ("sharpen this blade", "reinforce this armor") that
+// don't have an equivalent meaning for a ring or amulet in this catalog. Legacy-only interactions
+// this table does NOT yet cover (socket/spell_focus/ritual_component/summon_component/
+// monster_material/fleshmancer_input/wearable_part/unwearable_part/component/sell/place/harvest/
+// unlock/combine/wear) are tracked as an explicit gap in docs/V2_MECHANICS_MIGRATION.md, not
+// silently dropped — they apply to item types (quest/treasure/craftable monster parts) not yet in
+// scope, or (socket/spell_focus) to a mechanic this migration hasn't built yet.
 
 export const INTERACTIONS = {
   equip: {
     cat: 'Equipment', label: 'Equip',
-    default: it => it.itemType === 'weapon' || it.itemType === 'armor',
+    // A wondrous item only counts as equippable when it actually has a body slot — many (a lucky
+    // coin, a signal whistle) are carried/attuned rather than worn anywhere.
+    default: it => it.itemType === 'weapon' || it.itemType === 'armor' || (it.itemType === 'wondrous' && !!it.wondrous?.slot),
   },
   attune: {
     cat: 'Equipment', label: 'Attune',
-    default: it => (it.itemType === 'weapon' || it.itemType === 'armor') && !!it.requiresAttunement,
+    default: it => (it.itemType === 'weapon' || it.itemType === 'armor' || it.itemType === 'wondrous') && !!it.requiresAttunement,
   },
   enchant: {
     cat: 'Modification', label: 'Enchant',

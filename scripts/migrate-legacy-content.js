@@ -4,10 +4,12 @@
 // See docs/V2_MECHANICS_MIGRATION.md for the full plan this implements.
 //
 // SCOPE (confirmed narrow-start, expanded phase by phase): Phase 1 covered type === 'weapon' and
-// type === 'armor' (688 of loot-data.js's 1,243 items). Phase 2 adds type === 'consumable' (65
-// items). Every other type (misc/companion/treasure/questitem/document) is untouched and stays
-// exactly as authored in loot-data.js — this script never writes to that file. Later migration
-// phases extend this same approach to those types.
+// type === 'armor' (688 of loot-data.js's 1,243 items). Phase 2 added type === 'consumable' (65
+// items). Phase 3 adds type === 'misc' (404 items), split between a new 'wondrous' itemType and
+// the existing 'tool' itemType (see the Phase 3 comment above migrateMisc for why). Every remaining
+// type (companion/treasure/questitem/document) is untouched and stays exactly as authored in
+// loot-data.js — this script never writes to that file. Later migration phases extend this same
+// approach to those types.
 //
 // THIS IS NOT PART OF THE RUNTIME APP. Run it manually (`node scripts/migrate-legacy-content.js`)
 // whenever loot-data.js's migrated-type entries change; it is deterministic (no Math.random
@@ -101,7 +103,21 @@ function classifySubcategory(name, type, rarity, desc) {
     if (/bomb|grenade|flask|\bdart\b|\bdust\b|powder/.test(n)) return 'throwable';
     return 'food';
   }
+  if (type === 'misc') {
+    if (/\bring\b/.test(n)) return 'ring';
+    if (/amulet|necklace|pendant|periapt|\btorc\b|gorget|holy symbol|talisman|locket|brooch|medallion/.test(n)) return 'amulet';
+    return miscTierSubcategory(rarity);
+  }
   return '';
+}
+
+// Ported verbatim — buckets any non-ring/amulet misc item into one of three subcategories by
+// rarity tier instead of one flat bucket. Unknown/missing rarity falls back to Common Misc rather
+// than guessing.
+function miscTierSubcategory(rarity) {
+  if (rarity === 'rare' || rarity === 'superrare') return 'rareMisc';
+  if (rarity === 'legendary' || rarity === 'celestial') return 'wondrousMisc';
+  return 'commonMisc';
 }
 
 // Full verbatim table (dungeon_loot_wheel_v102_spell_details.html) — only the weapon/armor entries
@@ -661,6 +677,113 @@ function migrateConsumable(item, tier, index, nextId, ambiguous, fixes) {
   return canonical;
 }
 
+// ============================== Misc -> wondrous/tool split (Phase 3) ============================
+// `type === 'misc'` is dungeon-master-box's largest and most heterogeneous bucket (404 items):
+// everything from a plain torch or coil of rope to a legendary cloak with three tiers of Hidden
+// Power. There is no single existing itemType this maps onto, so this migration adds a new one —
+// `wondrous` (item-schema.js) — for anything with a real magical identity (a body slot, a passive
+// bonus, or attunement), and routes everything else onto the EXISTING `tool` itemType rather than
+// inventing a second new type for "misc gear with no mechanics" (a torch and a set of thieves'
+// tools are both just mundane equipment; V2's own ToolData doc comment already anticipated an
+// open-ended, free-form toolCategory for exactly this).
+//
+// classifySubcategory's own misc branch only ever returns 'ring'/'amulet'/a rarity-tier bucket — it
+// has no concept of cloak/boots/gauntlets/etc. for non-armor-typed items at all. The REAL per-slot
+// detection for those lives in classifyItemHierarchy's ungated accessory cascade (the same
+// /\bboots\b|slippers|sandals/ etc. checks that run for any item regardless of `type`), which is
+// reused here rather than re-derived.
+
+const ACCESSORY_LEAF_TO_WONDROUS_SLOT = {
+  Ring: 'ring', Neck: 'amulet', Back: 'cloak', Waist: 'beltwaist',
+  Feet: 'boots', Hands: 'handwear', Head: 'helmet', Face: 'facewear',
+};
+
+function deriveWondrousSlot(classification) {
+  if (classification[0] !== 'Accessory') return null;
+  return ACCESSORY_LEAF_TO_WONDROUS_SLOT[classification[1]] || null;
+}
+
+// Tool>X>Y classifications get toolCategory = slugified Y (e.g. Tool>Thieves' Tools>Lockpicks ->
+// 'lockpicks'); anything that didn't classify under the Tool branch at all (most commonly
+// Miscellaneous>Unknown>Unidentified Object — a narrative-only item with no clean category, e.g. a
+// piece of quest evidence mis-typed as misc in the source data) gets a disclosed generic fallback
+// rather than an invented specific one.
+// "Tool > X > Y" (e.g. Thieves' Tools > Lockpicks) and "Miscellaneous > X > Y" (e.g. Adventuring
+// Gear > Container, Household > Cookware) are BOTH legitimate, informative classifications for
+// mundane gear — classifyItemHierarchy's cascade routes "Waterskin"/"Sack"/"Iron Pot" through the
+// Miscellaneous branch, not the Tool branch, and that's correct, not a sign of a problem. Only a
+// genuinely uninformative placement (the literal "Unidentified Object" catch-all, or landing
+// somewhere unexpected like Key/Quest Object/Treasure/Document/an unmatched Accessory) means this
+// migration couldn't confidently categorize the item at all.
+function deriveToolCategory(classification) {
+  if (classification[0] === 'Tool' || classification[0] === 'Miscellaneous') {
+    return slugify(classification[classification.length - 1]);
+  }
+  return 'adventuring-gear';
+}
+
+function isUninformativeToolClassification(classification) {
+  if (classification[0] !== 'Tool' && classification[0] !== 'Miscellaneous') return true;
+  return classification[classification.length - 1] === 'Unidentified Object';
+}
+
+function migrateMisc(item, tier, index, nextId, ambiguous, fixes) {
+  const name = item.name;
+  const desc = item.desc || '';
+  const effect = item.effect || '';
+  const subcategory = classifySubcategory(name, 'misc', tier, desc);
+  const classification = classifyItemHierarchy({ ...item, subcategory }, tier);
+
+  const requiresAttunement = itemRequiresAttunement(item);
+  const deltas = extractStatDeltasFromText(effect);
+  const setOverrides = findSetValueOverrides(effect);
+  if (setOverrides.length) {
+    ambiguous.push({ name, tier, reason: `effect text sets an absolute ability score ("${setOverrides.map(o => `${o.stat} to ${o.value}`).join(', ')}") — no direct StatModifier equivalent, needs manual review`, effect });
+  }
+  const passive = toStatModifiers(deltas);
+  const wondrousSlot = deriveWondrousSlot(classification);
+
+  // classifyItemHierarchy's own magic-detection heuristic (any non-common item with effect text
+  // matching a magic keyword, or any non-common item with effect text at all) already identifies
+  // "Miscellaneous > Wondrous Item > *" independently of anything checked below — reused here
+  // rather than re-deriving "is this magical" from scratch. Without it, a magical trinket with no
+  // slot/attunement/stat-bonus/charges (its power is purely narrative/DM-adjudicated) would
+  // otherwise be misclassified as mundane 'tool' gear.
+  const classifiedAsWondrous = classification[0] === 'Miscellaneous' && classification[1] === 'Wondrous Item';
+  const isWondrous = !!wondrousSlot || requiresAttunement || passive.length > 0 || !!item.charges || classifiedAsWondrous;
+  if (item.abilities && item.abilities.length) {
+    ambiguous.push({ name, tier, reason: `item has a structured legacy "abilities" entry (${item.abilities.map(a => a.name).join(', ')}) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review`, abilities: item.abilities });
+  }
+  if (item.charges && !wondrousSlot) {
+    ambiguous.push({ name, tier, reason: `has a charged ability (charges "${item.charges}") with no confidently-extractable structured effect — no OnUseEffect built, migrated as a wondrous item with no abilities[] entry, needs manual review`, charges: item.charges });
+  }
+
+  if (scanResidualLanguage(effect, [])) {
+    ambiguous.push({ name, tier, reason: 'effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review', effect });
+  }
+
+  const base = {
+    id: nextId(name),
+    name,
+    rarity: tier,
+    weight: computeItemWeight(item, subcategory),
+    ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
+    ...(desc ? { flavorText: desc } : {}),
+    ...(requiresAttunement ? { requiresAttunement: true } : {}),
+    ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
+    legacySource: { tier, index, name },
+  };
+
+  if (isWondrous) {
+    return { ...base, itemType: 'wondrous', wondrous: wondrousSlot ? { slot: wondrousSlot } : {}, ...(passive.length ? { passive } : {}) };
+  }
+  if (isUninformativeToolClassification(classification)) {
+    ambiguous.push({ name, tier, reason: `no accessory slot, attunement, stat bonus, or recognized category found at all (classified as "${classification.join(' > ')}") — migrated as a generic tool with no real mechanical identity; may actually be quest/document/treasure content mis-scoped into this migration's misc-item pass, needs manual review`, classification });
+  }
+  // Note: passive is never non-empty here — a non-empty passive already forces isWondrous above.
+  return { ...base, itemType: 'tool', tool: { toolCategory: deriveToolCategory(classification) } };
+}
+
 // ============================== Main =============================================================
 function main() {
   const lootData = loadLootData();
@@ -670,8 +793,8 @@ function main() {
   const canonicalItems = [];
   const materialsSummary = {};
   let excludedCount = 0;
-  const counts = { weapon: 0, armor: 0, consumable: 0 };
-  const MIGRATORS = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable };
+  const counts = { weapon: 0, armor: 0, consumable: 0, misc: 0 };
+  const MIGRATORS = { weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc };
 
   for (const tier of Object.keys(lootData)) {
     lootData[tier].forEach((item, index) => {
@@ -717,9 +840,9 @@ function main() {
   const report = buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes });
   fs.writeFileSync(path.join(outDir, 'migration-report.md'), report);
 
-  const legacyTotal = counts.weapon + counts.armor + counts.consumable;
+  const legacyTotal = counts.weapon + counts.armor + counts.consumable + counts.misc;
   console.log(`Migrated ${canonicalItems.length}/${legacyTotal} items.`);
-  console.log(`  weapon: ${counts.weapon}, armor: ${counts.armor}, consumable: ${counts.consumable}, excluded: ${excludedCount}`);
+  console.log(`  weapon: ${counts.weapon}, armor: ${counts.armor}, consumable: ${counts.consumable}, misc: ${counts.misc}, excluded: ${excludedCount}`);
   console.log(`  ambiguous flags raised: ${ambiguous.length}`);
   console.log(`  bugs found and fixed: ${fixes.length}`);
   console.log(`  material modifiers applied: ${JSON.stringify(materialsSummary)}`);
@@ -729,7 +852,7 @@ function main() {
 function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes }) {
   const totalLegacyItems = Object.values(lootData).reduce((s, arr) => s + arr.length, 0);
   const lines = [];
-  lines.push('# V2 Mechanics Migration Report — Phases 1-2 (weapons + armor + consumables)');
+  lines.push('# V2 Mechanics Migration Report — Phases 1-3 (weapons + armor + consumables + misc)');
   lines.push('');
   lines.push(`Generated by \`scripts/migrate-legacy-content.js\`. Source: \`loot-data.js\` (untouched — this script never writes to it).`);
   lines.push('');
@@ -739,6 +862,7 @@ function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguou
   lines.push(`- Legacy weapon items: ${counts.weapon}`);
   lines.push(`- Legacy armor items: ${counts.armor}`);
   lines.push(`- Legacy consumable items: ${counts.consumable}`);
+  lines.push(`- Legacy misc items: ${counts.misc} (split into the new \`wondrous\` and existing \`tool\` itemTypes — see "Misc -> wondrous/tool split" below)`);
   lines.push(`- Migrated to canonical structured items: ${canonicalItems.length}`);
   lines.push(`- Excluded this pass (no parseable base dmg/ac/hp — see "Excluded items" below): ${excludedCount}`);
   lines.push(`- Added: 0 — Removed: 0 — Renamed: 0 (every migrated item keeps its exact original \`name\`)`);
@@ -758,6 +882,14 @@ function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguou
       lines.push(`- \`${modId}\`: applied to ${count} item(s)`);
     }
   }
+  lines.push('');
+  lines.push('## Misc -> wondrous/tool split (Section 8 — new itemType for legacy-only content)');
+  lines.push('');
+  const wondrousCount = canonicalItems.filter(i => i.itemType === 'wondrous').length;
+  const toolCount = canonicalItems.filter(i => i.itemType === 'tool').length;
+  const wondrousWithSlot = canonicalItems.filter(i => i.itemType === 'wondrous' && i.wondrous.slot).length;
+  lines.push(`- Migrated as \`wondrous\` (has a body slot, requires attunement, grants a stat bonus, or carries a charged ability): ${wondrousCount} (${wondrousWithSlot} of those have an equip slot; the rest are carried/attuned trinkets with no slot)`);
+  lines.push(`- Migrated as \`tool\` (no magical identity found — mundane gear): ${toolCount}`);
   lines.push('');
   lines.push('## Bugs found in the live app and fixed during migration (Section 19/29)');
   lines.push('');
@@ -793,7 +925,7 @@ function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguou
   }
   lines.push('## Not yet migrated (explicitly out of scope so far, not lost)');
   lines.push('');
-  lines.push('Every other legacy content type is untouched by this script and remains exactly as authored: misc/companion/treasure/questitem/document items (490 of loot-data.js\'s items), reference-data.js, npc-data.js, journey-data.js, puzzle-data.js, trap-data.js, cult-data.js, and monster/spell data (fetched live from the 5etools mirror, never stored locally). See docs/V2_MECHANICS_MIGRATION.md for the planned follow-up phases.');
+  lines.push('Every other legacy content type is untouched by this script and remains exactly as authored: companion/treasure/questitem/document items (86 of loot-data.js\'s items), reference-data.js, npc-data.js, journey-data.js, puzzle-data.js, trap-data.js, cult-data.js, and monster/spell data (fetched live from the 5etools mirror, never stored locally). See docs/V2_MECHANICS_MIGRATION.md for the planned follow-up phases.');
   lines.push('');
   return lines.join('\n');
 }
@@ -809,5 +941,6 @@ export {
   deriveWeaponMechanics, deriveWeaponProperties, toStatModifiers, findSetValueOverrides,
   scanResidualLanguage, applyMaterialModifiers, slugify, makeIdGenerator,
   deriveConsumableCategory, resolveConsumableUses,
-  migrateWeapon, migrateArmor, migrateConsumable, main,
+  deriveWondrousSlot, deriveToolCategory,
+  migrateWeapon, migrateArmor, migrateConsumable, migrateMisc, main,
 };
