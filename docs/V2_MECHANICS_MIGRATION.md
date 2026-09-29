@@ -575,28 +575,70 @@ that as expected rather than flag it. The other three were real bugs, found and 
     `isConditionallyPrefixed` catches this shape (a while/if/when clause, ending in a colon,
     immediately before the match, within the current sentence) and skips it — confirmed by scanning
     the full catalog to be the only weapon phrased this way today.
-- **Found, not fixed — flagged here rather than expanded into further scope:**
+- **Found, investigated, deliberately left as-is:**
   - `parseWeaponEffectBonuses`'s trailing guard also excludes "+1 to attack rolls **only** (not
     damage)" — the exact masterwork-style phrasing — since "only" is in the guard's exclusion list
     (meant for "only when X", a real condition) but here means "not *also* to damage," a scope
     clarification, not a condition. Confirmed to affect exactly 1 weapon in the catalog
-    ("Masterwork Longsword" — its real mechanic still applies correctly regardless, via the
-    materials system rather than this text).
+    ("Masterwork Longsword"). Investigated in Phase 14 and deliberately NOT fixed: this item's real
+    mechanic already applies correctly today via the independent materials-modifier pathway
+    (`material-masterwork` unconditionally adds `{stat:'attackRoll', value:1}` regardless of what
+    the effect text says), so teaching the text parser to also read the bonus would require new
+    dedup logic to avoid double-counting it against the materials-derived bonus — net effort for
+    zero net mechanical change. Left unfixed on purpose, not a gap awaiting future work.
   - The separate `bonusDiceRe` regex (`/(\d+d\d+...)\s+([a-z]+)?\s*damage/gi`, extracting "bonus
-    elemental damage dice" riders like Flame Tongue's "+2d6 fire") has no way to distinguish a
-    genuine bonus-damage rider from a weapon's own BASE damage restated in flavor text — "Hammer of
-    Thunderbolts": `"Deals 2d6+1 bludgeoning damage..."` gets read as an extra `2d6+1` bonus dice
-    clause on top of its own (identical) `dmg` field, and `"Giant-slaying: +2d6 additional
-    damage..."` gets read with `type:"additional"` (the word right before "damage", not a real
-    damage type) instead of the intended `type:"force"`-or-similar. Discovered while writing this
-    phase's own tests (not something shadow-mode's current checks cover at all — this function isn't
-    part of the stat/AC/weapon-attack/consumable-heal comparisons yet) — real, but unknown in scope
-    across the catalog; not investigated further this pass.
+    elemental damage dice" riders like Flame Tongue's "+2d6 fire") read `type:"additional"` for
+    "Giant-slaying: +2d6 **additional** damage..." (the word right before "damage", not a real damage
+    type, instead of the intended `type:"force"`-or-similar). Left as-is: a cosmetic label on a
+    correctly-valued bonus-damage entry, not a mechanics bug, and out of scope for Phase 14 below
+    (which fixed the adjacent, mechanically-real double-counting issue this same regex caused).
+    Its own-base-damage-restated-as-a-bonus issue, found in the same investigation, IS fixed — see
+    Phase 14.
 
 Current result: `npm run validate-migration` checks all 1207 loot-data.js-sourced migrated items and
 reports zero unexpected divergences (88 armor AC dedups, 343 weapon damage dedups — up from 291 after
 the "rolls"-optional fix — 1 AC "total" recap drop, 2 masterwork attackRoll additions — all
 individually confirmed, not just counted).
+
+## Phase 14: fixing `bonusDiceRe`'s own-base-damage double count
+
+Phase 13 found, but left uninvestigated, that `parseWeaponEffectBonuses`'s `bonusDiceRe` (extracting
+"bonus elemental damage dice" riders like Flame Tongue's "+2d6 fire" from an item's `effect` text)
+has no way to tell a genuine bonus-damage rider apart from a weapon simply restating its own base
+damage in flavor text.
+
+- **Precise scope, not a heuristic guess.** A first pass measuring this by die-size alone (any
+  bonus-dice clause the same size as the weapon's `dmg` field) overcounted badly — 45 "matches,"
+  almost all of them legitimate same-sized-but-genuinely-separate bonus riders (e.g. Iron Whip of
+  the Echo's "an extra 1d4 thunder damage on a critical hit," a real bonus that happens to share a
+  die size with something else on the same weapon). Re-measured with an exact full-`dmg`-string
+  match instead, the real scope is exactly 2 catalog weapons: **Hammer of Thunderbolts**
+  (`dmg:"2d6+1"`, effect opens "Deals 2d6+1 bludgeoning damage...") and **Arcane Cannon**
+  (`dmg:"3d8"`, effect reads "...dealing 3d8 force damage..."). Both were being double-counted: once
+  correctly via their `dmg` field, once again as a phantom `bonusDiceClauses` entry pulled from their
+  own flavor text — inflating their real damage output.
+- **Fix:** `parseWeaponEffectBonuses(effect, dmgField)` takes a new optional second parameter — the
+  item's own structured `dmg` string. Inside the `bonusDiceRe` loop, a clause is skipped when its
+  dice string is an EXACT match (whitespace-normalized) for `dmgField`. An exact-string match, not a
+  same-size match, is the whole point: Hammer of Thunderbolts' own "Giant-slaying: +2d6 additional
+  damage vs. giants" bonus (a real, separate rider, sharing nothing but a die *count* with the
+  restated "2d6+1" base damage) is correctly kept, only the identical "2d6+1" restatement is dropped.
+  Applied identically in both copies of the function (`scripts/migrate-legacy-content.js` and the
+  monolith's own copy, `dungeon_loot_wheel_v102_spell_details.html`), and at both call sites
+  (`migrateWeapon`, `computeWeaponAttackRoll`) to pass `item.dmg` through.
+- **Verified three ways:** the full test suite (335/335, including new regression tests for both
+  confirmed items plus a negative case proving a genuine same-sized-but-distinct rider is NOT
+  filtered), a re-run of `npm run validate-migration` (zero unexpected divergences — this function's
+  `bonusDiceClauses` output isn't part of shadow-mode's own comparisons, so this doesn't change its
+  reported categories, but confirms nothing else regressed), and direct inspection of the regenerated
+  `mechanics/canonical/items.json`: Arcane Cannon now has no `bonusDamage` array at all (previously
+  duplicated its own `3d8`), and Hammer of Thunderbolts' `bonusDamage` now contains only the real
+  giant-slaying `{dice:"2d6", type:"additional"}` rider, not a second entry for its own restated
+  `2d6+1`. Also confirmed live in the running app via a headless-browser check calling the monolith's
+  own `parseWeaponEffectBonuses` against both items' real `loot-data.js` text — same result.
+- **Not touched:** the `type:"additional"` cosmetic mislabel on that same giant-slaying entry (see
+  "Found, investigated, deliberately left as-is" above) and the "only" guard-clause gap — both
+  considered separately and left as documented, deliberate non-fixes, not overlooked.
 
 ## Not yet done (future phases, same approach)
 
@@ -648,14 +690,16 @@ the live regex path it replaces (Phase 13, all above). What's left:
    multiplayer sync layer, not `applyStateBlob`) doesn't get Phase 12's upgrade pass — see Phase
    12's "Still not covered" note above. Degrades to the pre-Phase-7 regex path for that one item,
    for that one viewer, not an error.
-5. Two small residual gaps in `parseWeaponEffectBonuses`, found by Phase 13's shadow-mode
-   validation and documented there in detail (the "+N attack and damage" no-"rolls" gap affecting
-   50 weapons, and a conditional-prefix false-positive risk, were both found AND fixed in Phase 13
-   itself — these two are the ones that weren't): the guard clause's "only" exclusion means "+1 to
-   attack rolls only (not damage)" still parses as no bonus at all (affects exactly 1 weapon,
-   "Masterwork Longsword" — its real mechanic still applies via the materials system regardless);
-   and the separate bonus-elemental-damage-dice regex can't tell a genuine bonus rider apart from a
-   weapon's own base damage restated in flavor text (scope across the catalog not investigated).
+5. One residual gap in `parseWeaponEffectBonuses`, found by Phase 13's shadow-mode validation and
+   investigated in full: the guard clause's "only" exclusion means "+1 to attack rolls only (not
+   damage)" still parses as no bonus at all (affects exactly 1 weapon, "Masterwork Longsword").
+   Deliberately left unfixed — see Phase 13's "Found, investigated, deliberately left as-is" note —
+   since the item's real mechanic already applies correctly via the independent materials-modifier
+   pathway, and fixing the text parser would only add double-count-avoidance complexity for zero net
+   mechanical change. (Two related gaps Phase 13 originally flagged here — the "+N attack and
+   damage" no-"rolls" case affecting 50 weapons, and the bonus-elemental-damage-dice regex
+   double-counting a weapon's own restated base damage — were fixed in Phase 13 and Phase 14
+   respectively; see those sections above.)
 
 ## Running the migration tool
 

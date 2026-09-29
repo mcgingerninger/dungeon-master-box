@@ -124,14 +124,44 @@ describe('parseWeaponEffectBonuses', () => {
   // trailing "when/while/..." the existing guard already excludes) must not be treated as always-on.
   test('a "While attuned with X AND Y: +N attack and damage" conditional prefix is NOT treated as an always-on bonus', () => {
     const effect = 'Deals 2d6+1 bludgeoning damage. While attuned with Belt of Giant Strength AND Gauntlets of Ogre Power: +5 attack and damage, giant hit DC 17 Wisdom or Frightened of you for 1 minute. Requires attunement.';
-    // bonusDiceClauses: [{dice:'2d6+1',...}] here is a separate, PRE-EXISTING quirk of the
-    // bonus-dice-clause regex (it matches any "NdM [type] damage" phrase, including the weapon's
-    // own base damage restated in flavor text) — unrelated to and unaffected by this fix, not
-    // asserted away here since that's a different, undocumented gap, not this test's subject.
+    // Without a dmgField, bonusDiceRe still catches "2d6+1 bludgeoning damage" as a clause — this
+    // test's subject is the conditional-prefix guard, not the dmgField filter below, so no dmgField
+    // is passed here and the clause is expected to appear.
     assert.deepEqual(parseWeaponEffectBonuses(effect), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [{ dice: '2d6+1', type: 'bludgeoning' }] });
   });
   test('the existing trailing guard (when/while/with/made/only right after the phrase) still excludes a conditional suffix', () => {
     assert.deepEqual(parseWeaponEffectBonuses('+2 to attack and damage rolls while raging.'), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [] });
+  });
+});
+
+// Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison
+// (Phase 13, docs/V2_MECHANICS_MIGRATION.md): bonusDiceRe matches any "NdM [type] damage" phrase in
+// the effect text, with no way to tell a genuine bonus-damage rider (e.g. Flame Tongue's "+2d6 fire
+// damage") apart from a weapon restating its OWN base damage in flavor text (e.g. Hammer of
+// Thunderbolts: dmg:"2d6+1", effect:"Deals 2d6+1 bludgeoning damage..."). Confirmed to affect
+// exactly 2 catalog items via an exact full-dmg-string match. Fixed by passing the item's dmg field
+// in as dmgField and excluding an exact match from bonusDiceClauses.
+describe('parseWeaponEffectBonuses — dmgField filters a weapon\'s own base damage out of bonusDiceClauses', () => {
+  test('Hammer of Thunderbolts: effect text restates the weapon\'s own dmg — filtered out when dmgField is passed', () => {
+    const effect = 'Deals 2d6+1 bludgeoning damage. On a critical hit, the target must succeed on a DC 17 Strength saving throw or be stunned.';
+    assert.deepEqual(parseWeaponEffectBonuses(effect, '2d6+1'), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [] });
+    // Without dmgField, the same text still produces the old (unfiltered) clause — confirms the
+    // filter is opt-in via the new parameter, not a change to default behavior.
+    assert.deepEqual(parseWeaponEffectBonuses(effect), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [{ dice: '2d6+1', type: 'bludgeoning' }] });
+  });
+  test('Arcane Cannon: effect text restates the weapon\'s own dmg with a different damage type wording — filtered out', () => {
+    const effect = 'A massive arcane weapon dealing 3d8 force damage to all creatures in a 10-foot-wide, 60-foot-long line.';
+    assert.deepEqual(parseWeaponEffectBonuses(effect, '3d8'), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [] });
+  });
+  test('a genuine same-sized bonus rider distinct from the weapon\'s own dmg is NOT filtered out', () => {
+    // dmgField ('2d6', the weapon's actual base damage) does not match the rider's dice ('1d4'), so
+    // the exact-string-match filter correctly leaves the rider alone.
+    const effect = 'Deals an extra 1d4 thunder damage on a critical hit. Requires attunement.';
+    assert.deepEqual(parseWeaponEffectBonuses(effect, '2d6'), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [{ dice: '1d4', type: 'thunder' }] });
+  });
+  test('a genuinely separate bonus rider alongside the weapon\'s own restated dmg keeps the rider and drops only the restated dmg', () => {
+    const effect = 'Deals 2d6 bludgeoning damage. Also deals an extra 2d8 fire damage on a hit.';
+    assert.deepEqual(parseWeaponEffectBonuses(effect, '2d6'), { atkBonus: 0, dmgBonus: 0, bonusDiceClauses: [{ dice: '2d8', type: 'fire' }] });
   });
 });
 

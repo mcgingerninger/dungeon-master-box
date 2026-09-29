@@ -238,7 +238,19 @@ function isConditionallyPrefixed(text, matchIndex) {
 function isGuardedSuffix(text, index) {
   return /^\s*(when|while|with|made|only)\b/i.test(text.slice(index));
 }
-function parseWeaponEffectBonuses(effect) {
+// dmgField (the item's own structured dmg string, e.g. "2d6+1") is optional context, used only to
+// exclude a weapon's own base damage from bonusDiceClauses below — a small, real gap found while
+// writing this phase's own tests (Phase 13, docs/V2_MECHANICS_MIGRATION.md): a few items restate
+// their own base damage in flavor text ("Hammer of Thunderbolts": dmg:"2d6+1", effect:"Deals 2d6+1
+// bludgeoning damage..."; "Arcane Cannon": dmg:"3d8", effect:"...dealing 3d8 force damage..."), and
+// bonusDiceRe (below) has no way to tell that apart from a genuine bonus-damage rider like Flame
+// Tongue's "+2d6 fire damage" — without this, both items would roll their own base damage twice
+// (once via dmgResult, once again via a spurious bonusDiceClauses entry). Confirmed to affect
+// exactly these 2 weapons in the full catalog (an exact, full dmg-string match, not just a
+// same-sized-die coincidence — several OTHER items legitimately use a same-sized bonus rider on
+// top of their own base damage, e.g. "an extra 1d4 thunder damage on a critical hit" alongside a
+// 1d4-based weapon, which is a real separate bonus and must still be counted).
+function parseWeaponEffectBonuses(effect, dmgField) {
   const t = String(effect || '');
   let atkBonus = 0, dmgBonus = 0;
   const comboMatch = t.match(/\+(\d+)\s+(?:to\s+)?(?:all\s+)?attack and damage(?:\s+rolls)?\b/i);
@@ -256,9 +268,12 @@ function parseWeaponEffectBonuses(effect) {
   }
   const bonusDiceClauses = [];
   const bonusDiceRe = /(\d+d\d+(?:\s*[+-]\s*\d+)?)\s+([a-z]+)?\s*damage/gi;
+  const ownDmg = dmgField ? String(dmgField).replace(/\s+/g, '') : null;
   let dm;
   while ((dm = bonusDiceRe.exec(t)) !== null) {
-    bonusDiceClauses.push({ dice: dm[1].replace(/\s+/g, ''), type: (dm[2] || '').toLowerCase() });
+    const dice = dm[1].replace(/\s+/g, '');
+    if (dice === ownDmg) continue;
+    bonusDiceClauses.push({ dice, type: (dm[2] || '').toLowerCase() });
   }
   return { atkBonus, dmgBonus, bonusDiceClauses };
 }
@@ -476,7 +491,7 @@ function migrateWeapon(item, tier, index, nextId, ambiguous, fixes) {
     ambiguous.push({ name, tier, reason: 'could not determine simple/martial proficiency category from name — left unset', classification });
   }
 
-  const { atkBonus, dmgBonus: textDmgBonus, bonusDiceClauses } = parseWeaponEffectBonuses(effect);
+  const { atkBonus, dmgBonus: textDmgBonus, bonusDiceClauses } = parseWeaponEffectBonuses(effect, item.dmg);
   let dmgBonus = textDmgBonus;
   if (dmgEmbeddedMod && textDmgBonus && dmgEmbeddedMod !== textDmgBonus) {
     // Genuinely conflicting numbers (not just redundant phrasing of the same bonus) — don't guess

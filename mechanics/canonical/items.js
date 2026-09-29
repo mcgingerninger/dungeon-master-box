@@ -15286,13 +15286,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "3d8",
-      "damageType": "bludgeoning",
-      "bonusDamage": [
-        {
-          "dice": "3d8",
-          "type": "force"
-        }
-      ]
+      "damageType": "bludgeoning"
     },
     "narrative": {
       "unlocks": [
@@ -28960,10 +28954,6 @@ const canonicalItems = [
       "damageType": "bludgeoning",
       "weaponCategory": "martial",
       "bonusDamage": [
-        {
-          "dice": "2d6+1",
-          "type": "bludgeoning"
-        },
         {
           "dice": "2d6",
           "type": "additional"
