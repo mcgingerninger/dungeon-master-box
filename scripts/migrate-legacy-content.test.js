@@ -201,6 +201,41 @@ describe('migrateArmor', () => {
     assert.equal(result.armor.armorType, 'medium');
     assert.ok(ambiguous.some(a => a.reason.includes("body armor's weight class")));
   });
+
+  // Real bug found while wiring collectEquippedAcBreakdown's canonical-item bridge: classifySubcategory's
+  // armor branch (verbatim-ported, never touched) only recognizes the literal word "shield", and has
+  // no neck-item pattern at all — so a "Buckler" or "Amulet of ___" both fell through to its 'chest'
+  // catch-all. That's harmless where subcategory is only a weight-bucketing hint (the original app),
+  // but migrateArmor also uses it to decide isBodySlot/additive — left uncorrected, a Buckler would
+  // migrate as non-additive body armor, REPLACING a player's AC with a flat 1 instead of adding it.
+  test('a "Buckler" with no literal "shield" in its name is still recognized as a shield (additive)', () => {
+    const item = { name: 'Buckler of the Whisperbound', desc: 'A small round shield.', type: 'armor', gp: '100 gp', ac: '+1', effect: '' };
+    const ambiguous = [];
+    const result = migrateArmor(item, 'uncommon', 0, makeIdGenerator(), ambiguous, []);
+    assert.equal(result.armor.slot, 'shield');
+    assert.equal(result.armor.armorType, 'shield');
+    assert.equal(result.armor.additive, true);
+    assert.equal(result.armor.baseAC, 1);
+    assert.ok(ambiguous.some(a => a.reason.includes("corrected to 'offhand (shield)'")));
+  });
+
+  test('an "Amulet of ___" armor item is recognized as a neck slot (additive), not body armor', () => {
+    const item = { name: 'Amulet of Natural Armor +1', desc: 'A magical amulet.', type: 'armor', gp: '500 gp', ac: '+1', effect: '' };
+    const ambiguous = [];
+    const result = migrateArmor(item, 'uncommon', 0, makeIdGenerator(), ambiguous, []);
+    assert.equal(result.armor.slot, 'amulet');
+    assert.equal(result.armor.additive, true);
+    assert.equal(result.armor.baseAC, 1);
+    assert.ok(ambiguous.some(a => a.reason.includes("corrected to 'amulet (neck)'")));
+  });
+
+  test('genuine body armor named "Robe of ___" is unaffected by the shield/neck name correction', () => {
+    const item = { name: 'Robe of Eyes', desc: 'A robe.', type: 'armor', gp: '5000 gp', ac: '+2', effect: '' };
+    const result = migrateArmor(item, 'rare', 0, makeIdGenerator(), [], []);
+    assert.equal(result.armor.slot, 'chest');
+    assert.equal(result.armor.additive, undefined);
+    assert.equal(result.armor.baseAC, 2);
+  });
 });
 
 describe('applyMaterialModifiers — real mechanics, not classification labels', () => {

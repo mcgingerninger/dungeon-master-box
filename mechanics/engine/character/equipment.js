@@ -56,6 +56,10 @@ function isTwoHanded(item) {
 export function equipmentSlotsForItem(item) {
   if (item.itemType === 'weapon') return ['weapon1', 'weapon2'];
   if (item.itemType === 'armor') {
+    // Same amulet1/amulet2 family a wondrous item's slot:'amulet' expands to below — an armor-type
+    // amulet (e.g. a migrated "Amulet of Natural Armor") competes for the same two neck slots, not
+    // a single dedicated one, the same way a one-handed weapon picks weapon1 or weapon2.
+    if (item.armor?.slot === 'amulet') return AMULET_SLOTS;
     const slot = ARMOR_SLOT_TO_EQUIPMENT_SLOT[item.armor?.slot];
     return slot ? [slot] : [];
   }

@@ -3405,16 +3405,16 @@
     "name": "Amulet of Natural Armor +1",
     "itemType": "armor",
     "rarity": "uncommon",
-    "weight": 31,
+    "weight": 0.8,
     "value": "150 gp",
     "flavorText": "A flat disc of iron engraved with a protective rune.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "light",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "amulet",
+      "additive": true
     },
     "legacySource": {
       "tier": "uncommon",
@@ -11064,16 +11064,16 @@
     "name": "Steel Buckler of the Tide",
     "itemType": "armor",
     "rarity": "uncommon",
-    "weight": 31,
+    "weight": 10,
     "value": "225 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the tide.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -11919,16 +11919,16 @@
     "name": "Buckler of the Whisperbound",
     "itemType": "armor",
     "rarity": "uncommon",
-    "weight": 40,
+    "weight": 12,
     "value": "725 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the whisper.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -12642,16 +12642,16 @@
     "name": "Buckler of the Wildroot",
     "itemType": "armor",
     "rarity": "uncommon",
-    "weight": 31,
+    "weight": 10,
     "value": "575 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the wild.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -19844,16 +19844,16 @@
     "name": "Mithral Buckler of the Venom",
     "itemType": "armor",
     "rarity": "rare",
-    "weight": 12,
+    "weight": 4.25,
     "value": "7000 gp",
     "flavorText": "A buckler that shifts color faintly in the presence of the venom.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest",
+      "slot": "shield",
+      "additive": true,
       "stealthDisadvantage": false
     },
     "passive": [
@@ -20118,16 +20118,16 @@
     "name": "Buckler of the Thundering",
     "itemType": "armor",
     "rarity": "rare",
-    "weight": 11,
+    "weight": 5,
     "value": "8000 gp",
     "flavorText": "Buckler that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -20772,16 +20772,16 @@
     "name": "Buckler of the Mindshard",
     "itemType": "armor",
     "rarity": "rare",
-    "weight": 22,
+    "weight": 8,
     "value": "5000 gp",
     "flavorText": "Well-worn buckler, clearly built by someone who understood the whisper better than most.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -20932,16 +20932,16 @@
     "name": "Buckler of the Scorching",
     "itemType": "armor",
     "rarity": "rare",
-    "weight": 32,
+    "weight": 10,
     "value": "7000 gp",
     "flavorText": "A buckler that shifts color faintly in the presence of the ember flame.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 1,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -26538,16 +26538,16 @@
     "name": "Duskwoven Buckler",
     "itemType": "armor",
     "rarity": "superrare",
-    "weight": 22,
+    "weight": 7.5,
     "value": "54500 gp",
     "flavorText": "Buckler that never seems to gather dust, dirt, or rust — as if the shadow kept it clean.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 2,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {
@@ -27478,16 +27478,16 @@
     "name": "Buckler of the Thornwoven",
     "itemType": "armor",
     "rarity": "superrare",
-    "weight": 10,
+    "weight": 5,
     "value": "63500 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the wild.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
+      "armorType": "shield",
       "baseAC": 2,
       "addsDexMod": true,
-      "dexModCap": 2,
-      "slot": "chest"
+      "slot": "shield",
+      "additive": true
     },
     "passive": [
       {

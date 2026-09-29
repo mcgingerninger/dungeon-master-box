@@ -508,17 +508,35 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
   const subcategory = classifySubcategory(name, 'armor', tier, desc);
   const classification = classifyItemHierarchy({ ...item, subcategory }, tier);
 
+  // classifySubcategory (verbatim-ported, kept byte-identical — its armor branch was only ever
+  // validated as a WEIGHT-bucketing helper in the original app, never as a source of mechanical
+  // truth) has no "shield synonym" pattern beyond the literal word "shield", and no neck-item
+  // pattern at all in its armor branch (only its misc branch recognizes amulets) — so a "Buckler"
+  // or an "Amulet of Natural Armor" both fall through to its 'chest' catch-all. That was harmless
+  // in the original app (subcategory never fed AC math there, only weight), but THIS migration
+  // reuses subcategory to decide isBodySlot/additive/slot below, which are real mechanics — left
+  // uncorrected, these items would migrate as non-additive body armor, replacing a player's AC
+  // with a flat 1 or 2 instead of adding it on top, a real regression from live behavior. Corrected
+  // here with a narrow, additional name check (not by editing the verbatim-ported function itself)
+  // — mirrors the classifiedAsWondrous correction already used the same way in migrateMisc.
+  const isShieldByName = subcategory === 'chest' && /buckler|\btarge\b|pavise/i.test(name);
+  const isNeckByName = subcategory === 'chest' && /amulet|necklace|pendant|periapt|\btorc\b|gorget|holy symbol|talisman|locket|brooch|medallion/i.test(name);
+  if (isShieldByName || isNeckByName) {
+    ambiguous.push({ name, tier, reason: `classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to '${isShieldByName ? 'offhand (shield)' : 'amulet (neck)'}' by name, needs a one-time confirmation`, legacySubcategory: subcategory });
+  }
+  const effectiveSlotCategory = isShieldByName ? 'offhand' : isNeckByName ? 'amulet' : subcategory;
+
   const acMatch = /^\s*([+-]?)(\d+)\s*$/.exec(String(item.ac ?? ''));
   if (!acMatch) {
     ambiguous.push({ name, tier, reason: 'no parseable armor.ac value — excluded from this migration pass', legacyAc: item.ac ?? null });
     return null;
   }
   const acValue = parseInt(acMatch[2], 10);
-  const isBodySlot = subcategory === 'chest';
+  const isBodySlot = effectiveSlotCategory === 'chest';
   const additive = !isBodySlot;
 
-  const SLOT_MAP = { offhand: 'shield', head: 'helmet', facewear: 'facewear', cloak: 'cloak', belt: 'beltwaist', boots: 'boots', leggings: 'leggings', handwear: 'handwear', chest: 'chest' };
-  const slot = SLOT_MAP[subcategory] || 'chest';
+  const SLOT_MAP = { offhand: 'shield', head: 'helmet', facewear: 'facewear', cloak: 'cloak', belt: 'beltwaist', boots: 'boots', leggings: 'leggings', handwear: 'handwear', chest: 'chest', amulet: 'amulet' };
+  const slot = SLOT_MAP[effectiveSlotCategory] || 'chest';
 
   // Only the BODY armor slot ('chest') ever has its armorType actually read for mechanics
   // (addsDexMod/dexModCap in mechanics/engine/character/equipment.js's computeEquippedArmorClass —
@@ -528,7 +546,7 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
   // leggings/cloak/facewear/beltwaist) armorType is cosmetic only — best-effort from
   // classification when available, a harmless 'light' placeholder otherwise, never flagged.
   let armorType;
-  if (subcategory === 'offhand') {
+  if (effectiveSlotCategory === 'offhand') {
     armorType = 'shield';
   } else if (isBodySlot) {
     const leaf = classification[1]; // 'Heavy Armor'|'Medium Armor'|'Light Armor'|'Exotic Material'
@@ -584,7 +602,7 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
     name,
     itemType: 'armor',
     rarity: tier,
-    weight: computeItemWeight(item, subcategory),
+    weight: computeItemWeight(item, effectiveSlotCategory),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),

@@ -1082,43 +1082,17 @@ These items WERE migrated with their best-effort derived mechanics (nothing belo
 - **Ashes of a Dying God** (celestial): effect text contains mechanical-sounding language (damage/save/condition/duration) this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **Celestial Steed of the Silver Path** (celestial): effect text contains mechanical-sounding language (per-rest/per-day abilities, conditional riders, etc.) beyond AC/speed/a mounted attack bonus this migration extracts — full text preserved in flavorText, needs manual review
 
-### could not determine body armor's weight class from name/desc (36)
-- **Amulet of Natural Armor +1** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Armor of Gleaming** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Cast-Off Armor** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Smoldering Armor** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Barrier Tattoo (Medium)** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Hunter's Coat** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Steel Buckler of the Tide** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Buckler of the Whisperbound** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Buckler of the Wildroot** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Armor +2** (rare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Mithral Buckler of the Venom** (rare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Mithral") — defaulted to medium, needs manual review
-- **Buckler of the Thundering** (rare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Buckler of the Mindshard** (rare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Buckler of the Scorching** (rare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Armor of Invulnerability** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Barrier Tattoo (Heavy)** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Dragonhide Armor** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Dragonscale / Elemental") — defaulted to medium, needs manual review
-- **Duskwoven Buckler** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Buckler of the Thornwoven** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Demon Armor (Cursed)** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Aegis of the Last Stand** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Robes of the Still Storm** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Signet of the Forgotten House** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Vexiel, the Silent Scream** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Vyrorn Aethash, the Gravebound** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Vyrith Solara, the Mindbreaker** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Feniel Zariel, the Long Winter** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Vorax, the Gravebound** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Silwyn Vorith, the Last Ember** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Aegis Eternal** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **The Mercykeeper's Sigil** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Dragonscale / Elemental") — defaulted to medium, needs manual review
-- **Shroud of the Silent Heaven** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Dragonscale / Elemental") — defaulted to medium, needs manual review
-- **Thalara, the Frostbitten** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Whisume Soliel, the Sunward** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Vyrume Briara, the Unbroken** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
-- **Myross Koross, the Sunward** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+### classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (10)
+- **Amulet of Natural Armor +1** (uncommon): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'amulet (neck)' by name, needs a one-time confirmation
+- **Steel Buckler of the Tide** (uncommon): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Buckler of the Whisperbound** (uncommon): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Buckler of the Wildroot** (uncommon): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Mithral Buckler of the Venom** (rare): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Buckler of the Thundering** (rare): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Buckler of the Mindshard** (rare): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Buckler of the Scorching** (rare): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Duskwoven Buckler** (superrare): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
+- **Buckler of the Thornwoven** (superrare): classifySubcategory's armor branch has no pattern for this name and defaulted it to 'chest' (body armor) — corrected to 'offhand (shield)' by name, needs a one-time confirmation
 
 ### item.hp (2)
 - **Potion of Heroism** (uncommon): item.hp ("10 temp HP") is not plain dice notation (temporary HP or a full-heal phrasing) — OnUseEffect's heal kind can't represent this correctly, left as a utility placeholder, needs a schema extension or manual handling
@@ -1175,6 +1149,34 @@ These items WERE migrated with their best-effort derived mechanics (nothing belo
 - **Pearl of Power** (uncommon): item has a structured legacy "abilities" entry (Regain Slot) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
 - **The Legion Seal** (rare): item has a structured legacy "abilities" entry (Compel Truth) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
 - **The Cinderwright's Press** (rare): item has a structured legacy "abilities" entry (Print Pamphlet) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
+
+### could not determine body armor's weight class from name/desc (26)
+- **Armor of Gleaming** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Cast-Off Armor** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Smoldering Armor** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Barrier Tattoo (Medium)** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Hunter's Coat** (uncommon): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Armor +2** (rare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Armor of Invulnerability** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Barrier Tattoo (Heavy)** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Dragonhide Armor** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Dragonscale / Elemental") — defaulted to medium, needs manual review
+- **Demon Armor (Cursed)** (superrare): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Aegis of the Last Stand** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Robes of the Still Storm** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Signet of the Forgotten House** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Vexiel, the Silent Scream** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Vyrorn Aethash, the Gravebound** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Vyrith Solara, the Mindbreaker** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Feniel Zariel, the Long Winter** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Vorax, the Gravebound** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Silwyn Vorith, the Last Ember** (legendary): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Aegis Eternal** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **The Mercykeeper's Sigil** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Dragonscale / Elemental") — defaulted to medium, needs manual review
+- **Shroud of the Silent Heaven** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Dragonscale / Elemental") — defaulted to medium, needs manual review
+- **Thalara, the Frostbitten** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Whisume Soliel, the Sunward** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Vyrume Briara, the Unbroken** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
+- **Myross Koross, the Sunward** (celestial): could not determine body armor's weight class from name/desc (classified as "Armor > Exotic Material > Unclassified Material") — defaulted to medium, needs manual review
 
 ### charges "1d4+1 applications" is dice notation (1)
 - **Keoghtom's Ointment** (uncommon): charges "1d4+1 applications" is dice notation — legacy rolls this once with true randomness on first use; this migration rolled it once deterministically instead (result: 3) to keep the migration itself reproducible, needs manual review/reroll if the exact starting count matters

@@ -124,7 +124,9 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @property {number} baseAC
  * @property {boolean} addsDexMod
  * @property {number} [dexModCap]
- * @property {'helmet'|'chest'|'handwear'|'boots'|'leggings'|'facewear'|'cloak'|'beltwaist'|'shield'} [slot]
+ * @property {'helmet'|'chest'|'handwear'|'boots'|'leggings'|'facewear'|'cloak'|'beltwaist'|'shield'|'amulet'} [slot]
+ *   // 'amulet' is a slot FAMILY like a wondrous item's — see equipmentSlotsForItem in
+ *   // character/equipment.js, which expands it to the same amulet1/amulet2 pair.
  * @property {number} [strengthRequirement]
  * @property {boolean} [stealthDisadvantage]
  * @property {boolean} [additive]  // true for a shield or an accessory piece whose baseAC ADDS to
