@@ -667,6 +667,69 @@ whole gap. Verified live: simulated a foreign player's state with a legacy-shape
 `applyViewedPlayerState`, and confirmed `resolveForeignItem` then returns that item with a real
 `__canonical` attached.
 
+### Phase 14c: honest `toolCategory` for the 14 misc items flagged "mis-scoped" in Phases 3-4
+
+Phases 3-4's own migration report flags exactly 16 `type: 'misc'` items as `isUninformativeToolClassification`
+— their real classification (via the same hierarchy cascade every other item uses) landed outside the
+Tool/Miscellaneous branches `deriveToolCategory` knows how to read, in a place the report's own note
+already names as "quest/document/treasure content mis-scoped into this migration's misc-item pass."
+2 of those 16 (Waterskin, Chalk) land in the genuinely-uninformative "Unidentified Object" catch-all
+and were already migrated with a disclosed, honest fallback (`unidentified-object`) — no change here.
+The other 14 (Rusty Key, Mystery Key, Crumpled Letter, Half-Written Journal, Folded Map (Personal),
+Aldric's Unsent Letter, Scrap of Foreign Cloth, Universal Solvent, and the six ability-score-boosting
+tomes — Manual of Bodily Health/Gainful Exercise/Quickness of Action, Tome of Clear Thought/
+Leadership and Influence/Understanding) still had a real, specific classification leaf (e.g. "Key /
+Quest Object > Key > Physical Key", "Document > Book > Magic") that `deriveToolCategory` was simply
+discarding in favor of an invented, generic `'adventuring-gear'` label for every one of them — not
+because a specific category wasn't knowable, but because the function only ever looked for one inside
+the Tool/Miscellaneous branches.
+
+**Fix:** `deriveToolCategory`'s fallback branch now reuses that same leaf (slugified), the identical
+technique `narrativeToolCategory` already applies to the SAME shape of content (treasure/questitem/
+document) when it isn't mistagged as `misc` in the source data — consistent with, not a new pattern
+alongside, the existing design. A genuinely leaf-less case (nothing after the top-level branch) still
+falls back to the disclosed generic `'adventuring-gear'` label, now correctly reserved for only that
+case. Verified: all 14 items now carry an honest, specific `toolCategory` (`physical-key`, `personal`,
+`dungeon`, `cloth-fabric`, `magic` ×6, `solvent`) in the regenerated canonical data; the full test
+suite (336/336, including updated/new `deriveToolCategory` regression tests) and a shadow-mode
+re-validation (zero unexpected divergences — `toolCategory` has no live-app regex-path equivalent to
+compare against, so this was never part of what shadow-mode checks) both pass. `toolCategory` is
+purely descriptive (confirmed: read only by `validate-item.js`'s non-empty check, never by any
+gating/rendering logic in the live app or engine), so this is a data-quality improvement with zero
+behavioral risk.
+
+**Still flagged ambiguous, on purpose, not silently resolved:** these 14 items remain in the
+migration report's ambiguous list — a better `toolCategory` doesn't change the underlying fact that
+they were authored as `misc` but classify as something else, which is still worth a human's eventual
+look. What follows is a separate, larger finding surfaced while investigating this, NOT fixed here —
+flagged for a decision, not acted on unilaterally, since it's well outside a "small item" fix and
+touches far more than 16 items:
+
+**A real, much larger content-preservation gap found, not fixed:** the six ability-score tomes above
+have a genuine, structured, permanently-missing mechanic — e.g. Manual of Bodily Health's `effect`
+reads "Read over 48 hours across 6 days: Constitution score and max HP permanently increase by 2. Tome
+loses magic after use. Recharges magic in a century," and NONE of that reaches the canonical item at
+all today (only `desc`, the flavor description, maps to `flavorText`; `effect` is dropped entirely
+whenever `type: 'misc'` migrates onto the `itemType: 'tool'` fallback, and `migrateNarrativeTool` —
+used for real `treasure`/`questitem`/`document` items — has the identical gap). Checked the scope:
+of 404 `type: 'misc'` items, 401 have non-empty `effect` text, and confirmed none of it is preserved
+anywhere in canonical output for any item that lands on the `tool` itemType (only `wondrous` items
+keep it, and only the numeric stat-bonus portion `extractStatDeltasFromText` can parse — the prose
+itself, e.g. a Torch's "Sheds bright light 20-ft radius..." or a Grappling Hook's "DC 10 Dexterity to
+set...", is lost too). `item-schema.js`'s own doc comment explicitly frames this as deliberate for
+`tool`-typed items generally ("nothing in this engine ever parses [flavorText] for mechanics") and for
+treasure/questitem/document specifically ("no real mechanic to model beyond identity/content/
+category") — whether that was written with full awareness of cases like the six tomes (a real,
+consistently-shaped, easily-structured mechanic, not narrative flavor) isn't something this pass can
+determine with confidence, so it's surfaced here rather than assumed either way. Two independent
+questions for a future, properly-scoped pass, not conflated: (1) should `effect`/prose-description text
+be preserved for display even where it's genuinely narrative/GM-adjudicated (a `tool`/narrative-item
+analog to `Ability.description`'s established "honest gap, preserved as free text" pattern), and (2) do
+the six ability-score tomes warrant an actual new structured mechanic (the schema has no "permanent
+stat increase on single use" concept today — `OnUseEffect`'s `statMods`/`durationMs` model a temporary
+buff, not a permanent absorb-and-consume effect). Out of scope for this pass; not silently dropped from
+the record either.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
@@ -678,10 +741,19 @@ already-existing save (Phase 12), a real Combat-kill monster-part drop now build
 engine (Phase 11), and a permanent shadow-mode regression check validates the whole bridge against
 the live regex path it replaces (Phase 13, all above). What's left:
 
-1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
-   different type than authored (ability-score-boosting "Manual of ___" tomes classified as
-   Document, a few keys/letters) — flagged in the migration report, not silently reclassified;
-   worth a manual look but not urgent since nothing was lost or broken.
+1. A handful of `misc`-typed items surfaced during Phases 3-4 as really belonging to a different type
+   than authored (ability-score-boosting "Manual of ___"/"Tome of ___" tomes classified as Document,
+   a few keys/letters/a map/a cloth scrap/a solvent) — flagged in the migration report, not silently
+   reclassified; given an honest, specific `toolCategory` in Phase 14c rather than an invented generic
+   one, but not moved to a different `itemType` (still worth a manual look, not urgent since nothing
+   mechanical was lost or broken by staying `tool`-typed). Phase 14c's investigation also surfaced a
+   larger, separate, NOT-yet-fixed finding worth a properly-scoped pass of its own: none of a
+   `tool`-typed item's `effect`/prose text is preserved anywhere in canonical output (only `desc`→
+   `flavorText` is) — confirmed across all 404 `misc` items, 401 of which have non-empty `effect` text
+   that's silently absent from canonical data today, the six ability-score tomes' actual "permanently
+   increase a score" mechanic included. See Phase 14c for the full writeup and the two separate
+   questions (display-only text preservation vs. a genuinely new "permanent stat increase on use"
+   mechanic) a future pass would need to answer.
 2. The rest of `npc-data.js` (creature stat blocks, combat definitions, relationship/connection
    data — `NPC_LIBRARY`/`NPC_COMBAT_DEFS`/`NPC_CONNECTIONS` and similar), journeys/puzzles/traps
    (`journey-data.js`/`puzzle-data.js`/`trap-data.js` — traps are already fully structured today,

@@ -492,8 +492,21 @@ describe('deriveToolCategory', () => {
     assert.equal(deriveToolCategory(['Miscellaneous', 'Adventuring Gear', 'Container']), 'container');
     assert.equal(deriveToolCategory(['Miscellaneous', 'Household', 'Cookware']), 'cookware');
   });
-  test('an unrelated branch (e.g. Key/Quest Object) falls back to a generic category rather than a misleading specific one', () => {
-    assert.equal(deriveToolCategory(['Key / Quest Object', 'Key', 'Physical Key']), 'adventuring-gear');
+  // Real gap found and fixed as one of the "three smaller items" in
+  // docs/V2_MECHANICS_MIGRATION.md's Phase 14 addendum: 14 catalog items (a rusty/mystery key,
+  // several letters/a journal/a personal map, a scrap of cloth, six ability-score tomes, a universal
+  // solvent) all landed outside the Tool/Miscellaneous branch — the migration report's own note
+  // already called this "quest/document/treasure content mis-scoped into this migration's misc-item
+  // pass" — yet each still has a real, specific classification leaf. Reusing that leaf (the same
+  // technique narrativeToolCategory already uses for the same content shape when it isn't mistagged)
+  // gives an honest, specific category instead of an invented generic one.
+  test('an unrelated branch (e.g. Key/Quest Object) with a real leaf category uses that leaf, not a generic fallback', () => {
+    assert.equal(deriveToolCategory(['Key / Quest Object', 'Key', 'Physical Key']), 'physical-key');
+    assert.equal(deriveToolCategory(['Document', 'Book', 'Magic']), 'magic');
+    assert.equal(deriveToolCategory(['Material', 'Organic', 'Cloth / Fabric']), 'cloth-fabric');
+  });
+  test('an unrelated branch with no usable leaf at all still falls back to a generic category', () => {
+    assert.equal(deriveToolCategory(['Key / Quest Object', 'Key', '']), 'adventuring-gear');
   });
 });
 

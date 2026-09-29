@@ -861,14 +861,30 @@ function deriveWondrousSlot(classification) {
 // Gear > Container, Household > Cookware) are BOTH legitimate, informative classifications for
 // mundane gear — classifyItemHierarchy's cascade routes "Waterskin"/"Sack"/"Iron Pot" through the
 // Miscellaneous branch, not the Tool branch, and that's correct, not a sign of a problem. Only a
-// genuinely uninformative placement (the literal "Unidentified Object" catch-all, or landing
-// somewhere unexpected like Key/Quest Object/Treasure/Document/an unmatched Accessory) means this
+// genuinely uninformative placement (the literal "Unidentified Object" catch-all) means this
 // migration couldn't confidently categorize the item at all.
+//
+// Landing somewhere unexpected instead (Key/Quest Object, Document, Material, Treasure, an unmatched
+// Accessory) is a DIFFERENT case, investigated and fixed here (one of the "three smaller items"
+// flagged in docs/V2_MECHANICS_MIGRATION.md): every one of these 14 catalog items — a rusty/mystery
+// key, several letters/a journal/a personal map, a torn scrap of cloth, six ability-score-boosting
+// tomes, and a universal solvent — is content the migration report's own note already names as
+// "quest/document/treasure content mis-scoped into this migration's misc-item pass." Their
+// classification hierarchy still has a real, meaningful leaf category (e.g. "Key / Quest Object >
+// Key > Physical Key", "Document > Book > Magic") — reusing that leaf (the same slugify-the-leaf
+// technique migrateNarrativeTool's own narrativeToolCategory already uses for the SAME content
+// shape when it isn't mistagged) gives an honest, specific category ('physical-key', 'magic', etc.)
+// instead of the uninformative blanket 'adventuring-gear' every one of them got before. Confirmed
+// this is the only place 'adventuring-gear' was ever used as an invented fallback rather than a
+// real classification leaf (isUninformativeToolClassification below flags this exact condition, and
+// only this condition, into the migration report's ambiguous list — 16 items there in total, the 2
+// not covered by this fix being Waterskin/Chalk's literal "Unidentified Object" catch-all, which
+// stays a disclosed generic fallback since there's no more specific leaf to fall back to).
 function deriveToolCategory(classification) {
   if (classification[0] === 'Tool' || classification[0] === 'Miscellaneous') {
     return slugify(classification[classification.length - 1]);
   }
-  return 'adventuring-gear';
+  return slugify(classification[classification.length - 1]) || 'adventuring-gear';
 }
 
 function isUninformativeToolClassification(classification) {

@@ -323,7 +323,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "physical-key"
     }
   },
   {
@@ -954,7 +954,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "personal"
     }
   },
   {
@@ -1002,7 +1002,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "personal"
     }
   },
   {
@@ -1018,7 +1018,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "dungeon"
     }
   },
   {
@@ -1913,7 +1913,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "cloth-fabric"
     }
   },
   {
@@ -5389,7 +5389,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "physical-key"
     }
   },
   {
@@ -12835,7 +12835,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "personal"
     }
   },
   {
@@ -13292,7 +13292,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -21767,7 +21767,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -21784,7 +21784,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -21811,7 +21811,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -22987,7 +22987,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -23004,7 +23004,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -27499,7 +27499,7 @@
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "solvent"
     }
   },
   {

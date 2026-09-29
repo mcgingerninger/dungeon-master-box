@@ -325,7 +325,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "physical-key"
     }
   },
   {
@@ -956,7 +956,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "personal"
     }
   },
   {
@@ -1004,7 +1004,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "personal"
     }
   },
   {
@@ -1020,7 +1020,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "dungeon"
     }
   },
   {
@@ -1915,7 +1915,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "cloth-fabric"
     }
   },
   {
@@ -5391,7 +5391,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "physical-key"
     }
   },
   {
@@ -12837,7 +12837,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "personal"
     }
   },
   {
@@ -13294,7 +13294,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -21769,7 +21769,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -21786,7 +21786,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -21813,7 +21813,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -22989,7 +22989,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -23006,7 +23006,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "magic"
     }
   },
   {
@@ -27501,7 +27501,7 @@ const canonicalItems = [
     },
     "itemType": "tool",
     "tool": {
-      "toolCategory": "adventuring-gear"
+      "toolCategory": "solvent"
     }
   },
   {
