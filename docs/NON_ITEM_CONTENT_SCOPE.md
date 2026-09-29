@@ -87,7 +87,7 @@ consequence types cleanly did). This is new design work with no existing templat
 bounded preservation fix — closer in kind to designing `journey-data.js`'s own consequence system
 was, the first time, than to anything this migration branch has done so far.
 
-### `npc-data.js` (`NPC_LIBRARY`: 29, `NPC_COMBAT_DEFS`: 26, `NPC_CONNECTIONS`: 29, `NPC_WEAPONS`: 8) — mostly done; one real, small content-quality question
+### `npc-data.js` (`NPC_LIBRARY`: 29, `NPC_COMBAT_DEFS`: 26, `NPC_CONNECTIONS`: 29, `NPC_WEAPONS`: 8) — reconciled (see below); update to this section's original finding
 
 `NPC_WEAPONS` (8 items) was already migrated as real canonical items back in the item migration's
 own Phase 6 — not revisited here. Of the rest:
@@ -100,39 +100,61 @@ own Phase 6 — not revisited here. Of the rest:
   read-only "Web" relationship-chart display. No mechanics to speak of; nothing to migrate.
 - `NPC_LIBRARY` itself carries its own `ac`/`hp`/`speed`/`attacks[]` fields, separately authored
   from — and duplicating — the same information in `NPC_COMBAT_DEFS`, for the NPCs tab's own
-  flavor/roleplay display. **Checked directly whether these two hand-kept-in-sync sources have
-  actually drifted**: compared every shared name's `ac` field programmatically — zero mismatches
-  across all 26 combat-capable NPCs. Also checked coverage: `NPC_COMBAT_DEFS` covers every
-  `NPC_LIBRARY` entry except three (Sela Reave, Petra Ashby, "The Patron") — all three read as
-  deliberately non-combatant on inspection (the file's own header comment already singles out "The
-  Patron" as someone nobody in the story has ever met in person), not an oversight.
+  flavor/roleplay display. Coverage: `NPC_COMBAT_DEFS` covers every `NPC_LIBRARY` entry except three
+  (Sela Reave, Petra Ashby, "The Patron") — all three read as deliberately non-combatant on
+  inspection (the file's own header comment already singles out "The Patron" as someone nobody in
+  the story has ever met in person), not an oversight.
 
-So today: consistent, not broken. The only real question is a maintainability one, not a mechanics
-one — two independently-authored sources of truth for the same NPC's combat stats is a real risk
-for future drift (nothing currently checks them against each other), but it isn't a live bug to fix
-today. If this is ever worth doing, the shape of the fix is narrow and well-understood: either a
-one-time reconciliation pass plus a lint-style consistency check in the test suite (cheap, keeps
-both files as-is), or collapsing `NPC_LIBRARY`'s `ac`/`hp`/`speed`/`attacks` fields to read live from
-`NPC_COMBAT_DEFS` instead of duplicating them (removes the duplication outright, more invasive).
-Neither is scoped further here since neither is urgent.
+**This section originally reported "zero mismatches" — that check only compared `ac`. A full audit
+(HP, speed, and every weapon attack's to-hit/damage) found 46 mismatches across 21 of the 26
+combat-capable NPCs — not rare drift, most of the cast, and not even one-directional (a few of
+NPC_LIBRARY's numbers were lower than the formula, most were higher).** Since `NPC_LIBRARY`'s
+`attacks[]` text is confirmed read-only display (the NPCs tab prints it as-is; nothing ever rolls
+dice off it — that's exclusively `NPC_COMBAT_DEFS`'s job via `NPC_LIBRARY_MONSTERS`/`monsterDatabase`),
+`NPC_COMBAT_DEFS` is the one with a real, live mechanical consequence and the one whose formula
+(`humanNpc`/`humanNpcAttack`) has an actual computable "correct" answer.
+
+**Reconciled by recomputing NPC_LIBRARY's formula-backed numbers from NPC_COMBAT_DEFS** — HP (from
+`hitDice`+`con`), speed (a flat copy), and each weapon attack's own `+to-hit` and base damage
+dice/modifier (from the relevant ability score + CR) — using the exact same formulas
+`humanNpc()`/`humanNpcAttack()` themselves use. A first attempt did this as a full `attacks[]`
+overwrite and was caught before committing: it silently deleted Firewarden Cassia Emberlyn's
+"Hearth-Seal" ability outright (a narrative utility ability with no `NPC_COMBAT_DEFS` counterpart to
+preserve it against) and trimmed several other abilities' flavor/DM-guidance text with no
+correctness justification (a non-weapon special ability's save DC and effect text is hand-authored
+on both sides with no formula backing either one — there's no computable "correct" version to
+enforce, so overwriting was just replacing one hand-authored choice with another and silently
+losing content). Redone narrower: only fields with an actual formula-derived ground truth were
+touched; attack/ability *names*, non-weapon special-ability text, and bonus-damage riders were left
+completely untouched. Verified nothing narrative was lost by diffing every changed line by hand
+before committing.
+
+Also added a permanent regression test (`npc-data.test.js`) — the same "keep it reconciled forever,
+not just once" pattern this whole migration effort already uses for items — that verifies every
+`NPC_COMBAT_DEFS` entry's formula-derived HP/speed/attack numbers still appear in `NPC_LIBRARY`'s
+text, for every shared NPC, so a future edit to either file that reintroduces this drift fails a test
+immediately instead of sitting unnoticed. Confirmed it actually catches drift (deliberately
+corrupted one value, watched the test fail with a clear message, restored it, watched it pass again)
+before treating the test as done.
 
 ## What this means for "the non-item content migration"
 
 There mostly isn't one — not in the shape the item migration was. Two files (`trap-data.js`,
 `journey-data.js`) are already exactly what a migration would have produced. Three
 (`reference-data.js`, `cult-data.js`, and `NPC_CONNECTIONS`/`NPC_COMBAT_DEFS` within `npc-data.js`)
-are reference/narrative/already-live content with nothing to fix. What's actually left is two
-small, independent, genuinely-optional pieces of NEW work, not preservation fixes, each easily
-separable from the other:
+are reference/narrative/already-live content with nothing to fix. Of the two remaining items:
 
-1. **`NPC_LIBRARY`/`NPC_COMBAT_DEFS` reconciliation** — small, mechanical, low-risk, a content-quality
-   improvement (either a consistency check or a dedup). Could be done in an afternoon.
-2. **A structured puzzle-consequence schema** — a real, open-ended design task with no template to
-   follow (V2 has nothing for this, and `journey-data.js`'s consequence system — the closest
-   precedent in this codebase — is a much narrower, closed vocabulary by comparison). Worth doing
-   only if there's an actual feature it would unlock (e.g. a "resolve this puzzle's consequence"
-   button the DM could click, mirroring the trap tool) — not valuable as preservation for its own
-   sake, since nothing is currently lost or broken by puzzles staying DM-adjudicated prose.
-
-Neither is started here. This document is the scoping deliverable; which (if either) to actually
-build is a call for whoever's driving the project, not something to default into.
+1. **`NPC_LIBRARY`/`NPC_COMBAT_DEFS` reconciliation** — **done.** Turned out to be a real, live
+   46-mismatch drift across 21 of 26 NPCs (not the "zero mismatches" this document originally
+   reported — that check only compared `ac`), fixed by recomputing `NPC_LIBRARY`'s formula-backed
+   numbers from `NPC_COMBAT_DEFS`, guarded going forward by a new permanent test
+   (`npc-data.test.js`). See the `npc-data.js` section above for the full account, including a first
+   attempt that was caught and reverted for silently deleting content.
+2. **A structured puzzle-consequence schema** — still not started. A real, open-ended design task
+   with no template to follow (V2 has nothing for this, and `journey-data.js`'s consequence system —
+   the closest precedent in this codebase — is a much narrower, closed vocabulary by comparison).
+   Worth doing only if there's an actual feature it would unlock (e.g. a "resolve this puzzle's
+   consequence" button the DM could click, mirroring the trap tool) — not valuable as preservation
+   for its own sake, since nothing is currently lost or broken by puzzles staying DM-adjudicated
+   prose. Whether to build this is a call for whoever's driving the project, not something to
+   default into.
