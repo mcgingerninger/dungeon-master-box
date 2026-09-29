@@ -392,13 +392,54 @@ use" and "Charge tracking" notes below for what's intentionally NOT bridged and 
   extraction from consumable text was never attempted). `startTimedEffect`/`parseDurationMs` keep
   reading `.effect` text for every consumable exactly as before.
 
+## Phase 10: `__canonical` now follows an item into a player's actual inventory, not just the catalog
+
+Phases 7-9's bridge only ever attached `__canonical` inside `buildTokenIndex()` — which only ever
+sees a fresh `'loot:'`-keyed reference to the static catalog. An item a player actually loots (a
+wheel spin, a chest, corpse loot, a Store purchase) becomes a separate `'gen:'`-keyed copy in
+`savedGeneratedItems`, and that copy never went through `buildTokenIndex()`'s attachment at all —
+so equipping and using an item you actually looted got none of Phases 7-9's fixes; only browsing
+the item directly from the catalog did. That's most of real play, so this closes the gap.
+
+The attachment moved into `inferItemMetadata` (the monolith) instead — already the one shared
+enrichment step called on every catalog item at load (`DOMContentLoaded`) AND on every item as it's
+actually saved (`saveLootResultItem`, `lootItemDirectly`, `placeItemIntoInventory` — wheel spin,
+chest, corpse, and Store purchase all funnel through one of these three). `buildTokenIndex()`'s own
+attachment stays too, as a catch-all for anything that lands in `lootData` a different way (a
+procedurally-generated monster part, which skips `inferItemMetadata` entirely) — both are
+idempotent, so there's no double-work or conflict between them.
+
+This was judged safe to do (where it was flagged as an open risk in Phase 9's writeup) after
+confirming directly, not assuming: `qualityForWheel`/`resolveScrollSpell` — the two functions in
+the actual roll pipeline — only ever BACKFILL a missing `dmg`/`ac`/`gp` field, never overwrite or
+randomize one that's already set, and every migrated item already has those fields set. So a
+migrated item that gets looted is always mechanically IDENTICAL to its catalog counterpart —
+there's no "modified instance" case where carrying `__canonical` forward could be wrong. (There is
+no live random-enhancement/`mods[]` roll applied at generation time in this codebase at all —
+earlier drafts of this doc speculated one might exist and interact badly with this; it doesn't.)
+
+Verified live: looted a "Longsword +1" the real way (built the same narrowed spin-result object
+`resolveRoll` does, ran it through `saveLootResultItem`), confirmed the saved `'gen:'`-keyed copy
+carries `__canonical`, then attacked with that actual looted instance — 8 total damage, the fixed
+(not double-counted) number, same as browsing the catalog item directly.
+
+**Still not covered:** an item already sitting in an OLDER save file, from before this existed. A
+save is a plain JSON blob (`localStorage`/the server DB) — `__canonical` isn't persisted in it (it's
+attached fresh on each load from the in-memory `CANONICAL_BY_LEGACY_KEY`), so an existing save
+loads its items without it and would need one of two things: a one-time upgrade pass at load time
+that runs every saved item through the same `name`+`rarity` lookup `inferItemMetadata` now does, or
+(simpler) nothing at all — the NEXT time that same item type is looted fresh, it'll already carry
+the fix; only an already-owned instance is what's still uncovered, and it degrades to exactly
+today's (pre-Phase-7) behavior for that one item, not an error or a worse regression.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
 completed (Phase 5), `npc-data.js`'s 8 `NPC_WEAPONS` — the one place in the legacy catalog already
-using a structured `abilities[]` pattern — are migrated (Phase 6), and equip-time stat bonuses/AC,
+using a structured `abilities[]` pattern — are migrated (Phase 6), equip-time stat bonuses/AC,
 weapon attack rolls, and consumable healing for migrated items are wired into the live app (Phases
-7-9, all above). What's left:
+7-9), and that bridge now follows a looted item into a player's actual inventory, not just the
+catalog (Phase 10, all above). What's left:
 
 1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
    different type than authored (ability-score-boosting "Manual of ___" tomes classified as
@@ -410,8 +451,9 @@ weapon attack rolls, and consumable healing for migrated items are wired into th
    likely the easiest slice), `reference-data.js`, and `cult-data.js`, plus the modifier/enhancement
    content pool for magic items beyond mundane weapons/armor. None of this is item content, so none
    of it fits this migration's `Item` schema directly — each needs its own scoping pass.
-3. The rest of `mechanics/engine/**`, beyond Phases 7-9's equip/AC/weapon-attack/consumable-heal
-   slice — two items resolved by inspection (no code needed), two genuinely still open:
+3. The rest of `mechanics/engine/**`, beyond Phases 7-10's equip/AC/weapon-attack/consumable-heal/
+   save-compatibility slice — two items resolved by inspection (no code needed), two genuinely
+   still open:
    - **Interactions need no bridge — verified, not assumed.** Every rule in the live app's
      `INTERACTIONS` table (`game-engine.js`) reads ONLY legacy fields (`item.type`/`.subcategory`/
      `.effect`/`.name`/`.partType`/`.classification`/`.charges`) — none of which this migration ever
@@ -446,18 +488,16 @@ weapon attack rolls, and consumable healing for migrated items are wired into th
      correctness, and a wrong projection would be a worse regression than leaving it alone. The
      Fleshmancer's own graft-crafting system (which CONSUMES a monster part) also has no
      canonical-schema equivalent at all yet.
-4. Save-compatibility: a loading-time path that recognizes an existing player's saved item
-   (matched via `legacySource`) and resolves it to its canonical structured item, without forcing
-   every load through live legacy-to-canonical conversion. Phases 7-9's `__canonical` attachment
-   only covers a FRESH reference to the static catalog (a `'loot:'`-keyed `TOKEN_INDEX` entry); an
-   item a player already owns in `savedGeneratedItems` (a `'gen:'`-keyed snapshot copy, made via
-   `{...item, id: freshId}` at generation time) carries `__canonical` forward automatically ONLY
-   when it was cloned from an UNMODIFIED catalog reference (the shallow spread copies the reference
-   along with everything else) — an item that got a random `mods[]` enhancement roll at generation
-   time has real mechanics that diverge from its base canonical record, so carrying `__canonical`
-   forward for one of those would be actively wrong, not just incomplete. Whether/how spin-roll
-   modifier application interacts with this wasn't investigated — a real save-compatibility pass
-   needs to resolve that before touching already-owned items, not just add a `legacySource` lookup.
+4. Save-compatibility for an item already sitting in an OLDER save file, from before Phase 10
+   existed. Phase 10 covers every item looted/purchased/saved from now on (it resolves
+   `__canonical` at the moment an item is actually saved, not just when browsing the catalog); an
+   item already sitting in `savedGeneratedItems` from an existing save was persisted without it,
+   and `__canonical` isn't itself part of the saved JSON (it's re-attached fresh from
+   `CANONICAL_BY_LEGACY_KEY` on load, not serialized) — so an existing save's items load exactly as
+   they did before Phase 7, not broken, just not yet upgraded. A real fix is a one-time pass at load
+   time running every already-saved item through the same `name`+`rarity` lookup
+   `inferItemMetadata` now does — low-risk (same lookup, same idempotent `__canonical === undefined`
+   guard), just not done yet.
 5. Shadow-mode comparison in the live app (old regex-computed result vs. new structured result) for
    a real validation pass before making the new engine authoritative for anything user-facing.
 

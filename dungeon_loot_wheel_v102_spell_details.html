@@ -6807,6 +6807,22 @@ function inferItemMetadata(item, rarity){
   if(item.type==='armor' && !item.ac) item.ac=FALLBACK_ARMOR_AC_BY_RARITY[rarity]||FALLBACK_ARMOR_AC_BY_RARITY.common;
   ensureChargeFormat(item);
   classifyItemFull(item, rarity);
+  // Phase 7's migrated-item bridge (docs/V2_MECHANICS_MIGRATION.md) originally only attached
+  // __canonical inside buildTokenIndex(), which covers a fresh 'loot:'-keyed catalog reference
+  // but nothing actually looted/saved — a player's real inventory. inferItemMetadata already runs
+  // on every catalog item at load (the DOMContentLoaded pass below) AND on every item as it's
+  // actually saved into savedGeneratedItems (saveLootResultItem/lootItemDirectly/
+  // placeItemIntoInventory) — one shared, idempotent attachment point here closes that gap for
+  // every loot source (wheel spin, chest, corpse, Store purchase) going forward, not just catalog
+  // browsing. `item.rarity` (a property, set by whichever roll function built this item) covers
+  // the save-time callers; the `rarity` parameter covers the startup pass, where lootData's own
+  // items carry no `.rarity` field of their own (it's implicit in which tier array they're in).
+  // Does NOT cover an item already sitting in an OLDER save from before this existed — that's
+  // still open (see docs/V2_MECHANICS_MIGRATION.md's "Not yet done" #4).
+  if (item.__canonical === undefined && typeof CANONICAL_BY_LEGACY_KEY !== 'undefined') {
+    const r = item.rarity || rarity;
+    item.__canonical = (r && CANONICAL_BY_LEGACY_KEY.get('loot:' + r + ':' + item.name)) || null;
+  }
   return item;
 }
 // Deferred to DOMContentLoaded (rather than run immediately here, as it did before the Phase 1
@@ -14766,6 +14782,11 @@ function buildTokenIndex() {
         // an item) — if this item was migrated to the canonical schema, game-engine.js's
         // computeCharacterSheetFor reads __canonical.passive/.armor directly instead of regexing
         // .effect/.ac, for this item only; everything not yet migrated is completely unaffected.
+        // inferItemMetadata (above) is the primary attachment point now (it also covers a freshly
+        // saved/looted instance, not just the static catalog) — this stays as a catch-all for
+        // anything that enters lootData a different way (e.g. a procedurally-generated monster
+        // part pushed in directly by generatePremadeMonsterPartsV2, which skips inferItemMetadata
+        // entirely — a no-op lookup for those today since none are migrated, but correct either way).
         if (item.__canonical === undefined) item.__canonical = CANONICAL_BY_LEGACY_KEY.get(key) || null;
         base[key] = { key, item, rarity: r, source: 'loot' };
       });
