@@ -259,6 +259,21 @@ describe('migrateArmor', () => {
     assert.deepEqual(result.passive, [{ stat: 'ac', value: 2 }]);
     assert.equal(fixes.some(f => f.kind === 'double-counted armor class bonus'), false);
   });
+
+  // Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison
+  // (Phase 13): a SECOND, differing "+N Armor Class" match can be purely an informational running
+  // total, not a real extra bonus — extractStatDeltasFromText has no way to tell "+5 AC" (a
+  // computed recap: "on top of a standard shield bonus, total +5") apart from a genuine third
+  // stacking source, so the live app would sum ALL of it (+1 field, +1 first match, +5 recap).
+  test('a second "+N Armor Class" match alongside the word "total" is dropped as an informational recap, not a real bonus, and flagged for review', () => {
+    const item = { name: 'Shield of the Unbroken Line', desc: '', type: 'armor', gp: '—', ac: '+3', effect: '+3 AC (on top of standard shield bonus — total +5 AC from this shield). Requires attunement.' };
+    const ambiguous = [];
+    const result = migrateArmor(item, 'legendary', 0, makeIdGenerator(), ambiguous, []);
+    assert.equal(result.armor.baseAC, 3);
+    assert.equal(result.armor.additive, true);
+    assert.equal((result.passive || []).some(m => m.stat === 'ac'), false, 'neither the redundant +3 nor the recap +5 should survive as a passive ac entry');
+    assert.ok(ambiguous.some(a => a.reason.includes('"total" AC figure')));
+  });
 });
 
 describe('applyMaterialModifiers — real mechanics, not classification labels', () => {
@@ -291,6 +306,25 @@ describe('applyMaterialModifiers — real mechanics, not classification labels',
     const { item } = applyMaterialModifiers(base, 'Masterwork Longsword', '', '');
     assert.equal(item.weapon.magical, false);
     assert.deepEqual(item.passive, [{ stat: 'attackRoll', value: 1 }]);
+  });
+
+  // Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison
+  // (Phase 13): "masterwork" is also a common English adjective for "finely crafted" — a real
+  // magic weapon's flavor `desc` calling it "a masterwork warhammer" was wrongly tagging an
+  // already-magical item as ALSO mundane, non-magical Masterwork gear (contradicting its own
+  // "counts as magical" effect text) and silently stacking an extra +1 attackRoll it was never
+  // designed to have.
+  test('a "masterwork" mention in flavor desc/effect (not the item\'s own name) is NOT treated as the Masterwork material', () => {
+    const base = { id: 'x', name: 'Warhammer +2', itemType: 'weapon', rarity: 'rare', weapon: { damageDice: '1d8', damageType: 'bludgeoning' } };
+    const { item, appliedNames } = applyMaterialModifiers(base, 'Warhammer +2', 'A masterwork warhammer with dwarven runes hammered into the head.', '+2 to attack and damage rolls. Counts as magical.');
+    assert.deepEqual(appliedNames, []);
+    assert.equal(item.weapon.magical, undefined, 'must not be marked non-magical — this item\'s own effect text says it counts as magical');
+    assert.equal(item.passive, undefined, 'must not gain a phantom attackRoll bonus from a flavor-text mention');
+  });
+  test('a "Masterwork ___" name prefix still applies the material even with unrelated flavor text', () => {
+    const base = { id: 'x', name: 'Masterwork Heavy Crossbow', itemType: 'weapon', rarity: 'uncommon', weapon: { damageDice: '1d10', damageType: 'piercing' } };
+    const { appliedNames } = applyMaterialModifiers(base, 'Masterwork Heavy Crossbow', 'A finely made heavy crossbow.', 'Range 100/400.');
+    assert.deepEqual(appliedNames, ['Masterwork']);
   });
 
   test('an item with no material keyword is returned unchanged', () => {

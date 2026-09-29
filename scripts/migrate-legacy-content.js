@@ -356,19 +356,32 @@ function scanResidualLanguage(effect, consumedSpans) {
 }
 
 // ============================== Material detection + application ===============================
+// Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison
+// (docs/V2_MECHANICS_MIGRATION.md's Phase 13): "masterwork" is also a common English adjective for
+// "finely crafted" — several items use it that way purely in their flavor `desc` ("A masterwork
+// warhammer with dwarven runes...", "The Fair Warning": "A masterwork siege crossbow that..."),
+// with no intent to invoke the actual Masterwork material rule. Matching it against the full
+// name+desc+effect text (the other three materials' own pattern) wrongly tagged real, already-
+// magical items ("Warhammer +2", already "Counts as magical") as ALSO mundane, non-magical
+// Masterwork gear — contradictory (an item can't be both a true +2 weapon and "not magical"), and
+// it silently stacked an extra +1 attackRoll neither the item's own text nor its rarity/price
+// justified. "Silvered"/"mithral"/"adamantine" don't have this collision (confirmed during the
+// Materials design pass: none of the three appear anywhere in the catalog as a generic adjective),
+// so only masterwork is scoped down — to the item's own NAME, where a genuine catalog masterwork
+// item ("Masterwork Longsword", "Masterwork Heavy Crossbow") actually says so.
 const MATERIAL_PATTERNS = {
-  silvered: /silvered/i,
-  mithral: /mithral/i,
-  adamantine: /adamantine/i,
-  masterwork: /masterwork/i,
+  silvered: { pattern: /silvered/i, field: 'text' },
+  mithral: { pattern: /mithral/i, field: 'text' },
+  adamantine: { pattern: /adamantine/i, field: 'text' },
+  masterwork: { pattern: /masterwork/i, field: 'name' },
 };
 
 function applyMaterialModifiers(item, name, desc, effect) {
   const text = `${name} ${desc || ''} ${effect || ''}`;
   const appliedNames = [];
   let current = item;
-  for (const [key, pattern] of Object.entries(MATERIAL_PATTERNS)) {
-    if (!pattern.test(text)) continue;
+  for (const [key, { pattern, field }] of Object.entries(MATERIAL_PATTERNS)) {
+    if (!pattern.test(field === 'name' ? name : text)) continue;
     const modifier = MATERIAL_MODIFIERS[key];
     if (!modifier.appliesTo.includes(current.itemType)) continue; // e.g. silvered armor: no rule for it, skip
     const applied = applyModifierToItem({ ...current, name: item.name }, modifier);
@@ -595,10 +608,27 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
   // EXACTLY matches the item's own `ac` field is it dropped as redundant phrasing of the same
   // bonus. A DIFFERING value (e.g. "Vanguard's Plate": ac:"13", effect:"+2 Armor Class" — see
   // game-engine.test.js) is a genuinely separate, intentional stacking bonus and is left untouched.
-  const acTextMod = passive.find(m => m.stat === 'ac');
-  if (acTextMod && acTextMod.value === acValue) {
-    passive = passive.filter(m => m !== acTextMod);
+  const exactAcMatches = passive.filter(m => m.stat === 'ac' && m.value === acValue);
+  if (exactAcMatches.length) {
+    passive = passive.filter(m => !exactAcMatches.includes(m));
     fixes.push({ name, tier, kind: 'double-counted armor class bonus', detail: `armor.ac ("${item.ac}") and effect text both expressed the same +${acValue} AC bonus; dungeon-master-box's live AC computation sums both independently today (a real double-count) — this migration applies it once.` });
+  }
+  // Real, already-live bug found by scripts/validate-migration-bridge.js (Phase 13): a SECOND,
+  // DIFFERING "+N Armor Class" match can also be purely informational, not a real extra bonus —
+  // "Shield of the Unbroken Line": ac:"+3", effect:"+3 AC (on top of standard shield bonus — total
+  // +5 AC from this shield)...". extractStatDeltasFromText has no concept of "this number is a
+  // recap, not a new source" — it catches "+5 AC" as a second Armor Class delta just as readily as
+  // a genuine one, and the live app would sum ALL of it (the item's own +3 AC field, ANOTHER +3
+  // from the first regex match, AND +5 from the recap — +11 total from a single "+3" shield).
+  // Distinguishing that requires a human, not a heuristic that could misfire elsewhere — flagged
+  // ambiguous, and any REMAINING 'ac' passive entry after the exact-match dedup above is dropped
+  // rather than risk carrying a similarly-inflated phantom bonus into the canonical schema; only
+  // fires when the effect text explicitly signals a computed running total (the word "total"), so
+  // it can't catch a genuinely-worded second stacking bonus with a different value.
+  if (passive.some(m => m.stat === 'ac') && /\btotal\b/i.test(effect)) {
+    const dropped = passive.filter(m => m.stat === 'ac');
+    passive = passive.filter(m => m.stat !== 'ac');
+    ambiguous.push({ name, tier, reason: `effect text mentions a "total" AC figure beyond the item's own ac field ("${item.ac}") and a first exact-match dedup — likely an informational recap (e.g. "on top of a standard shield bonus"), not a real extra bonus, so it was dropped rather than risk inflating AC; needs manual review to confirm nothing mechanical was lost`, effect, droppedValues: dropped.map(m => m.value) });
   }
 
   let armor = {

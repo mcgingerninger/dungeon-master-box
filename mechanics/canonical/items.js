@@ -14983,8 +14983,7 @@ const canonicalItems = [
       "properties": [
         "two-handed",
         "versatile"
-      ],
-      "magical": false
+      ]
     },
     "passive": [
       {
@@ -14994,21 +14993,13 @@ const canonicalItems = [
       {
         "stat": "damageRoll",
         "value": 2
-      },
-      {
-        "stat": "attackRoll",
-        "value": 1
       }
     ],
     "legacySource": {
       "tier": "rare",
       "index": 96,
       "name": "Warhammer +2"
-    },
-    "abilities": [],
-    "appliedModifiers": [
-      "material-masterwork"
-    ]
+    }
   },
   {
     "id": "windvane",
@@ -27452,24 +27443,13 @@ const canonicalItems = [
       "armorType": "heavy",
       "baseAC": 18,
       "addsDexMod": false,
-      "slot": "chest",
-      "magical": false
+      "slot": "chest"
     },
     "legacySource": {
       "tier": "superrare",
       "index": 216,
       "name": "Dwarven Plate"
-    },
-    "passive": [
-      {
-        "stat": "attackRoll",
-        "value": 1
-      }
-    ],
-    "abilities": [],
-    "appliedModifiers": [
-      "material-masterwork"
-    ]
+    }
   },
   {
     "id": "plate-armor-of-etherealness",
@@ -27845,17 +27825,12 @@ const canonicalItems = [
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
-      "damageType": "bludgeoning",
-      "magical": false
+      "damageType": "bludgeoning"
     },
     "passive": [
       {
         "stat": "damageRoll",
         "value": 4
-      },
-      {
-        "stat": "attackRoll",
-        "value": 1
       }
     ],
     "narrative": {
@@ -27884,11 +27859,7 @@ const canonicalItems = [
       "tier": "legendary",
       "index": 7,
       "name": "The Fair Warning"
-    },
-    "abilities": [],
-    "appliedModifiers": [
-      "material-masterwork"
-    ]
+    }
   },
   {
     "id": "frosthowl",
@@ -28131,12 +28102,6 @@ const canonicalItems = [
       "slot": "shield",
       "additive": true
     },
-    "passive": [
-      {
-        "stat": "ac",
-        "value": 5
-      }
-    ],
     "narrative": {
       "unlocks": [
         {

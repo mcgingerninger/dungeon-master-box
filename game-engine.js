@@ -600,7 +600,7 @@ export function canonicalPassiveDeltas(canonicalItem) {
 // wondrous/companion item's AC-flavored passive, if any, is handled by canonicalPassiveDeltas'
 // 'Armor Class' bucket instead — the same secondary text-rider layering the old system already
 // does on top of an item's own .ac field).
-function canonicalAcContribution(canonicalItem) {
+export function canonicalAcContribution(canonicalItem) {
   const armor = canonicalItem && canonicalItem.armor;
   if (!armor) return null;
   return armor.additive ? { flatAmount: armor.baseAC } : { replaceBase: armor.baseAC };

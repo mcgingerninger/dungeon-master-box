@@ -505,6 +505,65 @@ call graph to attach the same upgrade there wasn't done this pass. It degrades t
 everything else here does when uncovered: the DM's view of that one item falls back to the original
 `.effect`/`.ac`/`.dmg` regex path, not an error or a crash, just not yet upgraded.
 
+## Phase 13: shadow-mode validation — and two more real bugs it found
+
+`scripts/validate-migration-bridge.js` (`npm run validate-migration`) is the real validation pass
+this migration's own rules called for before treating the new engine as authoritative for anything
+user-facing. For every migrated item with a `legacySource`, it independently recomputes what the
+OLD live regex path (`extractStatDeltasFromText`, `parseWeaponEffectBonuses`, a raw `.hp`/`.ac`
+read) would produce from the item's still-present legacy fields, and compares it against what the
+Phase 7-9 bridge functions (`canonicalPassiveDeltas`, `canonicalAcContribution`,
+`canonicalWeaponAttackData`, `canonicalConsumableHealDice`) actually produce from `__canonical`.
+Every disagreement is sorted into one of four known, individually-verified categories (the weapon
+damage dedup, the armor AC dedup, an AC "total" recap drop, or a masterwork attackRoll addition —
+see below) or reported as a genuine, unexplained finding. This isn't a one-time report: it's a
+permanent regression check (`node scripts/validate-migration-bridge.js`, exits non-zero on any
+unrecognized divergence) that stays meaningful as more content gets migrated.
+
+The first run found 5 unexplained divergences, not the 0 the earlier phases' manual spot-checks and
+byte-identical-by-construction arguments implied. Two turned out to be the intended, already-
+documented "new mechanic" case (a genuine `Masterwork`-named weapon correctly gaining a real
+`attackRoll` bonus the old text-only world never had) — the validator itself was taught to recognize
+that as expected rather than flag it. The other three were real bugs, found and fixed here:
+
+- **The `masterwork` material pattern matched flavor text, not just genuine material items.**
+  "Masterwork" is also a common English adjective for "finely crafted" — several items use it that
+  way purely in their `desc` ("Warhammer +2": "A masterwork warhammer with dwarven runes..."; "The
+  Fair Warning": "A masterwork siege crossbow..."), with zero intent to invoke the actual Masterwork
+  material rule. Matching against the full name+desc+effect text (the same pattern used for
+  silvered/mithral/adamantine, which don't have this collision) wrongly tagged two already-magical
+  weapons as ALSO mundane, non-magical Masterwork gear — directly contradicting their own "Counts as
+  magical" text — and silently stacked an extra +1 `attackRoll` neither weapon was designed to have.
+  Fixed by scoping the `masterwork` pattern to the item's own `name` only, where a genuine catalog
+  masterwork item ("Masterwork Longsword", "Masterwork Heavy Crossbow") actually says so.
+- **A second, differing "+N Armor Class" match can be a purely informational recap, not a real
+  extra bonus.** "Shield of the Unbroken Line": `ac:"+3"`, effect `"+3 AC (on top of standard shield
+  bonus — total +5 AC from this shield)..."`. `extractStatDeltasFromText` has no concept of "this
+  number is a computed summary, not a new source" — it caught both the redundant "+3" (already
+  handled by the existing AC dedup) AND the "total +5" recap as two MORE independent Armor Class
+  deltas, meaning the live app would sum the item's own `+3` field, another `+3` from the first text
+  match, AND `+5` from the recap — `+11` total AC from a single "+3" shield. Distinguishing a
+  genuine second stacking bonus from an informational recap isn't safe to guess at generally, so the
+  fix is narrow and only fires alongside an explicit "total" in the text: any `ac` passive entry
+  still remaining after the existing exact-value dedup is dropped and flagged ambiguous for manual
+  confirmation, rather than risk carrying a similarly-inflated phantom bonus into the schema.
+- **Found, not yet fixed — flagged here rather than expanded into scope:** `parseWeaponEffectBonuses`'s
+  guard clause (excluding "when/while/with/made/only" immediately after "to attack rolls") means the
+  live app already fails to parse "+1 to attack rolls only (not damage)" — the exact masterwork-
+  style phrasing — as ANY bonus at all, even though "only" here means "not also to damage," not a
+  condition the guard was meant to exclude. Separately, `"+4 attack and damage."` (no trailing
+  "rolls") doesn't match either the combo or single-stat regex, both of which require the literal
+  word "rolls" — `"The Fair Warning"` (`"+4 attack and damage. Range 200/800..."`) loses its entire
+  attack-roll bonus in both the live app AND the migrated data as a result (its damage bonus alone
+  survives, from `dmg`'s own embedded `+4`). Both are real, already-live gaps in `parseWeaponEffectBonuses`
+  itself — confirmed identical between old and new, so shadow-mode correctly does NOT flag them (old
+  and new agree) — but they're real bugs in the live regex path worth a dedicated look outside this
+  migration's own scope.
+
+Current result: `npm run validate-migration` checks all 1207 loot-data.js-sourced migrated items and
+reports zero unexpected divergences (88 armor AC dedups, 291 weapon damage dedups, 1 AC "total"
+recap drop, 2 masterwork attackRoll additions — all individually confirmed, not just counted).
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
@@ -512,8 +571,9 @@ completed (Phase 5), `npc-data.js`'s 8 `NPC_WEAPONS` — the one place in the le
 using a structured `abilities[]` pattern — are migrated (Phase 6), equip-time stat bonuses/AC,
 weapon attack rolls, and consumable healing for migrated items are wired into the live app (Phases
 7-9), that bridge now follows a looted item into a player's actual inventory (Phase 10) and an
-already-existing save (Phase 12), and a real Combat-kill monster-part drop now builds through the
-real engine (Phase 11, all above). What's left:
+already-existing save (Phase 12), a real Combat-kill monster-part drop now builds through the real
+engine (Phase 11), and a permanent shadow-mode regression check validates the whole bridge against
+the live regex path it replaces (Phase 13, all above). What's left:
 
 1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
    different type than authored (ability-score-boosting "Manual of ___" tomes classified as
@@ -554,8 +614,12 @@ real engine (Phase 11, all above). What's left:
    multiplayer sync layer, not `applyStateBlob`) doesn't get Phase 12's upgrade pass — see Phase
    12's "Still not covered" note above. Degrades to the pre-Phase-7 regex path for that one item,
    for that one viewer, not an error.
-5. Shadow-mode comparison in the live app (old regex-computed result vs. new structured result) for
-   a real validation pass before making the new engine authoritative for anything user-facing.
+5. `parseWeaponEffectBonuses`'s guard clause and its "rolls"-only phrasing requirement have real,
+   already-live gaps (found by Phase 13's shadow-mode validation, documented there in detail) — a
+   weapon phrased "+N to attack rolls only (not damage)" or "+N attack and damage." (no trailing
+   "rolls") loses its bonus entirely, in the live app and the migrated data alike. Confirmed
+   identical between old and new (so not a migration regression), but a real bug in the live regex
+   path worth its own fix outside this migration's scope.
 
 ## Running the migration tool
 
