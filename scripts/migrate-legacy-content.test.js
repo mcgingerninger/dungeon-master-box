@@ -9,13 +9,17 @@
 
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
-  loadLootData, classifySubcategory, computeItemWeight, deriveWeaponMechanics,
+  loadLootData, loadNpcWeapons, classifySubcategory, computeItemWeight, deriveWeaponMechanics,
   deriveWeaponProperties, toStatModifiers, findSetValueOverrides, applyMaterialModifiers,
   slugify, makeIdGenerator, migrateWeapon, migrateArmor,
   deriveConsumableCategory, resolveConsumableUses, migrateConsumable,
   deriveWondrousSlot, deriveToolCategory, migrateMisc,
   extractSpeeds, narrativeToolCategory, migrateCompanion, migrateNarrativeTool,
+  convertNpcAbility, migrateNpcWeapon,
 } from './migrate-legacy-content.js';
 import { validateItem } from '../mechanics/engine/items/validate-item.js';
 import { equipmentSlotsForItem } from '../mechanics/engine/character/equipment.js';
@@ -463,49 +467,144 @@ describe('migrateNarrativeTool (treasure/questitem/document)', () => {
   });
 });
 
+describe('convertNpcAbility', () => {
+  test('converts a spell-kind ability with recharge and real uses, preserving effect text as description', () => {
+    const legacy = { id: 'x-counterspell', name: 'Counterspell', kind: 'spell', effectText: 'Cast Counterspell without using a spell slot.', uses: { max: 1, recharge: 'longRest' }, usesLeft: 1 };
+    const ambiguous = [];
+    const result = convertNpcAbility(legacy, 'Test Item', ambiguous);
+    assert.deepEqual(result, {
+      id: 'x-counterspell', name: 'Counterspell', kind: 'spell',
+      description: 'Cast Counterspell without using a spell slot.',
+      effect: { kind: 'utility' },
+      uses: { max: 1, recharge: 'long_rest' },
+      usesLeft: 1,
+    });
+    // Always flagged since the effect itself isn't reduced to a structured OnUseEffect.
+    assert.ok(ambiguous.some(a => a.reason.includes('preserved as description text only')));
+  });
+
+  test('a non-spell legacy kind (buff/debuff/utility) maps to active_effect', () => {
+    const legacy = { id: 'x', name: 'Compel Truth', kind: 'debuff', effectText: 'Force a save.', uses: { max: 1, recharge: 'longRest' }, usesLeft: 1 };
+    assert.equal(convertNpcAbility(legacy, 'Test Item', []).kind, 'active_effect');
+  });
+
+  test('an unrecognized recharge value is flagged and defaults to long_rest', () => {
+    const legacy = { id: 'x', name: 'Test', kind: 'spell', effectText: 'Does something.', uses: { max: 1, recharge: 'weird_value' }, usesLeft: 1 };
+    const ambiguous = [];
+    const result = convertNpcAbility(legacy, 'Test Item', ambiguous);
+    assert.equal(result.uses.recharge, 'long_rest');
+    assert.ok(ambiguous.some(a => a.reason.includes('unrecognized recharge type')));
+  });
+});
+
+describe('migrateNpcWeapon', () => {
+  test('reuses migrateWeapon for a weapon-typed NPC item and does not carry a literal "—" value through', () => {
+    const item = { name: 'Test Blade', desc: 'A test blade.', type: 'weapon', slotSize: 1, gp: '—', dmg: '1d8+2', effect: '+2 attack and damage.' };
+    const result = migrateNpcWeapon(item, 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'weapon');
+    assert.equal(result.value, undefined);
+    assert.equal(result.rarity, 'rare');
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('reuses migrateMisc for a misc-typed NPC item (e.g. a signature ring)', () => {
+    const item = { name: 'Test Signet', desc: 'A ring.', type: 'misc', subcategory: 'ring', slotSize: 1, gp: '—', effect: 'While worn: once per long rest, force a save. Requires attunement.' };
+    const result = migrateNpcWeapon(item, 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('a legacy structured abilities[] entry becomes a real V2 Ability on the migrated item', () => {
+    const item = { name: 'Test Wand', desc: '', type: 'weapon', slotSize: 1, gp: '—', dmg: '1d4', effect: 'A minor wand.', abilities: [{ id: 'w-1', name: 'Zap', kind: 'spell', effectText: 'Deals damage.', uses: { max: 1, recharge: 'longRest' }, usesLeft: 1 }] };
+    const result = migrateNpcWeapon(item, 0, makeIdGenerator(), [], []);
+    assert.equal(result.abilities.length, 1);
+    assert.equal(result.abilities[0].name, 'Zap');
+    assert.ok(validateItem(result).valid);
+  });
+
+  test('legacySource records the npc-data.js origin distinctly from loot-data.js items', () => {
+    const item = { name: 'Test Dagger', desc: '', type: 'weapon', slotSize: 1, gp: '—', dmg: '1d4', effect: '' };
+    const result = migrateNpcWeapon(item, 3, makeIdGenerator(), [], []);
+    assert.equal(result.legacySource.source, 'npc-data.js:NPC_WEAPONS');
+    assert.equal(result.legacySource.index, 3);
+  });
+
+  test('an unhandled legacy type is excluded rather than guessed at', () => {
+    const item = { name: 'Test Odd Thing', desc: '', type: 'questitem', gp: '—' };
+    const ambiguous = [];
+    const result = migrateNpcWeapon(item, 0, makeIdGenerator(), ambiguous, []);
+    assert.equal(result, null);
+    assert.ok(ambiguous.some(a => a.reason.includes('excluded from this pass')));
+  });
+
+  test('loadNpcWeapons loads the real npc-data.js NPC_WEAPONS array (8 items) without modifying the file', () => {
+    const weapons = loadNpcWeapons();
+    assert.equal(weapons.length, 8);
+  });
+});
+
 const MIGRATORS_FOR_TEST = {
   weapon: migrateWeapon, armor: migrateArmor, consumable: migrateConsumable, misc: migrateMisc,
   companion: migrateCompanion, treasure: migrateNarrativeTool, questitem: migrateNarrativeTool, document: migrateNarrativeTool,
 };
 
-describe('full migration determinism (real loot-data.js)', () => {
-  test('running the migration end-to-end twice produces byte-identical canonical output', () => {
-    const lootData = loadLootData();
-    const nextId1 = makeIdGenerator();
-    const nextId2 = makeIdGenerator();
-    const migrateAll = (nextId) => {
-      const out = [];
-      for (const tier of Object.keys(lootData)) {
-        lootData[tier].forEach((item, index) => {
-          const migrator = MIGRATORS_FOR_TEST[item.type];
-          if (!migrator) return;
-          const result = migrator(item, tier, index, nextId, [], []);
-          if (result) out.push(result);
-        });
-      }
-      return out;
-    };
-    const run1 = migrateAll(nextId1);
-    const run2 = migrateAll(nextId2);
-    assert.deepEqual(run1, run2);
-    assert.ok(run1.length > 1200, `expected the bulk of loot-data.js's 1243 items to migrate, got ${run1.length}`);
-  });
-
-  test('every canonical item in the committed output validates cleanly', () => {
-    const lootData = loadLootData();
-    const nextId = makeIdGenerator();
-    let checked = 0;
+describe('full migration determinism (real loot-data.js + npc-data.js)', () => {
+  // loadLootData()/loadNpcWeapons() are called ONCE and reused for both migration passes below —
+  // NOT once per pass. Each call re-parses the source file through a fresh node:vm context, and
+  // vm gives every context its own separate realm (its own Object.prototype/Array.prototype); two
+  // separately-parsed copies of the same nested legacy object (e.g. an item's `unlocks` array,
+  // passed through by reference into `narrative.unlocks`) are then content-identical but have
+  // different prototypes, which assert.deepEqual's strict, prototype-sensitive comparison correctly
+  // treats as unequal — a real node:vm cross-realm quirk, not a migration bug (confirmed: the
+  // actual script's real JSON output, which strips prototypes entirely, was independently verified
+  // byte-identical across repeated full runs — see the commit history). What this test needs to
+  // prove is narrower and doesn't require re-parsing twice: that the MIGRATION functions themselves
+  // are pure/deterministic for a given input, which loading the source once and migrating it twice
+  // already demonstrates without tripping over vm's realm semantics.
+  const lootData = loadLootData();
+  const npcWeapons = loadNpcWeapons();
+  function migrateEverything(nextId) {
+    const out = [];
     for (const tier of Object.keys(lootData)) {
       lootData[tier].forEach((item, index) => {
         const migrator = MIGRATORS_FOR_TEST[item.type];
         if (!migrator) return;
         const result = migrator(item, tier, index, nextId, [], []);
-        if (!result) return;
-        const { valid, errors } = validateItem(result);
-        assert.ok(valid, `${result.name}: ${errors.join('; ')}`);
-        checked++;
+        if (result) out.push(result);
       });
     }
+    npcWeapons.forEach((item, index) => {
+      const result = migrateNpcWeapon(item, index, nextId, [], []);
+      if (result) out.push(result);
+    });
+    return out;
+  }
+
+  test('running the migration end-to-end twice produces byte-identical canonical output', () => {
+    const run1 = migrateEverything(makeIdGenerator());
+    const run2 = migrateEverything(makeIdGenerator());
+    assert.deepEqual(run1, run2);
+    assert.ok(run1.length > 1200, `expected the bulk of loot-data.js's 1243 + npc-data.js's 8 items to migrate, got ${run1.length}`);
+  });
+
+  test('every canonical item in the committed output validates cleanly', () => {
+    const results = migrateEverything(makeIdGenerator());
+    let checked = 0;
+    for (const result of results) {
+      const { valid, errors } = validateItem(result);
+      assert.ok(valid, `${result.name}: ${errors.join('; ')}`);
+      checked++;
+    }
     assert.ok(checked > 1200);
+  });
+
+  test('the actual migration script output (mechanics/canonical/items.json) is reproducible across two independent full script runs (this DOES re-parse via vm each time, proving the real script is unaffected by the realm quirk above)', () => {
+    const scriptPath = path.join(import.meta.dirname, 'migrate-legacy-content.js');
+    const outputPath = path.join(import.meta.dirname, '..', 'mechanics', 'canonical', 'items.json');
+    execFileSync('node', [scriptPath]);
+    const first = fs.readFileSync(outputPath, 'utf8');
+    execFileSync('node', [scriptPath]);
+    const second = fs.readFileSync(outputPath, 'utf8');
+    assert.equal(first, second);
   });
 });

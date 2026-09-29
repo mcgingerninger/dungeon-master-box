@@ -66,6 +66,21 @@ function loadLootData() {
   return lootData;
 }
 
+// Same vm-loading technique, same reason: npc-data.js is also a classic (non-module) script the
+// live monolith loads via <script src>, with no export statement of its own that must never gain
+// one. NPC_WEAPONS is the one piece of npc-data.js that's real item content (the rest — NPC_LIBRARY,
+// NPC_COMBAT_DEFS, NPC_CONNECTIONS — is creature/relationship content, not item content, and out of
+// this migration's scope; see docs/V2_MECHANICS_MIGRATION.md's "Not yet done" section).
+function loadNpcWeapons() {
+  const src = fs.readFileSync(path.join(ROOT, 'npc-data.js'), 'utf8');
+  const sandbox = {};
+  vm.createContext(sandbox);
+  vm.runInContext(src, sandbox, { filename: 'npc-data.js' });
+  const npcWeapons = vm.runInContext('NPC_WEAPONS', sandbox);
+  if (!npcWeapons) throw new Error('npc-data.js did not define `NPC_WEAPONS`');
+  return npcWeapons;
+}
+
 // ============================== PORTED verbatim from the monolith =============================
 // Not exported by game-engine.js — copied here rather than reimplemented, per the confirmed
 // "reuse existing parsers" approach. Source: dungeon_loot_wheel_v102_spell_details.html.
@@ -463,7 +478,7 @@ function migrateWeapon(item, tier, index, nextId, ambiguous, fixes) {
     itemType: 'weapon',
     rarity: tier,
     weight: computeItemWeight(item, subcategory),
-    ...(item.gp ? { value: item.gp } : {}),
+    ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
     weapon,
@@ -570,7 +585,7 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
     itemType: 'armor',
     rarity: tier,
     weight: computeItemWeight(item, subcategory),
-    ...(item.gp ? { value: item.gp } : {}),
+    ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
     armor,
@@ -692,7 +707,7 @@ function migrateConsumable(item, tier, index, nextId, ambiguous, fixes) {
     itemType: 'consumable',
     rarity: tier,
     weight: computeItemWeight(item, subcategory),
-    ...(item.gp ? { value: item.gp } : {}),
+    ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
     consumable: { consumableCategory, effects, uses: { max: usesMax }, usesLeft: usesMax },
@@ -930,6 +945,67 @@ function migrateNarrativeTool(item, tier, index, nextId, ambiguous, fixes) {
   };
 }
 
+// ============================== NPC signature weapons (Phase 6) ====================================
+// npc-data.js's NPC_WEAPONS (8 items) is the one piece of item content outside loot-data.js, and the
+// ONE place in the entire catalog already using a structured `abilities[]` pattern (a real
+// {id,name,kind,uses:{max,recharge},usesLeft} shape) rather than the free-text `charges` string
+// everything else in this catalog uses. Each entry is otherwise shaped IDENTICALLY to a loot-data.js
+// entry (same name/desc/type/slotSize/gp/dmg/effect fields), so this reuses migrateWeapon/
+// migrateMisc directly rather than re-deriving weapon/armor mechanics a second time.
+//
+// npc-data.js has no rarity/tier field at all for these (they're narrative NPC gear, not part of
+// the tiered loot table) — every entry is assigned a placeholder tier of 'rare' (matching their
+// actual power level: +2 attack/damage, attunement, once-per-rest abilities, consistent with
+// loot-data.js's own rare-tier items), disclosed here and in the report rather than silently
+// invented. This is a uniform, deliberate placeholder — not a per-item ambiguity needing review the
+// way an unresolved weapon damage type would be.
+const NPC_WEAPON_TIER = 'rare';
+const LEGACY_RECHARGE_MAP = { longRest: 'long_rest', shortRest: 'short_rest', dawn: 'dawn', turn: 'charges' };
+
+function convertNpcAbility(legacyAbility, itemName, ambiguous) {
+  const kind = legacyAbility.kind === 'spell' ? 'spell' : 'active_effect';
+  const legacyRecharge = legacyAbility.uses?.recharge;
+  const recharge = LEGACY_RECHARGE_MAP[legacyRecharge] || 'long_rest';
+  if (!LEGACY_RECHARGE_MAP[legacyRecharge]) {
+    ambiguous.push({ name: itemName, tier: NPC_WEAPON_TIER, reason: `ability "${legacyAbility.name}" has an unrecognized recharge type "${legacyRecharge}" — defaulted to long_rest, needs manual review`, ability: legacyAbility });
+  }
+  // effectText is free prose ("Force one creature within 30 ft. to make a DC 16 Wisdom save or be
+  // compelled..."), same honest-gap situation as consumable effect text — preserved verbatim as
+  // `description` rather than force-fit into a structured OnUseEffect kind it doesn't cleanly match.
+  ambiguous.push({ name: itemName, tier: NPC_WEAPON_TIER, reason: `ability "${legacyAbility.name}"'s effect ("${legacyAbility.effectText}") is preserved as description text only — real uses/recharge were extracted, but the mechanical effect itself was not reduced to a structured OnUseEffect, needs manual review if it must actually resolve automatically`, ability: legacyAbility });
+  return {
+    id: legacyAbility.id,
+    name: legacyAbility.name,
+    kind,
+    description: legacyAbility.effectText,
+    effect: { kind: 'utility' },
+    uses: { max: legacyAbility.uses.max, recharge },
+    usesLeft: legacyAbility.usesLeft ?? legacyAbility.uses.max,
+  };
+}
+
+function migrateNpcWeapon(item, index, nextId, ambiguous, fixes) {
+  const migrator = item.type === 'weapon' ? migrateWeapon : item.type === 'misc' ? migrateMisc : null;
+  if (!migrator) {
+    ambiguous.push({ name: item.name, tier: NPC_WEAPON_TIER, reason: `NPC_WEAPONS entry has legacy type "${item.type}", which this migration doesn't handle for npc-data.js — excluded from this pass`, legacyType: item.type });
+    return null;
+  }
+  const canonical = migrator(item, NPC_WEAPON_TIER, index, nextId, ambiguous, fixes);
+  if (!canonical) return null;
+  if (item.abilities && item.abilities.length) {
+    // Only weapon/armor/wondrous may carry an `abilities` facet (validate-item.js's RULES) — guard
+    // rather than let a future misc-classification edge case (this item resolving to plain 'tool')
+    // produce an item that fails validation.
+    if (['weapon', 'armor', 'wondrous'].includes(canonical.itemType)) {
+      canonical.abilities = item.abilities.map(a => convertNpcAbility(a, item.name, ambiguous));
+    } else {
+      ambiguous.push({ name: item.name, tier: NPC_WEAPON_TIER, reason: `item has legacy structured abilities but migrated as itemType "${canonical.itemType}", which cannot carry an abilities facet — abilities dropped, needs manual review`, abilities: item.abilities });
+    }
+  }
+  canonical.legacySource = { tier: NPC_WEAPON_TIER, index, name: item.name, source: 'npc-data.js:NPC_WEAPONS' };
+  return canonical;
+}
+
 // ============================== Main =============================================================
 function main() {
   const lootData = loadLootData();
@@ -959,6 +1035,16 @@ function main() {
     });
   }
 
+  // npc-data.js's NPC_WEAPONS — the one item content outside loot-data.js (Phase 6).
+  const npcWeapons = loadNpcWeapons();
+  counts.npcWeapon = 0;
+  npcWeapons.forEach((item, index) => {
+    counts.npcWeapon++;
+    const result = migrateNpcWeapon(item, index, nextId, ambiguous, fixes);
+    if (!result) { excludedCount++; return; }
+    canonicalItems.push(result);
+  });
+
   // Validate every canonical item before writing anything.
   const invalid = [];
   for (const item of canonicalItems) {
@@ -986,7 +1072,7 @@ function main() {
     (ambiguousByReason[key] = ambiguousByReason[key] || []).push(a);
   }
 
-  const report = buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes });
+  const report = buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes, npcWeaponCount: npcWeapons.length });
   fs.writeFileSync(path.join(outDir, 'migration-report.md'), report);
 
   const legacyTotal = Object.values(counts).reduce((a, b) => a + b, 0);
@@ -998,21 +1084,22 @@ function main() {
   console.log(`Wrote mechanics/canonical/items.json and mechanics/canonical/migration-report.md`);
 }
 
-function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes }) {
-  const totalLegacyItems = Object.values(lootData).reduce((s, arr) => s + arr.length, 0);
+function buildReport({ lootData, counts, canonicalItems, excludedCount, ambiguous, ambiguousByReason, byTier, materialsSummary, fixes, npcWeaponCount }) {
+  const totalLegacyItems = Object.values(lootData).reduce((s, arr) => s + arr.length, 0) + npcWeaponCount;
   const lines = [];
-  lines.push('# V2 Mechanics Migration Report — Phases 1-4 (weapons + armor + consumables + misc + companion/treasure/questitem/document)');
+  lines.push('# V2 Mechanics Migration Report — Phases 1-6 (all loot-data.js items + monster-part system + npc-data.js NPC_WEAPONS)');
   lines.push('');
-  lines.push(`Generated by \`scripts/migrate-legacy-content.js\`. Source: \`loot-data.js\` (untouched — this script never writes to it).`);
+  lines.push(`Generated by \`scripts/migrate-legacy-content.js\`. Source: \`loot-data.js\`/\`npc-data.js\` (untouched — this script never writes to either).`);
   lines.push('');
   lines.push('## Content preservation (Section 20)');
   lines.push('');
-  lines.push(`- Legacy catalog total (all types): ${totalLegacyItems} items — every type is now migrated`);
+  lines.push(`- Legacy catalog total (loot-data.js + npc-data.js's NPC_WEAPONS): ${totalLegacyItems} items — every item is now migrated`);
   lines.push(`- Legacy weapon items: ${counts.weapon}`);
   lines.push(`- Legacy armor items: ${counts.armor}`);
   lines.push(`- Legacy consumable items: ${counts.consumable}`);
   lines.push(`- Legacy misc items: ${counts.misc} (split into the new \`wondrous\` and existing \`tool\` itemTypes — see "Misc -> wondrous/tool split" below)`);
   lines.push(`- Legacy companion items: ${counts.companion} (new \`companion\` itemType — pets/mounts)`);
+  lines.push(`- npc-data.js NPC_WEAPONS: ${npcWeaponCount} (placeholder rarity "rare" — this file has no tier field; structured legacy abilities[] converted to real V2 Ability records)`);
   lines.push(`- Legacy treasure items: ${counts.treasure} (existing \`tool\` itemType — mechanically inert by the source data's own description)`);
   lines.push(`- Legacy quest items: ${counts.questitem} (existing \`tool\` itemType, tagged with quest_item/turn_in/unlock interactions)`);
   lines.push(`- Legacy document items: ${counts.document} (existing \`tool\` itemType)`);
@@ -1090,10 +1177,11 @@ if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export {
-  loadLootData, classifySubcategory, computeItemWeight, hashItemName, parseWeaponEffectBonuses,
+  loadLootData, loadNpcWeapons, classifySubcategory, computeItemWeight, hashItemName, parseWeaponEffectBonuses,
   deriveWeaponMechanics, deriveWeaponProperties, toStatModifiers, findSetValueOverrides,
   scanResidualLanguage, applyMaterialModifiers, slugify, makeIdGenerator,
   deriveConsumableCategory, resolveConsumableUses,
   deriveWondrousSlot, deriveToolCategory, extractSpeeds, narrativeToolCategory,
-  migrateWeapon, migrateArmor, migrateConsumable, migrateMisc, migrateCompanion, migrateNarrativeTool, main,
+  convertNpcAbility,
+  migrateWeapon, migrateArmor, migrateConsumable, migrateMisc, migrateCompanion, migrateNarrativeTool, migrateNpcWeapon, main,
 };

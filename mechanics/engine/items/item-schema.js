@@ -77,6 +77,10 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @property {OnUseEffect} effect
  * @property {{max: number, recharge: 'short_rest'|'long_rest'|'dawn'|'charges'}} uses
  * @property {number} usesLeft
+ * @property {string} [description]  // display-only free text describing what the ability does,
+ *   for an ability whose real effect can't be confidently reduced to a structured OnUseEffect (the
+ *   same honest-gap pattern consumables use — see docs/V2_MECHANICS_MIGRATION.md's Phase 6). NEVER
+ *   parsed for mechanics, same convention as Item.flavorText.
  */
 
 /**

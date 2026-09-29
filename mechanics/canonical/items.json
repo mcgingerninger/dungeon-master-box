@@ -655,7 +655,6 @@
     "itemType": "weapon",
     "rarity": "common",
     "weight": 3.5,
-    "value": "—",
     "flavorText": "A smooth disc-shaped river stone perfectly sized for a sling.",
     "weapon": {
       "damageDice": "1d4",
@@ -5044,7 +5043,6 @@
     "itemType": "consumable",
     "rarity": "uncommon",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "A tiny, tasteless, slightly translucent bead.",
     "consumable": {
       "consumableCategory": "food",
@@ -5070,7 +5068,6 @@
     "itemType": "consumable",
     "rarity": "uncommon",
     "weight": 0.5,
-    "value": "—",
     "flavorText": "A tiny blue bead, slightly moist to the touch.",
     "consumable": {
       "consumableCategory": "food",
@@ -5446,7 +5443,6 @@
     "itemType": "consumable",
     "rarity": "uncommon",
     "weight": 2.5,
-    "value": "—",
     "flavorText": "A small crystal vial of dark pink perfume.",
     "consumable": {
       "consumableCategory": "food",
@@ -5514,7 +5510,6 @@
     "itemType": "consumable",
     "rarity": "uncommon",
     "weight": 3,
-    "value": "—",
     "flavorText": "A small sealed iron flask that rattles faintly when shaken.",
     "consumable": {
       "consumableCategory": "food",
@@ -5614,7 +5609,6 @@
     "itemType": "armor",
     "rarity": "uncommon",
     "weight": 8.5,
-    "value": "—",
     "flavorText": "A round shield with a blank face that shifts to mirror your emotions.",
     "armor": {
       "armorType": "shield",
@@ -5678,7 +5672,6 @@
     "itemType": "weapon",
     "rarity": "uncommon",
     "weight": 6.5,
-    "value": "—",
     "flavorText": "A wooden staff carved with miniature naturalistic scenes.",
     "weapon": {
       "damageDice": "1d6",
@@ -5697,7 +5690,6 @@
     "itemType": "weapon",
     "rarity": "uncommon",
     "weight": 7,
-    "value": "—",
     "flavorText": "A gnarled wooden staff carved with bird imagery.",
     "weapon": {
       "damageDice": "1d6",
@@ -5716,7 +5708,6 @@
     "itemType": "weapon",
     "rarity": "uncommon",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "A slender staff carved from living wood, always green.",
     "weapon": {
       "damageDice": "1d6",
@@ -5834,7 +5825,6 @@
     "itemType": "armor",
     "rarity": "uncommon",
     "weight": 33,
-    "value": "—",
     "flavorText": "A tattoo of interlocking geometric lines covering one arm.",
     "requiresAttunement": true,
     "armor": {
@@ -22421,7 +22411,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 8,
-    "value": "—",
     "flavorText": "An elven longsword that bonds to a single bearer and grows in power.",
     "requiresAttunement": true,
     "weapon": {
@@ -22684,7 +22673,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 5.5,
-    "value": "—",
     "flavorText": "A multi-function weapon rod.",
     "requiresAttunement": true,
     "weapon": {
@@ -22808,7 +22796,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 3,
-    "value": "—",
     "flavorText": "One of nine swords keyed to the alignment of its god.",
     "requiresAttunement": true,
     "weapon": {
@@ -22862,7 +22849,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 3,
-    "value": "—",
     "flavorText": "The death wand of the Demon Prince of Undead. It smells of rot and whispers names of the newly dead.",
     "requiresAttunement": true,
     "weapon": {
@@ -22887,7 +22873,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 15,
-    "value": "—",
     "flavorText": "A trident of the sea cresting with ocean-hued gems.",
     "requiresAttunement": true,
     "weapon": {
@@ -22922,7 +22907,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 25,
-    "value": "—",
     "flavorText": "A dwarven warhammer of legendary lineage.",
     "requiresAttunement": true,
     "weapon": {
@@ -22961,7 +22945,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 16,
-    "value": "—",
     "flavorText": "A massive black-bladed sword that devours souls.",
     "requiresAttunement": true,
     "weapon": {
@@ -23344,7 +23327,6 @@
     "itemType": "armor",
     "rarity": "superrare",
     "weight": 30,
-    "value": "—",
     "flavorText": "A full-torso tattoo of interlocking plate-like scales.",
     "requiresAttunement": true,
     "armor": {
@@ -23510,7 +23492,6 @@
     "itemType": "weapon",
     "rarity": "superrare",
     "weight": 4,
-    "value": "—",
     "flavorText": "A broken shard of what was once a greater weapon, radiating necrotic energy.",
     "requiresAttunement": true,
     "weapon": {
@@ -27826,7 +27807,6 @@
     "itemType": "armor",
     "rarity": "superrare",
     "weight": 14,
-    "value": "—",
     "flavorText": "Blackened plate armor, its pauldrons shaped like leering, horned faces that seem to shift when unwatched.",
     "requiresAttunement": true,
     "armor": {
@@ -27900,7 +27880,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 21,
-    "value": "—",
     "flavorText": "A massive greatsword forged from the fang of an ancient red wyrm and quenched in its own blood.",
     "requiresAttunement": true,
     "weapon": {
@@ -27954,7 +27933,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 4,
-    "value": "—",
     "flavorText": "A slender rapier engraved with a name that has been scratched out.",
     "requiresAttunement": true,
     "weapon": {
@@ -28001,7 +27979,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 48,
-    "value": "—",
     "flavorText": "A warhammer grown from petrified heartwood of a corrupted treant.",
     "requiresAttunement": true,
     "weapon": {
@@ -28052,7 +28029,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 2,
-    "value": "—",
     "flavorText": "An elven longbow strung with a lock of hair from a dying god.",
     "requiresAttunement": true,
     "weapon": {
@@ -28099,7 +28075,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 7,
-    "value": "—",
     "flavorText": "A dwarven battleaxe carried by seven generations of mountain kings.",
     "requiresAttunement": true,
     "weapon": {
@@ -28152,7 +28127,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 5.5,
-    "value": "—",
     "flavorText": "A matched pair of curved daggers forged by shadow-dancers who worked only by moonlight.",
     "requiresAttunement": true,
     "weapon": {
@@ -28203,7 +28177,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 28,
-    "value": "—",
     "flavorText": "An enormous maul once belonging to a hill giant chieftain, later cursed and abandoned.",
     "requiresAttunement": true,
     "weapon": {
@@ -28250,7 +28223,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 16,
-    "value": "—",
     "flavorText": "A masterwork siege crossbow that ended a famous siege with a single bolt from three hundred yards.",
     "requiresAttunement": true,
     "weapon": {
@@ -28306,7 +28278,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 23,
-    "value": "—",
     "flavorText": "A greatsword of blue-white steel, always rimed with frost.",
     "requiresAttunement": true,
     "weapon": {
@@ -28359,7 +28330,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 5,
-    "value": "—",
     "flavorText": "A pair of short swords forged from melted-down coins.",
     "requiresAttunement": true,
     "weapon": {
@@ -28410,7 +28380,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 16,
-    "value": "—",
     "flavorText": "Plate armor forged from the melted shields of a hundred knights who held a doomed line.",
     "requiresAttunement": true,
     "armor": {
@@ -28493,7 +28462,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 20,
-    "value": "—",
     "flavorText": "Chain from the hide of an ironback boar that took a village three days to bring down.",
     "requiresAttunement": true,
     "armor": {
@@ -28536,7 +28504,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 11,
-    "value": "—",
     "flavorText": "A tower shield passed down an unbroken line of border-guard captains for three centuries.",
     "requiresAttunement": true,
     "armor": {
@@ -28667,7 +28634,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 3,
-    "value": "—",
     "flavorText": "Worn by an oracle who saw her own death three times and changed the outcome each time.",
     "requiresAttunement": true,
     "armor": {
@@ -28717,7 +28683,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 15,
-    "value": "—",
     "flavorText": "Woven by a monastic order trained in the eye of a hurricane.",
     "requiresAttunement": true,
     "armor": {
@@ -28767,7 +28732,6 @@
     "itemType": "consumable",
     "rarity": "legendary",
     "weight": 1,
-    "value": "—",
     "flavorText": "Distilled from a single feather shed willingly by a phoenix.",
     "consumable": {
       "consumableCategory": "potion",
@@ -28810,7 +28774,6 @@
     "itemType": "consumable",
     "rarity": "legendary",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "An opalescent potion brewed for a client who was never named.",
     "consumable": {
       "consumableCategory": "potion",
@@ -28852,7 +28815,6 @@
     "itemType": "consumable",
     "rarity": "legendary",
     "weight": 1,
-    "value": "—",
     "flavorText": "A silvery liquid that moves against the current of its vial.",
     "consumable": {
       "consumableCategory": "potion",
@@ -28894,7 +28856,6 @@
     "itemType": "consumable",
     "rarity": "legendary",
     "weight": 0.1,
-    "value": "—",
     "flavorText": "A scroll of singing script — the last spell a legendary archmage cast before retiring.",
     "consumable": {
       "consumableCategory": "scroll",
@@ -28936,7 +28897,6 @@
     "itemType": "consumable",
     "rarity": "legendary",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "A pouch of silvery dust ground from a fragment of a fallen star.",
     "consumable": {
       "consumableCategory": "coating",
@@ -28978,7 +28938,6 @@
     "itemType": "consumable",
     "rarity": "legendary",
     "weight": 1,
-    "value": "—",
     "flavorText": "A crystal vial of tears wept by a queen who refused to die before finishing her revenge.",
     "consumable": {
       "consumableCategory": "food",
@@ -29057,7 +29016,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 17,
-    "value": "—",
     "flavorText": "A heavy signet ring bearing the crest of a house erased from every record.",
     "requiresAttunement": true,
     "armor": {
@@ -29173,7 +29131,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 0.45,
-    "value": "—",
     "flavorText": "A plain wooden mask worn by a monastery that vowed never to be heard again.",
     "requiresAttunement": true,
     "armor": {
@@ -29253,7 +29210,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 39,
-    "value": "—",
     "flavorText": "A massive warhammer with a head the size of a man's chest, inscribed with storm runes.",
     "requiresAttunement": true,
     "weapon": {
@@ -29636,7 +29592,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 22,
-    "value": "—",
     "flavorText": "Full plate armor of volcanic obsidian inlaid with fire dragon scales, impossibly smooth.",
     "armor": {
       "armorType": "heavy",
@@ -29672,7 +29627,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 36,
-    "value": "—",
     "flavorText": "A massive iron rod with a crackling crown of electrical energy.",
     "requiresAttunement": true,
     "weapon": {
@@ -29713,7 +29667,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 9,
-    "value": "—",
     "flavorText": "Tanned hide armor made from the pelt of a celestial beast. Covered in glowing runes.",
     "requiresAttunement": true,
     "armor": {
@@ -29781,7 +29734,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 6.5,
-    "value": "—",
     "flavorText": "One of the legendary Vestiges of Divergence — a blade that grows with its wielder.",
     "requiresAttunement": true,
     "weapon": {
@@ -29859,7 +29811,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 33,
-    "value": "—",
     "flavorText": "A greatsword of ancient make, forged during the Age of Arcanum. The blade is covered in tiny fracture lines that glow red when drawn.",
     "requiresAttunement": true,
     "weapon": {
@@ -30522,7 +30473,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 2,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this scimitar — only that whoever it was clearly did not intend for it to still be in use. It reacts, faintly and unmistakably, to the presence of the gale.",
     "requiresAttunement": true,
     "weapon": {
@@ -30577,7 +30527,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 5.5,
-    "value": "—",
     "flavorText": "Something about this war pick suggests it was never really finished being made — only set down, for a while. It reacts, faintly and unmistakably, to the presence of the shadow.",
     "requiresAttunement": true,
     "weapon": {
@@ -30628,7 +30577,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 4.5,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this battleaxe — only that whoever it was clearly did not intend for it to still be in use. It reacts, faintly and unmistakably, to the presence of swiftness.",
     "requiresAttunement": true,
     "weapon": {
@@ -30676,7 +30624,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 3.5,
-    "value": "—",
     "flavorText": "This kukri has outlived every person who ever claimed to have tamed it. Those who have carried it long enough report dreams that smell, unmistakably, of the ember flame.",
     "requiresAttunement": true,
     "weapon": {
@@ -30730,7 +30677,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 2,
-    "value": "—",
     "flavorText": "Something about this trident suggests it was never really finished being made — only set down, for a while. Scholars who've studied it agree on exactly one thing: it is not finished with the tide yet.",
     "requiresAttunement": true,
     "weapon": {
@@ -30784,7 +30730,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 35,
-    "value": "—",
     "flavorText": "This greataxe has outlived every person who ever claimed to have tamed it. It does not ask permission before drawing on the gale. It simply does.",
     "requiresAttunement": true,
     "weapon": {
@@ -30835,7 +30780,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 34,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this maul — only that whoever it was clearly did not intend for it to still be in use. Scholars who've studied it agree on exactly one thing: it is not finished with swiftness yet.",
     "requiresAttunement": true,
     "weapon": {
@@ -30880,7 +30824,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 3.5,
-    "value": "—",
     "flavorText": "This trident was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It does not ask permission before drawing on the void. It simply does.",
     "requiresAttunement": true,
     "weapon": {
@@ -30934,7 +30877,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 4,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this war pick has changed hands more times than its current bearer knows. It has never once been fully explained how the shadow came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -30986,7 +30928,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 27,
-    "value": "—",
     "flavorText": "This warhammer was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the tempest came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -31040,7 +30981,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 3,
-    "value": "—",
     "flavorText": "This handaxe has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the whisper came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -31097,7 +31037,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 24,
-    "value": "—",
     "flavorText": "This maul was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the echo came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -31152,7 +31091,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 22,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this greataxe has changed hands more times than its current bearer knows. It does not ask permission before drawing on the warding. It simply does.",
     "requiresAttunement": true,
     "weapon": {
@@ -31201,7 +31139,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 6,
-    "value": "—",
     "flavorText": "This kukri has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the decay came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -31255,7 +31192,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 3.5,
-    "value": "—",
     "flavorText": "Something about this battle staff suggests it was never really finished being made — only set down, for a while. Scholars who've studied it agree on exactly one thing: it is not finished with the echo yet.",
     "requiresAttunement": true,
     "weapon": {
@@ -31306,7 +31242,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 7,
-    "value": "—",
     "flavorText": "This morningstar has outlived every person who ever claimed to have tamed it. It reacts, faintly and unmistakably, to the presence of the ember flame.",
     "requiresAttunement": true,
     "weapon": {
@@ -31357,7 +31292,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 7.5,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this battleaxe — only that whoever it was clearly did not intend for it to still be in use. It does not ask permission before drawing on the shadow. It simply does.",
     "requiresAttunement": true,
     "weapon": {
@@ -31411,7 +31345,6 @@
     "itemType": "weapon",
     "rarity": "legendary",
     "weight": 2.5,
-    "value": "—",
     "flavorText": "This longbow was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the tide yet.",
     "requiresAttunement": true,
     "weapon": {
@@ -31462,7 +31395,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 16,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this half plate armor — only that whoever it was clearly did not intend for it to still be in use. Scholars who've studied it agree on exactly one thing: it is not finished with the whisper yet.",
     "requiresAttunement": true,
     "armor": {
@@ -31500,7 +31432,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 38,
-    "value": "—",
     "flavorText": "This chain mail was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It does not ask permission before drawing on the blood. It simply does.",
     "requiresAttunement": true,
     "armor": {
@@ -31539,7 +31470,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 24,
-    "value": "—",
     "flavorText": "Something about this ring mail suggests it was never really finished being made — only set down, for a while. Those who have carried it long enough report dreams that smell, unmistakably, of the whisper.",
     "requiresAttunement": true,
     "armor": {
@@ -31577,7 +31507,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 7.5,
-    "value": "—",
     "flavorText": "This studded leather armor has outlived every person who ever claimed to have tamed it. It reacts, faintly and unmistakably, to the presence of the whisper.",
     "requiresAttunement": true,
     "armor": {
@@ -31615,7 +31544,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 1,
-    "value": "—",
     "flavorText": "This cape was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Those who have carried it long enough report dreams that smell, unmistakably, of the ember flame.",
     "requiresAttunement": true,
     "armor": {
@@ -31659,7 +31587,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 33,
-    "value": "—",
     "flavorText": "This hide armor has outlived every person who ever claimed to have tamed it. Those who have carried it long enough report dreams that smell, unmistakably, of the deep frost.",
     "requiresAttunement": true,
     "armor": {
@@ -31697,7 +31624,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 2,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this gauntlets — only that whoever it was clearly did not intend for it to still be in use. It does not ask permission before drawing on the gale. It simply does.",
     "requiresAttunement": true,
     "armor": {
@@ -31741,7 +31667,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 12,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this shield has changed hands more times than its current bearer knows. It has never once been fully explained how the tempest came to live inside it.",
     "requiresAttunement": true,
     "armor": {
@@ -31785,7 +31710,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 29,
-    "value": "—",
     "flavorText": "This shield has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the blood came to live inside it.",
     "requiresAttunement": true,
     "armor": {
@@ -31829,7 +31753,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 1,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this circlet has changed hands more times than its current bearer knows. It has never once been fully explained how the venom came to live inside it.",
     "requiresAttunement": true,
     "armor": {
@@ -31873,7 +31796,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 3,
-    "value": "—",
     "flavorText": "This cape was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the deep frost yet.",
     "requiresAttunement": true,
     "armor": {
@@ -31917,7 +31839,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 1,
-    "value": "—",
     "flavorText": "Something about this gloves suggests it was never really finished being made — only set down, for a while. It reacts, faintly and unmistakably, to the presence of the dawn.",
     "requiresAttunement": true,
     "armor": {
@@ -31961,7 +31882,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this gauntlets has changed hands more times than its current bearer knows. It does not ask permission before drawing on the dawn. It simply does.",
     "requiresAttunement": true,
     "armor": {
@@ -32005,7 +31925,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "This gloves was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the tempest yet.",
     "requiresAttunement": true,
     "armor": {
@@ -32049,7 +31968,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 0.85,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this gauntlets has changed hands more times than its current bearer knows. It has never once been fully explained how the whisper came to live inside it.",
     "requiresAttunement": true,
     "armor": {
@@ -32093,7 +32011,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 32,
-    "value": "—",
     "flavorText": "This hide armor was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the ember flame yet.",
     "requiresAttunement": true,
     "armor": {
@@ -32131,7 +32048,6 @@
     "itemType": "armor",
     "rarity": "legendary",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this crown has changed hands more times than its current bearer knows. Those who have carried it long enough report dreams that smell, unmistakably, of the whisper.",
     "requiresAttunement": true,
     "armor": {
@@ -32417,7 +32333,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 27,
-    "value": "—",
     "flavorText": "A greatsword of living silver that has never fully decided whether it is a blade or a feather. The metal shifts like mercury when the light moves and the edge is too fine to see directly. It belonged to a seraph who chose to die defending something mortal, and the god who reforged it into a weapon did so without fully understanding what they were working with.",
     "requiresAttunement": true,
     "weapon": {
@@ -32465,7 +32380,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 22,
-    "value": "—",
     "flavorText": "Full plate cut from the actual shield-skin of a titan who was slain by a god, then given by that god to the first mortal ever recorded showing a titan mercy. The armor is warm to the touch regardless of temperature and the engraving on the breastplate changes slowly over years to reflect whatever the wearer considers most worth protecting.",
     "requiresAttunement": true,
     "armor": {
@@ -32503,7 +32417,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 1,
-    "value": "—",
     "flavorText": "A longbow strung with a single strand of actual night sky, pulled free before the sky noticed it was missing. It has been faintly cold since the moment it was made and has never once been fully silent — a sound too low to be called music plays from it whenever it is drawn, and it whispers the name of a different star each time. Astronomers who have seen it refuse to discuss what they observed.",
     "requiresAttunement": true,
     "weapon": {
@@ -32550,7 +32463,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 21,
-    "value": "—",
     "flavorText": "A robe woven by the Fates from a single thread they refused, for reasons unrecorded, to cut. The woven pattern changes slowly — not in response to anything the wearer does, but in response to what they are about to do. Scholars who have studied it closely report that the pattern is always approximately three decisions ahead. This is considered either very reassuring or very disturbing depending on the scholar.",
     "requiresAttunement": true,
     "armor": {
@@ -32587,7 +32499,6 @@
     "itemType": "consumable",
     "rarity": "celestial",
     "weight": 0.35,
-    "value": "—",
     "flavorText": "A golden cup from a divine banquet where no guest ever left hungry.",
     "consumable": {
       "consumableCategory": "food",
@@ -32630,7 +32541,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 3.5,
-    "value": "—",
     "flavorText": "Worn by the first mortal ruler ever crowned directly by the gods, at a ceremony that made several of the attending gods uncomfortable for reasons they declined to explain publicly. The crown is plain enough that people are surprised, on seeing it, that it is the thing in question. It gets warmer as morning approaches and cooler after noon, regardless of weather or what room you are in.",
     "requiresAttunement": true,
     "armor": {
@@ -32674,7 +32584,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "A cloak sewn from feathers shed voluntarily by an entire heavenly choir on the day they chose exile over singing what they were told. The feathers are white but catch color at odd angles — a different one each time, never the same color twice in a row. The wearer occasionally hums in eight-part harmony without meaning to, particularly when frightened or moved, and particularly when they think no one is listening.",
     "requiresAttunement": true,
     "armor": {
@@ -32748,7 +32657,6 @@
     "itemType": "consumable",
     "rarity": "celestial",
     "weight": 2,
-    "value": "—",
     "flavorText": "The cremated remains of a minor god who chose to die so that mortals might live a little longer. There is exactly one recorded account of a person drinking this and surviving to describe the taste — they described it as starlight and regret, and declined to elaborate further. The vial is always slightly warm.",
     "consumable": {
       "consumableCategory": "food",
@@ -32790,7 +32698,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 27,
-    "value": "—",
     "flavorText": "A ring forged by a celestial judge who refused to let a single soul it ever passed judgment on go unremembered. Every soul the judge released, condemned, or pardoned is recorded somewhere in the ring's metal in script too small to read with mortal eyes. The ring is always slightly warm and has never once gone cold, not even in the coldest recorded dungeon on any known plane.",
     "requiresAttunement": true,
     "armor": {
@@ -32864,7 +32771,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 3.5,
-    "value": "—",
     "flavorText": "A shortsword that was used, once, to wound a god. The god in question survived and has since declined to discuss the incident. The blade carries a nick from where it struck divine bone, and the nick has never been filed out because no whetstone has ever been able to touch it. The sword is cold. Not unpleasant cold. The kind of cold that means business.",
     "requiresAttunement": true,
     "weapon": {
@@ -32938,7 +32844,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 21,
-    "value": "—",
     "flavorText": "Full plate armor made from the melted-down weapons of every army that ever tried to take a particular mountain pass and failed. The smith who made it spent forty years on the project and died the morning after completing it, reportedly satisfied. The armor is heavier than any armor has a right to be, and yet the wearer never tires from wearing it.",
     "requiresAttunement": true,
     "armor": {
@@ -33005,7 +32910,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 23,
-    "value": "—",
     "flavorText": "A plain white burial shroud taken from a celestial who chose to be interred rather than return to the heavens, on the grounds that they had become too attached to the place they were in. The fabric is impossibly fine. It is translucent but not see-through. It never gets dirty. If it is ever fully spread out, the pattern woven into it — invisible until then — depicts a map of a place no one has been able to identify.",
     "requiresAttunement": true,
     "armor": {
@@ -33122,7 +33026,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 5.5,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this longsword — only that whoever it was clearly did not intend for it to still be in use. It does not ask permission before drawing on the whisper. It simply does.",
     "requiresAttunement": true,
     "weapon": {
@@ -33176,7 +33079,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 4,
-    "value": "—",
     "flavorText": "Something about this dagger suggests it was never really finished being made — only set down, for a while. Scholars who've studied it agree on exactly one thing: it is not finished with the venom yet.",
     "requiresAttunement": true,
     "weapon": {
@@ -33231,7 +33133,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 5.5,
-    "value": "—",
     "flavorText": "Something about this war pick suggests it was never really finished being made — only set down, for a while. Those who have carried it long enough report dreams that smell, unmistakably, of the warding.",
     "requiresAttunement": true,
     "weapon": {
@@ -33277,7 +33178,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 42,
-    "value": "—",
     "flavorText": "This greatsword was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It reacts, faintly and unmistakably, to the presence of the tide.",
     "requiresAttunement": true,
     "weapon": {
@@ -33328,7 +33228,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 14,
-    "value": "—",
     "flavorText": "This heavy crossbow has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the deep frost came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -33384,7 +33283,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 32,
-    "value": "—",
     "flavorText": "This maul was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the ember flame came to live inside it.",
     "requiresAttunement": true,
     "weapon": {
@@ -33435,7 +33333,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 1.5,
-    "value": "—",
     "flavorText": "This morningstar was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Those who have carried it long enough report dreams that smell, unmistakably, of swiftness.",
     "requiresAttunement": true,
     "weapon": {
@@ -33480,7 +33377,6 @@
     "itemType": "weapon",
     "rarity": "celestial",
     "weight": 33,
-    "value": "—",
     "flavorText": "This warhammer was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It does not ask permission before drawing on the decay. It simply does.",
     "requiresAttunement": true,
     "weapon": {
@@ -33536,7 +33432,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 31,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this breastplate has changed hands more times than its current bearer knows. It does not ask permission before drawing on the deep frost. It simply does.",
     "requiresAttunement": true,
     "armor": {
@@ -33574,7 +33469,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 21,
-    "value": "—",
     "flavorText": "This ring mail was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the void came to live inside it.",
     "requiresAttunement": true,
     "armor": {
@@ -33613,7 +33507,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 37,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this plate armor — only that whoever it was clearly did not intend for it to still be in use. Those who have carried it long enough report dreams that smell, unmistakably, of fortune.",
     "requiresAttunement": true,
     "armor": {
@@ -33652,7 +33545,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 8,
-    "value": "—",
     "flavorText": "This greaves was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the blood yet.",
     "requiresAttunement": true,
     "armor": {
@@ -33696,7 +33588,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 15,
-    "value": "—",
     "flavorText": "Legend disagrees about who first made this circlet — only that whoever it was clearly did not intend for it to still be in use. Those who have carried it long enough report dreams that smell, unmistakably, of the dawn.",
     "requiresAttunement": true,
     "armor": {
@@ -33740,7 +33631,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 31,
-    "value": "—",
     "flavorText": "Forged in an age nobody alive fully remembers, this breastplate has changed hands more times than its current bearer knows. Those who have carried it long enough report dreams that smell, unmistakably, of the blood.",
     "requiresAttunement": true,
     "armor": {
@@ -33777,7 +33667,6 @@
     "itemType": "armor",
     "rarity": "celestial",
     "weight": 1,
-    "value": "—",
     "flavorText": "This girdle has outlived every person who ever claimed to have tamed it. Scholars who've studied it agree on exactly one thing: it is not finished with the deep frost yet.",
     "requiresAttunement": true,
     "armor": {
@@ -33814,5 +33703,238 @@
       "index": 40,
       "name": "Zareth Nalen, the Frostbitten"
     }
+  },
+  {
+    "id": "cinderfall",
+    "name": "Cinderfall",
+    "itemType": "weapon",
+    "rarity": "rare",
+    "weight": 19,
+    "flavorText": "The Lord Commander's greatsword, forged from meteoric iron and quenched in dragon's blood during the Ashcrown's conquest of the Cinder Coast. The blade never quite cools — Bastian Reave can light a torch off the edge in cold weather, and has, more than once, just to unsettle whoever he's meeting with.",
+    "requiresAttunement": true,
+    "weapon": {
+      "damageDice": "2d6",
+      "damageType": "bludgeoning",
+      "bonusDamage": [
+        {
+          "dice": "2d6",
+          "type": "fire"
+        }
+      ]
+    },
+    "passive": [
+      {
+        "stat": "damageRoll",
+        "value": 5
+      }
+    ],
+    "legacySource": {
+      "tier": "rare",
+      "index": 0,
+      "name": "Cinderfall",
+      "source": "npc-data.js:NPC_WEAPONS"
+    }
+  },
+  {
+    "id": "the-vayle-codex",
+    "name": "The Vayle Codex",
+    "itemType": "weapon",
+    "rarity": "rare",
+    "weight": 3.5,
+    "flavorText": "Not a book — a wand disguised as one, its spine bound in what the Archmagus insists is ordinary leather. Selwyn Vayle has carried it since his apprenticeship, and it's absorbed enough of his own spellwork over the decades that it now argues back, in a small dry voice only he claims to hear.",
+    "weapon": {
+      "damageDice": "1d4",
+      "damageType": "bludgeoning"
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 1,
+      "name": "The Vayle Codex",
+      "source": "npc-data.js:NPC_WEAPONS"
+    },
+    "abilities": [
+      {
+        "id": "vaylecodex-counterspell",
+        "name": "Counterspell",
+        "kind": "spell",
+        "description": "Cast Counterspell without using a spell slot or reaction.",
+        "effect": {
+          "kind": "utility"
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "long_rest"
+        },
+        "usesLeft": 1
+      }
+    ]
+  },
+  {
+    "id": "korrins-reckoning",
+    "name": "Korrin's Reckoning",
+    "itemType": "weapon",
+    "rarity": "rare",
+    "weight": 48,
+    "flavorText": "General Thessaly Korrin's warhammer, cast from the melted-down chains of a rebellion she put down twenty years ago in the Cinder Coast — a trophy she commissioned herself, and wears without a trace of irony.",
+    "weapon": {
+      "damageDice": "2d6",
+      "damageType": "bludgeoning"
+    },
+    "passive": [
+      {
+        "stat": "damageRoll",
+        "value": 4
+      }
+    ],
+    "legacySource": {
+      "tier": "rare",
+      "index": 2,
+      "name": "Korrin's Reckoning",
+      "source": "npc-data.js:NPC_WEAPONS"
+    }
+  },
+  {
+    "id": "ashwicks-needle",
+    "name": "Ashwick's Needle",
+    "itemType": "weapon",
+    "rarity": "rare",
+    "weight": 3.5,
+    "flavorText": "A slim, unremarkable dagger the Imperial spymaster carries openly, on the theory that a weapon nobody bothers hiding is never suspected of anything.",
+    "weapon": {
+      "damageDice": "1d4",
+      "damageType": "bludgeoning",
+      "properties": [
+        "finesse"
+      ],
+      "bonusDamage": [
+        {
+          "dice": "1d6",
+          "type": "poison"
+        }
+      ]
+    },
+    "legacySource": {
+      "tier": "rare",
+      "index": 3,
+      "name": "Ashwick's Needle",
+      "source": "npc-data.js:NPC_WEAPONS"
+    }
+  },
+  {
+    "id": "the-legion-seal",
+    "name": "The Legion Seal",
+    "rarity": "rare",
+    "weight": 0.7,
+    "flavorText": "Not a weapon by trade — a magistrate's signet ring, heavy gold, that Darrow Vane has worn since he folded the old civil register into the Queen's Legion. Every ruling he's ever quietly redirected carries its impression.",
+    "requiresAttunement": true,
+    "legacySource": {
+      "tier": "rare",
+      "index": 4,
+      "name": "The Legion Seal",
+      "source": "npc-data.js:NPC_WEAPONS"
+    },
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "legionseal-compel",
+        "name": "Compel Truth",
+        "kind": "active_effect",
+        "description": "Force one creature within 30 ft. to make a DC 16 Wisdom save or be compelled to answer your next question honestly.",
+        "effect": {
+          "kind": "utility"
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "long_rest"
+        },
+        "usesLeft": 1
+      }
+    ]
+  },
+  {
+    "id": "vanes-judgment",
+    "name": "Vane's Judgment",
+    "itemType": "weapon",
+    "rarity": "rare",
+    "weight": 7,
+    "flavorText": "The Grand Inquisitor's mace, blessed by a rite the Ashcrown temple no longer performs openly — it was meant, once, to be used against genuine heresy. Darrow Vane has widened the definition considerably.",
+    "weapon": {
+      "damageDice": "1d6",
+      "damageType": "bludgeoning",
+      "bonusDamage": [
+        {
+          "dice": "2d6",
+          "type": "radiant"
+        }
+      ]
+    },
+    "passive": [
+      {
+        "stat": "damageRoll",
+        "value": 4
+      }
+    ],
+    "legacySource": {
+      "tier": "rare",
+      "index": 5,
+      "name": "Vane's Judgment",
+      "source": "npc-data.js:NPC_WEAPONS"
+    }
+  },
+  {
+    "id": "thornes-answer",
+    "name": "Thorne's Answer",
+    "itemType": "weapon",
+    "rarity": "rare",
+    "weight": 4,
+    "flavorText": "Commander Elara Thorne's longsword — Imperial-forged, taken off a Lord Commander's second-in-command the night she deserted. She's never had it reforged or rehilted. She wants every rebel who sees it to know exactly where it came from.",
+    "weapon": {
+      "damageDice": "1d8",
+      "damageType": "bludgeoning"
+    },
+    "passive": [
+      {
+        "stat": "damageRoll",
+        "value": 4
+      }
+    ],
+    "legacySource": {
+      "tier": "rare",
+      "index": 6,
+      "name": "Thorne's Answer",
+      "source": "npc-data.js:NPC_WEAPONS"
+    }
+  },
+  {
+    "id": "the-cinderwrights-press",
+    "name": "The Cinderwright's Press",
+    "rarity": "rare",
+    "weight": 0.4,
+    "flavorText": "A collapsible printing frame small enough to fit in a courier's pack, used to run off pamphlets by moonlight and vanish before dawn. Not a weapon in any conventional sense — the Second Flame considers it one of their most dangerous assets anyway.",
+    "legacySource": {
+      "tier": "rare",
+      "index": 7,
+      "name": "The Cinderwright's Press",
+      "source": "npc-data.js:NPC_WEAPONS"
+    },
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "cinderwrightpress-pamphlet",
+        "name": "Print Pamphlet",
+        "kind": "active_effect",
+        "description": "Advantage on your next Persuasion check to recruit local help, once per settlement per month.",
+        "effect": {
+          "kind": "utility"
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "long_rest"
+        },
+        "usesLeft": 1
+      }
+    ]
   }
 ]
