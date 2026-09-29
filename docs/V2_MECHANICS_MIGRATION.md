@@ -498,12 +498,13 @@ Verified live: built a plain object with the exact shape an old save's JSON woul
 `applyStateBlob` as if it had just loaded from `localStorage`, and confirmed the item carries a real
 `__canonical.weapon` afterward.
 
-**Still not covered:** a DM viewing another player's sheet reads that player's items via
-`resolveForeignItem`/`foreignSavedGeneratedItems`, which arrives through the multiplayer sync layer
-(`multiplayer-sync.js`/`server/websocket.js`), not through `applyStateBlob` — tracing that entire
-call graph to attach the same upgrade there wasn't done this pass. It degrades the same way
-everything else here does when uncovered: the DM's view of that one item falls back to the original
-`.effect`/`.ac`/`.dmg` regex path, not an error or a crash, just not yet upgraded.
+**Was not covered as of this phase — closed in Phase 14 below:** a DM viewing another player's sheet
+reads that player's items via `resolveForeignItem`/`foreignSavedGeneratedItems`, which arrives
+through the multiplayer sync layer (`multiplayer-sync.js`/`server/websocket.js`), not through
+`applyStateBlob` — tracing that entire call graph to attach the same upgrade there wasn't done this
+pass. It degraded the same way everything else here does when uncovered: the DM's view of that one
+item fell back to the original `.effect`/`.ac`/`.dmg` regex path, not an error or a crash, just not
+yet upgraded.
 
 ## Phase 13: shadow-mode validation — and two more real bugs it found
 
@@ -640,6 +641,32 @@ damage in flavor text.
   "Found, investigated, deliberately left as-is" above) and the "only" guard-clause gap — both
   considered separately and left as documented, deliberate non-fixes, not overlooked.
 
+### Phase 14b: closing the DM-foreign-view save-compat gap (Phase 12's "still not covered" note)
+
+Phase 12 added the one-time `__canonical`-attachment upgrade pass to `applyStateBlob`, so an
+already-existing save (loaded from `localStorage`, or synced as the account's OWN state) picks up
+Phases 7-11's fixes on load even though `__canonical` is never itself persisted. That pass covered
+every path EXCEPT one: a DM viewing another player's sheet.
+
+That view doesn't go through `applyStateBlob` at all. `multiplayer-sync.js`'s
+`startViewedPlayerListener` subscribes to a specific player's synced state and delivers it straight
+to `window.applyViewedPlayerState(uid, state)`, which previously just stored it as `viewedPlayerState`
+and re-rendered — `resolveForeignItem` then read items out of `state.savedGeneratedItems` with no
+`__canonical` ever attached, so a DM's view of another player's migrated items silently fell back to
+the pre-Phase-7 regex path for AC/weapon-attack/consumable-heal, for every item, every time, since
+this path never persists anything the way `applyStateBlob`'s items eventually do.
+
+Fixed with the identical one-line pattern Phase 12 established: `applyViewedPlayerState` now runs
+`state.savedGeneratedItems.forEach(item => attachCanonicalIfMigrated(item, item.rarity))` before
+storing the state, the same idempotent, no-op-if-already-set upgrade pass, just triggered by the
+foreign-state listener instead of the load-a-save path. Confirmed `applyViewedPlayerState` is the
+single delivery point for foreign player state (multiplayer-sync.js's own `window.applyViewedPlayerState`
+call is its only caller) and `resolveForeignItem` its only reader, so one change point closes the
+whole gap. Verified live: simulated a foreign player's state with a legacy-shaped item (no
+`__canonical`, name+rarity matching a real migrated catalog item) delivered through
+`applyViewedPlayerState`, and confirmed `resolveForeignItem` then returns that item with a real
+`__canonical` attached.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
@@ -686,11 +713,7 @@ the live regex path it replaces (Phase 13, all above). What's left:
      has no canonical-schema equivalent at all yet. It keeps accepting whatever shape of item it's
      handed (the Phase 11 wrapper is still legacy-shaped, so this already works unchanged) — genuine
      new design work if it's ever worth modeling grafts as their own canonical concept.
-4. A DM viewing another player's sheet via `resolveForeignItem`/`foreignSavedGeneratedItems` (the
-   multiplayer sync layer, not `applyStateBlob`) doesn't get Phase 12's upgrade pass — see Phase
-   12's "Still not covered" note above. Degrades to the pre-Phase-7 regex path for that one item,
-   for that one viewer, not an error.
-5. One residual gap in `parseWeaponEffectBonuses`, found by Phase 13's shadow-mode validation and
+4. One residual gap in `parseWeaponEffectBonuses`, found by Phase 13's shadow-mode validation and
    investigated in full: the guard clause's "only" exclusion means "+1 to attack rolls only (not
    damage)" still parses as no bonus at all (affects exactly 1 weapon, "Masterwork Longsword").
    Deliberately left unfixed — see Phase 13's "Found, investigated, deliberately left as-is" note —

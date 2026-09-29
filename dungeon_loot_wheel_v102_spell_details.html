@@ -20221,6 +20221,15 @@ function selectViewedPlayer(uid) {
 // the player's doc doesn't exist (shouldn't normally happen once they've ever connected once).
 window.applyViewedPlayerState = function (uid, state) {
   if (uid !== viewedPlayerUid) return; // a stale listener from a since-deselected player
+  // Phase 14 (docs/V2_MECHANICS_MIGRATION.md): the same one-time __canonical-attachment pass
+  // applyStateBlob does for the DM's OWN savedGeneratedItems (Phase 12) — a foreign player's synced
+  // state arrives here as a fresh JSON blob over the wire, never through applyStateBlob, so without
+  // this a DM viewing another player's sheet fell back to the pre-Phase-7 regex path for every one
+  // of that player's looted/generated items (resolveForeignItem never attached __canonical). One-time,
+  // idempotent — attachCanonicalIfMigrated no-ops once __canonical is already set.
+  if (state && state.savedGeneratedItems) {
+    state.savedGeneratedItems.forEach(item => attachCanonicalIfMigrated(item, item.rarity));
+  }
   viewedPlayerState = state;
   renderPlayersTab();
 };
