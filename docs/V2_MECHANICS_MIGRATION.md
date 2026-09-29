@@ -363,13 +363,42 @@ attack modal has no target to resolve against (it just rolls and shows a breakdo
 it manually), so adopting `resolveAttack` would mean a UI redesign, not a drop-in — out of scope for
 this bridge, which only replaces where the numbers come from, not the interaction model.
 
+## Phase 9: wiring migrated consumables' healing into the live app
+
+`applyHealFromItem` (the monolith — rolls a consumable's heal dice when it's used) now reads a
+migrated consumable's dice from its canonical `consumable.effects[].healDice` (a real `kind:'heal'`
+entry) via a new `canonicalConsumableHealDice` (`game-engine.js`), instead of `item.hp`, when
+`item.__canonical` is present. Verified all 8 of the migration's real `heal`-kind entries carry the
+exact same dice string `item.hp` already had — this changes WHERE the string is read from, not what
+it evaluates to. Verified live: a fixed roll on "Potion of Healing" restores the same amount either
+way.
+
+This is a deliberately narrow slice of consumable use, not the whole thing — see the "Consumable
+use" and "Charge tracking" notes below for what's intentionally NOT bridged and why:
+
+- **Charge/uses tracking was deliberately left alone.** `item.charges` (a per-instance mutable
+  string, `"3 uses"` -> `"2 uses"`) already works correctly today for every item, migrated or not —
+  it was never buggy, unlike `.effect`/`.dmg`/`.ac`'s double-counting. Bridging it to the canonical
+  schema's `consumable.uses.max`/`usesLeft` isn't just a field rename: `item.__canonical` is ONE
+  shared object reference per catalog entry (see `CANONICAL_BY_LEGACY_KEY`) — every player's copy
+  of "Potion of Healing" points at the SAME canonical record, so mutating `usesLeft` on it to track
+  one player's remaining charges would corrupt every other player's (and every other equipped
+  instance's) count. A real fix needs per-INSTANCE canonical state, which only exists once
+  save-compatibility (item 4 below) gives every owned item instance its own resolved copy — until
+  then, `item.charges` staying authoritative is correct, not an oversight.
+- **Buff/duration effects have no canonical target to bridge to at all**, for any consumable,
+  migrated or not — 57 of the 65 migrated consumables get a `kind:'utility'` placeholder (no
+  structured effect), by deliberate design (see "Deliberately not decided here" above: buff/debuff
+  extraction from consumable text was never attempted). `startTimedEffect`/`parseDurationMs` keep
+  reading `.effect` text for every consumable exactly as before.
+
 ## Not yet done (future phases, same approach)
 
 All of `loot-data.js` is migrated (Phases 1-4), the monster-part generation system is ported and
 completed (Phase 5), `npc-data.js`'s 8 `NPC_WEAPONS` — the one place in the legacy catalog already
-using a structured `abilities[]` pattern — are migrated (Phase 6), equip-time stat bonuses/AC for
-migrated items are wired into the live app (Phase 7), and so are migrated weapons' attack rolls
-(Phase 8, both above). What's left:
+using a structured `abilities[]` pattern — are migrated (Phase 6), and equip-time stat bonuses/AC,
+weapon attack rolls, and consumable healing for migrated items are wired into the live app (Phases
+7-9, all above). What's left:
 
 1. A handful of `misc`/`questitem`-typed items surfaced during Phases 3-4 as really belonging to a
    different type than authored (ability-score-boosting "Manual of ___" tomes classified as
@@ -381,43 +410,54 @@ migrated items are wired into the live app (Phase 7), and so are migrated weapon
    likely the easiest slice), `reference-data.js`, and `cult-data.js`, plus the modifier/enhancement
    content pool for magic items beyond mundane weapons/armor. None of this is item content, so none
    of it fits this migration's `Item` schema directly — each needs its own scoping pass.
-3. The rest of wiring `mechanics/engine/**` into the live app, beyond Phases 7-8's equip/AC/weapon-
-   attack slice:
-   - **Consumable use** — `handleItemActivation` (the monolith) mutates `item.charges` as a
-     free-text string (`"3 uses"` -> `"2 uses"`); the canonical schema's `consumable.uses.max`/
-     `usesLeft` is a structured `{max, usesLeft}` pair. These are two incompatible charge
-     representations needing a translation layer, not just a field rename, since other live code
-     (`itemChargesLeft`, the `crumble` interaction, `refillDailyItemCharges`) all key off the string
-     form today.
-   - **Interactions** — `mechanics/engine/items/interactions.js`'s table is deliberately narrower
-     than the live app's `INTERACTIONS` (game-engine.js) — it has no equivalent yet for
-     `socket`/`enchant`/`monster_material`/`fleshmancer_input`/`wearable_part`/`sell` and others
-     that actually gate live UI (the Monster Mangler, the Fleshmancer workshop, the Trader). A
-     wholesale swap for migrated items would silently break those UI gates; only the actions both
-     tables agree on (`equip`/`attune`/`consume`/`apply`) are safe to bridge without also porting
-     the rest of the live table's interactions first.
+3. The rest of `mechanics/engine/**`, beyond Phases 7-9's equip/AC/weapon-attack/consumable-heal
+   slice — two items resolved by inspection (no code needed), two genuinely still open:
+   - **Interactions need no bridge — verified, not assumed.** Every rule in the live app's
+     `INTERACTIONS` table (`game-engine.js`) reads ONLY legacy fields (`item.type`/`.subcategory`/
+     `.effect`/`.name`/`.partType`/`.classification`/`.charges`) — none of which this migration ever
+     removes or alters on a migrated item (`__canonical` is purely additive). So `canInteract` and
+     every live gate built on it (the Monster Mangler, the Fleshmancer workshop, the Trader, the DM's
+     "Apply to Player" tool) already work correctly for migrated items today, unchanged. Confirmed
+     also that `canInteract(item, 'equip')` itself is never actually called anywhere in the live
+     app (equip is gated by `getTokenSlotType`/`SLOT_CATEGORY` instead), so there was never a live
+     "equip" interaction to bridge in the first place. `mechanics/engine/items/interactions.js`'s
+     narrower table remains for when `mechanics/engine/character/equipment.js`'s own inventory model
+     is eventually adopted (see item 4) — it isn't a live gap today.
+   - **Attunement is a new feature, not a preservation gap, and was deliberately left out.** There
+     is no attunement-limit enforcement anywhere in the live app today (no "Attune" button, no
+     cap-checking code) — `itemRequiresAttunement`/`requiresAttunement` exist on both sides but the
+     live app never reads the flag for anything beyond an inert `INTERACTIONS` table entry. Adding
+     real enforcement is legitimate future work, just not "wiring the engine in."
    - **Monster-part generation** — `generateMonsterPartV2`/`buildMonsterPartItemV2` (the monolith,
      called from `rollMonsterCombatLoot` when a monster's loot is rolled in Combat, and from
      `generatePremadeMonsterPartsV2` for catalog browsing) still build a legacy-shaped
      `craftable`/`charm` item with prose `.effect`, not `mechanics/engine/items/monster-parts.js`'s
-     `generateMonsterPartMaterial`/`generateMonsterPartWondrous`. These are real swap-in candidates
-     at those two call sites, but the resulting canonical item then needs to flow into
-     `TOKEN_INDEX`/`playerSlots` correctly — the same integration question item 4 below raises for
-     any freshly-generated (not catalog) item — and the Fleshmancer's own graft-crafting system
-     (which CONSUMES a monster part) has no canonical-schema equivalent at all yet, so it would
-     need to keep accepting whatever shape of item it's handed.
-   - **Attunement** — there is no attunement-limit enforcement anywhere in the live app today (no
-     "Attune" button, no cap-checking code) — `itemRequiresAttunement`/`requiresAttunement` exist on
-     both sides but the live app never reads the flag for anything beyond an inert `INTERACTIONS`
-     table entry. Making this real is a new feature, not a preservation of existing behavior, and
-     was left out of Phase 7 for that reason.
+     `generateMonsterPartMaterial`/`generateMonsterPartWondrous`. Looked at closely this session:
+     this is NOT a simple call-site swap the way Phases 7-9 were, for two reasons. First, a
+     procedurally-generated part has no `legacySource` — it isn't a migrated catalog entry, so
+     there's no legacy-shaped item to attach `__canonical` onto; making it bridgeable means
+     synthesizing a NEW legacy-shaped projection (name/type/subcategory/effect/ac text) FROM the
+     canonical output, the mirror image of what the migration script does, and getting that
+     projection's prose to agree with the real mechanics it's standing in for. Second, correlating
+     it with the existing `buildMonsterPartItemV2` (so the two never disagree on which part/theme/
+     magnitude got rolled) needs both builders to consume randomness in the exact same order, which
+     they don't today. Neither risk is worth taking on blind — `buildMonsterPartItemV2` has no known
+     bug (unlike the weapon/armor double-counts), so the value here is architectural, not
+     correctness, and a wrong projection would be a worse regression than leaving it alone. The
+     Fleshmancer's own graft-crafting system (which CONSUMES a monster part) also has no
+     canonical-schema equivalent at all yet.
 4. Save-compatibility: a loading-time path that recognizes an existing player's saved item
    (matched via `legacySource`) and resolves it to its canonical structured item, without forcing
-   every load through live legacy-to-canonical conversion. Phase 7's `__canonical` attachment only
-   covers a FRESH reference to the static catalog (a `'loot:'`-keyed `TOKEN_INDEX` entry); an item a
-   player already owns in `savedGeneratedItems` (a `'gen:'`-keyed snapshot copy made at generation
-   time, from before this bridge existed) carries no `legacySource`-shaped tag at all and is not
-   resolved to its canonical counterpart by anything built so far.
+   every load through live legacy-to-canonical conversion. Phases 7-9's `__canonical` attachment
+   only covers a FRESH reference to the static catalog (a `'loot:'`-keyed `TOKEN_INDEX` entry); an
+   item a player already owns in `savedGeneratedItems` (a `'gen:'`-keyed snapshot copy, made via
+   `{...item, id: freshId}` at generation time) carries `__canonical` forward automatically ONLY
+   when it was cloned from an UNMODIFIED catalog reference (the shallow spread copies the reference
+   along with everything else) — an item that got a random `mods[]` enhancement roll at generation
+   time has real mechanics that diverge from its base canonical record, so carrying `__canonical`
+   forward for one of those would be actively wrong, not just incomplete. Whether/how spin-roll
+   modifier application interacts with this wasn't investigated — a real save-compatibility pass
+   needs to resolve that before touching already-owned items, not just add a `legacySource` lookup.
 5. Shadow-mode comparison in the live app (old regex-computed result vs. new structured result) for
    a real validation pass before making the new engine authoritative for anything user-facing.
 

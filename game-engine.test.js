@@ -197,6 +197,20 @@ describe('migrated-item bridge: canonicalWeaponAttackData (feeds computeWeaponAt
   });
 });
 
+describe('migrated-item bridge: canonicalConsumableHealDice (feeds applyHealFromItem in the monolith)', () => {
+  test('returns the healDice string from a real heal-kind effect', () => {
+    const canonical = { consumable: { effects: [{ kind: 'heal', healDice: '2d4+2' }] } };
+    assert.equal(GE.canonicalConsumableHealDice(canonical), '2d4+2');
+  });
+  test('returns null for a utility-only placeholder (the common case — no structured heal effect)', () => {
+    assert.equal(GE.canonicalConsumableHealDice({ consumable: { effects: [{ kind: 'utility' }] } }), null);
+  });
+  test('returns null for a consumable with no effects at all, and for a non-consumable canonical item', () => {
+    assert.equal(GE.canonicalConsumableHealDice({ consumable: {} }), null);
+    assert.equal(GE.canonicalConsumableHealDice({ itemType: 'weapon' }), null);
+  });
+});
+
 describe('battle: parsing, damage, effectiveness', () => {
   test('parses to-hit, multiple damage clauses with types, and save DC', () => {
     const parsed = GE.battleParseAttack('Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 19 (2d10+8) piercing damage plus 11 (2d10) psychic damage. If the target is a creature, it must succeed on a DC 15 Constitution saving throw.');

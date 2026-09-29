@@ -4830,13 +4830,15 @@ function expendSpecificPower(item, powerText) {
 // "used" message without handleItemActivation's own boolean return needing to change shape.
 // Cleared at the top of every call so a non-healing activation never reads a stale amount.
 let lastActivationHealAmount = null;
-// Rolls item.hp (e.g. "2d4+2") and adds it to the player's current HP via updateCharacterField,
-// which already clamps to characterMaxHpEffective and handles the render/scheduleSave side
-// effects — so a heal can never overheal past max, and never needs its own save/sync path.
-// Returns the amount actually restored (0 if already at full HP), or null if item.hp didn't
-// parse as a dice formula at all.
+// Rolls item.hp (e.g. "2d4+2") — or, for a migrated item (item.__canonical), the same dice string
+// read from its structured consumable.effects heal entry instead (canonicalConsumableHealDice,
+// game-engine.js) — and adds it to the player's current HP via updateCharacterField, which already
+// clamps to characterMaxHpEffective and handles the render/scheduleSave side effects — so a heal
+// can never overheal past max, and never needs its own save/sync path. Returns the amount actually
+// restored (0 if already at full HP), or null if there was no dice formula to roll at all.
 function applyHealFromItem(item) {
-  const rolled = rollDiceFormulaTotal(item.hp);
+  const dice = item.__canonical ? canonicalConsumableHealDice(item.__canonical) : item.hp;
+  const rolled = rollDiceFormulaTotal(dice);
   if (rolled == null) return null;
   const before = characterCurrentHp;
   updateCharacterField('characterCurrentHp', characterCurrentHp + Math.max(0, rolled));

@@ -626,6 +626,22 @@ export function canonicalWeaponAttackData(canonicalItem) {
   return { damageDice: weapon.damageDice || '', atkBonus, dmgBonus, bonusDiceClauses, finesse };
 }
 
+// Structured equivalent of applyHealFromItem's item.hp dice-formula read (the monolith), for a
+// migrated consumable's canonical `consumable.effects` array. Every one of the migration's 8 real
+// `heal`-kind entries carries the exact same dice string dungeon-master-box's own item.hp field
+// already had (verified directly against loot-data.js, not assumed) — this only changes WHERE the
+// dice string is read from, never what it evaluates to. A migrated consumable with no structured
+// heal effect (the "utility" placeholder most consumables get — see
+// docs/V2_MECHANICS_MIGRATION.md's "Deliberately not decided here": buff/debuff/temp-HP/"Full HP"
+// extraction from consumable text was never attempted) returns null here, same as item.hp already
+// produces today for those items (rollDiceFormulaTotal finds no dice pattern in "10 temp HP" or
+// "Full HP" either) — no behavior lost or gained beyond the 8 items that resolve identically either way.
+export function canonicalConsumableHealDice(canonicalItem) {
+  const effects = (canonicalItem && canonicalItem.consumable && canonicalItem.consumable.effects) || [];
+  const healEffect = effects.find(e => e.kind === 'heal' && e.healDice);
+  return healEffect ? healEffect.healDice : null;
+}
+
 export function collectEquippedStatBreakdown(slots, resolveItem) {
   const breakdown = {};
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
