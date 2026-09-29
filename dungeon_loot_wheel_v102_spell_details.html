@@ -4389,6 +4389,22 @@ const APP_VERSION = 'v96';
 <script src="npc-data.js"></script>
 <script src="reference-data.js"></script>
 <script src="journey-data.js"></script>
+<script src="mechanics/canonical/items.js"></script>
+<script>
+// mechanics/canonical/items.js (loaded just above) defines `canonicalItems` — the one-time
+// migration output described in docs/V2_MECHANICS_MIGRATION.md: a subset of lootData's own items,
+// re-expressed with structured mechanics (a real `passive`/`armor`/`weapon` facet) instead of
+// prose `.effect`/`.ac`/`.dmg` text. Indexed here by the exact same 'loot:'+tier+':'+name key
+// buildTokenIndex() below already computes for every static catalog item, so "is this item
+// migrated, and if so what's its canonical counterpart" is a single Map lookup, never fuzzy
+// matching. npc-data.js's NPC_WEAPONS are excluded — they aren't part of lootData/TOKEN_INDEX's
+// equip-slot system at all, so this index only ever needs to answer for the static catalog.
+const CANONICAL_BY_LEGACY_KEY = new Map(
+  canonicalItems
+    .filter(it => it.legacySource && it.legacySource.source !== 'npc-data.js:NPC_WEAPONS')
+    .map(it => ['loot:' + it.legacySource.tier + ':' + it.legacySource.name, it])
+);
+</script>
 <script>
 
 let spinResults = [];
@@ -14733,6 +14749,11 @@ function buildTokenIndex() {
     rarities.forEach(r => {
       (lootData[r] || []).forEach(item => {
         const key = 'loot:' + r + ':' + item.name;
+        // One-time, idempotent attach (same pattern classifyItemFull already uses to cache onto
+        // an item) — if this item was migrated to the canonical schema, game-engine.js's
+        // computeCharacterSheetFor reads __canonical.passive/.armor directly instead of regexing
+        // .effect/.ac, for this item only; everything not yet migrated is completely unaffected.
+        if (item.__canonical === undefined) item.__canonical = CANONICAL_BY_LEGACY_KEY.get(key) || null;
         base[key] = { key, item, rarity: r, source: 'loot' };
       });
     });

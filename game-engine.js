@@ -548,12 +548,73 @@ export function uniqueEquippedSlotEntries(slots) {
   return out;
 }
 
+// ===================== MIGRATED-ITEM BRIDGE =====================
+// A migrated item (see docs/V2_MECHANICS_MIGRATION.md) carries its passive stat bonuses as a
+// structured `passive: [{stat, value}]` array (mechanics/engine/items/item-schema.js), computed
+// ONCE by the migration script from the exact same extractStatDeltasFromText/extractStatSetValuesFromText
+// regex this file already runs — so reading `passive` back out here reproduces the live-regex
+// result exactly, just from the migration's frozen structured output instead of re-parsing prose
+// on every call (the canonical data becomes the runtime source, not a live conversion of it).
+// Ability-score keys ('str'..'cha') carry the SAME raw-score-delta convention legacy .effect text
+// always meant (e.g. "+2 Strength" -> a 2-point SCORE bump) — not the modifier-delta convention
+// mechanics/engine/character/stat-modifiers.js documents for V2's own hand-authored content, since
+// these numbers were extracted from migrated legacy items, not authored fresh against that spec.
+// 'attackRoll'/'damageRoll' are deliberately excluded: those feed weapon-attack math, a separate
+// concern from the character sheet (see computeWeaponAttackRoll in the monolith).
+const CANONICAL_STAT_TO_BREAKDOWN_LABEL = {
+  str: 'Strength', dex: 'Dexterity', con: 'Constitution', int: 'Intelligence', wis: 'Wisdom', cha: 'Charisma',
+  hp_max: 'Maximum Hit Points', speed: 'Movement Speed', ac: 'Armor Class',
+};
+const CANONICAL_SAVE_STAT_KEYS = ['save_str', 'save_dex', 'save_con', 'save_int', 'save_wis', 'save_cha'];
+
+// Structured equivalent of extractStatDeltasFromText for a migrated item's canonical `passive`
+// array. The migration script only ever emits a "Saving Throws" text delta as all six save_<abbr>
+// entries together with an equal value (toStatModifiers in scripts/migrate-legacy-content.js) —
+// matching the live app's own single flat "Saving Throws" bucket applied to every save alike (see
+// computeCharacterSheetFor below) — so those six are collapsed back into one entry here rather
+// than quietly summed six times over.
+export function canonicalPassiveDeltas(canonicalItem) {
+  const passive = (canonicalItem && canonicalItem.passive) || [];
+  const out = [];
+  let saveGroup = null;
+  passive.forEach(({ stat, value }) => {
+    if (CANONICAL_SAVE_STAT_KEYS.includes(stat)) {
+      if (!saveGroup) saveGroup = { value, count: 0 };
+      if (value === saveGroup.value) saveGroup.count += 1;
+      return;
+    }
+    const label = CANONICAL_STAT_TO_BREAKDOWN_LABEL[stat] || (SKILL_ABILITY_MAP[stat] ? stat : null);
+    if (label) out.push({ stat: label, amount: value });
+  });
+  if (saveGroup && saveGroup.count === CANONICAL_SAVE_STAT_KEYS.length) {
+    out.push({ stat: 'Saving Throws', amount: saveGroup.value });
+  }
+  return out;
+}
+
+// Structured equivalent of collectEquippedAcBreakdown's per-item .ac-string parsing, for a
+// migrated `armor` item. A non-additive (body-slot) baseAC REPLACES the running base, matching the
+// old body-armor convention (a bare unsigned number in the armor slot fully replacing default AC
+// 10); an additive baseAC (shield/accessory slot) stacks as a flat bonus, matching the old "+N"
+// accessory convention. Returns null for anything without an `armor` facet (a migrated weapon/
+// wondrous/companion item's AC-flavored passive, if any, is handled by canonicalPassiveDeltas'
+// 'Armor Class' bucket instead — the same secondary text-rider layering the old system already
+// does on top of an item's own .ac field).
+function canonicalAcContribution(canonicalItem) {
+  const armor = canonicalItem && canonicalItem.armor;
+  if (!armor) return null;
+  return armor.additive ? { flatAmount: armor.baseAC } : { replaceBase: armor.baseAC };
+}
+
 export function collectEquippedStatBreakdown(slots, resolveItem) {
   const breakdown = {};
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
     const entry = resolveItem(key);
     if (!entry) return;
-    extractStatDeltasFromText(entry.item.effect).forEach(({ stat, amount }) => {
+    const deltas = entry.item.__canonical
+      ? canonicalPassiveDeltas(entry.item.__canonical)
+      : extractStatDeltasFromText(entry.item.effect);
+    deltas.forEach(({ stat, amount }) => {
       (breakdown[stat] = breakdown[stat] || []).push({ itemName: entry.item.name, amount });
     });
   });
@@ -610,6 +671,13 @@ export function collectEquippedAcBreakdown(slots, resolveItem) {
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
     const entry = resolveItem(key);
     if (!entry) return;
+    if (entry.item.__canonical) {
+      const contribution = canonicalAcContribution(entry.item.__canonical);
+      if (!contribution) return;
+      if (contribution.replaceBase != null) { base = contribution.replaceBase; baseSource = entry.item.name; }
+      else flatSources.push({ itemName: entry.item.name, amount: contribution.flatAmount });
+      return;
+    }
     const raw = String(entry.item.ac || '').trim();
     if (!raw) return;
     if (slotId === 'armor' && /^\d+$/.test(raw)) { base = parseInt(raw, 10); baseSource = entry.item.name; return; }

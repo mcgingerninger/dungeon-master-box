@@ -236,6 +236,29 @@ describe('migrateArmor', () => {
     assert.equal(result.armor.additive, undefined);
     assert.equal(result.armor.baseAC, 2);
   });
+
+  // Real, already-live bug found while wiring collectEquippedAcBreakdown's canonical-item bridge:
+  // an item's effect text often restates its own `ac` field in prose (a common authoring
+  // redundancy), which dungeon-master-box's live app double-counts today (two independent read
+  // pathways for `.ac` vs. `.effect`) — the same pattern already fixed for weapons above.
+  test('an effect-text AC rider that exactly matches the item\'s own ac field is dropped as a redundant restatement (fixes a real double-count)', () => {
+    const item = { name: 'Steel Buckler of the Tide', desc: '', type: 'armor', gp: '225 gp', ac: '+1', effect: '+1 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.' };
+    const fixes = [];
+    const result = migrateArmor(item, 'uncommon', 0, makeIdGenerator(), [], fixes);
+    assert.equal(result.armor.baseAC, 1);
+    assert.equal(result.armor.additive, true);
+    assert.equal((result.passive || []).some(m => m.stat === 'ac'), false);
+    assert.ok(fixes.some(f => f.kind === 'double-counted armor class bonus'));
+  });
+
+  test('an effect-text AC rider that DIFFERS from the item\'s own ac field is a genuine separate stacking bonus and is kept (matches computeCharacterSheetFor\'s own tested "Vanguard\'s Plate" behavior)', () => {
+    const item = { name: 'Vanguard\'s Plate', desc: '', type: 'armor', gp: '1000 gp', ac: '13', effect: '+2 Armor Class' };
+    const fixes = [];
+    const result = migrateArmor(item, 'rare', 0, makeIdGenerator(), [], fixes);
+    assert.equal(result.armor.baseAC, 13);
+    assert.deepEqual(result.passive, [{ stat: 'ac', value: 2 }]);
+    assert.equal(fixes.some(f => f.kind === 'double-counted armor class bonus'), false);
+  });
 });
 
 describe('applyMaterialModifiers — real mechanics, not classification labels', () => {

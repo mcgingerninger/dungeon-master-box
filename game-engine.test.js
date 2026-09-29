@@ -108,6 +108,62 @@ describe('computeCharacterSheetFor: text-driven Armor Class / Movement Speed (na
   });
 });
 
+describe('migrated-item bridge: computeCharacterSheetFor reads a canonical `passive`/`armor` facet instead of regexing .effect/.ac', () => {
+  test('canonicalPassiveDeltas maps ability/hp/speed/ac stat keys onto the same breakdown labels extractStatDeltasFromText produces', () => {
+    const canonical = { passive: [{ stat: 'str', value: 2 }, { stat: 'hp_max', value: 5 }, { stat: 'speed', value: -10 }, { stat: 'ac', value: 1 }] };
+    assert.deepEqual(GE.canonicalPassiveDeltas(canonical), [
+      { stat: 'Strength', amount: 2 },
+      { stat: 'Maximum Hit Points', amount: 5 },
+      { stat: 'Movement Speed', amount: -10 },
+      { stat: 'Armor Class', amount: 1 },
+    ]);
+  });
+  test('canonicalPassiveDeltas passes an exact skill name through unchanged', () => {
+    assert.deepEqual(GE.canonicalPassiveDeltas({ passive: [{ stat: 'Stealth', value: 3 }] }), [{ stat: 'Stealth', amount: 3 }]);
+  });
+  test('canonicalPassiveDeltas collapses all six save_<abbr> entries (how the migration always emits a "Saving Throws" bonus) into one "Saving Throws" source, not six', () => {
+    const canonical = { passive: [{ stat: 'save_str', value: 1 }, { stat: 'save_dex', value: 1 }, { stat: 'save_con', value: 1 }, { stat: 'save_int', value: 1 }, { stat: 'save_wis', value: 1 }, { stat: 'save_cha', value: 1 }] };
+    assert.deepEqual(GE.canonicalPassiveDeltas(canonical), [{ stat: 'Saving Throws', amount: 1 }]);
+  });
+  test('canonicalPassiveDeltas ignores attackRoll/damageRoll (a separate weapon-attack concern) and an incomplete save group', () => {
+    const canonical = { passive: [{ stat: 'attackRoll', value: 1 }, { stat: 'damageRoll', value: 1 }, { stat: 'save_str', value: 1 }] };
+    assert.deepEqual(GE.canonicalPassiveDeltas(canonical), []);
+  });
+
+  test('a migrated body-armor item (armor.additive absent) replaces the AC base exactly like an old unsigned .ac string would', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Test Plate', __canonical: { armor: { baseAC: 16 } } } } };
+    const sheet = GE.computeCharacterSheetFor({ dex: 10 }, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 16);
+    assert.equal(sheet.ac.sources[0].itemName, 'Test Plate');
+  });
+  test('a migrated shield/accessory item (armor.additive true) stacks as a flat AC bonus, never replacing the base', () => {
+    const slots = { armor: 'chestKey', ring1: 'shieldKey' };
+    const items = {
+      chestKey: { item: { name: 'Test Plate', __canonical: { armor: { baseAC: 16 } } } },
+      shieldKey: { item: { name: 'Test Buckler', __canonical: { armor: { baseAC: 1, additive: true } } } },
+    };
+    const sheet = GE.computeCharacterSheetFor({ dex: 10 }, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 17); // 16 base + 1 additive, not replaced down to 1
+  });
+  test('a migrated item\'s canonical passive ability bonus flows into total/mod exactly like a legacy "+N Stat" effect would', () => {
+    const slots = { ring1: 'ringKey' };
+    const items = { ringKey: { item: { name: 'Test Ring', __canonical: { passive: [{ stat: 'str', value: 2 }] } } } };
+    const sheet = GE.computeCharacterSheetFor({ str: 14 }, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.abilities.str.total, 16);
+    assert.equal(sheet.abilities.str.mod, 3);
+  });
+  test('a migrated item ignores its own still-present legacy .effect/.ac text once __canonical is attached (no double-counting from both sources)', () => {
+    const slots = { armor: 'chestKey' };
+    // Legacy fields deliberately left on the item (as buildTokenIndex does in the live app) —
+    // if the bridge read both the old text AND the new structured facet, this would double-count.
+    const items = { chestKey: { item: { name: 'Test Plate', ac: '16', effect: '+4 Strength', __canonical: { armor: { baseAC: 16 }, passive: [{ stat: 'str', value: 2 }] } } } };
+    const sheet = GE.computeCharacterSheetFor({ str: 14, dex: 10 }, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 16);
+    assert.equal(sheet.abilities.str.total, 16); // +2 from canonical passive, not +4 from the stale .effect text
+  });
+});
+
 describe('battle: parsing, damage, effectiveness', () => {
   test('parses to-hit, multiple damage clauses with types, and save DC', () => {
     const parsed = GE.battleParseAttack('Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 19 (2d10+8) piercing damage plus 11 (2d10) psychic damage. If the target is a creature, it must succeed on a DC 15 Constitution saving throw.');
