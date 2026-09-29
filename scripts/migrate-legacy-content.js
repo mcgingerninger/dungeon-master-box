@@ -540,6 +540,7 @@ function migrateWeapon(item, tier, index, nextId, ambiguous, fixes) {
     weight: computeItemWeight(item, subcategory),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
+    ...(effect ? { description: effect } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
     weapon,
     ...(passive.length ? { passive } : {}),
@@ -695,6 +696,7 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
     weight: computeItemWeight(item, effectiveSlotCategory),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
+    ...(effect ? { description: effect } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
     armor,
     ...(passive.length ? { passive } : {}),
@@ -817,6 +819,7 @@ function migrateConsumable(item, tier, index, nextId, ambiguous, fixes) {
     weight: computeItemWeight(item, subcategory),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
+    ...(effect ? { description: effect } : {}),
     ...(itemRequiresAttunement(item) ? { requiresAttunement: true } : {}),
     consumable: { consumableCategory, effects, uses: { max: usesMax }, usesLeft: usesMax },
     ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
@@ -892,12 +895,66 @@ function isUninformativeToolClassification(classification) {
   return classification[classification.length - 1] === 'Unidentified Object';
 }
 
+// Phase 15 (docs/V2_MECHANICS_MIGRATION.md): the six ability-score-boosting tomes/manuals
+// (Manual of Bodily Health/Gainful Exercise/Quickness of Action, Tome of Clear Thought/Leadership
+// and Influence/Understanding) share the same underlying single-use PERMANENT stat mechanic this
+// migration was previously dropping entirely (Phase 14c found it; this is the fix) — but two
+// different exact phrasings for it, confirmed directly against loot-data.js rather than assumed:
+// Constitution's own entry (the one ability that also raises max HP) reads "Constitution score and
+// max HP permanently increase by 2"; the other five read "<Ability> score and maximum <Ability>
+// permanently increase[s] by 2" or "...permanently +2" (mixed even among those five). The regex
+// below is deliberately an exact-shape match on all of "<Ability> score and (max HP|maximum
+// <Ability>) permanently (increase[s] by|+)N", not a loose "permanently increase" scan, so it can
+// never misfire on unrelated text — confirmed to match exactly these 6 items across the catalog.
+const PERMANENT_STAT_INCREASE_RE = /(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma) score and (max HP|maximum (?:Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)) permanently (?:increases?|\+)\s*(?:by\s+)?(\d+)/i;
+const ABILITY_SCORE_ABBR = { strength: 'str', dexterity: 'dex', constitution: 'con', intelligence: 'int', wisdom: 'wis', charisma: 'cha' };
+function parsePermanentStatIncreaseEffect(effect) {
+  const t = String(effect || '');
+  const m = PERMANENT_STAT_INCREASE_RE.exec(t);
+  if (!m) return null;
+  const abbr = ABILITY_SCORE_ABBR[m[1].toLowerCase()];
+  const amount = parseInt(m[3], 10);
+  const statMods = [{ stat: abbr, value: amount }];
+  if (/^max hp$/i.test(m[2])) statMods.push({ stat: 'hp_max', value: amount });
+  return statMods;
+}
+
 function migrateMisc(item, tier, index, nextId, ambiguous, fixes) {
   const name = item.name;
   const desc = item.desc || '';
   const effect = item.effect || '';
   const subcategory = classifySubcategory(name, 'misc', tier, desc);
   const classification = classifyItemHierarchy({ ...item, subcategory }, tier);
+
+  // A genuinely different shape of content from everything else this function handles — a
+  // permanent, single-use stat mechanic, not a slot/attunement/passive-bonus wondrous item or
+  // mundane gear — so it's modeled as a real 5e Wondrous Item (correct D&D categorization for these
+  // tomes) with one structured Ability, short-circuiting the rest of this function entirely.
+  const permanentStatIncrease = parsePermanentStatIncreaseEffect(effect);
+  if (permanentStatIncrease) {
+    return {
+      id: nextId(name),
+      name,
+      rarity: tier,
+      weight: computeItemWeight(item, subcategory),
+      ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
+      ...(desc ? { flavorText: desc } : {}),
+      ...(effect ? { description: effect } : {}),
+      itemType: 'wondrous',
+      wondrous: {},
+      abilities: [{
+        id: 'read',
+        name: 'Read',
+        kind: 'active_effect',
+        effect: { kind: 'permanent_stat_increase', statMods: permanentStatIncrease },
+        uses: { max: 1, recharge: 'charges' },
+        usesLeft: 1,
+        description: effect,
+      }],
+      ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
+      legacySource: { tier, index, name },
+    };
+  }
 
   const requiresAttunement = itemRequiresAttunement(item);
   const deltas = extractStatDeltasFromText(effect);
@@ -934,6 +991,7 @@ function migrateMisc(item, tier, index, nextId, ambiguous, fixes) {
     weight: computeItemWeight(item, subcategory),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
+    ...(effect ? { description: effect } : {}),
     ...(requiresAttunement ? { requiresAttunement: true } : {}),
     ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
     legacySource: { tier, index, name },
@@ -1011,6 +1069,7 @@ function migrateCompanion(item, tier, index, nextId, ambiguous, fixes) {
     weight: computeItemWeight(item, companionType),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
+    ...(effect ? { description: effect } : {}),
     ...(requiresAttunement ? { requiresAttunement: true } : {}),
     companion,
     ...(passive.length ? { passive } : {}),
@@ -1062,6 +1121,7 @@ function migrateNarrativeTool(item, tier, index, nextId, ambiguous, fixes) {
     weight: computeItemWeight(item, subcategory),
     ...(item.gp && item.gp !== '—' ? { value: item.gp } : {}),
     ...(desc ? { flavorText: desc } : {}),
+    ...(effect ? { description: effect } : {}),
     tool: { toolCategory: narrativeToolCategory(classification) },
     ...(extraInteractions.length ? { extraInteractions } : {}),
     ...(item.unlocks ? { narrative: { unlocks: item.unlocks } } : {}),
@@ -1317,6 +1377,6 @@ export {
   scanResidualLanguage, applyMaterialModifiers, slugify, makeIdGenerator,
   deriveConsumableCategory, resolveConsumableUses,
   deriveWondrousSlot, deriveToolCategory, extractSpeeds, narrativeToolCategory,
-  convertNpcAbility,
+  convertNpcAbility, parsePermanentStatIncreaseEffect,
   migrateWeapon, migrateArmor, migrateConsumable, migrateMisc, migrateCompanion, migrateNarrativeTool, migrateNpcWeapon, main,
 };

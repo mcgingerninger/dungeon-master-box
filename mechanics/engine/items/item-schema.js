@@ -40,13 +40,30 @@
 //     existing `effect` string (regex-scraped at runtime for bonuses) is replaced entirely for
 //     migrated items. `flavorText` still exists for display, but nothing in this engine ever
 //     parses it for mechanics.
+//   - `description` (Phase 15, docs/V2_MECHANICS_MIGRATION.md) is this migration's fix for a real
+//     content-preservation gap found in Phase 14c: an item's raw legacy `effect` text was being
+//     silently dropped entirely for any item whose mechanics don't fully capture it (most acutely,
+//     the 404 `type: 'misc'` items that migrate onto the `tool` itemType — 401 of which have
+//     non-empty `effect` text, none of it preserved anywhere before this). Same convention as
+//     `Ability.description` below: display-only, populated with the item's raw legacy `effect`
+//     text verbatim wherever it's non-empty, NEVER parsed for mechanics. A structured facet
+//     (`weapon`/`armor`/`consumable`/`passive`/etc.) is still the real, authoritative mechanic
+//     whenever one exists — `description` is a backstop against silent loss, not a replacement for
+//     structured extraction.
+//   - `'permanent_stat_increase'` (Phase 15) is a new OnUseEffect kind for a genuinely different
+//     shape of mechanic from every other kind here: a ONE-TIME, PERMANENT change to a character's
+//     base stats (an ability-score-boosting tome's "Constitution score... permanently increase[s]
+//     by 2"), not a temporary buff/debuff. Reuses the existing `statMods` field — for this kind
+//     only, `statMods` describes a permanent base-stat change, not an active/timed modifier, and
+//     `durationMs` is never set. See docs/V2_MECHANICS_MIGRATION.md's Phase 15 for the six
+//     ability-score tomes this models.
 
 // ---------- Shared vocab ----------
 
 export const WEAPON_CATEGORIES = ['simple', 'martial'];
 export const ARMOR_TYPES = ['light', 'medium', 'heavy', 'shield'];
 export const CONSUMABLE_CATEGORIES = ['potion', 'food', 'scroll', 'thrown', 'coating', 'topical', 'other'];
-export const ON_USE_KINDS = ['heal', 'buff', 'debuff', 'damage', 'utility'];
+export const ON_USE_KINDS = ['heal', 'buff', 'debuff', 'damage', 'utility', 'permanent_stat_increase'];
 export const ABILITY_KINDS = ['spell', 'active_effect'];
 export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
 
@@ -59,11 +76,14 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
 
 /**
  * @typedef {Object} OnUseEffect
- * @property {'heal'|'buff'|'debuff'|'damage'|'utility'} kind
+ * @property {'heal'|'buff'|'debuff'|'damage'|'utility'|'permanent_stat_increase'} kind
  * @property {string} [healDice]        // 'heal' kind
  * @property {string} [damageDice]      // 'damage' kind
  * @property {string} [damageType]      // 'damage' kind
- * @property {StatModifier[]} [statMods]
+ * @property {StatModifier[]} [statMods]  // buff/debuff: an active, timed modifier (see durationMs).
+ *   'permanent_stat_increase' (Phase 15): the SAME field reused for a one-time, permanent change to
+ *   the character's own base stats instead — applied once, directly, never expires, never
+ *   re-applied by a rest. `durationMs` is never set for this kind.
  * @property {number} [durationMs]     // structured, not a parsed phrase; buff/debuff duration is
  *   REPORTED by resolveConsumableEffect (consume.js) but not yet tracked by a persistent
  *   active-effects timer — that's a separate system, not built in this migration phase.
@@ -198,7 +218,13 @@ export const RECHARGE_KINDS = ['short_rest', 'long_rest', 'dawn', 'charges'];
  * @property {string} rarity        // keeps dungeon-master-box's existing loot-table rarity tiers verbatim
  * @property {number} [weight]
  * @property {string} [value]       // gp, matches existing loot-table formatting
- * @property {string} [flavorText]  // display only, NEVER parsed for mechanics
+ * @property {string} [flavorText]  // display only, NEVER parsed for mechanics — dungeon-master-box's
+ *   `desc` field (the item's physical appearance/narrative flavor).
+ * @property {string} [description]  // display only, NEVER parsed for mechanics — dungeon-master-box's
+ *   `effect` field, preserved verbatim (Phase 15). Distinct from flavorText: this is what the item
+ *   DOES in the original prose, kept as a backstop even when a structured facet already captures
+ *   the real mechanic, so nothing from the legacy catalog is ever silently unreadable in canonical
+ *   data. Same convention as Ability.description below.
  * @property {boolean} [requiresAttunement]
  *
  * @property {WeaponData} [weapon]        // weapon only, required for weapon

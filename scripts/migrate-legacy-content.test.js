@@ -19,7 +19,7 @@ import {
   deriveConsumableCategory, resolveConsumableUses, migrateConsumable,
   deriveWondrousSlot, deriveToolCategory, migrateMisc,
   extractSpeeds, narrativeToolCategory, migrateCompanion, migrateNarrativeTool,
-  convertNpcAbility, migrateNpcWeapon,
+  convertNpcAbility, migrateNpcWeapon, parsePermanentStatIncreaseEffect,
 } from './migrate-legacy-content.js';
 import { validateItem } from '../mechanics/engine/items/validate-item.js';
 import { equipmentSlotsForItem } from '../mechanics/engine/character/equipment.js';
@@ -507,6 +507,51 @@ describe('deriveToolCategory', () => {
   });
   test('an unrelated branch with no usable leaf at all still falls back to a generic category', () => {
     assert.equal(deriveToolCategory(['Key / Quest Object', 'Key', '']), 'adventuring-gear');
+  });
+});
+
+// Phase 15 (docs/V2_MECHANICS_MIGRATION.md): the real, structured, single-use permanent stat
+// mechanic Phase 14c found being silently dropped entirely — see loot-data.js's actual six
+// ability-score tomes/manuals, two different exact phrasings.
+describe('parsePermanentStatIncreaseEffect', () => {
+  test('Constitution\'s "max HP" phrasing (Manual of Bodily Health) yields both a con and an hp_max statMod', () => {
+    const effect = 'Read over 48 hours across 6 days: Constitution score and max HP permanently increase by 2. Tome loses magic after use. Recharges magic in a century.';
+    assert.deepEqual(parsePermanentStatIncreaseEffect(effect), [{ stat: 'con', value: 2 }, { stat: 'hp_max', value: 2 }]);
+  });
+  test('the "maximum <Ability> permanently +N" phrasing (Tome of Clear Thought) yields just the one ability statMod', () => {
+    const effect = 'Read over 48 hours across 6 days: Intelligence score and maximum Intelligence permanently +2. Loses magic after use. Recharges magic in a century.';
+    assert.deepEqual(parsePermanentStatIncreaseEffect(effect), [{ stat: 'int', value: 2 }]);
+  });
+  test('the "maximum <Ability> permanently increase by N" phrasing (Manual of Gainful Exercise) also matches', () => {
+    const effect = 'Read over 48 hours across 6 days: Strength score and maximum Strength permanently increase by 2. Tome loses magic after use. Recharges magic in a century.';
+    assert.deepEqual(parsePermanentStatIncreaseEffect(effect), [{ stat: 'str', value: 2 }]);
+  });
+  test('unrelated effect text (even one mentioning an ability score) does not match', () => {
+    assert.equal(parsePermanentStatIncreaseEffect('+2 to Strength while attuned.'), null);
+    assert.equal(parsePermanentStatIncreaseEffect(''), null);
+  });
+});
+
+describe('migrateMisc — the six ability-score tomes become a wondrous item with a permanent_stat_increase ability', () => {
+  test('Manual of Bodily Health migrates to itemType wondrous with a real Ability, not the generic tool fallback', () => {
+    const item = { name: 'Manual of Bodily Health', desc: 'A leather-bound tome.', type: 'misc', slotSize: 2, gp: '5000 gp', effect: 'Read over 48 hours across 6 days: Constitution score and max HP permanently increase by 2. Tome loses magic after use. Recharges magic in a century.' };
+    const result = migrateMisc(item, 'rare', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+    assert.deepEqual(result.wondrous, {});
+    assert.equal(result.abilities.length, 1);
+    const ability = result.abilities[0];
+    assert.equal(ability.kind, 'active_effect');
+    assert.deepEqual(ability.effect, { kind: 'permanent_stat_increase', statMods: [{ stat: 'con', value: 2 }, { stat: 'hp_max', value: 2 }] });
+    assert.deepEqual(ability.uses, { max: 1, recharge: 'charges' });
+    assert.equal(ability.usesLeft, 1);
+    assert.equal(result.description, item.effect);
+    assert.ok(validateItem(result).valid);
+  });
+  test('an item that merely mentions an ability score in passing still migrates through the ordinary wondrous/tool path', () => {
+    const item = { name: 'Test Belt', desc: 'A leather belt.', type: 'misc', gp: '100 gp', effect: '+2 Strength while worn.' };
+    const result = migrateMisc(item, 'uncommon', 0, makeIdGenerator(), [], []);
+    assert.equal(result.itemType, 'wondrous');
+    assert.equal(result.abilities, undefined);
   });
 });
 

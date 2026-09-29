@@ -8,6 +8,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "1 cp",
     "flavorText": "A wooden handle wrapped in oil-soaked cloth. Burns for about an hour.",
+    "description": "Sheds bright light 20-ft radius, dim light 20 ft further. Burns 1 hour.",
     "legacySource": {
       "tier": "common",
       "index": 0,
@@ -43,6 +44,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5 sp",
     "flavorText": "Hard tack and dried salted meat in a wax block.",
+    "description": "Provides one day of food. No preparation required.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -85,6 +87,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "5 sp",
     "flavorText": "A small tin with flint, steel, and charcloth for starting fires.",
+    "description": "Lights a torch or fire in 1 action (calm). Takes 1 minute in wind or rain.",
     "legacySource": {
       "tier": "common",
       "index": 4,
@@ -102,6 +105,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1 sp",
     "flavorText": "Strips of linen on a small spool. For binding wounds.",
+    "description": "Stabilize a dying creature or bind a wound during a short rest. Grants +1 to one Hit Die roll when used intentionally.",
     "legacySource": {
       "tier": "common",
       "index": 5,
@@ -120,6 +124,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "1 cp",
     "flavorText": "A sharpened length of ash wood.",
+    "description": "Improvised weapon. Deals double damage to a pinned incapacitated vampire.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "bludgeoning"
@@ -137,6 +142,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "5 gp",
     "flavorText": "A palm-sized disc of polished tin.",
+    "description": "Look around corners without exposing yourself. May reveal vampires or certain illusions.",
     "legacySource": {
       "tier": "common",
       "index": 7,
@@ -154,6 +160,7 @@ const canonicalItems = [
     "weight": 0.5,
     "value": "1 cp",
     "flavorText": "A stub of tallow candle, maybe two inches tall.",
+    "description": "Sheds bright light 5-ft radius, dim light 5 ft further. Burns 1 hour.",
     "legacySource": {
       "tier": "common",
       "index": 8,
@@ -188,6 +195,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "1 cp",
     "flavorText": "A coarse burlap bag large enough for a haul of loot.",
+    "description": "Holds up to 30 lbs. / 1 cubic foot.",
     "legacySource": {
       "tier": "common",
       "index": 10,
@@ -205,6 +213,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "2 gp",
     "flavorText": "A foot-long iron pry bar with a curved forked end.",
+    "description": "Advantage on Strength checks to force open sealed or stuck objects.",
     "legacySource": {
       "tier": "common",
       "index": 11,
@@ -222,6 +231,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "2 gp",
     "flavorText": "Four iron claws on a central ring. Attach a rope and throw.",
+    "description": "DC 10 Dexterity to set on first throw. Anchors a rope for climbing.",
     "legacySource": {
       "tier": "common",
       "index": 12,
@@ -240,6 +250,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "5 gp",
     "flavorText": "A single-bladed hatchet with a worn hickory handle.",
+    "description": "Light, thrown (range 20/60). Also useful as a camp tool.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "slashing",
@@ -259,6 +270,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "2 gp",
     "flavorText": "A double-edged blade about a foot long with a simple crossguard.",
+    "description": "Finesse, light, thrown (range 20/60).",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -281,6 +293,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 sp",
     "flavorText": "A braided leather strip with a small pouch. Can fling stones lethally.",
+    "description": "Ammunition (range 30/120). Requires a free hand and stones or bullets.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "bludgeoning",
@@ -302,6 +315,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2 sp",
     "flavorText": "A drawstring leather pouch containing roughly 20 copper pieces.",
+    "description": "20 cp. Enough for a cheap meal, a poorhouse night, or a small bribe.",
     "legacySource": {
       "tier": "common",
       "index": 16,
@@ -318,6 +332,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1,
     "flavorText": "An old iron key, heavily corroded. May fit a lock — or be useless.",
+    "description": "GM determines if this key fits any lock in the current dungeon.",
     "legacySource": {
       "tier": "common",
       "index": 17,
@@ -335,6 +350,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 sp",
     "flavorText": "A plain grey wool cloak with a bone clasp.",
+    "description": "Warmth in cold environments. Advantage on Con saves vs. mild cold (not magical cold).",
     "legacySource": {
       "tier": "common",
       "index": 18,
@@ -352,6 +368,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "1 gp",
     "flavorText": "A rolled blanket of wool and canvas.",
+    "description": "Required for a normal long rest in the wilderness. Without one: DC 10 Con save or gain 1 level of exhaustion.",
     "legacySource": {
       "tier": "common",
       "index": 19,
@@ -369,6 +386,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "A flat rectangular stone of fine grit.",
+    "description": "Restore a blade to serviceable condition after heavy use. Takes 1 minute.",
     "legacySource": {
       "tier": "common",
       "index": 20,
@@ -386,6 +404,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "1 sp",
     "flavorText": "Six iron spikes with flat heads.",
+    "description": "Jam doors open or shut. Function as pitons for rope anchoring on stone.",
     "legacySource": {
       "tier": "common",
       "index": 21,
@@ -403,6 +422,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "5 gp",
     "flavorText": "A tin lantern with a hinged glass panel.",
+    "description": "Bright light 30-ft radius, dim light 30 ft further. Burns 1 flask of oil per hour. Hood reduces to 5-ft cone.",
     "legacySource": {
       "tier": "common",
       "index": 22,
@@ -421,6 +441,7 @@ const canonicalItems = [
     "weight": 0.7,
     "value": "1 sp",
     "flavorText": "A small clay flask of lamp oil.",
+    "description": "Fuels a lantern 6 hours. Thrown: DC 10 Dex save or 5 (1d10) fire damage if ignited. Covers 5 sq ft.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -446,6 +467,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 sp",
     "flavorText": "A small leather pouch that clips onto a belt.",
+    "description": "Holds up to 6 lbs. / 1/5 cubic foot.",
     "legacySource": {
       "tier": "common",
       "index": 24,
@@ -463,6 +485,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "2 gp",
     "flavorText": "A squat cast-iron cooking pot, blackened from countless fires.",
+    "description": "Required for cooking camp meals. 10 lbs. — heavy but nearly indestructible.",
     "legacySource": {
       "tier": "common",
       "index": 25,
@@ -480,6 +503,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "2 gp",
     "flavorText": "A goose feather quill and a vial of dark ink.",
+    "description": "Required for writing maps, letters, or copying spells. Ink for approximately 2 pages.",
     "legacySource": {
       "tier": "common",
       "index": 26,
@@ -497,6 +521,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 sp",
     "flavorText": "A single sheet of rough parchment, slightly yellowed.",
+    "description": "For maps, notes, or copying spells. One sheet.",
     "legacySource": {
       "tier": "common",
       "index": 27,
@@ -514,6 +539,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "1 gp",
     "flavorText": "Dried herbs tied with twine. Possibly culinary, possibly medicinal.",
+    "description": "Substitute for one Herbalism Kit use. DC 12 Medicine or Nature to apply medicinal benefit (GM discretion).",
     "legacySource": {
       "tier": "common",
       "index": 28,
@@ -531,6 +557,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "5 cp",
     "flavorText": "Coarse salt in a waxed linen pouch.",
+    "description": "Essential for food preservation. Scattered in a 5-ft line — may deter certain supernatural creatures.",
     "legacySource": {
       "tier": "common",
       "index": 29,
@@ -548,6 +575,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1 gp",
     "flavorText": "A brass bell about the size of a thumb with a clear ring.",
+    "description": "Rig as a simple tripwire alarm. Audible up to 60 ft. in quiet dungeon conditions.",
     "legacySource": {
       "tier": "common",
       "index": 30,
@@ -565,6 +593,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 cp",
     "flavorText": "A loop of thin brass wire on a length of cord.",
+    "description": "DC 12 Survival to set. DC 13 Perception to spot. Catches Small or smaller creatures. Requires a short rest to set.",
     "legacySource": {
       "tier": "common",
       "index": 31,
@@ -582,6 +611,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 cp",
     "flavorText": "A short whistle carved from a hollow bone.",
+    "description": "Audible 600 ft. in open air, 300 ft. in dungeon corridors. For use as a signal device.",
     "legacySource": {
       "tier": "common",
       "index": 32,
@@ -599,6 +629,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2 sp",
     "flavorText": "A thumb-sized block of golden beeswax.",
+    "description": "Waterproof thread, seal small containers, or make a wax key impression (DC 12 Sleight of Hand). Also a fire accelerant.",
     "legacySource": {
       "tier": "common",
       "index": 33,
@@ -617,6 +648,7 @@ const canonicalItems = [
     "weight": 0.5,
     "value": "1 sp",
     "flavorText": "A large mushroom, dried. May be edible — or mildly toxic.",
+    "description": "DC 12 Nature or Medicine to identify. Edible: restores 1 HP during short rest. Toxic (failed ID): Poisoned for 1 hour.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -641,6 +673,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1.5,
     "flavorText": "A torn corner of a map in faded ink, showing corridors and a room with an X.",
+    "description": "GM determines relevance. Advantage on the first Navigation check in a connected area if applicable.",
     "legacySource": {
       "tier": "common",
       "index": 35,
@@ -658,6 +691,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 3.5,
     "flavorText": "A smooth disc-shaped river stone perfectly sized for a sling.",
+    "description": "Functions as sling ammunition. No cost — found near rivers and dungeon floors.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "bludgeoning",
@@ -678,6 +712,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1.5,
     "flavorText": "A rough sketch on a leather scrap showing a corridor and a door marked with a skull.",
+    "description": "GM determines what it depicts. Advantage on first Navigation or Investigation check when exploring the illustrated area.",
     "legacySource": {
       "tier": "common",
       "index": 37,
@@ -696,6 +731,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "5 sp",
     "flavorText": "A wooden shield with a split across the face.",
+    "description": "+2 AC. On any critical hit taken while using this shield: DC 12 Con save or shield is destroyed.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -717,6 +753,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "10 gp",
     "flavorText": "Soft leather armor, scuffed and scratched.",
+    "description": "AC 11 + Dexterity modifier. Light armor. No Stealth disadvantage.",
     "armor": {
       "armorType": "light",
       "baseAC": 11,
@@ -738,6 +775,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "25 gp",
     "flavorText": "A simple wooden shortbow, unstrung.",
+    "description": "Ammunition (range 80/320). Two-handed. Requires arrows (quiver holds 20).",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -760,6 +798,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 gp",
     "flavorText": "A leather quiver holding twenty standard fletched arrows.",
+    "description": "20 standard arrows for shortbows or longbows.",
     "legacySource": {
       "tier": "common",
       "index": 42,
@@ -778,6 +817,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "1 sp",
     "flavorText": "A stout length of hardwood, heavy at one end.",
+    "description": "Light. The simplest weapon that exists.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "bludgeoning",
@@ -797,6 +837,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "1 gp",
     "flavorText": "A six-foot ash shaft tipped with an iron point.",
+    "description": "Thrown (range 20/60), versatile (1d8).",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -820,6 +861,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5 sp",
     "flavorText": "A short light throwing spear.",
+    "description": "Thrown (range 30/120).",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -839,6 +881,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "2 sp",
     "flavorText": "A sturdy six-foot hardwood staff.",
+    "description": "Versatile (1d8). Can function as a spellcasting focus for some classes.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -860,6 +903,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "5 sp",
     "flavorText": "A small cloth pouch with five silver pieces.",
+    "description": "5 sp. Covers several days of modest travel expenses.",
     "legacySource": {
       "tier": "common",
       "index": 47,
@@ -877,6 +921,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "5 sp",
     "flavorText": "Plain unremarkable traveler's clothes.",
+    "description": "Required for social interactions in settled areas. Dungeon-stained gear imposes disadvantage on Persuasion in most towns.",
     "legacySource": {
       "tier": "common",
       "index": 48,
@@ -894,6 +939,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 sp",
     "flavorText": "A bone needle, two spools of thread, and a thimble.",
+    "description": "Repairs torn clothing or leather gear. 10 minutes per item.",
     "legacySource": {
       "tier": "common",
       "index": 49,
@@ -911,6 +957,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "1 sp",
     "flavorText": "A spool of thin cord with a small hook.",
+    "description": "DC 10 Survival check per hour to catch fish in suitable water. Can rig as a tripwire.",
     "legacySource": {
       "tier": "common",
       "index": 50,
@@ -929,6 +976,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "2 sp",
     "flavorText": "A short single-edged knife for eating or whittling.",
+    "description": "Light, finesse. Improvised combat weapon.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -949,6 +997,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.1,
     "flavorText": "A folded piece of parchment, sweat-stained and read many times. The handwriting is careful but the ink is blurred in one corner, as though it got wet once.",
+    "description": "GM determines the contents — love letter, orders, a debt record, or family news. May be relevant to the dungeon or purely personal.",
     "legacySource": {
       "tier": "common",
       "index": 52,
@@ -965,6 +1014,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.55,
     "flavorText": "A small folded parchment sealed with dark red wax bearing a thumbprint instead of a sigil. Whoever sealed it had no ring.",
+    "description": "Unbroken seal may be worth opening carefully (DC 13 Dex to avoid obvious tampering). Contents GM's discretion.",
     "legacySource": {
       "tier": "common",
       "index": 53,
@@ -981,6 +1031,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.9,
     "flavorText": "A broadsheet printed with a woodblock illustration and a name. Someone has been carrying this. The face has been crossed out with charcoal.",
+    "description": "GM determines if the subject is a PC, an NPC, or the creature that was carrying it. The reward amount is still legible: 1d10 × 10 gp.",
     "legacySource": {
       "tier": "common",
       "index": 54,
@@ -997,6 +1048,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1.5,
     "flavorText": "A pocket-sized book with a cracked spine. About a third of the pages are written in a small cramped hand. The last entry is dated three days ago.",
+    "description": "Reading (10 minutes) gives the GM an opportunity to reveal information about the dungeon, its inhabitants, or the person who carried it.",
     "legacySource": {
       "tier": "common",
       "index": 55,
@@ -1013,6 +1065,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1.5,
     "flavorText": "A hand-drawn map on folded cloth, worn at the creases. Shows roads, a town, and a route with a destination marked by a simple house symbol.",
+    "description": "Not a dungeon map. Shows where this person was going or came from. GM may use it to establish backstory or a point of interest.",
     "legacySource": {
       "tier": "common",
       "index": 56,
@@ -1029,6 +1082,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.25,
     "flavorText": "A stick of ash wood notched with dozens of small cuts. A counting record — debts, days, or kills. No way to know which.",
+    "description": "Purely personal. May give the GM material for a character's history.",
     "legacySource": {
       "tier": "common",
       "index": 57,
@@ -1046,6 +1100,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "2 sp",
     "flavorText": "A plain brass ring, thin and worn smooth. It fits a finger smaller than yours. The inside is engraved with two initials and a date.",
+    "description": "Worth 2 sp as brass. The engraving suggests it was a gift or a wedding band. May be recognizable to the right NPC.",
     "legacySource": {
       "tier": "common",
       "index": 58,
@@ -1063,6 +1118,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "1 sp",
     "flavorText": "A small oval locket on a thin chain, silver-plated over brass. The hinge still works. Whatever was inside it is gone.",
+    "description": "Worth 1 sp. The inside has the faint ghost of a painted miniature — something was here until recently.",
     "legacySource": {
       "tier": "common",
       "index": 59,
@@ -1080,6 +1136,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "2 sp",
     "flavorText": "A small oval locket on a brass chain. Inside is a tiny painted miniature of a woman or man — the paint is faded but the face is clear.",
+    "description": "Worth 2 sp. The painted subject may be recognizable to a GM-determined NPC. Returning it might earn goodwill.",
     "legacySource": {
       "tier": "common",
       "index": 60,
@@ -1097,6 +1154,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 sp",
     "flavorText": "A plain iron band, slightly oval from years of wear. It left a mark on the finger that was wearing it.",
+    "description": "Worth 1 sp as iron. GM may use this to establish a surviving spouse or family somewhere.",
     "legacySource": {
       "tier": "common",
       "index": 61,
@@ -1114,6 +1172,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "1 cp",
     "flavorText": "A small lead disc stamped with a crudely rendered saint figure on one side. A hole has been drilled through for a cord, long since lost.",
+    "description": "A religious keepsake, worth nothing materially. Clerics and priests of the relevant faith may recognize the patron saint.",
     "legacySource": {
       "tier": "common",
       "index": 62,
@@ -1131,6 +1190,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "1 cp",
     "flavorText": "A small animal carved from a finger bone — a rabbit, a fish, or a bird — worn smooth from handling. Likely a luck charm.",
+    "description": "Purely sentimental. May hold significance to druids, tribal cultures, or anyone who recognizes the carving style.",
     "legacySource": {
       "tier": "common",
       "index": 63,
@@ -1147,6 +1207,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1.5,
     "flavorText": "A small bundle of dark hair tied tightly with a red thread. Someone kept this deliberately.",
+    "description": "A keepsake. May be used as a material component for certain divination or scrying spells targeting the hair's original owner.",
     "legacySource": {
       "tier": "common",
       "index": 64,
@@ -1163,6 +1224,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.9,
     "flavorText": "A dried wildflower pressed flat between two pieces of stiff leather. It's been there long enough to leave a faint stain.",
+    "description": "Personal. The flower species may be identifiable (DC 12 Nature) and could indicate region of origin.",
     "legacySource": {
       "tier": "common",
       "index": 65,
@@ -1179,6 +1241,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.95,
     "flavorText": "A smooth river stone with a simple face painted on it in faded colour — a child's project, or a parent's keepsake.",
+    "description": "Purely personal. No mechanical use. A detail for the GM's world-building.",
     "legacySource": {
       "tier": "common",
       "index": 66,
@@ -1196,6 +1259,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "3 sp",
     "flavorText": "A flat pewter flask that fits a coat pocket. Dented along one side. Still smells faintly of whatever was last in it.",
+    "description": "Can hold about half a pint of liquid. Worth 3 sp empty. If found with contents, GM determines what it holds (water, ale, spirits, or something worse).",
     "legacySource": {
       "tier": "common",
       "index": 67,
@@ -1213,6 +1277,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 sp",
     "flavorText": "A short briar pipe with a worn stem. The bowl is darkened from use. A thin layer of ash remains inside.",
+    "description": "Functional smoking pipe. Worth 5 sp. Common in working-class and rural populations. Some cultures use pipes during negotiation or oath-swearing.",
     "legacySource": {
       "tier": "common",
       "index": 68,
@@ -1231,6 +1296,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "2 sp",
     "flavorText": "A small folding knife with a horn handle and a blade barely three inches long. The blade is a little rusty near the hinge.",
+    "description": "Light. Improvised weapon, finesse. Primarily a tool — for cutting rope, opening crates, or preparing food. Disadvantage on attack rolls in combat.",
     "weapon": {
       "damageDice": "1d3",
       "damageType": "piercing",
@@ -1252,6 +1318,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1 cp",
     "flavorText": "A palm-sized rectangle of grey stone, smooth on both sides from years of use. Fits in a belt pouch.",
+    "description": "Restore a blade edge in 1 minute. Works as a full Whetstone for all purposes.",
     "legacySource": {
       "tier": "common",
       "index": 70,
@@ -1269,6 +1336,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "A ball of coarse brown twine about the size of a fist, wound tightly. Maybe 30 feet of it, maybe 40. Hard to tell.",
+    "description": "Roughly 30–40 ft. of usable cordage. Lighter and thinner than rope — not suitable for climbing, but fine for binding, marking paths, or rigging simple traps.",
     "legacySource": {
       "tier": "common",
       "index": 71,
@@ -1286,6 +1354,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "1 cp",
     "flavorText": "A single steel needle and a small spool of black thread, wrapped together in a scrap of leather.",
+    "description": "Can repair a small tear in clothing or leather. Not suitable for heavy canvas or armor. Can also be used to suture a wound (DC 10 Medicine, heals 1 HP if successful).",
     "legacySource": {
       "tier": "common",
       "index": 72,
@@ -1303,6 +1372,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2 cp",
     "flavorText": "A grey block of lye soap, nearly used down. Still useful. Smells vaguely of tallow.",
+    "description": "Enough soap for 2–3 uses. Useful for washing before entering noble company. Also produces lather that can make a surface slippery (covers 1 sq ft., DC 10 Acrobatics to avoid falling).",
     "legacySource": {
       "tier": "common",
       "index": 73,
@@ -1320,6 +1390,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "A rough iron comb with half its teeth intact. Someone used it regularly — it's worn smooth at the spine.",
+    "description": "Personal grooming. Worth almost nothing. Advantage on Charisma (Persuasion) checks in social situations where grooming would matter, if you've used it for at least 1 minute beforehand.",
     "legacySource": {
       "tier": "common",
       "index": 74,
@@ -1337,6 +1408,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2 cp",
     "flavorText": "Tiny iron scissors, hinged in the middle. Slightly misaligned but still functional for cutting thread, trimming nails, or cutting purse strings.",
+    "description": "+2 to Sleight of Hand checks to cut a purse or sever a thin cord.",
     "legacySource": {
       "tier": "common",
       "index": 75,
@@ -1354,6 +1426,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "1 cp",
     "flavorText": "A battered copper thimble with a dent in the side. Someone wore this while working.",
+    "description": "Worth 1 cp. Can be used as a finger-guard, a small cup, or a dice cup in a pinch. Makes a small metallic tap when struck.",
     "legacySource": {
       "tier": "common",
       "index": 76,
@@ -1372,6 +1445,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5 cp",
     "flavorText": "A small round tin containing a waxy yellowish salve. It smells medicinal — pine tar and something sharper.",
+    "description": "Applied to a wound or dry skin: provides no HP but prevents infection in non-magical situations. Grants advantage on Con saves made to avoid disease from a wound (GM discretion). 3 applications remain.",
     "consumable": {
       "consumableCategory": "topical",
       "effects": [
@@ -1397,6 +1471,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1 cp",
     "flavorText": "A finger-length stub of dark red sealing wax, half-used.",
+    "description": "Enough to seal 3–4 letters or vials. Can also be used to mark a surface, plug a small hole, or set as a primitive tripwire indicator (fresh wax on a door joint breaks cleanly if the door is opened).",
     "legacySource": {
       "tier": "common",
       "index": 78,
@@ -1414,6 +1489,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "A strip of clean linen, folded into a neat square and tucked into a coat pocket. Somebody had the foresight to carry it.",
+    "description": "Single-use bandage. Can stabilize a dying creature as an action without a Medicine check (replaces the Medicine roll entirely, once).",
     "legacySource": {
       "tier": "common",
       "index": 79,
@@ -1431,6 +1507,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2 cp",
     "flavorText": "A hinged tin holding four short sticks of compressed charcoal, wrapped in cloth to prevent smudging.",
+    "description": "Makes bold marks on nearly any surface. Useful for writing messages on walls, marking dungeon passages, or leaving signs. 4 sticks, each lasting about 10 uses.",
     "legacySource": {
       "tier": "common",
       "index": 80,
@@ -1449,6 +1526,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "2 cp",
     "flavorText": "A wax-wrapped block of salt meat and hard biscuit, half consumed. The remaining portion is still sealed and edible.",
+    "description": "Provides half a day's worth of food. Not appetizing, but sustaining.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -1475,6 +1553,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "2 cp",
     "flavorText": "A handful of dried plums or apricots in a small cloth bag, sticky and dense. Someone packed these for the road.",
+    "description": "Provides one light meal worth of sustenance. Sweet. Can be used to bait an animal (DC 10 Animal Handling to attract small woodland creatures).",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -1501,6 +1580,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "3 cp",
     "flavorText": "A wedge of hard cheese, wrapped in cloth and sealed with wax. Pungent but edible. Probably better than most things found in a dungeon.",
+    "description": "Provides half a day's food. The strong smell is detectable by creatures with Keen Smell within 30 ft. — this may or may not be desirable.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -1527,6 +1607,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3 cp",
     "flavorText": "A finger-sized glass vial of clear or amber spirits, tightly corked. Strong enough to sterilize a wound.",
+    "description": "Drink: provides no nourishment but grants advantage on Con saves vs. cold for 1 hour. Apply to wound: advantage on Con saves vs. infection (GM discretion). Two uses.",
     "consumable": {
       "consumableCategory": "topical",
       "effects": [
@@ -1553,6 +1634,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "A knot of dark brown sugar candy wrapped in waxed paper. Slightly sticky at the seams.",
+    "description": "No mechanical benefit. Provides a brief moment of sweetness. Can be used to bribe or placate a child NPC automatically.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -1579,6 +1661,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "3 cp",
     "flavorText": "A small drawstring pouch holding a handful of dried nuts, seeds, and raisins.",
+    "description": "Provides one light meal. Quick to eat — can be consumed as a bonus action rather than an action.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -1604,6 +1687,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "1d6 sp",
     "flavorText": "A handful of assorted coinage — a few coppers, a silver, possibly a foreign coin of unclear denomination.",
+    "description": "Roll 1d6: result in silver pieces, plus 1d4 copper. One coin in five is a foreign denomination worth the same but unrecognizable to most merchants (DC 12 History to identify).",
     "legacySource": {
       "tier": "common",
       "index": 87,
@@ -1621,6 +1705,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 gp",
     "flavorText": "One gold piece, heavier than expected. The stamp is worn but shows a ruler's profile.",
+    "description": "Worth 1 gp. The profile may be identifiable (DC 14 History) to determine its nation of origin and approximate age.",
     "legacySource": {
       "tier": "common",
       "index": 88,
@@ -1638,6 +1723,7 @@ const canonicalItems = [
     "weight": 0.4,
     "value": "1d4 cp",
     "flavorText": "A tiny leather purse holding almost nothing — a few copper pieces and a button.",
+    "description": "Roll 1d4 copper pieces, plus a bone button worth nothing and a receipt from a pawnbroker for something already sold.",
     "legacySource": {
       "tier": "common",
       "index": 89,
@@ -1654,6 +1740,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.55,
     "flavorText": "A coin of unusual shape and metal — octagonal, or with a hole through the center, or stamped in a script no one here reads.",
+    "description": "Worth 1 gp to a collector or historian (DC 13 History to identify its origin). Local merchants may refuse it or accept it at half value.",
     "legacySource": {
       "tier": "common",
       "index": 90,
@@ -1670,6 +1757,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1.5,
     "flavorText": "A scrap of parchment with a number and a symbol — not a map, but a reference to something buried, hidden, or deposited somewhere.",
+    "description": "GM determines what it references. Could lead to a few copper hidden in a wall or something more valuable. Requires Investigation (DC 14) plus roleplay to follow up.",
     "legacySource": {
       "tier": "common",
       "index": 91,
@@ -1687,6 +1775,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "A single boot, worn down on the outside heel. No partner. Someone wore this regularly and then, at some point, lost track of its pair.",
+    "description": "Useless on its own. Could be used as a container, a pillow, or thrown as an improvised weapon (1d3 bludgeoning, 20-ft range).",
     "legacySource": {
       "tier": "common",
       "index": 92,
@@ -1704,6 +1793,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "2 cp",
     "flavorText": "A pair of thick wool socks, hand-knitted. One has been darned at the heel twice.",
+    "description": "Wearing them: advantage on Con saves vs. frostbitten feet in extreme cold while traveling on foot. Also dry your boots.",
     "legacySource": {
       "tier": "common",
       "index": 93,
@@ -1721,6 +1811,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1 cp",
     "flavorText": "A long wool scarf, dyed a faded blue-green, with a repair near one end in a slightly different shade of thread.",
+    "description": "Wrap around face and neck: advantage on Con saves vs. dust, smoke inhalation, or mild cold.",
     "legacySource": {
       "tier": "common",
       "index": 94,
@@ -1738,6 +1829,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1 cp",
     "flavorText": "Heavy leather gloves stiff with dried labor — resin, blood, or grease, hard to tell which.",
+    "description": "Protect hands from minor cuts and abrasions. Advantage on Strength (Athletics) checks involving sustained grip (climbing, hauling) for up to 1 hour before they impair fine dexterity.",
     "legacySource": {
       "tier": "common",
       "index": 95,
@@ -1755,6 +1847,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1 cp",
     "flavorText": "A square of cotton cloth, faded and fraying at two corners. Can be worn many ways.",
+    "description": "Filter water through it (removes sediment, not contamination). Bind a wound. Keep dust out of your face. Carry small objects. Ten uses without tearing with care.",
     "legacySource": {
       "tier": "common",
       "index": 96,
@@ -1772,6 +1865,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1 cp",
     "flavorText": "A plain pewter buckle, still attached to a short length of old leather strap. The leather snapped; the buckle survived.",
+    "description": "Can be used to repair a broken belt or strap (takes 10 minutes and a sewing needle). Also a flat, heavy object usable as an improvised hammer for light tasks.",
     "legacySource": {
       "tier": "common",
       "index": 97,
@@ -1789,6 +1883,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5 cp",
     "flavorText": "Two six-sided dice carved from bone. The pips are inked in black. One die is very slightly weighted — DC 15 Investigation to notice, DC 20 to be certain.",
+    "description": "Standard dice for gambling. The weighted die gives a subtle advantage (GM may grant +1 to Deception when cheating, opposed by victim's Insight or Investigation).",
     "legacySource": {
       "tier": "common",
       "index": 98,
@@ -1806,6 +1901,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1 sp",
     "flavorText": "A worn deck of thirty-two hand-painted cards, dog-eared on the same four cards from years of use. Missing one.",
+    "description": "Standard card deck, minus one card (which one is GM's choice). Advantage on Charisma (Persuasion) checks in gambling contexts — showing a deck establishes rapport.",
     "legacySource": {
       "tier": "common",
       "index": 99,
@@ -1823,6 +1919,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "1 cp",
     "flavorText": "A dried rabbit's foot on a leather cord, stiff with age. Missing two of its claws.",
+    "description": "The owner clearly believed in this. Once per session: if you fail a saving throw by exactly 1, you may choose to succeed instead. The GM narrates a fortunate coincidence. Whether the foot caused it is unclear.",
     "legacySource": {
       "tier": "common",
       "index": 100,
@@ -1840,6 +1937,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "5 sp",
     "flavorText": "A working padlock with a shackle that opens and closes properly. No key. Whoever had this lost it or had a reason to keep the lock separate.",
+    "description": "Functions as a standard padlock (DC 15 Thieves' Tools to pick). No key present. Worth 5 sp. Useful for securing things you need securing.",
     "legacySource": {
       "tier": "common",
       "index": 101,
@@ -1857,6 +1955,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1 cp",
     "flavorText": "A dented tin drinking cup with a name scratched into the bottom in rough letters.",
+    "description": "Someone owned this specifically. The name may be recognizable to a GM-determined NPC. Functions as a standard cup.",
     "legacySource": {
       "tier": "common",
       "index": 102,
@@ -1874,6 +1973,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1 cp",
     "flavorText": "A simple carved wooden figure — a horse, a soldier, a rabbit — about the size of a hand. The paint is mostly worn off.",
+    "description": "Purely personal. A child's toy, carried by someone who missed home. May be used to establish rapport with a child NPC (automatic friendly reaction).",
     "legacySource": {
       "tier": "common",
       "index": 103,
@@ -1891,6 +1991,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "5 cp",
     "flavorText": "A small glass bottle of dark ink, stoppered with a cork. About half remains. The cork has dried ink on its edges.",
+    "description": "Enough ink for approximately 3 pages of dense writing. Can also be splashed as an improvised distraction: targets within 5 ft. make DC 10 Con save or are Blinded until end of their next turn (ink in eyes).",
     "legacySource": {
       "tier": "common",
       "index": 104,
@@ -1908,6 +2009,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5 cp",
     "flavorText": "A palm-sized piece of richly colored silk or patterned cotton, torn unevenly — cut from something larger. Used as a handkerchief or keepsake.",
+    "description": "Worth 5 cp as fabric. May indicate the carrier's origin (DC 13 History to identify the weaving tradition).",
     "legacySource": {
       "tier": "common",
       "index": 105,
@@ -1925,6 +2027,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "3 cp",
     "flavorText": "A small printed almanac for the previous year — weather predictions, market days, tide tables, holy days. Someone's made notes in the margins.",
+    "description": "The margin notes are the valuable part. GM determines what was noted — meeting times, prices, names, or routes. One piece of useful information for the GM to reveal.",
     "legacySource": {
       "tier": "common",
       "index": 106,
@@ -1943,6 +2046,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5 cp",
     "flavorText": "A small leather pouch of dried, shredded herb. Opens to a mild, sweet smell. Enough for several pipes.",
+    "description": "3 uses. Smoking during a short rest: advantage on one Wisdom saving throw before the next long rest (the calm helps). Only effective once per long rest.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -1968,6 +2072,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1 cp",
     "flavorText": "A charcoal writing stick wrapped in cord, about half its original length.",
+    "description": "Makes marks on most surfaces. About 15 uses remaining. Can write on stone, wood, or cloth. Smudges easily.",
     "legacySource": {
       "tier": "common",
       "index": 108,
@@ -1985,6 +2090,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "5 sp",
     "flavorText": "A bronze-backed mirror with a handle, small enough to fit in a coat pocket. The reflection is slightly warped near one edge.",
+    "description": "Look around corners without exposing yourself. Check for breath from an unconscious creature. Reflect sunlight as a signal (visible up to 1 mile in clear weather).",
     "legacySource": {
       "tier": "common",
       "index": 109,
@@ -2002,6 +2108,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "1 cp",
     "flavorText": "A cheap printed pamphlet of maybe twenty pages — a popular story, a religious tract, or a bawdy song collection. Well-read.",
+    "description": "Reading it (20 minutes) can pass the time during a watch. GM may plant a relevant detail in the text — a real place name, a referenced person, a historical event.",
     "legacySource": {
       "tier": "common",
       "index": 110,
@@ -2018,6 +2125,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.55,
     "flavorText": "A stamped piece of parchment recording a transaction at a named shop in a named town. The amount is legible.",
+    "description": "Places the carrier in a specific location recently. The shop named may exist in the GM's world and could be visited. The transaction value (1d6 × 10 gp) hints at what was bought or sold.",
     "legacySource": {
       "tier": "common",
       "index": 111,
@@ -2035,6 +2143,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "1 gp",
     "flavorText": "A cheap brass compass with a slightly sticky needle. It's accurate but slow — takes 5 seconds to settle after being moved.",
+    "description": "Points magnetic north. Takes 1 full round to settle after movement. Advantage on Survival (Navigation) checks in the wilderness while consulting it.",
     "legacySource": {
       "tier": "common",
       "index": 112,
@@ -2052,6 +2161,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "2 sp",
     "flavorText": "A soft leather cover around thirty or forty folded pages, tied shut with a cord. About half the pages are used.",
+    "description": "Functions as a blank parchment supply for notes, maps, or spells. The existing entries are the GM's to determine — a personal diary, field observations, or a ledger.",
     "legacySource": {
       "tier": "common",
       "index": 113,
@@ -2069,6 +2179,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "3 cp",
     "flavorText": "Three short tallow candles bundled together with a twist of string. Smell of rendered fat.",
+    "description": "Each candle burns 1 hour, shedding bright light 5 ft., dim light 5 ft. further. Cheaper and smellier than wax candles — the smell attracts some creatures and deters others (GM discretion).",
     "legacySource": {
       "tier": "common",
       "index": 114,
@@ -2086,6 +2197,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "2 cp",
     "flavorText": "A small cloth sachet of dried lavender, sewn shut. Still fragrant.",
+    "description": "Mask a smell within 5 ft. (advantage on checks to resist nausea from odors). Can be slipped into a pocket to detect pickpockets — the smell lingers on a thief's hand (DC 12 Perception to detect).",
     "legacySource": {
       "tier": "common",
       "index": 115,
@@ -2103,6 +2215,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1 cp",
     "flavorText": "Three plain iron fishhooks in a small cloth wrap, sized for freshwater fish.",
+    "description": "Required equipment for fishing alongside a fishing line. Each hook can be used as an improvised clasp, catch, or light anchor for thin cord.",
     "legacySource": {
       "tier": "common",
       "index": 116,
@@ -2120,6 +2233,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "2 cp",
     "flavorText": "A string of twelve wooden beads on a knotted cord, with a single larger bead at one end carved with a simple religious symbol.",
+    "description": "A religious comfort object. Clerics and paladins who recognize the faith may react positively. Can be used as an improvised garrote (1d4 bludgeoning on a successful grapple attempt).",
     "legacySource": {
       "tier": "common",
       "index": 117,
@@ -2137,6 +2251,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "1 cp",
     "flavorText": "Four polished knucklebones — ankle bones from a sheep, used as primitive dice or for the game of jacks.",
+    "description": "Used for gambling (each bone has four sides of unequal probability). Advantage on Charisma (Persuasion) checks to join a group of soldiers or laborers when you produce them — universal currency of boredom.",
     "legacySource": {
       "tier": "common",
       "index": 118,
@@ -2155,6 +2270,7 @@ const canonicalItems = [
     "weight": 22,
     "value": "150 gp",
     "flavorText": "Full plate forged from iron, fitted to cover the torso, shoulders, and hips.",
+    "description": "AC 16. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 16,
@@ -2177,6 +2293,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "20 gp",
     "flavorText": "A full-face iron helm matched to a plate armor set.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -2198,6 +2315,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "20 gp",
     "flavorText": "Articulated iron gauntlets, hinged at the knuckles for a full grip.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -2219,6 +2337,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "20 gp",
     "flavorText": "Iron greaves covering the thighs and shins, buckled at the sides.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -2240,6 +2359,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "20 gp",
     "flavorText": "Reinforced iron sabatons with articulated toe plates.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -2261,6 +2381,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "15 gp",
     "flavorText": "A kite shield of solid iron, sized to match a full plate ensemble.",
+    "description": "+2 AC.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -2282,6 +2403,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "8 gp",
     "flavorText": "A iron a short, balanced blade suited to quick strikes.",
+    "description": "Finesse, light.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -2304,6 +2426,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "8 gp",
     "flavorText": "A iron a straight double-edged blade about a yard long.",
+    "description": "Versatile (1d10).",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -2326,6 +2449,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "8 gp",
     "flavorText": "A iron a short double-edged blade with a simple crossguard.",
+    "description": "Finesse, light, thrown (range 20/60).",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -2348,6 +2472,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "8 gp",
     "flavorText": "A iron a flanged metal head on a sturdy haft.",
+    "description": "Bludgeoning.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -2367,6 +2492,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "8 gp",
     "flavorText": "A iron a broad single-bladed axe head on a long haft.",
+    "description": "Versatile (1d10).",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -2389,6 +2515,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "8 gp",
     "flavorText": "A iron a heavy square hammerhead built for crushing blows.",
+    "description": "Versatile (1d10).",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning",
@@ -2412,6 +2539,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "8 gp",
     "flavorText": "A iron a long haft tipped with a leaf-shaped point.",
+    "description": "Thrown (range 20/60), versatile (1d8).",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -2435,6 +2563,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "5 gp",
     "flavorText": "A lean tabby cat that follows at a comfortable distance and only comes close when it wants something.",
+    "description": "Advantage on Wisdom (Perception) checks to notice rodents, insects, or small hidden compartments the cat investigates.",
     "companion": {
       "companionType": "pet"
     },
@@ -2462,6 +2591,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "3 gp",
     "flavorText": "A gray pigeon with a leg band, trained to fly to a known location and back.",
+    "description": "Can carry a written message up to 1 mile away and return within a day. Not durable in bad weather.",
     "companion": {
       "companionType": "pet"
     },
@@ -2489,6 +2619,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "2 gp",
     "flavorText": "A scruffy mixed-breed puppy with floppy ears and boundless energy.",
+    "description": "Advantage on Charisma (Persuasion) checks made in its presence — hard to distrust someone with a happy dog.",
     "companion": {
       "companionType": "pet"
     },
@@ -2516,6 +2647,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1 gp",
     "flavorText": "A tiny brown mouse that rides in a pocket or sleeve without complaint.",
+    "description": "Can squeeze through gaps as small as 1 inch to retrieve small objects or scout tiny spaces.",
     "companion": {
       "companionType": "pet"
     },
@@ -2543,6 +2675,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1 gp",
     "flavorText": "A fat speckled toad that eats bugs and croaks when it senses rain.",
+    "description": "Reliably predicts weather changes up to 12 hours in advance.",
     "companion": {
       "companionType": "pet"
     },
@@ -2570,6 +2703,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "4 gp",
     "flavorText": "A quick, curious weasel with sharp eyes and an opportunistic streak.",
+    "description": "Advantage on Dexterity (Sleight of Hand) checks — it's an excellent distraction and occasional accomplice.",
     "companion": {
       "companionType": "pet"
     },
@@ -2597,6 +2731,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "6 gp",
     "flavorText": "A glossy black crow that mimics sounds and remembers faces.",
+    "description": "Recognizes and reacts distinctly to up to 10 individual creatures it has met before.",
     "companion": {
       "companionType": "pet"
     },
@@ -2624,6 +2759,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "3 gp",
     "flavorText": "A small spiny hedgehog that curls into a ball at the slightest provocation.",
+    "description": "While it's near you as you sleep, advantage on the first Perception check to wake if danger approaches.",
     "companion": {
       "companionType": "pet"
     },
@@ -2651,6 +2787,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "2 gp",
     "flavorText": "An unsettling but harmless cloud of flies that hovers near its owner and no one else.",
+    "description": "Advantage on Constitution saves against disease — the flies, oddly, seem to eat the early signs.",
     "companion": {
       "companionType": "pet"
     },
@@ -2678,6 +2815,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "5 gp",
     "flavorText": "A long, wriggly ferret that loves tunnels, sleeves, and other people's pockets.",
+    "description": "Can retrieve a small stashed item from a burrow or gap without disturbing the surrounding area.",
     "companion": {
       "companionType": "pet"
     },
@@ -2705,6 +2843,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "2 gp",
     "flavorText": "An imprinted duckling that believes its owner is its parent, permanently.",
+    "description": "Alerts (loud quacking) if a stranger approaches within 30 feet while you rest.",
     "companion": {
       "companionType": "pet"
     },
@@ -2732,6 +2871,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1 gp",
     "flavorText": "An unbothered hen that lays an egg most mornings, war or no war.",
+    "description": "Produces one fresh egg per day — negligible in most situations, occasionally exactly what's needed.",
     "companion": {
       "companionType": "pet"
     },
@@ -2759,6 +2899,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "5 gp",
     "flavorText": "A sleek black cat with unnervingly intelligent eyes.",
+    "description": "Advantage on Charisma (Intimidation) checks against superstitious creatures.",
     "companion": {
       "companionType": "pet"
     },
@@ -2786,6 +2927,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "8 gp",
     "flavorText": "A slow, patient tortoise that has clearly seen a few things.",
+    "description": "Advantage on saving throws against being frightened while the tortoise is within reach — its calm is contagious.",
     "companion": {
       "companionType": "pet"
     },
@@ -2813,6 +2955,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "3 gp",
     "flavorText": "A small finch with a surprisingly complex song.",
+    "description": "Its singing lifts a somber camp's spirits — advantage on the next Charisma check made to raise a group's morale.",
     "companion": {
       "companionType": "pet"
     },
@@ -2840,6 +2983,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "2 gp",
     "flavorText": "A surprisingly sharp-eyed sewer rat that's learned a few tricks.",
+    "description": "Can navigate cramped tunnels and sewers to scout a path, reporting back in simple terms (barks, tugs, gestures).",
     "companion": {
       "companionType": "pet"
     },
@@ -2867,6 +3011,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "30 gp",
     "flavorText": "A sturdy, even-tempered pony suited for a Small rider or light loads.",
+    "description": "Speed 40 ft. Suitable rider: Small or smaller. Carrying capacity 225 lbs.",
     "companion": {
       "companionType": "mount",
       "ac": 10,
@@ -2896,6 +3041,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "20 gp",
     "flavorText": "A patient, hard-working mule, better suited to hauling than speed.",
+    "description": "Speed 40 ft. Exceptional load-bearer: carrying capacity 420 lbs. without penalty. Sure-footed on rough terrain — advantage on checks to avoid slipping or stumbling.",
     "companion": {
       "companionType": "mount",
       "ac": 10,
@@ -2925,6 +3071,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "50 gp",
     "flavorText": "A calm, reliable horse, unremarkable except for its dependability.",
+    "description": "Speed 60 ft. Suitable rider: Medium or smaller. Carrying capacity 480 lbs.",
     "companion": {
       "companionType": "mount",
       "ac": 10,
@@ -2954,6 +3101,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "25 gp",
     "flavorText": "A surefooted mountain goat, small enough for a halfling or gnome to ride comfortably.",
+    "description": "Speed 40 ft. Climb speed 20 ft. Advantage on checks and saves to avoid falling or being knocked prone on rough or sloped terrain.",
     "companion": {
       "companionType": "mount",
       "ac": 10,
@@ -2984,6 +3132,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "2 gp",
     "flavorText": "A worn leather-bound journal, its pages full of a stranger's cramped handwriting — travel routes, weather notes, and the occasional worried aside about being followed.",
+    "description": "Reading it cover to cover reveals the route of a specific journey and a name the writer feared. GM discretion on relevance to the current adventure.",
     "tool": {
       "toolCategory": "personal"
     },
@@ -3001,6 +3150,7 @@ const canonicalItems = [
     "weight": 0.4,
     "value": "5 gp",
     "flavorText": "A hand-inked map of a specific dungeon or ruin, corners curled from handling.",
+    "description": "Shows the layout of one dungeon or ruin, including at least one route the party hasn't found yet. May be incomplete or slightly wrong.",
     "tool": {
       "toolCategory": "dungeon"
     },
@@ -3021,6 +3171,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "50 gp",
     "flavorText": "A neat stack of coins bearing the crest of a kingdom that may or may not still exist.",
+    "description": "Pure currency — no mechanical effect, just spendable wealth (assuming the kingdom's coin is still honored anywhere).",
     "tool": {
       "toolCategory": "coin"
     },
@@ -3038,6 +3189,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "25 gp",
     "flavorText": "A fist-sized chunk of rose quartz, cloudy and imperfect but still pretty enough to sell.",
+    "description": "A decorative semi-precious stone. Worth more to a jeweler than an alchemist.",
     "tool": {
       "toolCategory": "precious-gem"
     },
@@ -3054,6 +3206,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.1,
     "flavorText": "A heavy iron key, rusted nearly solid. Whatever it opens hasn't been touched in a long time.",
+    "description": "GM determines what lock this key fits, if any — likely something the current owner forgot existed.",
     "tool": {
       "toolCategory": "physical-key"
     },
@@ -3075,6 +3228,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 0.45,
     "flavorText": "A torn scrap of fabric, stained dark. Someone will want to know where this was found.",
+    "description": "Physical evidence tying its bearer (or whoever presents it) to a specific event. GM determines what it can prove and to whom.",
     "tool": {
       "toolCategory": "evidence"
     },
@@ -3095,6 +3249,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "15 gp",
     "flavorText": "A brass sighting scope, a set of measuring chains, and a well-used sketchbook.",
+    "description": "Proficiency with a cartographer's tools lets you produce an accurate map of any area you've thoroughly explored.",
     "legacySource": {
       "tier": "common",
       "index": 159,
@@ -3112,6 +3267,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "10 gp",
     "flavorText": "A well-traveled lute with a few new scars but a still-true sound.",
+    "description": "A musical instrument. Proficiency with it lets you use it as a spellcasting focus (bard) or simply to play — and possibly earn a meal and a bed for the night.",
     "legacySource": {
       "tier": "common",
       "index": 160,
@@ -3129,6 +3285,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "3 gp",
     "flavorText": "A small idol carved from dark wood, worn smooth at the base from generations of hands.",
+    "description": "A minor religious keepsake. No mechanical effect, though it may be recognized by followers of whatever it depicts.",
     "legacySource": {
       "tier": "common",
       "index": 161,
@@ -3146,6 +3303,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "4 gp",
     "flavorText": "A painted porcelain figurine of a shepherdess, missing one hand.",
+    "description": "A decorative curiosity. Worth more to a collector than to anyone practical.",
     "legacySource": {
       "tier": "common",
       "index": 162,
@@ -3163,6 +3321,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2 gp",
     "flavorText": "A dozen small carved pieces for a strategy game, missing their board.",
+    "description": "A complete (if boardless) game set — draw a grid in the dirt and you're back in business.",
     "legacySource": {
       "tier": "common",
       "index": 163,
@@ -3180,6 +3339,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "1 cp",
     "flavorText": "A plain clay mug with a chip in the rim, otherwise perfectly serviceable.",
+    "description": "Holds a drink. That's it. That's the whole item.",
     "legacySource": {
       "tier": "common",
       "index": 164,
@@ -3198,6 +3358,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "150 gp",
     "flavorText": "A glass vial of faintly glowing pink liquid with a sweet, coppery taste.",
+    "description": "Restores 2d4+2 hit points. Action to drink. The most common magical item in existence.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -3225,6 +3386,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "150 gp",
     "flavorText": "A vibrant red potion, noticeably warmer than it should be.",
+    "description": "Restores 4d4+4 hit points. Action to drink.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -3252,6 +3414,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "300 gp",
     "flavorText": "A slender dagger with a pure silver blade, polished to a mirror sheen.",
+    "description": "Finesse, light, thrown (20/60). +1 to attack/damage. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical — doesn't bypass general magical resistance.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -3285,6 +3448,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "125 gp",
     "flavorText": "A leather roll with picks, tension wrenches, and a mirror on wire.",
+    "description": "Required for picking locks and disarming traps. Proficiency required for full effectiveness.",
     "legacySource": {
       "tier": "uncommon",
       "index": 3,
@@ -3302,6 +3466,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "125 gp",
     "flavorText": "Iron pitons, a small hammer, and spiked leather gloves.",
+    "description": "Anchor yourself while climbing. You cannot fall more than 25 feet while anchored and moving at half speed.",
     "legacySource": {
       "tier": "uncommon",
       "index": 4,
@@ -3319,6 +3484,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "250 gp",
     "flavorText": "A water-damaged tome with half its pages stuck together. Legible spells remain.",
+    "description": "Contains 1d4 random 1st-level wizard spells and 1 2nd-level spell. A wizard can copy them: 50 gp and 2 hours per spell level.",
     "legacySource": {
       "tier": "uncommon",
       "index": 5,
@@ -3337,6 +3503,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "150 gp",
     "flavorText": "A murky grey liquid in a stoppered bottle.",
+    "description": "Grants Darkvision 60 ft. for 8 hours. If you already have Darkvision, extends range by 60 ft.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -3362,6 +3529,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "200 gp",
     "flavorText": "A coil of silky rope that seems to tighten knots on its own.",
+    "description": "DC 15 Strength (Athletics) check (instead of normal) to escape knots. Disadvantage on escape attempts.",
     "legacySource": {
       "tier": "uncommon",
       "index": 7,
@@ -3379,6 +3547,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "200 gp",
     "flavorText": "Thin black leather gloves that leave no fingerprints.",
+    "description": "Advantage on Sleight of Hand checks. No fingerprints left behind. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -3398,6 +3567,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "150 gp",
     "flavorText": "A flat disc of iron engraved with a protective rune.",
+    "description": "+1 bonus to AC. Requires attunement. Compatible with any armor or none.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -3419,6 +3589,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "1000 gp",
     "flavorText": "A plain bronze ring that radiates gentle heat.",
+    "description": "Resistance to cold damage. Comfortable down to -50°F. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -3438,6 +3609,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "150 gp",
     "flavorText": "A clear bitter liquid that neutralizes common poisons.",
+    "description": "Advantage on saving throws against poison for 1 hour. Does not remove existing effects.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -3464,6 +3636,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "480 gp",
     "flavorText": "A viscous clear oil. Applied to skin or surface, grip becomes near impossible.",
+    "description": "Applied to creature: immune to Grappled for 8 hours. Applied to 10-ft surface: DC 13 Acrobatics or fall prone (mimics Freedom of Movement on creature).",
     "consumable": {
       "consumableCategory": "coating",
       "effects": [
@@ -3490,6 +3663,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "300 gp",
     "flavorText": "Iridescent grey powder in a wax envelope.",
+    "description": "Scattered over up to 6 creatures in 10-ft radius: all turn Invisible for 2d4 minutes (Invisibility spell).",
     "consumable": {
       "consumableCategory": "thrown",
       "effects": [
@@ -3515,6 +3689,7 @@ const canonicalItems = [
     "weight": 0.7,
     "value": "500 gp",
     "flavorText": "A cloth bag whose interior is far larger than its exterior.",
+    "description": "Holds 500 lbs. / 64 cubic feet. Always weighs 15 lbs. Creatures inside suffocate after 10 minutes. Do not place inside another extradimensional space.",
     "legacySource": {
       "tier": "uncommon",
       "index": 14,
@@ -3530,6 +3705,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1500 gp",
     "flavorText": "Soft leather boots stitched with leaf patterns.",
+    "description": "Advantage on Stealth checks to move silently. Movement makes no sound. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -3548,6 +3724,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "2000 gp",
     "flavorText": "A mottled green-grey cloak that shifts to match surroundings.",
+    "description": "Advantage on Stealth checks. Disadvantage on Perception checks against you (visual). Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -3566,6 +3743,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1000 gp",
     "flavorText": "Brass-framed goggles with dark amber lenses.",
+    "description": "Grants Darkvision 60 ft. If you already have Darkvision, range increases by 60 ft.",
     "legacySource": {
       "tier": "uncommon",
       "index": 17,
@@ -3584,6 +3762,7 @@ const canonicalItems = [
     "weight": 0.7,
     "value": "180 gp",
     "flavorText": "A blue slightly fizzy liquid.",
+    "description": "Breathe underwater as easily as air for 1 hour.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -3610,6 +3789,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "180 gp",
     "flavorText": "A thick amber potion smelling of pine sap.",
+    "description": "Climb speed equal to walking speed for 1 hour. Advantage on Athletics checks to climb.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -3636,6 +3816,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "500 gp",
     "flavorText": "A well-crafted longsword with faint runes along the blade.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -3669,6 +3850,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "500 gp",
     "flavorText": "A round iron shield with subtle magical reinforcement.",
+    "description": "+1 to AC (adds to the standard shield +2 bonus, for +3 total from shield). Requires attunement by a creature proficient with shields.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -3691,6 +3873,7 @@ const canonicalItems = [
     "weight": 3.75,
     "value": "1000 gp",
     "flavorText": "A shirt of interlocking mithral rings, incredibly light and silent.",
+    "description": "AC 13 + Dex modifier. Light armor. No Stealth disadvantage. Can be worn under clothes without notice.",
     "armor": {
       "armorType": "medium",
       "baseAC": 13,
@@ -3717,6 +3900,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "125 gp",
     "flavorText": "A finely cast silver symbol on a chain.",
+    "description": "Spellcasting focus (cleric, paladin, druid). Silver construction works in certain anti-undead rituals. Worth 25 gp as silver.",
     "legacySource": {
       "tier": "uncommon",
       "index": 23,
@@ -3735,6 +3919,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "300 gp",
     "flavorText": "Parchment inscribed with a glowing sigil. Reading it unleashes a sphere of flame.",
+    "description": "Single use. Fireball (3rd level): 8d6 fire damage, DC 15 Dex save for half, 20-ft radius.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -3761,6 +3946,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "300 gp",
     "flavorText": "A vellum scroll turning one creature invisible for up to one hour.",
+    "description": "Single use. Invisibility: target is invisible until it attacks, casts a spell, or 1 hour passes.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -3786,6 +3972,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "100 gp",
     "flavorText": "A compact iron-shod battering ram with folding handles.",
+    "description": "Advantage on Strength checks to break down doors. Solo: +4 bonus. With helper: +6 bonus and advantage.",
     "legacySource": {
       "tier": "uncommon",
       "index": 27,
@@ -3801,6 +3988,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "500 gp",
     "flavorText": "Two smooth stones carved with the same rune.",
+    "description": "Hold one stone, speak up to 25 words — the other stone's holder hears you. Works across any distance on the same plane. Each stone: once per day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 28,
@@ -3817,6 +4005,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "150 gp",
     "flavorText": "A volatile green liquid that ignites when shattered.",
+    "description": "Thrown (range 20 ft.): target takes 1d4 fire damage at the start of each turn. DC 10 Dexterity action to extinguish.",
     "consumable": {
       "consumableCategory": "thrown",
       "effects": [
@@ -3843,6 +4032,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "100 gp",
     "flavorText": "A grey stone that detonates with a concussive thunderclap when thrown.",
+    "description": "Thrown (range 20 ft.): creatures within 10 ft. make DC 15 Con save or deafened 1 minute.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -3869,6 +4059,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "150 gp",
     "flavorText": "A sack of viscous goo. When burst it roots the target in place.",
+    "description": "Thrown (range 20 ft.): DC 15 Strength save or Restrained for 1d4 rounds.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -3895,6 +4086,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "100 gp",
     "flavorText": "A wax-coated rod that produces dense grey smoke when snapped.",
+    "description": "Creates a 10-ft radius cloud of thick smoke. Heavily obscures the area. Lasts 1 minute or until dispersed by wind.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -3921,6 +4113,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "500 gp",
     "flavorText": "A sword crafted by a skilled smith with exceptional balance. Not magical.",
+    "description": "+1 to attack rolls only (not damage). Not magical — does not overcome resistance.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -3955,6 +4148,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "200 gp",
     "flavorText": "A finely made heavy crossbow with a cranked loading mechanism.",
+    "description": "+1 to attack rolls (not damage). Not magical. Range 100/400. Loading property.",
     "weapon": {
       "damageDice": "1d10",
       "damageType": "piercing",
@@ -3992,6 +4186,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "800 gp",
     "flavorText": "A brass lantern whose flame never gutters or runs dry.",
+    "description": "Functions as a hooded lantern but requires no oil and cannot be extinguished by wind. Only dispel magic or submersion can extinguish it temporarily.",
     "legacySource": {
       "tier": "uncommon",
       "index": 35,
@@ -4009,6 +4204,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "400 gp",
     "flavorText": "A padlock that cannot be picked or forced — only the correct key opens it.",
+    "description": "Cannot be picked (immune to Thieves' Tools), forced with Strength, or destroyed by non-magical means. Magical attacks deal half damage.",
     "legacySource": {
       "tier": "uncommon",
       "index": 36,
@@ -4027,6 +4223,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "180 gp",
     "flavorText": "A bright red potion that tastes of iron and pepper.",
+    "description": "Grants 10 temporary hit points. Also under the effect of Bless for 1 hour (no concentration required).",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -4053,6 +4250,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "500 gp",
     "flavorText": "Iron bracers inscribed with interlocking shields.",
+    "description": "AC 13 + Dex modifier while wearing no armor and no shield. Requires attunement. Incompatible with armor.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -4074,6 +4272,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "2000 gp",
     "flavorText": "A silver ring set with a tiny white feather.",
+    "description": "When you fall: descend at 60 ft./round (no falling damage). Land on your feet. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4093,6 +4292,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "100 gp",
     "flavorText": "A red syrupy liquid.",
+    "description": "Enlarge effect for 1 minute: size +1 category, advantage on Strength checks/saves, +1d4 weapon damage.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -4119,6 +4319,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "100 gp",
     "flavorText": "A blue watery potion.",
+    "description": "Reduce effect for 1 minute: size -1 category, disadvantage on Strength checks, -1d4 weapon damage, advantage on Stealth.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -4145,6 +4346,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "500 gp",
     "flavorText": "A beaded necklace with 1d6+1 beads that explode as fireballs.",
+    "description": "Each bead thrown (range 60 ft.): Fireball (8d6 fire, DC 15 Dex for half, 20-ft radius). Extra beads detonated together add 2d6 each.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -4170,6 +4372,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "1000 gp",
     "flavorText": "An unremarkable hat that alters the wearer's appearance when worn.",
+    "description": "Cast Disguise Self at will (no slot required). Requires concentration. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4188,6 +4391,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "500 gp",
     "flavorText": "Carved bone pipes. Playing them summons swarms of rats.",
+    "description": "3 charges. Play for 1 minute: summon 1d3 Swarms of Rats that obey you for 1 hour. Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4204,6 +4408,7 @@ const canonicalItems = [
     "weight": 0.45,
     "value": "2000 gp",
     "flavorText": "A clear crystal that emits a blinding burst of light.",
+    "description": "50 charges. Expend 1: bright light 30-ft, dim 30-ft (1 min). Expend 5: sunlight 30-ft (1 min). Expend 10: DC 15 Con save or blinded 1 min in 30-ft radius. Recharges 1d50 charges each day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 45,
@@ -4219,6 +4424,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "800 gp",
     "flavorText": "Crystal lenses on a wire frame that reveal fine detail.",
+    "description": "Advantage on Investigation checks for details within 1 ft. Can read text as small as 1 mm. Detects hidden writing.",
     "legacySource": {
       "tier": "uncommon",
       "index": 46,
@@ -4236,6 +4442,7 @@ const canonicalItems = [
     "weight": 0.4,
     "value": "1500 gp",
     "flavorText": "A bronze headband set with a smoky amber gem.",
+    "description": "1 charge. Once per day: Scorching Ray (+5 ranged spell attack, 2d6 fire on hit). Recharges 1 charge each day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 47,
@@ -4253,6 +4460,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "135 gp",
     "flavorText": "A stoppered silver flask that produces water on command.",
+    "description": "'Stream': 1 gallon/action. 'Fountain': 5 gallons/action. 'Geyser': 30 gallons/action, DC 13 Strength save or knocked prone.",
     "legacySource": {
       "tier": "uncommon",
       "index": 48,
@@ -4268,6 +4476,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "200 gp",
     "flavorText": "A small ivory horn. Allies are silently alerted when blown.",
+    "description": "No audible sound. Up to 6 designated creatures within 600 ft. are mentally alerted. Works through walls. 1 use per short rest.",
     "legacySource": {
       "tier": "uncommon",
       "index": 49,
@@ -4283,6 +4492,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "2000 gp",
     "flavorText": "An iron rod that becomes fixed in space when a button is pressed.",
+    "description": "Press button: rod is fixed in place — holds up to 8,000 lbs. Press again or DC 30 Strength check to move it. Infinite uses.",
     "legacySource": {
       "tier": "uncommon",
       "index": 50,
@@ -4301,6 +4511,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "1500 gp",
     "flavorText": "An enchanted javelin. When thrown it transforms into a lightning bolt.",
+    "description": "3 charges. Expend 1 and throw: 4d6 lightning to target, 4d6 to each creature within 5 ft. of its path (DC 13 Dex for half). Returns after resolving. Recharges 1d3 charges each day.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -4319,6 +4530,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "1500 gp",
     "flavorText": "A silver disc. Wearing it lets you sense nearby thoughts.",
+    "description": "3 charges. Expend 1: cast Detect Thoughts (DC 13). Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4337,6 +4549,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2000 gp",
     "flavorText": "A milky white pearl that pulses faintly.",
+    "description": "Action: regain one expended spell slot of 3rd level or lower. Once per day. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4353,6 +4566,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "2000 gp",
     "flavorText": "A jade pendant on a silver chain.",
+    "description": "Immune to disease. Cannot be afflicted by the Poisoned condition. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4372,6 +4586,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "300 gp",
     "flavorText": "A misty shifting liquid. The drinker becomes a cloud of gas.",
+    "description": "Gaseous Form for 1 hour: fly speed 10 ft., pass through any gap air can, resistance to non-magical damage. Action to end.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -4398,6 +4613,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "270 gp",
     "flavorText": "A bubbling orange draught.",
+    "description": "Enlarge on yourself for 1 minute (no concentration): Large size, advantage on Strength checks/saves, +1d4 weapon damage.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -4423,6 +4639,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "1200 gp",
     "flavorText": "A gold ring engraved with a leaping frog.",
+    "description": "Cast Jump at will (no slot). Long jump: 30 ft. running / 15 ft. standing. High jump: 15 ft. running / 7 ft. standing. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4441,6 +4658,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "2000 gp",
     "flavorText": "A polished obsidian band.",
+    "description": "Immune to magic detecting your thoughts or whether you're lying. Immune to Detect Thoughts. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4459,6 +4677,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "1500 gp",
     "flavorText": "A ring of pale blue aquamarine.",
+    "description": "Swim speed 40 ft. Can hold breath for up to 1 hour before needing air. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4477,6 +4696,7 @@ const canonicalItems = [
     "weight": 0.4,
     "value": "2000 gp",
     "flavorText": "A patched robe with magical items stitched in as patches.",
+    "description": "Contains 2d4+4 patches. Each detached patch becomes a real item (roll on DMG p.195 Robe of Useful Items table). Once detached, patches cannot be reattached.",
     "legacySource": {
       "tier": "uncommon",
       "index": 60,
@@ -4492,6 +4712,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2000 gp",
     "flavorText": "A 60-foot silk rope that animates on command.",
+    "description": "Command it to fasten, unfasten, knot, or unknot. Moves up to 10 ft./round. Holds 3,000 lbs. AC 10, 20 HP.",
     "legacySource": {
       "tier": "uncommon",
       "index": 61,
@@ -4509,6 +4730,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "2000 gp",
     "flavorText": "Soft slippers stitched with spider-silk thread.",
+    "description": "Climb speed 20 ft. on walls and ceilings — no hands required. Does not work if the wearer is heavily encumbered or on oiled/greased surfaces. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4527,6 +4749,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "2000 gp",
     "flavorText": "A smooth agate stone, warm to the touch.",
+    "description": "+1 bonus to all ability checks and saving throws while you possess and are attuned to this stone. Does not require you to be holding it.",
     "legacySource": {
       "tier": "uncommon",
       "index": 63,
@@ -4542,6 +4765,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1500 gp",
     "flavorText": "A thin hazel wand that vibrates near hidden doors.",
+    "description": "3 charges. Action: wand vibrates if any secret door or hidden compartment is within 30 ft. Recharges 1d3 charges each day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 64,
@@ -4557,6 +4781,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "2000 gp",
     "flavorText": "Leather boots with white feathers at the cuffs.",
+    "description": "Fly speed equal to walking speed for up to 4 hours per day. Recharges at a rate of 2 hours per hour spent not flying. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4575,6 +4800,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2000 gp",
     "flavorText": "A dramatic red and black cape.",
+    "description": "Once per day: Dimension Door — teleport up to 500 ft. to any visible location, appearing in a puff of brimstone smoke. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4593,6 +4819,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "1500 gp",
     "flavorText": "A hollow metal tube. Struck and pointed, it opens locks.",
+    "description": "10 charges. Ring within 120 ft. of a lock, latch, or sealed container: it opens. On last charge: roll d20 — on 1, the chime cracks and is destroyed.",
     "legacySource": {
       "tier": "uncommon",
       "index": 67,
@@ -4608,6 +4835,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "2000 gp",
     "flavorText": "A hooded lantern with a bluish flame. Reveals invisible things.",
+    "description": "Burns oil normally. Invisible creatures within its 30-ft bright radius become visible as faintly glowing outlines.",
     "legacySource": {
       "tier": "uncommon",
       "index": 68,
@@ -4626,6 +4854,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "1000 gp",
     "flavorText": "A lightweight shield of interlocking mithral rings.",
+    "description": "+2 AC. No Stealth disadvantage. No Dex modifier penalty. Silent.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -4652,6 +4881,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "1500 gp",
     "flavorText": "A silver chain set with a green jade bead.",
+    "description": "Breathe normally in any environment: vacuum, underwater, suffocating gas. Advantage on Con saves vs. inhaled poisons. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4671,6 +4901,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "1900 gp",
     "flavorText": "A shimmering translucent oil.",
+    "description": "Apply over 10 minutes: for 1 hour, use action to go Ethereal and return at will (Etherealness spell). Non-magical damage cannot affect you while Ethereal.",
     "consumable": {
       "consumableCategory": "coating",
       "effects": [
@@ -4696,6 +4927,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1800 gp",
     "flavorText": "Bone pipes carved with skull faces.",
+    "description": "3 charges. DC 15 Performance check required. On success: creatures within 30 ft. make DC 13 Wisdom save or Frightened for 1 minute. Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4712,6 +4944,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "1800 gp",
     "flavorText": "A carved bone ring.",
+    "description": "3 charges. Expend 1: cast Animal Friendship (DC 13), Fear (beasts only, DC 13), or Speak with Animals. Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4731,6 +4964,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "110 gp",
     "flavorText": "A longsword coated in a thin layer of silver.",
+    "description": "Counts as silvered for overcoming resistance/immunity. Effective against lycanthropes and certain undead. Not magical — doesn't bypass general magical resistance.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -4757,6 +4991,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "1800 gp",
     "flavorText": "A gnarled staff carved as a coiled serpent.",
+    "description": "3 charges. Expend 1: serpent head animates, makes +3 melee attack for 1d6+3 piercing + 3d6 poison (DC 13 Con for half poison). Recharges 1d3 charges each day. Requires attunement (cleric, druid, or warlock).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -4776,6 +5011,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "1500 gp",
     "flavorText": "A willow wand that glows faintly near magical auras.",
+    "description": "3 charges. Expend 1: Detect Magic (concentration, 10 minutes). Recharges 1d3 charges each day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 76,
@@ -4791,6 +5027,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "2000 gp",
     "flavorText": "A pale birch wand that conjures sticky webs.",
+    "description": "7 charges. Expend 1: Web (concentration, 1 hour) — 20-ft cube of webs, DC 12 Dex save or Restrained, DC 12 Strength to break free. Recharges 1d6+1 charges each day. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4807,6 +5044,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "500 gp",
     "flavorText": "A pleated silk fan.",
+    "description": "5 charges. Expend 1: Gust of Wind until end of next turn. Expend 3: wind wall 50 ft. long, 15 ft. high. Recharges 1d4 charges each day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 78,
@@ -4822,6 +5060,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "1500 gp",
     "flavorText": "An iron brooch that absorbs Magic Missile spells.",
+    "description": "Immune to Magic Missile. Absorbs up to 101 total damage from Magic Missiles before becoming nonmagical (track cumulative absorption). Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4840,6 +5079,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "750 gp",
     "flavorText": "A fist-sized sphere of glass containing a mote of light.",
+    "description": "Command word: globe sheds bright light 20-ft, dim 20-ft. Second command: cast Light or Daylight centered on globe (Daylight once per day). Floats 5 ft. from attuned user. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4856,6 +5096,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1500 gp",
     "flavorText": "A six-inch wooden block that unfolds into a vessel on command.",
+    "description": "Three forms: Block, Rowboat (10×4 ft., holds 4), or Sailing Vessel (24×8 ft., holds 15). Contents ejected on folding.",
     "legacySource": {
       "tier": "uncommon",
       "index": 81,
@@ -4871,6 +5112,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "600 gp",
     "flavorText": "A finely made saddle that holds a rider firmly.",
+    "description": "Cannot be dismounted while conscious. DC 10 Strength save to stay mounted when effects would unseat you.",
     "legacySource": {
       "tier": "uncommon",
       "index": 82,
@@ -4887,6 +5129,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "2000 gp",
     "flavorText": "A living oak staff wreathed in carved leaves.",
+    "description": "6 charges. Spells: Animal Friendship (1), Barkskin (2), Locate Animals/Plants (2), Speak with Animals (1), Speak with Plants (3), Wall of Thorns (6). Recharges 1d3+1 charges each day. Requires attunement by a druid.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -4906,6 +5149,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2000 gp",
     "flavorText": "Brown leather boots with a spring in the sole.",
+    "description": "Walking speed is 30 ft. regardless of armor or encumbrance. Long jump up to 30 ft. (running) / 15 ft. (standing). High jump up to 15 ft. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -4924,6 +5168,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "2000 gp",
     "flavorText": "A circle of black cloth 6 ft. across. Placed on a surface it becomes a 10-ft-deep hole.",
+    "description": "Extradimensional space 6 ft. across, 10 ft. deep. Air lasts 10 minutes for one Medium creature. Placing inside a Bag of Holding causes a rift to the Astral Plane, destroying both.",
     "legacySource": {
       "tier": "uncommon",
       "index": 85,
@@ -4940,6 +5185,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "150 gp",
     "flavorText": "A sealed scroll containing a single 1st-level spell.",
+    "description": "Single use. DC 10 Arcana check if class can't normally cast it. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -4966,6 +5212,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "250 gp",
     "flavorText": "A parchment bearing a 2nd-level spell.",
+    "description": "Single use. DC 12 Arcana check if class can't normally cast it. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -4991,6 +5238,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1800 gp",
     "flavorText": "A ceramic jug with a stoppered mouth and strange gurgling interior. When you speak a command word and name a liquid, the jug produces it on demand.",
+    "description": "Produces one of many liquids per day: acid (8 oz), basic poison (1/2 oz), beer (4 gallons), honey (1 gallon), mayonnaise (2 gallons), oil (1 quart), vinegar (2 gallons), water (8 gallons), wine (1 gallon). Each liquid takes 1 minute to flow.",
     "legacySource": {
       "tier": "uncommon",
       "index": 88,
@@ -5009,6 +5257,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "500 gp",
     "flavorText": "A suit of armor that magically repels tarnish and rust, staying perfectly polished.",
+    "description": "AC 13 + Dex modifier (max 2) as a chain shirt, though this enchantment can be applied to any armor (use that armor's normal AC). The armor never gets dirty. Cleaning it requires no effort. Useful for social encounters.",
     "armor": {
       "armorType": "medium",
       "baseAC": 13,
@@ -5029,6 +5278,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A tiny, tasteless, slightly translucent bead.",
+    "description": "Swallow it: you receive as much nourishment as if you'd eaten a hearty meal. Single use. Often found in clusters of 1d4+1.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -5054,6 +5304,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.5,
     "flavorText": "A tiny blue bead, slightly moist to the touch.",
+    "description": "Swallow it: you receive as much hydration as if you'd drunk a full pint of water. Single use.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -5079,6 +5330,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1500 gp",
     "flavorText": "Shaggy fur-lined boots that retain warmth in any conditions.",
+    "description": "Resistance to cold damage. Comfortable to -50°F with no special clothing. Walk across ice without movement penalties. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5096,6 +5348,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "flavorText": "A dark blue candle that burns with a cold, greenish light.",
+    "description": "Burns for 1 hour. Light is bright in a 5-ft radius, dim in 10 ft. The flame is not extinguished by wind or water — it can even burn while fully submerged.",
     "legacySource": {
       "tier": "uncommon",
       "index": 93,
@@ -5112,6 +5365,7 @@ const canonicalItems = [
     "weight": 24,
     "value": "500 gp",
     "flavorText": "Light or medium armor with buckles and releases designed for fast removal.",
+    "description": "AC 13 + Dex modifier (max 2) as studded leather. You can doff this armor as a bonus action instead of the normal 5 minutes. Useful in situations where armor becomes a liability.",
     "armor": {
       "armorType": "medium",
       "baseAC": 13,
@@ -5131,6 +5385,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1,
     "flavorText": "A die that, on command, always shows the face you want.",
+    "description": "While holding this six-sided die and speaking its command word, you can have it show any number. Once it leaves your hand, it behaves normally.",
     "legacySource": {
       "tier": "uncommon",
       "index": 95,
@@ -5145,6 +5400,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.65,
     "flavorText": "A deep blue velvet cloak with silver clasps.",
+    "description": "As a bonus action, cause the cloak to billow dramatically. Pure cosmetic effect — it billows in any direction you choose, even with no wind. Useful for intimidation or theatrics.",
     "legacySource": {
       "tier": "uncommon",
       "index": 96,
@@ -5161,6 +5417,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "flavorText": "A nondescript grey cloak that transforms its appearance.",
+    "description": "As a bonus action, alter the cloak's apparent style, color, and cut. It cannot duplicate specific garments or materials, but it can appear as any ordinary cloak, robe, or cape.",
     "legacySource": {
       "tier": "uncommon",
       "index": 97,
@@ -5177,6 +5434,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.85,
     "flavorText": "A brass amulet containing a tiny clockwork mechanism that ticks steadily.",
+    "description": "When you make an attack roll, you can forgo rolling and treat the d20 result as a 10 (before adding modifiers). Once per day.",
     "legacySource": {
       "tier": "uncommon",
       "index": 98,
@@ -5193,6 +5451,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.95,
     "flavorText": "Comfortable, ordinary-looking garments.",
+    "description": "Torn, cut, or burnt portions of the garment repair themselves within 1 hour. The clothes always look clean and well-pressed. Will not repair damage that was not done to the garment itself.",
     "legacySource": {
       "tier": "uncommon",
       "index": 99,
@@ -5209,6 +5468,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.75,
     "flavorText": "A jagged piece of obsidian on a silver chain that seems to pull light into it.",
+    "description": "Requires attunement by a warlock. You can use this as a spellcasting focus. When you fail a Constitution save to maintain concentration, you can reroll — take the new result. Once per day.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5226,6 +5486,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.9,
     "flavorText": "A polished wooden ear horn with silver fittings.",
+    "description": "While holding this to your ear: you can make out whispered conversations up to 30 ft. away that you normally wouldn't hear. Advantage on Wisdom (Perception) checks involving hearing.",
     "legacySource": {
       "tier": "uncommon",
       "index": 102,
@@ -5242,6 +5503,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.25,
     "flavorText": "A leather-bound tome reinforced against magical damage.",
+    "description": "A wizard's spellbook that is immune to fire and water damage. Also immune to the disintegrate spell (and similar spell-based destruction effects).",
     "legacySource": {
       "tier": "uncommon",
       "index": 103,
@@ -5258,6 +5520,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A glass eye that fits a missing eye socket perfectly.",
+    "description": "Requires attunement. While wearing: the eye functions as a normal eye in all respects. Provides darkvision 60 ft. if you did not already have it. Cannot be removed while attuned.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5276,6 +5539,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "1000 gp",
     "flavorText": "A brass bottle stoppered with a lead cap. Smoke leaks from the seams.",
+    "description": "Open the cap: smoke billows out, filling a 60-ft radius in 1 round, expanding 10 ft. per round after. Smoke heavily obscures. Removing the bottle from the area or stoppered again collapses smoke in 10 minutes.",
     "legacySource": {
       "tier": "uncommon",
       "index": 105,
@@ -5291,6 +5555,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1500 gp",
     "flavorText": "A pair of crystal lenses with a faint pink tint.",
+    "description": "3 charges. Expend 1: cast Charm Person (DC 13, target must be able to see you). Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5308,6 +5573,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.5,
     "flavorText": "Tight black leather gloves, almost invisible in dim light.",
+    "description": "+5 to Dexterity (Sleight of Hand) checks. +5 to Dexterity checks made to pick locks. The gloves are invisible while worn.",
     "legacySource": {
       "tier": "uncommon",
       "index": 107,
@@ -5324,6 +5590,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.3,
     "flavorText": "Brass-rimmed goggles with smoky purple lenses.",
+    "description": "Requires attunement. While wearing: you can cast Identify as a ritual without components (no spell slot required). The goggles reveal the history and purpose of an object when examined for 1 minute.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5342,6 +5609,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "1500 gp",
     "flavorText": "A beautifully crafted lute with inlaid silver filigree.",
+    "description": "Requires attunement by a bard. Cast one of the following at will (1 charge each): Fly, Invisibility, Levitate, Protection from Evil and Good, Animal Friendship (DC 15), Protection from Poison (DC 15), Speak with Animals (DC 15). 4 charges. Recharges 1d4 charges each day.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5359,6 +5627,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "500 gp",
     "flavorText": "A small clay pot containing a sweet-smelling amber unguent.",
+    "description": "Pot holds 1d4+1 applications. One application: restore 2d8+2 HP, cease being poisoned, cure one disease. Requires 1 action to apply to self or another.",
     "consumable": {
       "consumableCategory": "topical",
       "effects": [
@@ -5384,6 +5653,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.9,
     "flavorText": "A silver key on a ring, without any obvious matching lock.",
+    "description": "The key has a 5% chance of opening any lock it is inserted into (roll a d20; on 20, it opens). It cannot open the same lock twice.",
     "legacySource": {
       "tier": "uncommon",
       "index": 111,
@@ -5400,6 +5670,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.15,
     "flavorText": "A fist-sized crystal orb with a floating compass needle inside.",
+    "description": "Point the orb: the needle points toward magnetic north. While outdoors, the orb also tells you what time of day it is (within 1 hour).",
     "legacySource": {
       "tier": "uncommon",
       "index": 112,
@@ -5414,6 +5685,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A crystal orb with a tiny sundial inside that moves on its own.",
+    "description": "While holding the orb: you can tell within 1 hour how long until dawn or dusk (whichever is sooner). Also tells you how many days, months, and years have passed since a date you specify.",
     "legacySource": {
       "tier": "uncommon",
       "index": 113,
@@ -5429,6 +5701,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "flavorText": "A small crystal vial of dark pink perfume.",
+    "description": "Apply to yourself. For 1 hour: humanoids within 30 ft. that can smell it treat you as an acquaintance of average standing (not hostile). This overrides indifferent attitudes only — already hostile creatures get a DC 13 Wisdom save. Single application.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -5453,6 +5726,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.15,
     "flavorText": "A carved meerschaum pipe with a silver mouthpiece.",
+    "description": "While smoking: you can exhale smoke in the shape of any creature you've seen. The smoke shape lasts 1 minute, can move at 20 ft. per round, and appears real — but has no substance. Particularly useful for deception.",
     "legacySource": {
       "tier": "uncommon",
       "index": 115,
@@ -5467,6 +5741,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A 10-foot pole that collapses to 1 foot with a command word.",
+    "description": "Command word extends it from 1 to 10 feet. Second command word collapses it. Useful for prodding things safely, testing floor stability, or bridging gaps.",
     "legacySource": {
       "tier": "uncommon",
       "index": 116,
@@ -5481,6 +5756,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1,
     "flavorText": "A ceramic planting pot painted with druidic symbols.",
+    "description": "Plant a shrub in this pot and tend it for 30 days. After 30 days the shrub becomes an Awakened Shrub (see MM). The shrub is friendly and follows your commands. Once used, the pot loses its magic.",
     "legacySource": {
       "tier": "uncommon",
       "index": 117,
@@ -5496,6 +5772,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "flavorText": "A small sealed iron flask that rattles faintly when shaken.",
+    "description": "Open it underwater: releases a blast of pressurized air creating a 10-ft sphere of air for 1 minute, allowing normal breathing. Can also be used to propel a small object 30 ft. underwater. Single use.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -5520,6 +5797,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A finely crafted magical prosthetic — arm, hand, leg, or foot.",
+    "description": "Functions as the missing limb in all respects. Cannot be removed against your will while attuned. Made of wood, stone, or metal depending on the version.",
     "legacySource": {
       "tier": "uncommon",
       "index": 119,
@@ -5534,6 +5812,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1,
     "flavorText": "A 50-ft length of silk rope.",
+    "description": "Cut into pieces: they automatically reattach and rejoin when the ends are pressed together. Takes 1 minute for pieces to reconnect fully. Destroyed pieces regenerate over 24 hours.",
     "legacySource": {
       "tier": "uncommon",
       "index": 120,
@@ -5551,6 +5830,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "1000 gp",
     "flavorText": "A carefully polished ruby with a faint internal glow.",
+    "description": "Requires attunement by a spellcaster. Affix to a weapon: that weapon functions as a spellcasting focus while you hold it. +1 to spell attack rolls made using that weapon as a focus.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5568,6 +5848,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "2000 gp",
     "flavorText": "A round shield with a painted eye on its face.",
+    "description": "+2 AC (standard shield). Advantage on initiative rolls. Advantage on Perception checks. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -5589,6 +5870,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8.5,
     "flavorText": "A round shield with a blank face that shifts to mirror your emotions.",
+    "description": "+2 AC. As a bonus action: change the expression on the shield's face (happy, sad, angry, frightened, etc.). Purely cosmetic — but useful for communication and intimidation at range.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -5609,6 +5891,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "500 gp",
     "flavorText": "Bladed metal boots enchanted for ice travel.",
+    "description": "While wearing on ice: movement speed increases by 10 ft. and you can move across ice without any chance of falling. You can also skate on water that has been frozen by any magical effect.",
     "legacySource": {
       "tier": "uncommon",
       "index": 124,
@@ -5625,6 +5908,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "500 gp",
     "flavorText": "Dark plate mail that occasionally vents smoke from the joints.",
+    "description": "AC 16 (standard chain mail AC). When a creature within 5 ft. hits you: it takes 1 fire damage. Smoke vents from the armor as a purely cosmetic effect. No Stealth disadvantage.",
     "armor": {
       "armorType": "medium",
       "baseAC": 16,
@@ -5646,6 +5930,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6.5,
     "flavorText": "A wooden staff carved with miniature naturalistic scenes.",
+    "description": "Up to three small objects can magically float around the tip of the staff while you hold it — rotating slowly, never falling. Can hold objects up to 1 lb. each. Remove or add objects as an action.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -5664,6 +5949,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "flavorText": "A gnarled wooden staff carved with bird imagery.",
+    "description": "10 charges. Expend 1: imitate the sound of any bird you have heard. The sound travels up to 60 ft. Recharges 1d6+4 charges each day. If all charges spent: roll d20 — on 1, staff becomes a mundane quarterstaff.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -5682,6 +5968,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A slender staff carved from living wood, always green.",
+    "description": "10 charges. Expend 1: cause a flower to bloom from a point within 5 ft. Expend 1: summon a fragrant hedge of flowers (3-ft tall, 10 ft. long). Recharges 1d6+4 charges each day.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -5699,6 +5986,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.2,
     "flavorText": "A plain clay tankard that feels slightly warm.",
+    "description": "Any alcoholic beverage poured into it tastes exactly as it should — but produces no intoxicating effect. You can drink freely from it without risk of drunkenness.",
     "legacySource": {
       "tier": "uncommon",
       "index": 129,
@@ -5713,6 +6001,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.9,
     "flavorText": "A black walnut cane topped with a carved fist.",
+    "description": "As a bonus action, speak the command word: the cane becomes a longsword (1d8 slashing, versatile 1d10). Speak again or sheathe it to return it to cane form. Counts as magical.",
     "legacySource": {
       "tier": "uncommon",
       "index": 130,
@@ -5727,6 +6016,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1,
     "flavorText": "A thin black wand with a white tip.",
+    "description": "3 charges. Expend 1: a phantom orchestra plays a tune of your choice for 1 minute, audible within 60 ft. Recharges 1d3 charges each day. If all charges spent: roll d20 — on 1, wand emits a sad trombone noise and becomes mundane.",
     "legacySource": {
       "tier": "uncommon",
       "index": 132,
@@ -5741,6 +6031,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.9,
     "flavorText": "A wand ending in a small charred tip, smelling faintly of sulfur.",
+    "description": "7 charges. Expend 1: shoot a harmless shower of colored sparks (Prestidigitation effect). Recharges 1d6+1 charges each day. Can ignite flammable objects. Fireworks travel up to 60 ft. and produce a small bang audible within 300 ft.",
     "legacySource": {
       "tier": "uncommon",
       "index": 133,
@@ -5755,6 +6046,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1,
     "flavorText": "A twisted iron wand with a scowling face at the tip.",
+    "description": "3 charges. Expend 1: target creature within 30 ft. must succeed on a DC 12 Charisma save or have its face locked in a scowl for 1 hour. Purely cosmetic — imposes no mechanical penalty but may affect social encounters at GM discretion.",
     "legacySource": {
       "tier": "uncommon",
       "index": 134,
@@ -5769,6 +6061,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.55,
     "flavorText": "A thin willow wand with a smiling face at the tip.",
+    "description": "3 charges. Expend 1: target creature within 30 ft. must succeed on a DC 12 Charisma save or smile uncontrollably for 1 minute. Purely cosmetic — imposes no mechanical penalty.",
     "legacySource": {
       "tier": "uncommon",
       "index": 135,
@@ -5783,6 +6076,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A permanent magical tattoo in swirling dark colors that seems to drink in light.",
+    "description": "Requires attunement. Once per day: as a reaction when you take a specific damage type (chosen at creation), halve the damage. Resistance to that damage type. Common types: acid, cold, fire, force, lightning, necrotic, poison, psychic, radiant, thunder.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5799,6 +6093,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 33,
     "flavorText": "A tattoo of interlocking geometric lines covering one arm.",
+    "description": "AC 15 while not wearing armor. Requires attunement. If you wear armor, the tattoo provides no benefit (does not stack). Acts as the Mage Armor spell at a fixed value.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -5820,6 +6115,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "1500 gp",
     "flavorText": "A small crystal vial that fills with your blood when you put it to your skin.",
+    "description": "Requires attunement by a sorcerer. +1 bonus to spell attack rolls and spell save DC. When you expend Sorcery Points: regain 5 HP per point spent. Once per day.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5836,6 +6132,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "2000 gp",
     "flavorText": "A small iron cauldron that always smells of herbs and smoke.",
+    "description": "Requires attunement by a druid or warlock. Once per 7 days: place a dead creature in the cauldron with 200 gp of diamonds. After 1 hour, the creature is restored to life as per the True Resurrection spell. The diamonds dissolve.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5851,6 +6148,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.35,
     "flavorText": "A tattoo of a serpentine vine that circles your arm.",
+    "description": "Requires attunement. 3 charges. Expend 1: one arm extends 15 ft. (Bigby's Hand grapple attempt, Strength +8). If grappled target fails DC 15 Strength save: restrained. Recharges 1d3 charges each day.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5866,6 +6164,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.45,
     "flavorText": "A tattoo of clawlike shapes covering your hand and forearm.",
+    "description": "Requires attunement. Your unarmed strikes count as magical. +1 to attack and damage with unarmed strikes. Once per day: cast Chill Touch (no slot) using Constitution as your spellcasting ability.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5881,6 +6180,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.7,
     "flavorText": "A ghostly, pale-blue tattoo of footsteps that seem to be walking in mid-air.",
+    "description": "Requires attunement. 3 charges. Expend 1 as a bonus action: become incorporeal until end of turn (move through objects and creatures; 1d10 force damage if end turn inside object). Recharges 1d3 charges each day.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5896,6 +6196,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.5,
     "flavorText": "A tattoo of tiny, shifting letters and symbols.",
+    "description": "Requires attunement. As an action: touch a surface and leave writing on it (lasts until you dismiss it). You can also copy any text you read by touching it (copying happens automatically). Magically encrypted texts can also be read.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5911,6 +6212,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A tattoo of a shifting mask motif.",
+    "description": "Requires attunement. As a bonus action: the tattoo changes to any tattoo you have ever seen. The magical tattoo blends seamlessly with your natural skin. Also grants advantage on Deception checks made to disguise your appearance.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5928,6 +6230,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "2000 gp",
     "flavorText": "A silver full-face mask shaped like a peregrine falcon in mid-dive.",
+    "description": "+1 AC. Requires attunement. While wearing: Darkvision 60 ft. Advantage on Perception checks involving sight. When you take the Dash action, you can Disengage as a bonus action.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -5949,6 +6252,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2000 gp",
     "flavorText": "A handheld drum painted with swirling patterns.",
+    "description": "Requires attunement by a bard. +1 to spell attack rolls and spell save DC. Can be used as a spellcasting focus. While playing: allies within 30 ft. who can hear you gain +1 to their attack rolls (does not stack with Bless).",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5964,6 +6268,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A deck of illustrated fortune-telling cards with silver-gilt edges.",
+    "description": "Requires attunement. Draw a card: receive an Augury result (weal, woe, weal and woe, or nothing) related to a specific course of action within the next hour. Once per day. Also can cast Speak with Dead once per day (no components).",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -5981,6 +6286,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1500 gp",
     "flavorText": "A luminous indigo potion that sparkles even in darkness.",
+    "description": "Drink before casting a spell: all damage dice for that spell deal their maximum value (no rolling). Duration: applies to the next spell cast within 1 minute of drinking. Single use.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -6007,6 +6313,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "500 gp",
     "flavorText": "A tightly rolled scroll inscribed with a complex 3rd-level spell sigil.",
+    "description": "Single use. DC 13 Arcana check if not on your class spell list. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -6033,6 +6340,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "1000 gp",
     "flavorText": "A densely inscribed vellum scroll bearing a 4th-level spell.",
+    "description": "Single use. DC 14 Arcana check if not on your class spell list. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -6059,6 +6367,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "2000 gp",
     "flavorText": "A longsword hammered from iron pulled from the plane of Acheron. The metal rings faintly even when not struck.",
+    "description": "+1 attack and damage. Once per day: enter a rage-like state for 1 minute — advantage on Strength checks and saves, +2 damage with melee attacks. Can't cast spells while raging. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -6087,6 +6396,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "flavorText": "A small chunk of stone from the ruins of a gnomish inventor's workshop. It hums at 60 cycles.",
+    "description": "While holding: you have advantage on Intelligence (History) checks related to gnomish inventions and Tinker lore. Once per day: cast Identify without components.",
     "legacySource": {
       "tier": "uncommon",
       "index": 152,
@@ -6103,6 +6413,7 @@ const canonicalItems = [
     "weight": 33,
     "value": "1500 gp",
     "flavorText": "A dark leather coat with sewn-in iron studs and a high collar.",
+    "description": "AC 12 + Dex modifier. Requires attunement. While wearing: advantage on Wisdom (Survival) checks made to track creatures. You always know the direction of the last creature that dealt you damage within the past hour.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -6125,6 +6436,7 @@ const canonicalItems = [
     "weight": 0.7,
     "value": "250 gp",
     "flavorText": "A clear liquid with floating silver threads that form letters.",
+    "description": "Drink it: gain the effect of Comprehend Languages for 1 hour. You can read any language, understand any spoken language, and interpret any written sigil.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -6151,6 +6463,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "2000 gp",
     "flavorText": "A silvery-blue liquid that sloshes with mathematical precision.",
+    "description": "Drink it: gain 2 Fragments of Possibility — each can replace one d20 roll (yours or a roll you can see) with a 15. Fragments last 24 hours. From Wildemount; replaces the Portent feature for non-diviners.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -6177,6 +6490,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "2000 gp",
     "flavorText": "A visored iron helmet engraved with a rising sun.",
+    "description": "+1 AC. Requires attunement. Once per day: when you roll for hit points from a Hit Die, reroll any 1s. When you successfully stabilize a dying creature, you gain 1d6 temporary HP.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -6198,6 +6512,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2000 gp",
     "flavorText": "A sealed glass bottle containing a swirling mist.",
+    "description": "Once per day: absorb a spell targeting only you (up to 4th level) into the bottle. The spell has no effect on you. Within 24 hours, you can uncork the bottle to release the spell, targeting a creature within 30 ft. using the original caster's DC and attack bonus.",
     "legacySource": {
       "tier": "uncommon",
       "index": 157,
@@ -6214,6 +6529,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "1200 gp",
     "flavorText": "A shortsword etched with battle tallies on the flat of the blade.",
+    "description": "+1 attack and damage. Finesse, light. Once per long rest: after hitting with this weapon, add 2d6 psychic damage — the strike triggers a flash of battle memory in the target (DC 13 Wisdom or Frightened until end of their next turn).",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "slashing",
@@ -6252,6 +6568,7 @@ const canonicalItems = [
     "weight": 22,
     "value": "400 gp",
     "flavorText": "Full plate forged from steel, fitted to cover the torso, shoulders, and hips.",
+    "description": "AC 17. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. Superior tempering resists rust and chipping far better than plain iron.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 17,
@@ -6274,6 +6591,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "45 gp",
     "flavorText": "A full-face steel helm matched to a plate armor set.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6295,6 +6613,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "45 gp",
     "flavorText": "Articulated steel gauntlets, hinged at the knuckles for a full grip.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6316,6 +6635,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "45 gp",
     "flavorText": "Steel greaves covering the thighs and shins, buckled at the sides.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6337,6 +6657,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "45 gp",
     "flavorText": "Reinforced steel sabatons with articulated toe plates.",
+    "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6358,6 +6679,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "30 gp",
     "flavorText": "A kite shield of solid steel, sized to match a full plate ensemble.",
+    "description": "+2 AC.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -6379,6 +6701,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "650 gp",
     "flavorText": "Full plate forged from silver, fitted to cover the torso, shoulders, and hips.",
+    "description": "AC 17. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. Prized as much for its ceremonial shine as its protection. Counts as silvered for any effect that cares.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 17,
@@ -6401,6 +6724,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "70 gp",
     "flavorText": "A full-face silver helm matched to a plate armor set.",
+    "description": "+1 bonus to AC. Counts as silvered.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6422,6 +6746,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "70 gp",
     "flavorText": "Articulated silver gauntlets, hinged at the knuckles for a full grip.",
+    "description": "+1 bonus to AC. Counts as silvered.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6443,6 +6768,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "70 gp",
     "flavorText": "Silver greaves covering the thighs and shins, buckled at the sides.",
+    "description": "+1 bonus to AC. Counts as silvered.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6464,6 +6790,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "70 gp",
     "flavorText": "Reinforced silver sabatons with articulated toe plates.",
+    "description": "+1 bonus to AC. Counts as silvered.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -6485,6 +6812,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "55 gp",
     "flavorText": "A kite shield of solid silver, sized to match a full plate ensemble.",
+    "description": "+2 AC.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -6506,6 +6834,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "60 gp",
     "flavorText": "A steel a short, balanced blade suited to quick strikes.",
+    "description": "Finesse, light. +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -6538,6 +6867,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "60 gp",
     "flavorText": "A steel a straight double-edged blade about a yard long.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -6570,6 +6900,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "60 gp",
     "flavorText": "A steel a short double-edged blade with a simple crossguard.",
+    "description": "Finesse, light, thrown (range 20/60). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -6602,6 +6933,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "60 gp",
     "flavorText": "A steel a flanged metal head on a sturdy haft.",
+    "description": "Bludgeoning. +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -6631,6 +6963,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "60 gp",
     "flavorText": "A steel a broad single-bladed axe head on a long haft.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -6663,6 +6996,7 @@ const canonicalItems = [
     "weight": 40,
     "value": "60 gp",
     "flavorText": "A steel a heavy square hammerhead built for crushing blows.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning",
@@ -6696,6 +7030,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "60 gp",
     "flavorText": "A steel a long haft tipped with a leaf-shaped point.",
+    "description": "Thrown (range 20/60), versatile (1d8). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -6729,6 +7064,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "90 gp",
     "flavorText": "A silver a short, balanced blade suited to quick strikes.",
+    "description": "Finesse, light. +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -6767,6 +7103,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "90 gp",
     "flavorText": "A silver a flanged metal head on a sturdy haft.",
+    "description": "Bludgeoning. +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -6802,6 +7139,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "90 gp",
     "flavorText": "A silver a broad single-bladed axe head on a long haft.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -6840,6 +7178,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "90 gp",
     "flavorText": "A silver a heavy square hammerhead built for crushing blows.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning",
@@ -6879,6 +7218,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "90 gp",
     "flavorText": "A silver a long haft tipped with a leaf-shaped point.",
+    "description": "Thrown (range 20/60), versatile (1d8). +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -6918,6 +7258,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "40 gp",
     "flavorText": "A red-tailed hawk trained to hunt and return to the wrist.",
+    "description": "Can scout an area from above; grants advantage on the next Survival check to navigate or track within the scouted area.",
     "companion": {
       "companionType": "pet"
     },
@@ -6945,6 +7286,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "45 gp",
     "flavorText": "A small owl with silent flight and unblinking focus.",
+    "description": "Advantage on Wisdom (Perception) checks made at night or in dim light while the owl is perched nearby.",
     "companion": {
       "companionType": "pet"
     },
@@ -6972,6 +7314,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "35 gp",
     "flavorText": "A clever red fox raised from a kit, loyal but never quite tame.",
+    "description": "Advantage on Dexterity (Stealth) checks made while moving through natural terrain (forest, brush, tall grass).",
     "companion": {
       "companionType": "pet"
     },
@@ -6999,6 +7342,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "50 gp",
     "flavorText": "A house-cat-sized frog by frog standards — thankfully harmless and mild-mannered.",
+    "description": "Its powerful legs can help haul a stuck cart or push open a heavy door — advantage on Strength checks to move heavy objects when it assists.",
     "companion": {
       "companionType": "pet"
     },
@@ -7026,6 +7370,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "40 gp",
     "flavorText": "A calm snake that wraps around an arm or shoulder and stays put.",
+    "description": "Advantage on Intimidation checks — most people are unnerved by a large snake, regardless of temperament.",
     "companion": {
       "companionType": "pet"
     },
@@ -7053,6 +7398,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "30 gp",
     "flavorText": "A stout, short-tempered badger that digs first and asks questions never.",
+    "description": "Can dig a usable tunnel or foxhole (5-ft cube of loose earth) in about 10 minutes.",
     "companion": {
       "companionType": "pet"
     },
@@ -7080,6 +7426,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "60 gp",
     "flavorText": "A raven that has picked up a vocabulary of about a dozen words and uses them with unsettling intent.",
+    "description": "Can deliver a short (10-word) verbal message to a specified recipient it can find.",
     "companion": {
       "companionType": "pet"
     },
@@ -7107,6 +7454,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "25 gp",
     "flavorText": "A beetle the size of a dog with glowing glands above its eyes.",
+    "description": "Sheds bright light in a 10-ft radius and dim light for 10 ft. more, hands-free, indefinitely.",
     "companion": {
       "companionType": "pet"
     },
@@ -7134,6 +7482,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "45 gp",
     "flavorText": "A large, steady mastiff trained to hold a position and warn of intruders.",
+    "description": "While it stands watch, advantage on the group's passive Perception against being surprised during a rest.",
     "companion": {
       "companionType": "pet"
     },
@@ -7161,6 +7510,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "55 gp",
     "flavorText": "A dinner-table-sized crab with an even temperament, so long as it isn't cornered.",
+    "description": "Can carry up to 300 lbs. across shallow water or wet sand without slowing.",
     "companion": {
       "companionType": "pet"
     },
@@ -7188,6 +7538,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "30 gp",
     "flavorText": "A bald, patient vulture that circles high and reports what it sees by landing nearby.",
+    "description": "Can identify the presence of nearby corpses, carrion, or recent death within a mile from the air.",
     "companion": {
       "companionType": "pet"
     },
@@ -7215,6 +7566,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "35 gp",
     "flavorText": "A playful river otter that's more useful than it looks.",
+    "description": "Swim speed 30 ft. and can retrieve small sunken or submerged items on command.",
     "companion": {
       "companionType": "pet",
       "swimSpeed": 30
@@ -7243,6 +7595,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "40 gp",
     "flavorText": "A leg-heavy centipede kept docile by a specially fitted muzzle over its venom glands.",
+    "description": "Advantage on checks to squeeze through narrow gaps or navigate rubble it can burrow through first.",
     "companion": {
       "companionType": "pet"
     },
@@ -7270,6 +7623,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "400 gp",
     "flavorText": "A trained war charger, unbothered by the noise and chaos of combat.",
+    "description": "Speed 60 ft. Trained for combat: doesn't need a check to remain steady near battle. Rider gains +1 to attack rolls made while mounted on this horse (its footing and training make your strikes surer).",
     "companion": {
       "companionType": "mount",
       "ac": 11,
@@ -7305,6 +7659,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "60 gp",
     "flavorText": "A tall, ill-tempered but extremely hardy desert camel.",
+    "description": "Speed 50 ft. Can go up to 4 days without water. Rider has advantage on Constitution saves against extreme heat while mounted.",
     "companion": {
       "companionType": "mount",
       "ac": 10,
@@ -7334,6 +7689,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "350 gp",
     "flavorText": "A broad-antlered elk, calm enough to bear a rider despite its size.",
+    "description": "Speed 60 ft. Rider gains advantage on Survival checks to navigate forests or tundra while mounted.",
     "companion": {
       "companionType": "mount",
       "ac": 11,
@@ -7363,6 +7719,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "500 gp",
     "flavorText": "A goat the size of a small horse, bred in mountain holds for exactly this purpose.",
+    "description": "Speed 40 ft. Climb speed 40 ft. Never needs a check to climb even sheer, difficult surfaces at full speed.",
     "companion": {
       "companionType": "mount",
       "ac": 11,
@@ -7393,6 +7750,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "10 gp",
     "flavorText": "A rolled parchment sealed in wax bearing an unmistakable royal crest. Whatever it orders, it orders with authority.",
+    "description": "An official decree from a ruling authority. GM determines its contents and how much weight it carries with whoever reads it.",
     "tool": {
       "toolCategory": "spell-formula"
     },
@@ -7413,6 +7771,7 @@ const canonicalItems = [
     "weight": 0.4,
     "value": "25 gp",
     "flavorText": "A hand-drawn map, edges burnt, marking an X in a location that may or may not still be accurate.",
+    "description": "Marks the location of a specific cache of treasure. GM determines what's actually there — and whether anyone's beaten you to it.",
     "tool": {
       "toolCategory": "treasure-map"
     },
@@ -7433,6 +7792,7 @@ const canonicalItems = [
     "weight": 9,
     "value": "200 gp",
     "flavorText": "A bar of tarnished silver, stamped with a mint mark no one currently alive recognizes.",
+    "description": "Pure currency, denser and more valuable than coin. No mechanical effect.",
     "tool": {
       "toolCategory": "bar"
     },
@@ -7450,6 +7810,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "150 gp",
     "flavorText": "A delicate gold necklace, old-fashioned in its craftsmanship but not in its shine.",
+    "description": "A piece of jewelry with real resale value. No mechanical effect — this one's just for the coin.",
     "tool": {
       "toolCategory": "necklace"
     },
@@ -7466,6 +7827,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.2,
     "flavorText": "A small silver medallion stamped with a sigil — a mark of standing within some organization, current or defunct.",
+    "description": "Identifies the bearer as a member (or impostor) of the Silver Order. GM determines what doors — literal or otherwise — this opens.",
     "tool": {
       "toolCategory": "sigil"
     },
@@ -7486,6 +7848,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.05,
     "flavorText": "A folded letter of passage, sealed with a noble house's wax stamp, granting the bearer safe travel through their lands.",
+    "description": "Grants safe passage through territory controlled by the issuing house, so long as the seal is intact and unquestioned.",
     "tool": {
       "toolCategory": "pass"
     },
@@ -7506,6 +7869,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "flavorText": "A flat river stone carved with a single rune, clearly meant to slot into something else entirely.",
+    "description": "One piece of a larger mechanism or puzzle. GM determines what it fits and what happens when it does.",
     "tool": {
       "toolCategory": "rune"
     },
@@ -7526,6 +7890,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "40 gp",
     "flavorText": "A leather roll of surgical implements — scalpels, clamps, needle and gut — kept meticulously clean.",
+    "description": "Proficiency with this kit grants advantage on checks made to perform surgery, stabilize a dying creature, or treat a serious wound beyond what a basic healer's kit can manage.",
     "legacySource": {
       "tier": "uncommon",
       "index": 209,
@@ -7543,6 +7908,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "60 gp",
     "flavorText": "A compact roll of fine lockpicks and tension wrenches, clearly the tools of someone who took this seriously.",
+    "description": "A superior set of thieves' tools. Grants a +2 bonus on checks made to pick locks or disarm mechanical traps, on top of normal tool proficiency.",
     "legacySource": {
       "tier": "uncommon",
       "index": 210,
@@ -7560,6 +7926,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "20 gp",
     "flavorText": "A boar's head, mounted and preserved, tusks still impressively sharp.",
+    "description": "A hunting trophy. No mechanical effect, but it makes a statement wherever it's hung.",
     "legacySource": {
       "tier": "uncommon",
       "index": 211,
@@ -7578,6 +7945,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "225 gp",
     "flavorText": "The edge of this battle staff never quite looks the same twice — always faintly touched by the void.",
+    "description": "+1 to attack and damage rolls. On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -7614,6 +7982,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "425 gp",
     "flavorText": "The edge of this hand crossbow never quite looks the same twice — always faintly touched by the tempest.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -7653,6 +8022,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "550 gp",
     "flavorText": "A battle-worn longbow said to have been carried through a war fought over the wild itself.",
+    "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -7686,6 +8056,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "475 gp",
     "flavorText": "A hand crossbow that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -7725,6 +8096,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "450 gp",
     "flavorText": "This spear feels heavier than it should, as if the tide itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -7775,6 +8147,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "725 gp",
     "flavorText": "A battle-worn kukri said to have been carried through a war fought over the wild itself.",
+    "description": "+1 to attack and damage rolls. Finesse. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -7808,6 +8181,7 @@ const canonicalItems = [
     "weight": 9,
     "value": "275 gp",
     "flavorText": "The edge of this trident never quite looks the same twice — always faintly touched by the gale.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -7848,6 +8222,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "550 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this trident carries gravity in its very grain.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -7888,6 +8263,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "200 gp",
     "flavorText": "A battle-worn longbow said to have been carried through a war fought over gravity itself.",
+    "description": "+1 to attack and damage rolls. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -7927,6 +8303,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "425 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this war pick carries the shadow in its very grain.",
+    "description": "+1 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -7963,6 +8340,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "725 gp",
     "flavorText": "This trident feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8003,6 +8381,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "400 gp",
     "flavorText": "This shortsword feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8036,6 +8415,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "525 gp",
     "flavorText": "A kukri that hums faintly with the tide, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8075,6 +8455,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "500 gp",
     "flavorText": "The edge of this heavy crossbow never quite looks the same twice — always faintly touched by the tempest.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -8125,6 +8506,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "425 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this shortbow carries the blood in its very grain.",
+    "description": "+1 to attack and damage rolls. On a hit, drain 1d4 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8164,6 +8546,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "775 gp",
     "flavorText": "The edge of this maul never quite looks the same twice — always faintly touched by the echo.",
+    "description": "+1 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -8203,6 +8586,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "550 gp",
     "flavorText": "A battle-worn longbow said to have been carried through a war fought over the gale itself.",
+    "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -8242,6 +8626,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "600 gp",
     "flavorText": "This heavy crossbow feels heavier than it should, as if the void itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -8292,6 +8677,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "225 gp",
     "flavorText": "This scimitar feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8331,6 +8717,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "550 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this sickle carries the wild in its very grain.",
+    "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8371,6 +8758,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "200 gp",
     "flavorText": "A battle-worn maul said to have been carried through a war fought over the dawn itself.",
+    "description": "+1 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 1d4 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -8410,6 +8798,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "325 gp",
     "flavorText": "A battle-worn heavy crossbow said to have been carried through a war fought over the gale itself.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -8450,6 +8839,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "575 gp",
     "flavorText": "The edge of this longsword never quite looks the same twice — always faintly touched by the deep frost.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -8499,6 +8889,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "750 gp",
     "flavorText": "This shortbow feels heavier than it should, as if gravity itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8538,6 +8929,7 @@ const canonicalItems = [
     "weight": 43,
     "value": "400 gp",
     "flavorText": "A battle-worn maul said to have been carried through a war fought over the gale itself.",
+    "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -8577,6 +8969,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "275 gp",
     "flavorText": "This whip feels heavier than it should, as if the tide itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8622,6 +9015,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "500 gp",
     "flavorText": "The edge of this kukri never quite looks the same twice — always faintly touched by the shadow.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8661,6 +9055,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "250 gp",
     "flavorText": "This scimitar feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8700,6 +9095,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "375 gp",
     "flavorText": "A dagger that hums faintly with the wild, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8743,6 +9139,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "725 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this shortbow carries the warding in its very grain.",
+    "description": "+1 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -8776,6 +9173,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "275 gp",
     "flavorText": "This dagger feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8815,6 +9213,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "375 gp",
     "flavorText": "A battleaxe that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -8864,6 +9263,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "600 gp",
     "flavorText": "The edge of this dagger never quite looks the same twice — always faintly touched by the tide.",
+    "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -8913,6 +9313,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "775 gp",
     "flavorText": "A war pick that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -8959,6 +9360,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "625 gp",
     "flavorText": "The edge of this trident never quite looks the same twice — always faintly touched by swiftness.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9003,6 +9405,7 @@ const canonicalItems = [
     "weight": 35,
     "value": "625 gp",
     "flavorText": "The edge of this greataxe never quite looks the same twice — always faintly touched by the decay.",
+    "description": "+1 to attack and damage rolls. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -9042,6 +9445,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "150 gp",
     "flavorText": "This mace feels heavier than it should, as if swiftness itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9072,6 +9476,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "150 gp",
     "flavorText": "This mace feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9118,6 +9523,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "225 gp",
     "flavorText": "This trident feels heavier than it should, as if the tempest itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9158,6 +9564,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "550 gp",
     "flavorText": "This glaive feels heavier than it should, as if the blood itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a hit, drain 1d4 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -9197,6 +9604,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "325 gp",
     "flavorText": "This shortsword feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9236,6 +9644,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "150 gp",
     "flavorText": "A trident that hums faintly with the blood, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, drain 1d4 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9286,6 +9695,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "150 gp",
     "flavorText": "This rapier feels heavier than it should, as if the whisper itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, a lance of psychic feedback adds an extra 1d4 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -9325,6 +9735,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "525 gp",
     "flavorText": "This rapier feels heavier than it should, as if the deep frost itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -9364,6 +9775,7 @@ const canonicalItems = [
     "weight": 28,
     "value": "725 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this greataxe carries the warding in its very grain.",
+    "description": "+1 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -9397,6 +9809,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "350 gp",
     "flavorText": "A battle-worn sickle said to have been carried through a war fought over the wild itself.",
+    "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -9427,6 +9840,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "375 gp",
     "flavorText": "A warhammer that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -9467,6 +9881,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "500 gp",
     "flavorText": "The edge of this wand blade never quite looks the same twice — always faintly touched by the wild.",
+    "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -9497,6 +9912,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "300 gp",
     "flavorText": "A battle-worn war pick said to have been carried through a war fought over the decay itself.",
+    "description": "+1 to attack and damage rolls. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -9533,6 +9949,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "450 gp",
     "flavorText": "A longbow that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -9572,6 +9989,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "625 gp",
     "flavorText": "A battle-worn mace said to have been carried through a war fought over the deep frost itself.",
+    "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9608,6 +10026,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "550 gp",
     "flavorText": "A battle staff that hums faintly with swiftness, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9638,6 +10057,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "425 gp",
     "flavorText": "This pike feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -9677,6 +10097,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "125 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this heavy crossbow carries the shadow in its very grain.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -9717,6 +10138,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "200 gp",
     "flavorText": "A battle-worn kukri said to have been carried through a war fought over gravity itself.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -9766,6 +10188,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "500 gp",
     "flavorText": "A battle-worn hand crossbow said to have been carried through a war fought over the void itself.",
+    "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9805,6 +10228,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "225 gp",
     "flavorText": "A whip that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Finesse. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -9844,6 +10268,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "750 gp",
     "flavorText": "This dagger feels heavier than it should, as if the whisper itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, a lance of psychic feedback adds an extra 1d4 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -9883,6 +10308,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "300 gp",
     "flavorText": "The edge of this shortsword never quite looks the same twice — always faintly touched by the tempest.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9922,6 +10348,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "300 gp",
     "flavorText": "A scimitar that hums faintly with the warding, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -9965,6 +10392,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "550 gp",
     "flavorText": "A mace that hums faintly with the shadow, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10001,6 +10429,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "775 gp",
     "flavorText": "The edge of this quarterstaff never quite looks the same twice — always faintly touched by the dawn.",
+    "description": "+1 to attack and damage rolls. Versatile (1d8+1). On a hit against an undead or fiend, deal an extra 1d4 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10040,6 +10469,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "325 gp",
     "flavorText": "The edge of this greataxe never quite looks the same twice — always faintly touched by the shadow.",
+    "description": "+1 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -10079,6 +10509,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "375 gp",
     "flavorText": "A wand blade that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -10115,6 +10546,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "625 gp",
     "flavorText": "A handaxe that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60). On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10161,6 +10593,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "150 gp",
     "flavorText": "The edge of this quarterstaff never quite looks the same twice — always faintly touched by the decay.",
+    "description": "+1 to attack and damage rolls. Versatile (1d8+1). On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10210,6 +10643,7 @@ const canonicalItems = [
     "weight": 43,
     "value": "350 gp",
     "flavorText": "The edge of this greatsword never quite looks the same twice — always faintly touched by the ember flame.",
+    "description": "+1 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d4 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -10249,6 +10683,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "800 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this quarterstaff carries swiftness in its very grain.",
+    "description": "+1 to attack and damage rolls. Versatile (1d8+1). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10282,6 +10717,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "275 gp",
     "flavorText": "This trident feels heavier than it should, as if gravity itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10322,6 +10758,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "250 gp",
     "flavorText": "A battle-worn longsword said to have been carried through a war fought over the venom itself.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, inject venom for an extra 1d4 poison damage; the target must succeed on a DC 12 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10361,6 +10798,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "575 gp",
     "flavorText": "A glaive that hums faintly with fortune, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -10394,6 +10832,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "300 gp",
     "flavorText": "A longsword that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, the wound cauterizes into flame for an extra 1d4 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10433,6 +10872,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "625 gp",
     "flavorText": "The edge of this handaxe never quite looks the same twice — always faintly touched by the venom.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60). On a hit, inject venom for an extra 1d4 poison damage; the target must succeed on a DC 12 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10469,6 +10909,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "100 gp",
     "flavorText": "This battle staff feels heavier than it should, as if the wild itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10499,6 +10940,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "150 gp",
     "flavorText": "The edge of this glaive never quite looks the same twice — always faintly touched by the tide.",
+    "description": "+1 to attack and damage rolls. On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -10538,6 +10980,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "575 gp",
     "flavorText": "The edge of this shortsword never quite looks the same twice — always faintly touched by the void.",
+    "description": "+1 to attack and damage rolls. Finesse. On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10577,6 +11020,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "400 gp",
     "flavorText": "This longbow feels heavier than it should, as if the whisper itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 1d4 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10616,6 +11060,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "775 gp",
     "flavorText": "This rapier feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10649,6 +11094,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "525 gp",
     "flavorText": "This war pick feels heavier than it should, as if the deep frost itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10685,6 +11131,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "275 gp",
     "flavorText": "A battle-worn sickle said to have been carried through a war fought over the decay itself.",
+    "description": "+1 to attack and damage rolls. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -10727,6 +11174,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "150 gp",
     "flavorText": "The edge of this longsword never quite looks the same twice — always faintly touched by the void.",
+    "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10766,6 +11214,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "525 gp",
     "flavorText": "A war pick that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -10802,6 +11251,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "200 gp",
     "flavorText": "A battle staff that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "description": "+1 to attack and damage rolls. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10848,6 +11298,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this spear carries the shadow in its very grain.",
+    "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10888,6 +11339,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "250 gp",
     "flavorText": "This shortbow feels heavier than it should, as if the venom itself were bound somewhere inside it.",
+    "description": "+1 to attack and damage rolls. On a hit, inject venom for an extra 1d4 poison damage; the target must succeed on a DC 12 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -10926,6 +11378,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "200 gp",
     "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the gale.",
+    "description": "Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -10945,6 +11398,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "725 gp",
     "flavorText": "A padded armor passed down through a lineage that had a complicated history with the blood.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -10965,6 +11419,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "500 gp",
     "flavorText": "Well-worn bracers, clearly built by someone who understood the deep frost better than most.",
+    "description": "Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -10984,6 +11439,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "525 gp",
     "flavorText": "A scale mail that shifts color faintly in the presence of the tide.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -11005,6 +11461,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "175 gp",
     "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the void kept them clean.",
+    "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11024,6 +11481,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "225 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the tide.",
+    "description": "+1 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -11055,6 +11513,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "400 gp",
     "flavorText": "This cape was clearly made for someone who expected trouble involving gravity.",
+    "description": "Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11074,6 +11533,7 @@ const canonicalItems = [
     "weight": 33,
     "value": "250 gp",
     "flavorText": "A breastplate that shifts color faintly in the presence of the wild.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11095,6 +11555,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "425 gp",
     "flavorText": "A chain shirt that shifts color faintly in the presence of the decay.",
+    "description": "AC 13 + Dexterity modifier (max 2). Medium armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -11116,6 +11577,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "750 gp",
     "flavorText": "Boots that shift color faintly in the presence of the void.",
+    "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11135,6 +11597,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "275 gp",
     "flavorText": "This breastplate was clearly made for someone who expected trouble involving gravity.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11156,6 +11619,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "200 gp",
     "flavorText": "A plate armor that shifts color faintly in the presence of the deep frost.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11177,6 +11641,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "400 gp",
     "flavorText": "Gloves that shift color faintly in the presence of the tempest.",
+    "description": "Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11195,6 +11660,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "750 gp",
     "flavorText": "A girdle that shifts color faintly in the presence of the wild.",
+    "description": "Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11214,6 +11680,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "525 gp",
     "flavorText": "This tower shield was clearly made for someone who expected trouble involving the ember flame.",
+    "description": "+3 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -11236,6 +11703,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "325 gp",
     "flavorText": "Plate Armor that never seems to gather dust, dirt, or rust — as if the shadow kept it clean.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11258,6 +11726,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "425 gp",
     "flavorText": "A hide armor passed down through a lineage that had a complicated history with the venom.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11279,6 +11748,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "500 gp",
     "flavorText": "These gauntlets were clearly made for someone who expected trouble involving the shadow.",
+    "description": "+1 AC. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11301,6 +11771,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "150 gp",
     "flavorText": "A breastplate that shifts color faintly in the presence of the ember flame.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11332,6 +11803,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "625 gp",
     "flavorText": "Well-worn ring mail, clearly built by someone who understood the deep frost better than most.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11353,6 +11825,7 @@ const canonicalItems = [
     "weight": 0.45,
     "value": "350 gp",
     "flavorText": "Well-worn bracers, clearly built by someone who understood the decay better than most.",
+    "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11372,6 +11845,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "275 gp",
     "flavorText": "This half plate armor was clearly made for someone who expected trouble involving the dawn.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11393,6 +11867,7 @@ const canonicalItems = [
     "weight": 37,
     "value": "325 gp",
     "flavorText": "This ring mail was clearly made for someone who expected trouble involving the tide.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11414,6 +11889,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "400 gp",
     "flavorText": "Boots that shift color faintly in the presence of gravity.",
+    "description": "Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11433,6 +11909,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "450 gp",
     "flavorText": "A hide armor passed down through a lineage that had a complicated history with the gale.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11453,6 +11930,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "650 gp",
     "flavorText": "These gauntlets were clearly made for someone who expected trouble involving the void.",
+    "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11471,6 +11949,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "375 gp",
     "flavorText": "Well-worn boots, clearly built by someone who understood the tempest better than most.",
+    "description": "Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -11499,6 +11978,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "475 gp",
     "flavorText": "Well-worn bracers, clearly built by someone who understood the venom better than most.",
+    "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11517,6 +11997,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "575 gp",
     "flavorText": "Well-worn gloves, clearly built by someone who understood the void better than most.",
+    "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11536,6 +12017,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "725 gp",
     "flavorText": "A leather armor passed down through a lineage that had a complicated history with the warding.",
+    "description": "AC 11 + Dexterity modifier. Light armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11556,6 +12038,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "600 gp",
     "flavorText": "A girdle that shifts color faintly in the presence of the gale.",
+    "description": "Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11575,6 +12058,7 @@ const canonicalItems = [
     "weight": 31,
     "value": "675 gp",
     "flavorText": "A half plate armor that shifts color faintly in the presence of the ember flame.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11596,6 +12080,7 @@ const canonicalItems = [
     "weight": 30,
     "value": "550 gp",
     "flavorText": "Chain Shirt that never seems to gather dust, dirt, or rust — as if the dawn kept it clean.",
+    "description": "AC 13 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -11618,6 +12103,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "575 gp",
     "flavorText": "Well-worn cape, clearly built by someone who understood the void better than most.",
+    "description": "+1 AC. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11639,6 +12125,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "800 gp",
     "flavorText": "Well-worn greaves, clearly built by someone who understood the wild better than most.",
+    "description": "Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11656,6 +12143,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "500 gp",
     "flavorText": "Well-worn shield, clearly built by someone who understood the venom better than most.",
+    "description": "+2 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -11678,6 +12166,7 @@ const canonicalItems = [
     "weight": 28,
     "value": "175 gp",
     "flavorText": "A breastplate that shifts color faintly in the presence of the warding.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11699,6 +12188,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "325 gp",
     "flavorText": "A shield that shifts color faintly in the presence of the tide.",
+    "description": "+2 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -11720,6 +12210,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "400 gp",
     "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the decay.",
+    "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11739,6 +12230,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "225 gp",
     "flavorText": "A chain mail that shifts color faintly in the presence of the blood.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -11772,6 +12264,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "300 gp",
     "flavorText": "Ring Mail that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11794,6 +12287,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "300 gp",
     "flavorText": "A half plate armor passed down through a lineage that had a complicated history with the blood.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -11815,6 +12309,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "300 gp",
     "flavorText": "A cloak that shifts color faintly in the presence of the wild.",
+    "description": "+1 AC. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Roots and vines seem to reach for the bearer's feet — difficult terrain in natural environments costs them double movement, even terrain that wouldn't normally slow others. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11837,6 +12332,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "725 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the whisper.",
+    "description": "+1 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -11858,6 +12354,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "225 gp",
     "flavorText": "This cape was clearly made for someone who expected trouble involving the whisper.",
+    "description": "Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -11877,6 +12374,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "175 gp",
     "flavorText": "This tower shield was clearly made for someone who expected trouble involving the decay.",
+    "description": "+3 AC. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -11898,6 +12396,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "775 gp",
     "flavorText": "This belt was clearly made for someone who expected trouble involving the deep frost.",
+    "description": "Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -11927,6 +12426,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "275 gp",
     "flavorText": "A chain mail that shifts color faintly in the presence of the dawn.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -11950,6 +12450,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "625 gp",
     "flavorText": "Gloves that shift color faintly in the presence of the tide.",
+    "description": "+1 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -11972,6 +12473,7 @@ const canonicalItems = [
     "weight": 34,
     "value": "600 gp",
     "flavorText": "This chain mail was clearly made for someone who expected trouble involving the tempest.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -11995,6 +12497,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "800 gp",
     "flavorText": "This studded leather armor was clearly made for someone who expected trouble involving the decay.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -12027,6 +12530,7 @@ const canonicalItems = [
     "weight": 28,
     "value": "250 gp",
     "flavorText": "A ring mail that shifts color faintly in the presence of the echo.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 12 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -12049,6 +12553,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "450 gp",
     "flavorText": "A breastplate passed down through a lineage that had a complicated history with the tempest.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -12070,6 +12575,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "625 gp",
     "flavorText": "A splint armor that shifts color faintly in the presence of the echo.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 12 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -12092,6 +12598,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "550 gp",
     "flavorText": "This shield was clearly made for someone who expected trouble involving swiftness.",
+    "description": "+2 AC. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -12114,6 +12621,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "475 gp",
     "flavorText": "Splint Armor that never seems to gather dust, dirt, or rust — as if the void kept it clean.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. The bearer's eyes reflect starlight even in total darkness, faintly visible from up to 30 ft. — impossible to fully hide their face. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -12136,6 +12644,7 @@ const canonicalItems = [
     "weight": 0.7,
     "value": "675 gp",
     "flavorText": "A belt passed down through a lineage that had a complicated history with the deep frost.",
+    "description": "+1 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -12158,6 +12667,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "650 gp",
     "flavorText": "Tower Shield that never seems to gather dust, dirt, or rust — as if the ember flame kept it clean.",
+    "description": "+3 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -12179,6 +12689,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "325 gp",
     "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if swiftness kept it clean.",
+    "description": "+1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -12207,6 +12718,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "700 gp",
     "flavorText": "These greaves were clearly made for someone who expected trouble involving the tide.",
+    "description": "You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12224,6 +12736,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "700 gp",
     "flavorText": "A chain mail that shifts color faintly in the presence of the venom.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -12246,6 +12759,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "250 gp",
     "flavorText": "Well-worn belt, clearly built by someone who understood the ember flame better than most.",
+    "description": "Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12265,6 +12779,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "275 gp",
     "flavorText": "A girdle that shifts color faintly in the presence of the decay.",
+    "description": "+1 AC. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -12286,6 +12801,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "400 gp",
     "flavorText": "Well-worn bracers, clearly built by someone who understood the venom better than most.",
+    "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12304,6 +12820,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "775 gp",
     "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the dawn kept them clean.",
+    "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12323,6 +12840,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "275 gp",
     "flavorText": "This scale mail was clearly made for someone who expected trouble involving the venom.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -12344,6 +12862,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "600 gp",
     "flavorText": "A belt passed down through a lineage that had a complicated history with the warding.",
+    "description": "+1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12363,6 +12882,7 @@ const canonicalItems = [
     "weight": 31,
     "value": "400 gp",
     "flavorText": "Half Plate Armor that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -12383,6 +12903,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "725 gp",
     "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the wild kept them clean.",
+    "description": "Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -12412,6 +12933,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "450 gp",
     "flavorText": "Breastplate that never seems to gather dust, dirt, or rust — as if the void kept it clean.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -12443,6 +12965,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "350 gp",
     "flavorText": "A hide armor that shifts color faintly in the presence of the venom.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -12463,6 +12986,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "175 gp",
     "flavorText": "Greaves that shift color faintly in the presence of the dawn.",
+    "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -12490,6 +13014,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "225 gp",
     "flavorText": "Well-worn gloves, clearly built by someone who understood the warding better than most.",
+    "description": "+1 AC. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -12512,6 +13037,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "575 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the wild.",
+    "description": "+1 AC. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -12533,6 +13059,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "300 gp",
     "flavorText": "These greaves were clearly made for someone who expected trouble involving gravity.",
+    "description": "Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12550,6 +13077,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "750 gp",
     "flavorText": "A leather armor that shifts color faintly in the presence of the venom.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -12570,6 +13098,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "450 gp",
     "flavorText": "A pair of crystal lenses, faceted like a bird of prey's stare.",
+    "description": "While wearing these lenses over your eyes, you have advantage on Wisdom (Perception) checks that rely on sight. In addition, you can see up to 1 mile away with no difficulty, able to discern even fine details as though looking at something within 100 feet of you.",
     "legacySource": {
       "tier": "uncommon",
       "index": 382,
@@ -12587,6 +13116,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "1600 gp",
     "flavorText": "A worn leather quiver, deceptively light for how much it clearly holds.",
+    "description": "Each of the quiver's three compartments connects to a small extradimensional space: one holds up to 60 arrows/bolts/crossbow bolts, one holds up to 18 javelins or similar weapons, and one holds up to 6 weapons with a slot size no larger than 2. You can draw any item the quiver holds as if from a regular quiver or scabbard.",
     "legacySource": {
       "tier": "uncommon",
       "index": 383,
@@ -12602,6 +13132,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "350 gp",
     "flavorText": "A heavy iron cauldron, dented from years of honest use, that never seems to run truly empty.",
+    "description": "Once per day, the cauldron can produce 2d4 x 10 pounds of nourishing (if bland) meat, enough to feed a dozen or more people, provided it's filled partway with water first.",
     "legacySource": {
       "tier": "uncommon",
       "index": 384,
@@ -12617,6 +13148,7 @@ const canonicalItems = [
     "weight": 0.4,
     "value": "1400 gp",
     "flavorText": "A gem the color of the element bound within it — flame-orange, storm-grey, deep loam-brown, or sea-blue.",
+    "description": "Crushing this gem and speaking its command word summons an elemental as if you had cast Conjure Elemental, requiring no concentration and no components. The elemental serves you for 1 hour before returning to its home plane. The gem is consumed.",
     "legacySource": {
       "tier": "uncommon",
       "index": 385,
@@ -12631,6 +13163,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.9,
     "flavorText": "To the eye it's identical to a Bag of Holding. It is not identical to a Bag of Holding.",
+    "description": "Functions as a Bag of Holding for nonliving matter. Any living plant matter placed inside decays to compost in 1 round. Any other living creature or organic material placed inside is instead attacked by unseen mouths that devour it whole (destroying it, in the case of an object; killing and permanently consuming a creature that fails a DC 15 Dexterity save). The bag's true nature is only ever revealed the hard way.",
     "legacySource": {
       "tier": "uncommon",
       "index": 386,
@@ -12645,6 +13178,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "flavorText": "An ornate, room-sized rug, finely woven and unnervingly still.",
+    "description": "Indistinguishable from a masterwork rug until it animates — typically when a creature stands on it. It attacks by smothering, imposing the Grappled condition and attempting to suffocate its victim. Functions mechanically as a monster (see the DM), not as a usable magic item.",
     "legacySource": {
       "tier": "uncommon",
       "index": 387,
@@ -12660,6 +13194,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "600 gp",
     "flavorText": "A simple band, cool to the touch and faintly smelling of the sea.",
+    "description": "You can stand on and move across any liquid surface — water, acid, mud, snow, quicksand, or lava — as if it were solid ground.",
     "legacySource": {
       "tier": "uncommon",
       "index": 390,
@@ -12677,6 +13212,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "900 gp",
     "flavorText": "An ordinary-looking broom that responds instantly to a firmly spoken command.",
+    "description": "Speak the command word and the broom rises to hover, ready to carry you. It can fly up to 50 ft. per round (400 lb. carrying capacity, allowing a second rider), or fly on its own to a named destination within 1 mile if released.",
     "legacySource": {
       "tier": "uncommon",
       "index": 391,
@@ -12692,6 +13228,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "800 gp",
     "flavorText": "A plain traveler's cloak, warded with a subtle, steady enchantment.",
+    "description": "+1 bonus to AC and all saving throws. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
@@ -12710,6 +13247,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "550 gp",
     "flavorText": "A dark, smooth cloak that ripples like water even in still air.",
+    "description": "You can breathe underwater, and you have a swimming speed of 60 feet.",
     "legacySource": {
       "tier": "uncommon",
       "index": 393,
@@ -12727,6 +13265,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "1200 gp",
     "flavorText": "A pair of matched, rough-cut stones, warm to the touch when their twin is being spoken to.",
+    "description": "Sold and used in pairs. Speaking a message while holding one stone sends it to whoever holds its twin, wherever they are, along with a brief reply if given within 1 round. Usable once per day per stone; if a stone is destroyed, its twin becomes nonmagical.",
     "legacySource": {
       "tier": "uncommon",
       "index": 394,
@@ -12742,6 +13281,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "1200 gp",
     "flavorText": "A signet ring bearing the Ashcrown crest, close enough to genuine that only a court clerk who's handled hundreds of real ones would think to look twice. Whoever made this either had access to a real seal or spent a very long time studying one.",
+    "description": "While worn and presented confidently, grants advantage on Charisma (Deception) checks made to pass as a minor Imperial courier or official. A genuinely thorough background check — cross-referencing actual civil service records — still exposes it.",
     "legacySource": {
       "tier": "rare",
       "index": 0,
@@ -12758,6 +13298,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "flavorText": "A single page torn from an Ashcrown court ledger, its entries written in a cramped, meticulous hand — a partial list of names, sums, and dates, each corresponding to a debt called in against a sitting Imperial official.",
+    "description": "Quest item. Names three court officials currently indebted to the Black Books — real, usable leverage in the hands of whoever holds it, and a page Auditor Voss Ferrand would pay an enormous, quiet sum to get back.",
     "legacySource": {
       "tier": "rare",
       "index": 1,
@@ -12772,6 +13313,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1,
     "flavorText": "A leather-bound register of Ashbond followers marked for a 'sacred pilgrimage,' cross-referenced against a second list of names quietly struck through — every one of them reported missing by their families within the same season.",
+    "description": "Quest item. Concrete evidence that the Ashbond's inner circle has been disappearing its own devotees under the guise of a holy rite — proof that could turn Zaharos's own faithful against Firewarden Emberlyn's circle, if it ever reached them.",
     "legacySource": {
       "tier": "rare",
       "index": 2,
@@ -12786,6 +13328,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.3,
     "flavorText": "A small bone whistle, carved rather than cast, tuned to a pitch just past what most ears register as sound. Rebel scouts carry these on long patrols — a whistle nobody outside the Second Flame knows to listen for.",
+    "description": "Once per day, sound the whistle to summon the nearest sympathetic patrol or courier within 5 miles, if any are in range — response time and who (if anyone) actually shows up is the DM's call.",
     "legacySource": {
       "tier": "rare",
       "index": 3,
@@ -12800,6 +13343,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.75,
     "flavorText": "A private, meticulously kept journal in Firewarden Cassia Emberlyn's own hand, recording the name, preparation, and outcome of every Ashbond 'Deepening' ceremony she has personally overseen. Not a record she's ever shown anyone — least of all Zaharos.",
+    "description": "Quest item. Damning, first-hand proof of exactly what the Ashbond's inner circle does to its most devoted followers, written in the handwriting of the woman who leads it.",
     "legacySource": {
       "tier": "rare",
       "index": 4,
@@ -12814,6 +13358,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.4,
     "flavorText": "A tarnished silver locket holding two painted portraits — a boy and a girl, no older than ten, both smiling in a way neither sibling quite manages anymore. Grand Inquisitor Vane hasn't opened it in over a decade. He hasn't thrown it away either.",
+    "description": "Quest item, not a magic item. A genuine, personal way to reach Darrow Vane emotionally — through his estranged sister Lysette — that no threat or bribe could manage.",
     "legacySource": {
       "tier": "rare",
       "index": 5,
@@ -12830,6 +13375,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.4,
     "flavorText": "A folded letter in the Crown Prince's own hand, addressed to no one, admitting more about where his allowance actually goes than he's ever said aloud. It reads like something written to be burned, not sent — and never was.",
+    "description": "Quest item. Confirms, in Aldric Draventh's own handwriting, that he is the Second Flame's anonymous Patron — the single most dangerous piece of paper in the Ashcrown Empire, depending entirely on whose hands it ends up in.",
     "legacySource": {
       "tier": "rare",
       "index": 6,
@@ -12846,6 +13392,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.9,
     "flavorText": "An official Ashcrown military file, decades old, water-stained and half-illegible — a Cinder Coast rebel listed as confirmed executed, complete with General Korrin's own signature on the report.",
+    "description": "Quest item. Proof that a supposedly executed Cinder Coast rebel is alive, which is either a devastating embarrassment for General Korrin's official record or confirmation of something she's long suspected and never said aloud.",
     "legacySource": {
       "tier": "rare",
       "index": 7,
@@ -12860,6 +13407,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1,
     "flavorText": "Twelve thin stones, each etched with the mark of an animal or element and worn smooth by hands long dead. Unlike the wilder fate-decks of the world, this one doesn't ask for anything in return — it just lends its strength for a while.",
+    "description": "Use the deck from your Inventory tab to cast a rune. Drawing one grants its bearer a temporary boon for the next hour. The deck is never spent or destroyed by casting — cast as often as you like.",
     "legacySource": {
       "tier": "rare",
       "index": 8,
@@ -12876,6 +13424,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "4000 gp",
     "flavorText": "A longsword of exceptional craftsmanship, its blade inscribed with flowing runes.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -12919,6 +13468,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "8000 gp",
     "flavorText": "A black iron staff capped with a ruby.",
+    "description": "10 charges. Burning Hands (1, DC 15), Fireball (3, DC 15). Resistance to fire while holding. Recharges 1d6+4 charges each day. Roll d20 on last charge: on 1, staff is destroyed. Requires attunement (druid, sorcerer, warlock, wizard).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -12938,6 +13488,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "3500 gp",
     "flavorText": "A finely wrought ring of cold iron.",
+    "description": "+1 to AC and all saving throws. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -12956,6 +13507,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "9000 gp",
     "flavorText": "A deep blue cloak that makes the wearer appear slightly offset from their true position.",
+    "description": "Attacks against you have disadvantage. This ends if you are incapacitated or take damage — resumes at start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -12984,6 +13536,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "4000 gp",
     "flavorText": "Knee-high boots with small wings at the ankle.",
+    "description": "Bonus action: double walking speed and opportunity attacks against you have disadvantage for 10 minutes. Recharges after long rest. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13002,6 +13555,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "3000 gp",
     "flavorText": "Leather bracers etched with bowstrings.",
+    "description": "Proficiency with longbows and shortbows. +2 to ranged attack rolls made with bows. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13021,6 +13575,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5000 gp",
     "flavorText": "A longsword that erupts in bright flame on command.",
+    "description": "Command word (bonus action): blade erupts in flame, +2d6 fire damage on hit, sheds bright light 40-ft, dim 40-ft. Command again to extinguish. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -13063,6 +13618,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "5000 gp",
     "flavorText": "A longsword encased in a perpetual rime of ice.",
+    "description": "+1d6 cold damage on hit. Extinguishes non-magical flames within 30 ft. when drawn. Fire resistance while holding. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -13094,6 +13650,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "8000 gp",
     "flavorText": "A polished redwood wand.",
+    "description": "7 charges. Expend 1–3 charges: Fireball (DC 15, 8d6 fire + 1d6 per extra charge) centered within 150 ft. Recharges 1d6+1 charges each day. Roll d20 on last charge: on 1, wand crumbles. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13110,6 +13667,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "8000 gp",
     "flavorText": "A jade pendant on a golden chain.",
+    "description": "Constitution score is 19 while wearing. No effect if Constitution is already 19+. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13128,6 +13686,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "4000 gp",
     "flavorText": "A thick leather belt with an ogre-bone buckle.",
+    "description": "Strength score is 21 while wearing. No effect if Strength is already 21+. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -13156,6 +13715,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "8000 gp",
     "flavorText": "A one-inch cube of iron. Pressing a face activates a force field.",
+    "description": "36 charges. Creates a 15-ft force field of varying permeability. Loses 1 charge/round active + 1 per spell hitting the field. Recharges 1d20 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13172,6 +13732,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "9500 gp",
     "flavorText": "A two-inch metal cube that expands into a 20-ft iron tower.",
+    "description": "Place on the ground and speak command word: expands to a 20-ft square, 30-ft tall iron tower with crenelations, arrow slits, an iron door, and two floors. AC 20, 100 HP per 10-ft section. Command word to collapse — must be completely unoccupied or collapse fails.",
     "legacySource": {
       "tier": "rare",
       "index": 21,
@@ -13187,6 +13748,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2500 gp",
     "flavorText": "A small carved animal figurine. Commanded, it becomes the real creature.",
+    "description": "Speak command word: figurine becomes a living creature for up to 8 hours. It follows your instructions. Recharge: cannot be activated again for 2 days. Roll or GM assigns creature type.",
     "narrative": {
       "unlocks": [
         {
@@ -13212,6 +13774,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "9000 gp",
     "flavorText": "A pale lavender gem, flawlessly cut and slightly warm.",
+    "description": "3 charges. Hold to your eye and expend 1 charge: Truesight 120 ft. for 10 minutes — see invisible creatures, illusions, and true forms. Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13228,6 +13791,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "8000 gp",
     "flavorText": "A silver headband set with a faceted blue crystal.",
+    "description": "Intelligence score is 19 while wearing. No effect if Intelligence is already 19+. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13246,6 +13810,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "4500 gp",
     "flavorText": "A silver war horn.",
+    "description": "Blow: creatures in 30-ft cone take 5d6 thunder damage (DC 15 Con save, half on save, not deafened). Unshielded glass shatters in cone. Up to 3/day — on first use after 2+, roll d20: on 1, horn explodes (10d6 thunder to user).",
     "narrative": {
       "unlocks": [
         {
@@ -13271,6 +13836,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5000 gp",
     "flavorText": "A clear teardrop crystal that orbits the wearer's head.",
+    "description": "No need for food, water, or sleep (still need 6 hours inactivity for long rest). Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13287,14 +13853,39 @@ const canonicalItems = [
     "weight": 1,
     "value": "5000 gp",
     "flavorText": "A leather-bound tome.",
+    "description": "Read over 48 hours across 6 days: Constitution score and max HP permanently increase by 2. Tome loses magic after use. Recharges magic in a century.",
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "read",
+        "name": "Read",
+        "kind": "active_effect",
+        "effect": {
+          "kind": "permanent_stat_increase",
+          "statMods": [
+            {
+              "stat": "con",
+              "value": 2
+            },
+            {
+              "stat": "hp_max",
+              "value": 2
+            }
+          ]
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "charges"
+        },
+        "usesLeft": 1,
+        "description": "Read over 48 hours across 6 days: Constitution score and max HP permanently increase by 2. Tome loses magic after use. Recharges magic in a century."
+      }
+    ],
     "legacySource": {
       "tier": "rare",
       "index": 27,
       "name": "Manual of Bodily Health"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "magic"
     }
   },
   {
@@ -13304,6 +13895,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "9000 gp",
     "flavorText": "A strand of mixed gemstone beads. Each bead is a single-use spell.",
+    "description": "1d4+2 beads of random types: Bless, Curing (2d4+2 HP), Favor, Smiting (4d6 radiant), Summons (Planar Ally), Wind Walking. Each bead: bonus action. Recharges 1d4+2 beads daily each day. Requires attunement (cleric, druid, paladin).",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13323,6 +13915,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3000 gp",
     "flavorText": "A thin iridescent oil.",
+    "description": "Apply over 1 minute. For 1 hour: +3 to attack and damage rolls. Also overcomes all resistance and immunity to non-magical damage.",
     "consumable": {
       "consumableCategory": "coating",
       "effects": [
@@ -13348,6 +13941,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "5000 gp",
     "flavorText": "A jet black gem on a silver setting.",
+    "description": "Death saving throws stabilize on 10+ (not 15). When you spend a Hit Die, double the dice rolled. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -13377,6 +13971,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "5000 gp",
     "flavorText": "A light blue slightly frothy liquid.",
+    "description": "Flying speed equal to walking speed for 1 hour. Can hover. If duration ends while airborne and you can't hover, you fall.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -13403,6 +13998,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "3000 gp",
     "flavorText": "A shimmering silver liquid.",
+    "description": "Resistance to all damage types for 1 minute after drinking.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -13428,6 +14024,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "5000 gp",
     "flavorText": "A golden ring set with a tiny carved foot.",
+    "description": "3 charges. When you fail a Dexterity save: expend 1 charge to succeed instead. Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13446,6 +14043,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "8000 gp",
     "flavorText": "A band of platinum.",
+    "description": "Difficult terrain costs no extra movement. Magic cannot reduce your speed or paralyze or restrain you. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13464,6 +14062,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "8000 gp",
     "flavorText": "A mithral ring with a faded green gem.",
+    "description": "Regain 1d6 HP every 10 minutes (if at least 1 HP). Regrown severed limbs after 1d6+1 days. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -13492,6 +14091,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "8000 gp",
     "flavorText": "A ring inlaid with a gemstone linked to a specific element.",
+    "description": "Resistance to one damage type determined by gem (diamond=force, garnet=necrotic, pearl=radiant, ruby=fire, sapphire=thunder, etc.). Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13510,6 +14110,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "8000 gp",
     "flavorText": "A sapphire ring.",
+    "description": "6 charges. Outdoors at night: Dancing Lights and Light at will. Expend 1–3: 1d6 fire/charge (one or split targets). Expend 4: Ball Lightning — up to 4 balls, 2d8 lightning each. Recharges 1d6 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13529,6 +14130,7 @@ const canonicalItems = [
     "weight": 29,
     "value": "9500 gp",
     "flavorText": "A dark robe covered in embroidered open eyes.",
+    "description": "See in all directions simultaneously. Darkvision 120 ft. Advantage on Perception. Cannot be surprised. See Invisible 120 ft. Requires attunement. Light or Daylight spells blind you for 1 minute.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -13549,6 +14151,7 @@ const canonicalItems = [
     "weight": 0.9,
     "value": "9500 gp",
     "flavorText": "A gold-topped rod. Every surface is engraved with the same word in seven languages, all of them meaning 'obey'.",
+    "description": "Action: all creatures within 120 ft. that can see and hear you make DC 15 Wisdom save or regard you as their trusted sovereign for 8 hours — obeying reasonable orders and not attacking you. Hostile creatures have advantage on the save. Once per day. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -13575,6 +14178,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "4000 gp",
     "flavorText": "A silken rope that entangles on command.",
+    "description": "Command (action): shoots out to Restrain a creature within 20 ft. DC 15 Strength (action) to escape. The rope: AC 10, 20 HP, resistance to piercing.",
     "legacySource": {
       "tier": "rare",
       "index": 40,
@@ -13593,6 +14197,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "4000 gp",
     "flavorText": "A steel shield with a glowing rune at its center.",
+    "description": "+2 AC bonus (adds to the standard shield +2, for +4 total AC from shield). Requires attunement by a creature proficient with shields.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -13615,6 +14220,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "9000 gp",
     "flavorText": "A round shield set with a large quartz lens.",
+    "description": "+2 AC. Advantage on saves against spells and magical effects. Immunity to Magic Missile. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -13647,6 +14253,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "7000 gp",
     "flavorText": "A pale birchwood staff topped with a crystal.",
+    "description": "10 charges. Cure Wounds (1–4 charges, 1d8+4 HP per charge), Lesser Restoration (2), Mass Cure Wounds (5, 3d8+4 to 6 creatures). Recharges 1d6+4 charges each day. Requires attunement (bard, cleric, druid).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -13667,6 +14274,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "8000 gp",
     "flavorText": "A gnarled black staff.",
+    "description": "3 charges. Expend 1 on hit: DC 15 Con save or 2d10 necrotic + disadvantage on Con checks/saves for 1 hour. Recharges 1d3 charges each day. Requires attunement (cleric, druid, warlock).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -13687,6 +14295,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "7000 gp",
     "flavorText": "A longsword hilt projecting a blade of pure radiance when activated.",
+    "description": "+2 attack and damage. Deals radiant instead of slashing. +1d8 radiant against undead. Emits sunlight 15-ft bright (adjustable). Finesse. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -13730,6 +14339,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "8000 gp",
     "flavorText": "A serrated blade that siphons vitality on critical hits.",
+    "description": "+2 attack and damage. Critical hit: DC 15 Con save or target loses 3d6 max HP. On failed save (not construct/undead): you gain 3d6 temporary HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -13760,6 +14370,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "8000 gp",
     "flavorText": "A jagged sword opening wounds that resist natural healing.",
+    "description": "+2 attack and damage. On hit: target loses 1d4 HP each turn start (no save). DC 15 Medicine check or magical healing to stop. Wounds stack. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -13790,6 +14401,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "3500 gp",
     "flavorText": "A silver trident.",
+    "description": "+2 attack and damage. Thrown (20/60). 3 charges: Dominate Beast (DC 14, aquatic only, 1 hour). Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -13823,6 +14435,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "3000 gp",
     "flavorText": "A weapon that surges with violent magic on a critical hit.",
+    "description": "+2 to attack and damage rolls. Natural 20: deal an extra 2d6 of the weapon's damage type.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning"
@@ -13860,6 +14473,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "6000 gp",
     "flavorText": "A bone wand.",
+    "description": "7 charges. Expend 2: Hold Person (DC 17). Expend 5: Hold Monster (DC 17). Recharges 1d6+1 charges each day. Roll d20 on last charge: on 1, crumbles. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13876,6 +14490,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "8000 gp",
     "flavorText": "A copper wand.",
+    "description": "7 charges. Action, expend 1: for 1 minute, wand points toward nearest hostile creature within 60 ft. (bypasses walls and invisibility). Recharges 1d6+1 charges each day.",
     "legacySource": {
       "tier": "rare",
       "index": 51,
@@ -13891,6 +14506,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "6000 gp",
     "flavorText": "A black iron wand.",
+    "description": "7 charges. Expend 1: creatures in 60-ft cone make DC 15 Wisdom save or drop held items, Frightened 1 min, must Dash away each turn. Recharges 1d6+1 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -13917,6 +14533,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "8000 gp",
     "flavorText": "A polished copper wand.",
+    "description": "7 charges. Expend 1–3: Lightning Bolt (DC 15, 8d6 lightning + 1d6/extra charge) in 100-ft line, 5 ft. wide. Recharges 1d6+1 charges each day. Roll d20 on last charge: on 1, crumbles. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13933,6 +14550,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "8500 gp",
     "flavorText": "An ivory wand.",
+    "description": "7 charges. Action, expend 1: ranged spell attack. Hit: DC 15 Con save or Paralyzed 1 minute (repeat save each turn). Recharges 1d6+1 charges each day. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13949,6 +14567,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "4000 gp",
     "flavorText": "A crystal-tipped wand that enhances spell attacks.",
+    "description": "+2 to spell attack rolls. Ignore half cover on spell attacks. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -13965,6 +14584,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "6000 gp",
     "flavorText": "A cloak bearing large decorative feathers.",
+    "description": "Command word (action): sprout/retract wings. Flying speed 60 ft. Can hover. Maximum 4 hours flight per day. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -13992,6 +14612,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "8000 gp",
     "flavorText": "A hollow staff swarming with bees inside.",
+    "description": "10 charges. Giant Insect (4), Insect Plague (5). Expend 1: 30-ft radius swarm around a point within 300 ft. for 10 min (Perception checks at disadvantage inside; costs double movement). Recharges 1d6+4 charges each day. Requires attunement (cleric, druid).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14012,6 +14633,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "8000 gp",
     "flavorText": "A living oak staff of rare power.",
+    "description": "10 charges. +2 attack and damage. Command word: staff transforms into a 60-ft oak tree (back to staff as bonus action). Spells: Animal Friendship (1), Barkskin (2), Locate Animals/Plants (2), Speak with Animals (1), Speak with Plants (3), Wall of Thorns (6), Awaken (8 — costs a 1,000 gp diamond component; does not expend a charge). Recharges 1d6+2 charges each day. Roll d20 on last charge: on 1, staff roots into the ground and becomes a permanent tree. Requires attunement by a druid.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14042,6 +14664,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "4500 gp",
     "flavorText": "An enchanted javelin charged with multiple lightning strikes.",
+    "description": "5 charges. Expend 1 and throw: target takes 4d6 lightning. All creatures within 5 ft. of the 120-ft line: DC 13 Dex or 4d6 lightning (half on save). Javelin returns to hand. Recharges 1d4+1 charges each day.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -14077,6 +14700,7 @@ const canonicalItems = [
     "weight": 9,
     "value": "4000 gp",
     "flavorText": "A suit of armor with subtle protective runes worked into the metal.",
+    "description": "+2 bonus to AC beyond the armor's normal value. Requires attunement. Works with any armor type.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -14099,6 +14723,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "3000 gp",
     "flavorText": "A single arrow with a barbed silver head and feathers from a creature it was made to destroy.",
+    "description": "If the arrow hits a creature of the type it was made to slay: target must make DC 17 Constitution save or take 6d10 piercing damage in addition to normal arrow damage. Single use.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -14138,6 +14763,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "4000 gp",
     "flavorText": "A broad leather belt with an iron buckle shaped like a dwarven rune.",
+    "description": "Requires attunement. Constitution +2 (max 20). Advantage on Charisma (Persuasion) checks with dwarves. Can speak, read, write Dwarvish. 50% chance each day to grow a beard (or thicken existing one) if capable of doing so.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14157,6 +14783,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "5500 gp",
     "flavorText": "A rough-hewn battleaxe with a blade the color of dried blood. Carries a curse.",
+    "description": "+1 attack and damage. While attuned: if you start your turn without dealing damage since your last turn, you must succeed on DC 15 Wisdom save or attack the nearest creature (cannot control who). Difficult to un-attune from. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -14186,6 +14813,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "4000 gp",
     "flavorText": "Tall leather boots with silver buckles and faint arcane glyphs worked into the soles.",
+    "description": "Requires attunement. Once per day: cast Levitate (self only, no concentration) — hover up to 20 ft. for 10 minutes. Can move vertically at will during this time.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14205,6 +14833,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "6000 gp",
     "flavorText": "Plain iron bracers covered in finely etched defensive runes.",
+    "description": "+2 AC while wearing no armor and not using a shield. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -14236,6 +14865,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5000 gp",
     "flavorText": "A voluminous red velvet cape with a deep hood.",
+    "description": "Requires attunement. Once per day as a bonus action: grow to Large size (Enlarge effect — +1d4 damage, advantage on Strength checks, can shove Large creatures) for 10 minutes. Revert as a bonus action.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14255,6 +14885,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "5000 gp",
     "flavorText": "A black-bladed dagger with a tiny gemstone set into the pommel that glows faintly red.",
+    "description": "+1 attack and damage. Finesse, light, thrown (20/60). While holding: Blindsight 30 ft. (you sense creatures without seeing them). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -14288,6 +14919,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "2500 gp",
     "flavorText": "A black blade with a hollow channel running to the edge. A faint green tinge along the metal.",
+    "description": "+1 attack and damage. Finesse, light. Once per day: coat the blade (action). Next hit deals 2d10 extra poison damage (DC 15 Constitution save for half) and target becomes Poisoned for 1 minute on a failed save.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -14330,6 +14962,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "6000 gp",
     "flavorText": "A longsword with a perfectly balanced blade that seems to drift slightly even when held still.",
+    "description": "+1 attack and damage. Once per day: throw the sword into the air as a bonus action — it hovers and attacks on your turn (+1 attack roll, 1d8+1) for 4 rounds. Returns to your hand at the end. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -14360,6 +14993,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "4000 gp",
     "flavorText": "Armor made from the scales of a specific dragon type. Rigid, heavy, and prized.",
+    "description": "AC 14 + Dex modifier (max 2). Advantage on saves against Frightful Presence and breath weapons of the dragon type matching the scales. Resistance to the damage type of that dragon's breath. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -14382,6 +15016,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "4000 gp",
     "flavorText": "A longsword with a dragonhead hilt and runes that warm in proximity to dragons.",
+    "description": "+1 attack and damage. On a hit against a dragon: deal an extra 3d6 of the weapon's damage type. The blade vibrates faintly when a dragon is within 1 mile. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -14412,6 +15047,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "4000 gp",
     "flavorText": "A shirt of interlocking elven-forged rings, fine as fabric.",
+    "description": "AC 13 + Dex modifier (max 2). No Stealth disadvantage. You are considered proficient with this armor even if you lack proficiency in medium armor. Does not require attunement.",
     "armor": {
       "armorType": "medium",
       "baseAC": 13,
@@ -14443,6 +15079,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "4000 gp",
     "flavorText": "Iron gauntlets etched with the face of a snarling ogre.",
+    "description": "Requires attunement. Strength score becomes 19. No effect if your Strength is already 19 or higher.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14462,6 +15099,7 @@ const canonicalItems = [
     "weight": 27,
     "value": "2000 gp",
     "flavorText": "Studded leather armor engraved with delicate flowing runes.",
+    "description": "AC 12 + Dex modifier. As a bonus action: change the armor's appearance to any other outfit, costume, or suit of non-magical armor. Looks and feels completely real. Provides the same protection regardless of appearance. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -14484,6 +15122,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "6000 gp",
     "flavorText": "An iron helm with a large blue crystal set into the brow.",
+    "description": "+1 AC. Requires attunement. While wearing: cast Detect Thoughts (DC 13) at will. While concentrating on Detect Thoughts: send a one-way telepathic message to any creature you're reading. Receive surface thoughts within 30 ft. (DC 13 Wisdom to resist).",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -14515,6 +15154,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "6000 gp",
     "flavorText": "A dark blue rhomboid that orbits the wearer's head.",
+    "description": "Cannot be surprised while this stone orbits your head. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14531,6 +15171,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "9000 gp",
     "flavorText": "A dusty rose prism that orbits your head with slow dignity.",
+    "description": "+1 bonus to AC. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14547,6 +15188,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "8000 gp",
     "flavorText": "A vibrant purple prism that pulses rhythmically.",
+    "description": "Store up to 3 levels of spell slots in the stone by expending them. Recover them later by touching the stone. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -14574,6 +15216,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "3500 gp",
     "flavorText": "A finely balanced enchanted javelin with a rune-etched head.",
+    "description": "+2 to attack and damage rolls. Thrown (range 30/120). Returns to your hand at the end of the turn after being thrown (like Boomerang). Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14604,6 +15247,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "4000 gp",
     "flavorText": "A heavy mace with a head of polished silver inscribed with holy sigils.",
+    "description": "+1 attack and damage. On a hit against undead: +2d6 radiant damage. If target has 25 HP or fewer after the hit: DC 15 Wisdom save or destroyed outright. Sheds bright light 20-ft while held. Requires attunement by a good creature.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14640,6 +15284,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "4000 gp",
     "flavorText": "A stout iron mace with a golden sunburst on the head.",
+    "description": "+1 attack and damage (+3 against constructs). On a natural 20 against a construct: the construct also takes 7 extra bludgeoning damage, and if it has 25 HP or fewer, it is destroyed.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -14669,6 +15314,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "5000 gp",
     "flavorText": "A gnarled black mace with a screaming skull at the head.",
+    "description": "+1 attack and damage. 3 charges. Expend 1: all creatures of your choice within 30 ft. make DC 15 Wisdom save or Frightened for 1 minute (repeat save each turn). Recharges 1d3 charges each day. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14709,6 +15355,7 @@ const canonicalItems = [
     "weight": 19.5,
     "value": "5500 gp",
     "flavorText": "Full plate constructed from mithral — silver-white and as light as chain mail.",
+    "description": "AC 18. No Stealth disadvantage. Does not require a Strength score to wear without movement penalty. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 18,
@@ -14735,6 +15382,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3000 gp",
     "flavorText": "A brilliant red potion that sparkles when turned.",
+    "description": "Restores 8d4+8 hit points. Action to drink.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -14762,6 +15410,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3000 gp",
     "flavorText": "A magenta liquid that seems to swirl against gravity.",
+    "description": "Drink it: Detect Thoughts for 1 hour (DC 13). You can sense surface thoughts of creatures within 30 ft., probe deeper thoughts, and detect presence of thinking creatures within 30 ft.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -14788,6 +15437,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "4000 gp",
     "flavorText": "An elegant rapier with a swept-hilt guard engraved with flowing vines.",
+    "description": "+2 attack and damage. Finesse. Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -14820,6 +15470,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "10000 gp",
     "flavorText": "A heavy platinum ring with a small mirror-like stone set into it.",
+    "description": "While wearing: if you succeed on a saving throw against a spell that targets only you and was cast with a spell slot, roll 1d6 — on a 5 or 6, the spell is reflected back at the caster using their own spell attack bonus. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -14848,6 +15499,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "5000 gp",
     "flavorText": "A ring set with a polished white stone.",
+    "description": "Requires attunement. Action: see through solid matter up to 5 ft. thick (not lead). Lasts 1 minute. Each minute of use beyond the first: DC 15 Constitution save or Exhaustion level 1. Multiple saves compound. Reset after long rest.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -14867,6 +15519,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "4000 gp",
     "flavorText": "A recurve shortbow with a string of braided mithral wire.",
+    "description": "+2 to attack and damage rolls. Range 80/320. Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14900,6 +15553,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "6500 gp",
     "flavorText": "A slender birch staff with small carved faces along its length.",
+    "description": "10 charges. Charm Person (1, DC 14), Command (1, DC 14), Comprehend Languages (1). Also: as a reaction to a spell targeting only you, make a DC 13 save — on success, reflect the spell back at the caster. Recharges 1d8+2 charges each day. Requires attunement by a bard, cleric, druid, sorcerer, warlock, or wizard.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14920,6 +15574,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "6000 gp",
     "flavorText": "A smooth black staff carved with coiling serpents.",
+    "description": "+1 attack and damage. 3 charges. Expend 1: throw the staff — it becomes a Giant Constrictor Snake for 1 hour (obeys your commands). Return to staff form as a bonus action. If the snake is slain, staff becomes mundane. Recharges 1d3 charges each day. Requires attunement (cleric, druid, warlock).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -14960,6 +15615,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "4000 gp",
     "flavorText": "A broadsword that hungers for retribution. Carries a curse.",
+    "description": "+1 attack and damage. Curse: while attuned, you must attack with this sword if able. If you would deal damage with another weapon, you must make DC 15 Wisdom save or attack with this sword instead. Remove Curse required to break attunement. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -14989,6 +15645,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "10000 gp",
     "flavorText": "A crystal-tipped wand that crackles with barely contained energy.",
+    "description": "+3 to spell attack rolls. Ignore half cover on spell attacks. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -15006,6 +15663,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "6000 gp",
     "flavorText": "A black lacquered scepter topped with a glowing purple gem.",
+    "description": "+1 attack and damage. Requires attunement by a warlock. While holding: Eldritch Blast counts as having the Agonizing Blast invocation (add Charisma modifier to damage). If you already have Agonizing Blast: add an extra 1d6 force damage instead.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -15051,6 +15709,7 @@ const canonicalItems = [
     "weight": 42,
     "value": "4000 gp",
     "flavorText": "A masterwork warhammer with dwarven runes hammered into the head.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -15085,6 +15744,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "5000 gp",
     "flavorText": "A gleaming silver spear with a blade that ripples like moving water.",
+    "description": "+2 attack and damage. Thrown (20/60). While holding: resistance to lightning and thunder damage. Cast Lightning Bolt (DC 13, 8d6 lightning) once per day. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -15114,6 +15774,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "5000 gp",
     "flavorText": "A weapon etched with draconic scales that warm when near dragons.",
+    "description": "+1 attack and damage. On a hit: 1d6 of the damage type associated with a specific dragon (fire, cold, lightning, poison, acid) based on the type of dragon whose essence empowers it. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -15152,6 +15813,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "4000 gp",
     "flavorText": "A broad belt made from the treated hide of a specific dragon type.",
+    "description": "Requires attunement by a monk. +1 to the saving throw DC of your ki features. Breath of the Dragon: once per day, spend 2 ki points to breathe the damage type of the dragon whose hide this is (15 ft. cone or 30 ft. line, 3d6, DC = 8 + Con + prof bonus).",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -15171,6 +15833,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "6000 gp",
     "flavorText": "A lance of crystal with a dragonic head carved at the tip.",
+    "description": "Deals 1d12+2 piercing while mounted (+2 attack and damage). On foot: 1d8+2 piercing. Against dragons: +3d6 piercing damage. While holding: advantage on initiative rolls. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -15209,6 +15872,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5000 gp",
     "flavorText": "A decorative object — ring, brooch, or medallion — covered in tiny metallic dragon scales.",
+    "description": "Requires attunement. +1 to spell attack rolls. Once per day: as a reaction when a creature within 30 ft. casts a spell, you can identify the spell being cast and gain advantage on the saving throw against it if it targets you.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -15225,6 +15889,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "2500 gp",
     "flavorText": "A leather satchel holding a variety of alchemical components, odd reagents, and half-finished notes.",
+    "description": "Once per day: when you cast a spell from a spell scroll, you can add your Intelligence modifier to the spell attack roll or saving throw DC.",
     "narrative": {
       "unlocks": [
         {
@@ -15250,6 +15915,7 @@ const canonicalItems = [
     "weight": 0.75,
     "value": "3000 gp",
     "flavorText": "A pendant shaped like a quill dipped in silver ink, etched with bold script.",
+    "description": "Requires attunement. You can cast Silvery Barbs (Strixhaven) without expending a spell slot once per short rest. Once per day: impose disadvantage on one creature's saving throw (before the roll).",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -15267,6 +15933,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "flavorText": "A pennant in the colors of one of the five Strixhaven colleges, with a faint magical shimmer.",
+    "description": "While carrying the pennant: advantage on Charisma checks with creatures affiliated with that college. Once per long rest: one Intelligence or Charisma ability check gains advantage.",
     "legacySource": {
       "tier": "rare",
       "index": 104,
@@ -15283,6 +15950,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "8000 gp",
     "flavorText": "A brass cannon small enough to be carried in two hands, with arcane runes along the barrel.",
+    "description": "Fires a magical bolt dealing 3d8 force damage (range 120/480). Requires 1 action to reload. On a hit: target must make DC 15 Strength save or be pushed 10 ft. away. Counts as magical. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "3d8",
@@ -15312,6 +15980,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "5000 gp",
     "flavorText": "A shortsword that looks darker than the surrounding shadows.",
+    "description": "+1 attack and damage. Finesse, light. If you are in dim light or darkness: deal +1d6 psychic damage on a hit. Targets hit are unable to see in magical darkness for 1 minute (Constitution DC 13 to resist). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -15350,6 +16019,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "3000 gp",
     "flavorText": "A bronze ring inlaid with a dark smoky stone.",
+    "description": "Requires attunement. 3 charges. Expend 1 as a bonus action: cast Fog Cloud centered on yourself (25-ft radius sphere). Recharges 1d3 charges each day.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -15368,6 +16038,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2000 gp",
     "flavorText": "A copper mechanical beetle the size of a fist, with a small voice-recording tube on its back.",
+    "description": "Wind it up and whisper a message (up to 1 minute). It walks at 30 ft. toward any creature that has spoken a specific sound, phrase, or name. When it reaches its target: plays back the recorded message. If damaged or falls 20 ft.: broken.",
     "legacySource": {
       "tier": "rare",
       "index": 108,
@@ -15384,6 +16055,7 @@ const canonicalItems = [
     "weight": 1.25,
     "value": "900 gp",
     "flavorText": "A full-face mithral helm matched to a plate armor set.",
+    "description": "+1 bonus to AC. No Stealth disadvantage. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -15411,6 +16083,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "900 gp",
     "flavorText": "Articulated mithral gauntlets, hinged at the knuckles for a full grip.",
+    "description": "+1 bonus to AC. No Stealth disadvantage. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -15438,6 +16111,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "900 gp",
     "flavorText": "Mithral greaves covering the thighs and shins, buckled at the sides.",
+    "description": "+1 bonus to AC. No Stealth disadvantage. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -15465,6 +16139,7 @@ const canonicalItems = [
     "weight": 1.75,
     "value": "900 gp",
     "flavorText": "Reinforced mithral sabatons with articulated toe plates.",
+    "description": "+1 bonus to AC. No Stealth disadvantage. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 1,
@@ -15492,6 +16167,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "1000 gp",
     "flavorText": "A kite shield of solid mithral, sized to match a full plate ensemble.",
+    "description": "+2 AC. As light as a wooden buckler despite being full metal. Does not require attunement.",
     "armor": {
       "armorType": "shield",
       "baseAC": 2,
@@ -15519,6 +16195,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "1200 gp",
     "flavorText": "A mithral a short, balanced blade suited to quick strikes.",
+    "description": "Finesse, light. +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -15551,6 +16228,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "1200 gp",
     "flavorText": "A mithral a straight double-edged blade about a yard long.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -15583,6 +16261,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "1200 gp",
     "flavorText": "A mithral a short double-edged blade with a simple crossguard.",
+    "description": "Finesse, light, thrown (range 20/60). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -15615,6 +16294,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "1200 gp",
     "flavorText": "A mithral a flanged metal head on a sturdy haft.",
+    "description": "Bludgeoning. +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -15644,6 +16324,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "1200 gp",
     "flavorText": "A mithral a broad single-bladed axe head on a long haft.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -15676,6 +16357,7 @@ const canonicalItems = [
     "weight": 32,
     "value": "1200 gp",
     "flavorText": "A mithral a heavy square hammerhead built for crushing blows.",
+    "description": "Versatile (1d10). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning",
@@ -15709,6 +16391,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "1200 gp",
     "flavorText": "A mithral a long haft tipped with a leaf-shaped point.",
+    "description": "Thrown (range 20/60), versatile (1d8). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -15742,6 +16425,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "800 gp",
     "flavorText": "A cat-sized dragon with a barbed tail and sharp, knowing eyes, telepathically bonded to one companion.",
+    "description": "Telepathic communication within 100 ft. Advantage on all Wisdom (Insight) and Perception checks while it's within 30 ft. Once per short rest, as a reaction, it can sting an attacker within 5 ft. of you, forcing a DC 13 Constitution save or the attacker is poisoned for 1 minute.",
     "companion": {
       "companionType": "pet"
     },
@@ -15769,6 +16453,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "900 gp",
     "flavorText": "A small devil bound by a minor pact — technically obedient, constitutionally untrustworthy.",
+    "description": "Can turn invisible (self only) at will to scout unseen. Advantage on Deception checks made on its owner's behalf. Once per short rest, it can sting a creature within 5 ft. of you as a reaction, dealing 3d6 poison damage (DC 13 Con save for half) to defend you.",
     "companion": {
       "companionType": "pet"
     },
@@ -15796,6 +16481,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1200 gp",
     "flavorText": "A loyal, fey-touched dog that teleports in short bursts and dislikes evil creatures on sight.",
+    "description": "Twice per short rest, teleport up to 40 ft. together with the dog as a reaction to avoid an attack. Advantage on saving throws against being charmed while the dog is within 10 ft. — it dislikes evil magic almost as much as evil creatures.",
     "companion": {
       "companionType": "pet"
     },
@@ -15823,6 +16509,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1000 gp",
     "flavorText": "A car-sized owl that can speak Common and Sylvan, and judges you constantly.",
+    "description": "Fly speed 60 ft. if ridden by a Small creature. Advantage on Wisdom (Perception) checks at all times, not just at night. Can carry a whispered message to a specific person or place it has seen before, delivering it accurately from memory.",
     "companion": {
       "companionType": "pet",
       "flySpeed": 60
@@ -15851,6 +16538,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "900 gp",
     "flavorText": "A small, cackling fiend bound to obedience, mostly.",
+    "description": "Can turn invisible at will, itself or its owner (touch range), for up to 1 hour per day combined. Resistance to poison damage while it's within 5 ft. Once per short rest, it can polymorph into a rat, raven, or spider for 1 hour to scout unseen.",
     "companion": {
       "companionType": "pet"
     },
@@ -15878,6 +16566,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1500 gp",
     "flavorText": "A small artificial servant built from clay, wax, and a drop of its creator's blood.",
+    "description": "Shares its owner's senses when perched on them, and its owner can see through its eyes at range. Can deliver a touch-range spell of up to 3rd level on its creator's behalf once per short rest. If destroyed, it can be rebuilt over a long rest with basic crafting tools.",
     "companion": {
       "companionType": "pet"
     },
@@ -15905,6 +16594,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "700 gp",
     "flavorText": "A wagon-sized amphibian with a surprisingly gentle disposition toward its owner.",
+    "description": "Its tongue can retrieve a dropped or thrown item within 15 ft. as a reaction, or grapple a Medium or smaller creature within 15 ft. (DC 13 Dex save negates), pulling it 10 ft. closer. Advantage on Strength checks and saves while it's within 5 ft.",
     "companion": {
       "companionType": "pet"
     },
@@ -15932,6 +16622,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1100 gp",
     "flavorText": "A young winter wolf, still more playful than predatory, with a breath that fogs even warm air.",
+    "description": "Resistance to cold damage while the pup is within 10 ft. of you. Once per short rest, it can exhale a 15-ft cone of frost as a reaction to protect you: 4d6 cold damage (DC 13 Con save for half) to creatures in the cone.",
     "companion": {
       "companionType": "pet"
     },
@@ -15959,6 +16650,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "1300 gp",
     "flavorText": "A butterfly-winged dragon barely a foot long, invisible when it wants to be and always a little bored.",
+    "description": "Can turn invisible for 10 minutes at will — itself only. Twice per long rest it can also grant the same invisibility to its owner. Its breath weapon (euphoria or fear gas, 10-ft cone, DC 13 Con save) can be used once per short rest to help in a fight.",
     "companion": {
       "companionType": "pet"
     },
@@ -15986,6 +16678,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "850 gp",
     "flavorText": "A wolf-sized weasel, disconcertingly fast and unnervingly quiet for its size.",
+    "description": "Speed 40 ft.; advantage on the wearer's Stealth checks at all times while it travels alongside them. Its keen sense of smell grants advantage on Survival checks made to track a creature or find a hidden path.",
     "companion": {
       "companionType": "pet",
       "speed": 40
@@ -16014,6 +16707,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "2500 gp",
     "flavorText": "A massive wolf, broken to saddle through patience and mutual respect rather than force.",
+    "description": "Speed 60 ft. Rider gains +2 to attack rolls while mounted. Advantage on the mount's own checks to track by scent. Once per short rest, the wolf's own bite can knock a Medium or smaller creature prone (DC 13 Strength save), aiding the rider in a fight.",
     "companion": {
       "companionType": "mount",
       "ac": 13,
@@ -16049,6 +16743,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "3000 gp",
     "flavorText": "A stocky, broad-backed lizard bred for stability on vertical and inverted surfaces.",
+    "description": "Speed 40 ft. Climb speed 40 ft., including upside-down and on ceilings. Never needs a check to climb difficult surfaces. Rider gains +1 to attack rolls made while mounted (the lizard's stability makes for a steadier strike).",
     "companion": {
       "companionType": "mount",
       "ac": 13,
@@ -16085,6 +16780,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "3500 gp",
     "flavorText": "A colorful, gentle seahorse the size of a warhorse, used for underwater travel by coastal folk.",
+    "description": "Swim speed 60 ft. Cannot leave the water. Rider can breathe water while mounted, and has resistance to cold damage while submerged and mounted (the seahorse's natural field extends both courtesies).",
     "companion": {
       "companionType": "mount",
       "ac": 12,
@@ -16114,6 +16810,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "2800 gp",
     "flavorText": "A flightless, big-beaked bird bred for speed across open ground, foul-tempered but fast.",
+    "description": "Speed 70 ft. Rider gains advantage on checks to avoid being thrown or unhorsed at high speed, and +1 to attack rolls made on a turn the mount moved at least 20 ft. beforehand (a mounted charge).",
     "companion": {
       "companionType": "mount",
       "ac": 12,
@@ -16149,6 +16846,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "150 gp",
     "flavorText": "A heavy tome bound in cracked leather, its pages dense with arcane theory that predates most current schools of magic.",
+    "description": "A scholarly work on arcane magic. Studying it for a full week grants advantage on the next Arcana check made regarding a topic it covers, GM discretion.",
     "tool": {
       "toolCategory": "magic"
     },
@@ -16166,6 +16864,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "120 gp",
     "flavorText": "A richly illustrated bestiary cataloguing dozens of monstrous creatures, complete with margin notes on their weaknesses.",
+    "description": "A bestiary covering a range of creatures. Consulting it before an encounter with a catalogued creature grants advantage on the relevant Nature or Arcana check to recall useful information about it.",
     "tool": {
       "toolCategory": "bestiary"
     },
@@ -16183,6 +16882,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "500 gp",
     "flavorText": "A deep blue sapphire cut to total clarity, without a single visible flaw.",
+    "description": "A precious gem of exceptional quality. Pure currency value — no mechanical effect.",
     "tool": {
       "toolCategory": "precious-gem"
     },
@@ -16200,6 +16900,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "600 gp",
     "flavorText": "A finely carved marble statue depicting a warrior whose name has been lost to time, one hand still raised in a gesture no one alive can interpret.",
+    "description": "A large art object of real value. No mechanical effect — and it's heavy enough that moving it is a project of its own.",
     "tool": {
       "toolCategory": "statue"
     },
@@ -16216,6 +16917,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.4,
     "flavorText": "A key of gleaming, untarnishable metal, faintly warm to the touch and etched with softly glowing enchanted sigils.",
+    "description": "A magically enchanted key. GM determines what warded lock or barrier it opens — ordinary means won't get through without it.",
     "tool": {
       "toolCategory": "magical-key"
     },
@@ -16237,6 +16939,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "180 gp",
     "flavorText": "A polished obsidian mirror, a pouch of silver dust, and a set of diviner's cards, all kept in a padded velvet case.",
+    "description": "A set of divination tools. Proficiency with them grants advantage on checks made while casting or interpreting divination magic, such as scrying or augury.",
     "legacySource": {
       "tier": "rare",
       "index": 141,
@@ -16254,6 +16957,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "90 gp",
     "flavorText": "A bundle of black tallow ritual candles marked with the sigil of a secretive circle, meant to be burned in a specific pattern.",
+    "description": "A set of ritual tools. Using them while casting a spell with the ritual tag grants advantage on any ability check required as part of the casting.",
     "legacySource": {
       "tier": "rare",
       "index": 142,
@@ -16272,6 +16976,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "6000 gp",
     "flavorText": "A handaxe that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60). On a critical hit, a thunderclap deals an extra 1d6 thunder damage to every creature within 10 ft. of the target (DC 14 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16308,6 +17013,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "6500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this handaxe carries the decay in its very grain.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16344,6 +17050,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "5000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this trident carries the decay in its very grain.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16384,6 +17091,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "6000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this hand crossbow carries the gale in its very grain.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16423,6 +17131,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "4000 gp",
     "flavorText": "This heavy crossbow feels heavier than it should, as if fortune itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -16467,6 +17176,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "8500 gp",
     "flavorText": "A glaive that hums faintly with the venom, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -16506,6 +17216,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "2500 gp",
     "flavorText": "This shortbow feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16545,6 +17256,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "5000 gp",
     "flavorText": "A mace that hums faintly with fortune, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16575,6 +17287,7 @@ const canonicalItems = [
     "weight": 9,
     "value": "3500 gp",
     "flavorText": "A glaive that hums faintly with the wild, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 14 Strength to break free) until the end of its next turn. Roots and vines seem to reach for the bearer's feet — difficult terrain in natural environments costs them double movement, even terrain that wouldn't normally slow others. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -16609,6 +17322,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "2500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this longsword carries the warding in its very grain.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -16652,6 +17366,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "3500 gp",
     "flavorText": "A trident that hums faintly with swiftness, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16686,6 +17401,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "7500 gp",
     "flavorText": "A glaive that hums faintly with the whisper, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -16725,6 +17441,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "3000 gp",
     "flavorText": "A battle-worn longbow said to have been carried through a war fought over fortune itself.",
+    "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -16758,6 +17475,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this hand crossbow carries the deep frost in its very grain.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, the target's blood slows to frost for an extra 1d6 cold damage and its speed is halved until the end of its next turn. The bearer's own hands run cold — disadvantage on checks requiring a delicate, warm touch (lockpicking, healer's kit, fine art). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16797,6 +17515,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "4000 gp",
     "flavorText": "A battle-worn rapier said to have been carried through a war fought over the tempest itself.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -16836,6 +17555,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "7000 gp",
     "flavorText": "A quarterstaff that hums faintly with the void, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Versatile (1d8+2). On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16875,6 +17595,7 @@ const canonicalItems = [
     "weight": 23,
     "value": "4500 gp",
     "flavorText": "A battle-worn warhammer said to have been carried through a war fought over the warding itself.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -16909,6 +17630,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "6500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this shortbow carries swiftness in its very grain.",
+    "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -16942,6 +17664,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "9000 gp",
     "flavorText": "A morningstar that hums faintly with the dawn, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 1d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -16978,6 +17701,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "4500 gp",
     "flavorText": "A battle-worn wand blade said to have been carried through a war fought over fortune itself.",
+    "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -17008,6 +17732,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "8000 gp",
     "flavorText": "A trident that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17048,6 +17773,7 @@ const canonicalItems = [
     "weight": 41,
     "value": "5000 gp",
     "flavorText": "A battle-worn greataxe said to have been carried through a war fought over the blood itself.",
+    "description": "+2 to attack and damage rolls. On a hit, drain 1d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -17097,6 +17823,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "8000 gp",
     "flavorText": "A heavy crossbow that hums faintly with the whisper, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -17147,6 +17874,7 @@ const canonicalItems = [
     "weight": 29,
     "value": "4500 gp",
     "flavorText": "A greataxe that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -17186,6 +17914,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "6500 gp",
     "flavorText": "A hand crossbow that hums faintly with the whisper, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17225,6 +17954,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "3000 gp",
     "flavorText": "A morningstar that hums faintly with the blood, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, drain 1d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -17261,6 +17991,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "3000 gp",
     "flavorText": "A scimitar that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17300,6 +18031,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "3500 gp",
     "flavorText": "A battle-worn spear said to have been carried through a war fought over the ember flame itself.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17340,6 +18072,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "7500 gp",
     "flavorText": "A battle-worn glaive said to have been carried through a war fought over the gale itself.",
+    "description": "+2 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -17379,6 +18112,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "8500 gp",
     "flavorText": "A maul that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, force crushes down for an extra 1d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -17418,6 +18152,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "7500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this glaive carries the wild in its very grain.",
+    "description": "+2 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 14 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -17451,6 +18186,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "9000 gp",
     "flavorText": "A rapier that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -17490,6 +18226,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "2500 gp",
     "flavorText": "A longbow that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -17539,6 +18276,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "9000 gp",
     "flavorText": "The edge of this kukri never quite looks the same twice — always faintly touched by the tempest.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -17578,6 +18316,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "8500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this trident carries swiftness in its very grain.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17612,6 +18351,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "6500 gp",
     "flavorText": "This whip feels heavier than it should, as if the shadow itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit while you are in dim light or darkness, deal an extra 1d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -17651,6 +18391,7 @@ const canonicalItems = [
     "weight": 29,
     "value": "5500 gp",
     "flavorText": "This greatsword feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -17694,6 +18435,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "4500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this flail carries the gale in its very grain.",
+    "description": "+2 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -17740,6 +18482,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "2500 gp",
     "flavorText": "The edge of this shortbow never quite looks the same twice — always faintly touched by the venom.",
+    "description": "+2 to attack and damage rolls. On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17789,6 +18532,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "8000 gp",
     "flavorText": "A battle-worn pike said to have been carried through a war fought over the decay itself.",
+    "description": "+2 to attack and damage rolls. On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -17838,6 +18582,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "4500 gp",
     "flavorText": "The edge of this hand crossbow never quite looks the same twice — always faintly touched by the decay.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -17877,6 +18622,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "9000 gp",
     "flavorText": "A battle-worn whip said to have been carried through a war fought over the dawn itself.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit against an undead or fiend, deal an extra 1d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -17916,6 +18662,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "2500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this wand blade carries the blood in its very grain.",
+    "description": "+2 to attack and damage rolls. On a hit, drain 1d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -17962,6 +18709,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "8000 gp",
     "flavorText": "This halberd feels heavier than it should, as if the tempest itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -18001,6 +18749,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "9000 gp",
     "flavorText": "The edge of this flail never quite looks the same twice — always faintly touched by the tempest.",
+    "description": "+2 to attack and damage rolls. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -18047,6 +18796,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "7500 gp",
     "flavorText": "A scimitar that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18086,6 +18836,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "2500 gp",
     "flavorText": "The edge of this halberd never quite looks the same twice — always faintly touched by the whisper.",
+    "description": "+2 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -18125,6 +18876,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "7000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this longsword carries the void in its very grain.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -18174,6 +18926,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "4500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this longsword carries the void in its very grain.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -18213,6 +18966,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "6500 gp",
     "flavorText": "The edge of this dagger never quite looks the same twice — always faintly touched by the venom.",
+    "description": "+2 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -18252,6 +19006,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "7500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this handaxe carries swiftness in its very grain.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18282,6 +19037,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "8500 gp",
     "flavorText": "This greatsword feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d6 thunder damage to every creature within 10 ft. of the target (DC 14 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -18321,6 +19077,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "2500 gp",
     "flavorText": "A battle-worn maul said to have been carried through a war fought over the deep frost itself.",
+    "description": "+2 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d6 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -18360,6 +19117,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "6000 gp",
     "flavorText": "A battle-worn hand crossbow said to have been carried through a war fought over the decay itself.",
+    "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18399,6 +19157,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "8000 gp",
     "flavorText": "A battle-worn shortbow said to have been carried through a war fought over swiftness itself.",
+    "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18432,6 +19191,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "5500 gp",
     "flavorText": "A battle-worn battle staff said to have been carried through a war fought over the tempest itself.",
+    "description": "+2 to attack and damage rolls. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18468,6 +19228,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "4000 gp",
     "flavorText": "This greataxe feels heavier than it should, as if swiftness itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -18501,6 +19262,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "4000 gp",
     "flavorText": "A spear that hums faintly with the venom, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18541,6 +19303,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "5000 gp",
     "flavorText": "This shortsword feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Finesse. On a critical hit, a thunderclap deals an extra 1d6 thunder damage to every creature within 10 ft. of the target (DC 14 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18580,6 +19343,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "2500 gp",
     "flavorText": "This quarterstaff feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Versatile (1d8+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18619,6 +19383,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "8500 gp",
     "flavorText": "The edge of this whip never quite looks the same twice — always faintly touched by the ember flame.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -18658,6 +19423,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "7000 gp",
     "flavorText": "The edge of this morningstar never quite looks the same twice — always faintly touched by the dawn.",
+    "description": "+2 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 1d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -18694,6 +19460,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "7000 gp",
     "flavorText": "The edge of this sickle never quite looks the same twice — always faintly touched by the void.",
+    "description": "+2 to attack and damage rolls. On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. The bearer's eyes reflect starlight even in total darkness, faintly visible from up to 30 ft. — impossible to fully hide their face. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -18730,6 +19497,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "8000 gp",
     "flavorText": "A handaxe that hums faintly with the warding, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60). While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18760,6 +19528,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "4500 gp",
     "flavorText": "The edge of this kukri never quite looks the same twice — always faintly touched by the ember flame.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -18809,6 +19578,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "2000 gp",
     "flavorText": "The edge of this spear never quite looks the same twice — always faintly touched by the tide.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18849,6 +19619,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "5000 gp",
     "flavorText": "This wand blade feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -18879,6 +19650,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2500 gp",
     "flavorText": "A mace that hums faintly with the decay, its metal cool to the touch even in a forge.",
+    "description": "+2 to attack and damage rolls. On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18925,6 +19697,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "5500 gp",
     "flavorText": "A battle-worn scimitar said to have been carried through a war fought over the tide itself.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -18964,6 +19737,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "7500 gp",
     "flavorText": "A battle-worn whip said to have been carried through a war fought over the wild itself.",
+    "description": "+2 to attack and damage rolls. Finesse. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 14 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -19007,6 +19781,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "6000 gp",
     "flavorText": "This battleaxe feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Versatile (1d10+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -19046,6 +19821,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "8500 gp",
     "flavorText": "This flail feels heavier than it should, as if the tide itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -19082,6 +19858,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "8000 gp",
     "flavorText": "A battle-worn shortbow said to have been carried through a war fought over the ember flame itself.",
+    "description": "+2 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -19121,6 +19898,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "8500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this maul carries swiftness in its very grain.",
+    "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -19154,6 +19932,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "7000 gp",
     "flavorText": "This kukri feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -19187,6 +19966,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "6000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this rapier carries the tide in its very grain.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -19226,6 +20006,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "4500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this glaive carries swiftness in its very grain.",
+    "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -19269,6 +20050,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "7000 gp",
     "flavorText": "A battle-worn halberd said to have been carried through a war fought over the void itself.",
+    "description": "+2 to attack and damage rolls. On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -19318,6 +20100,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "3500 gp",
     "flavorText": "The edge of this wand blade never quite looks the same twice — always faintly touched by gravity.",
+    "description": "+2 to attack and damage rolls. On a hit, force crushes down for an extra 1d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -19354,6 +20137,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "3000 gp",
     "flavorText": "The edge of this quarterstaff never quite looks the same twice — always faintly touched by swiftness.",
+    "description": "+2 to attack and damage rolls. Versatile (1d8+2). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -19387,6 +20171,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "7000 gp",
     "flavorText": "The edge of this spear never quite looks the same twice — always faintly touched by the decay.",
+    "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -19427,6 +20212,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "6500 gp",
     "flavorText": "The edge of this mace never quite looks the same twice — always faintly touched by gravity.",
+    "description": "+2 to attack and damage rolls. On a hit, force crushes down for an extra 1d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -19473,6 +20259,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "2500 gp",
     "flavorText": "A battle-worn flail said to have been carried through a war fought over fortune itself.",
+    "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -19503,6 +20290,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "8500 gp",
     "flavorText": "This whip feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "description": "+2 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -19542,6 +20330,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "3500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this rapier carries the tide in its very grain.",
+    "description": "+2 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -19580,6 +20369,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "8000 gp",
     "flavorText": "Gloves that shift color faintly in the presence of the echo.",
+    "description": "Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -19599,6 +20389,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "5500 gp",
     "flavorText": "A tower shield that shifts color faintly in the presence of the ember flame.",
+    "description": "+3 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -19621,6 +20412,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "8000 gp",
     "flavorText": "Well-worn plate armor, clearly built by someone who understood the ember flame better than most.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -19643,6 +20435,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "3000 gp",
     "flavorText": "Well-worn scale mail, clearly built by someone who understood the ember flame better than most.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -19664,6 +20457,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "6500 gp",
     "flavorText": "A belt passed down through a lineage that had a complicated history with swiftness.",
+    "description": "+1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -19693,6 +20487,7 @@ const canonicalItems = [
     "weight": 34,
     "value": "4500 gp",
     "flavorText": "This leather armor was clearly made for someone who expected trouble involving the decay.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -19713,6 +20508,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "6500 gp",
     "flavorText": "Well-worn girdle, clearly built by someone who understood the dawn better than most.",
+    "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -19742,6 +20538,7 @@ const canonicalItems = [
     "weight": 4.25,
     "value": "7000 gp",
     "flavorText": "A buckler that shifts color faintly in the presence of the venom.",
+    "description": "+1 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -19770,6 +20567,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "8500 gp",
     "flavorText": "Plate Armor that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -19801,6 +20599,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3000 gp",
     "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "description": "Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -19819,6 +20618,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3000 gp",
     "flavorText": "A belt that shifts color faintly in the presence of the venom.",
+    "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -19847,6 +20647,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2000 gp",
     "flavorText": "Well-worn gloves, clearly built by someone who understood the warding better than most.",
+    "description": "+1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -19866,6 +20667,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "3500 gp",
     "flavorText": "Studded Leather Armor that never seems to gather dust, dirt, or rust — as if swiftness kept it clean.",
+    "description": "AC 12 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -19888,6 +20690,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "6500 gp",
     "flavorText": "A splint armor that shifts color faintly in the presence of the blood.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -19910,6 +20713,7 @@ const canonicalItems = [
     "weight": 37,
     "value": "4000 gp",
     "flavorText": "A splint armor that shifts color faintly in the presence of the shadow.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -19932,6 +20736,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "8500 gp",
     "flavorText": "A shield that shifts color faintly in the presence of the venom.",
+    "description": "+2 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -19954,6 +20759,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "4000 gp",
     "flavorText": "A tower shield passed down through a lineage that had a complicated history with the tempest.",
+    "description": "+3 AC. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -19976,6 +20782,7 @@ const canonicalItems = [
     "weight": 23,
     "value": "4000 gp",
     "flavorText": "A chain mail passed down through a lineage that had a complicated history with the deep frost.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -19999,6 +20806,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "8000 gp",
     "flavorText": "Buckler that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
+    "description": "+1 AC. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20021,6 +20829,7 @@ const canonicalItems = [
     "weight": 29,
     "value": "7500 gp",
     "flavorText": "A plate armor that shifts color faintly in the presence of the venom.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20053,6 +20862,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "5000 gp",
     "flavorText": "A half plate armor that shifts color faintly in the presence of fortune.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20084,6 +20894,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "7000 gp",
     "flavorText": "A chain mail passed down through a lineage that had a complicated history with swiftness.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -20107,6 +20918,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "3000 gp",
     "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if the venom kept it clean.",
+    "description": "+1 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20129,6 +20941,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "5500 gp",
     "flavorText": "This hide armor was clearly made for someone who expected trouble involving the dawn.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20149,6 +20962,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "3500 gp",
     "flavorText": "This cape was clearly made for someone who expected trouble involving swiftness.",
+    "description": "+1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -20168,6 +20982,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "2500 gp",
     "flavorText": "Well-worn chain shirt, clearly built by someone who understood fortune better than most.",
+    "description": "AC 13 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -20189,6 +21004,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "6000 gp",
     "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "description": "Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -20207,6 +21023,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "6500 gp",
     "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the ember flame.",
+    "description": "Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -20236,6 +21053,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "7000 gp",
     "flavorText": "A shield passed down through a lineage that had a complicated history with the deep frost.",
+    "description": "+2 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20258,6 +21076,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "4000 gp",
     "flavorText": "A plate armor passed down through a lineage that had a complicated history with the ember flame.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20280,6 +21099,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "6500 gp",
     "flavorText": "A splint armor passed down through a lineage that had a complicated history with the venom.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20302,6 +21122,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "4000 gp",
     "flavorText": "A tower shield that shifts color faintly in the presence of the warding.",
+    "description": "+3 AC. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20334,6 +21155,7 @@ const canonicalItems = [
     "weight": 22,
     "value": "6000 gp",
     "flavorText": "A ring mail passed down through a lineage that had a complicated history with the gale.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20356,6 +21178,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "7000 gp",
     "flavorText": "This scale mail was clearly made for someone who expected trouble involving the decay.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -20378,6 +21201,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "3500 gp",
     "flavorText": "A padded armor that shifts color faintly in the presence of the tempest.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20409,6 +21233,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "2500 gp",
     "flavorText": "A tower shield passed down through a lineage that had a complicated history with the decay.",
+    "description": "+3 AC. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20431,6 +21256,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "5000 gp",
     "flavorText": "A pair of greaves passed down through a lineage that had a complicated history with swiftness.",
+    "description": "+1 AC. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20453,6 +21279,7 @@ const canonicalItems = [
     "weight": 12.5,
     "value": "8000 gp",
     "flavorText": "Breastplate that never seems to gather dust, dirt, or rust — as if the gale kept it clean.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20480,6 +21307,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "4500 gp",
     "flavorText": "This breastplate was clearly made for someone who expected trouble involving the warding.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20501,6 +21329,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "8500 gp",
     "flavorText": "Well-worn crown, clearly built by someone who understood the deep frost better than most.",
+    "description": "+1 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20523,6 +21352,7 @@ const canonicalItems = [
     "weight": 24,
     "value": "8000 gp",
     "flavorText": "A half plate armor that shifts color faintly in the presence of gravity.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20553,6 +21383,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "7500 gp",
     "flavorText": "A cape passed down through a lineage that had a complicated history with the shadow.",
+    "description": "While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -20571,6 +21402,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "4500 gp",
     "flavorText": "A cape passed down through a lineage that had a complicated history with the echo.",
+    "description": "Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -20590,6 +21422,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "4500 gp",
     "flavorText": "A half plate armor that shifts color faintly in the presence of the deep frost.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20611,6 +21444,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "5000 gp",
     "flavorText": "Well-worn buckler, clearly built by someone who understood the whisper better than most.",
+    "description": "+1 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20633,6 +21467,7 @@ const canonicalItems = [
     "weight": 31,
     "value": "4500 gp",
     "flavorText": "A leather armor that shifts color faintly in the presence of swiftness.",
+    "description": "AC 11 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20654,6 +21489,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "7500 gp",
     "flavorText": "Plate Armor that never seems to gather dust, dirt, or rust — as if the echo kept it clean.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20676,6 +21512,7 @@ const canonicalItems = [
     "weight": 9,
     "value": "4000 gp",
     "flavorText": "This tower shield was clearly made for someone who expected trouble involving the deep frost.",
+    "description": "+3 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20697,6 +21534,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "9000 gp",
     "flavorText": "Gloves that shift color faintly in the presence of the blood.",
+    "description": "Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -20716,6 +21554,7 @@ const canonicalItems = [
     "weight": 34,
     "value": "8500 gp",
     "flavorText": "This hide armor was clearly made for someone who expected trouble involving the wild.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20737,6 +21576,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "8500 gp",
     "flavorText": "Scale Mail that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Roots and vines seem to reach for the bearer's feet — difficult terrain in natural environments costs them double movement, even terrain that wouldn't normally slow others. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -20759,6 +21599,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "7000 gp",
     "flavorText": "A buckler that shifts color faintly in the presence of the ember flame.",
+    "description": "+1 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -20791,6 +21632,7 @@ const canonicalItems = [
     "weight": 23,
     "value": "9000 gp",
     "flavorText": "A breastplate passed down through a lineage that had a complicated history with the venom.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20812,6 +21654,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "8000 gp",
     "flavorText": "Hide Armor that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20843,6 +21686,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "4500 gp",
     "flavorText": "This studded leather armor was clearly made for someone who expected trouble involving the tempest.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -20865,6 +21709,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "4000 gp",
     "flavorText": "This great helm was clearly made for someone who expected trouble involving fortune.",
+    "description": "+1 AC. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20886,6 +21731,7 @@ const canonicalItems = [
     "weight": 0.7,
     "value": "4000 gp",
     "flavorText": "Greaves that shift color faintly in the presence of the venom.",
+    "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -20903,6 +21749,7 @@ const canonicalItems = [
     "weight": 15.5,
     "value": "8000 gp",
     "flavorText": "This scale mail was clearly made for someone who expected trouble involving the tempest.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -20941,6 +21788,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "6000 gp",
     "flavorText": "Well-worn padded armor, clearly built by someone who understood the tide better than most.",
+    "description": "AC 11 + Dexterity modifier. Light armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -20962,6 +21810,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "7000 gp",
     "flavorText": "Well-worn half plate armor, clearly built by someone who understood the echo better than most.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -20982,6 +21831,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "3000 gp",
     "flavorText": "These gloves were clearly made for someone who expected trouble involving the ember flame.",
+    "description": "Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21001,6 +21851,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "4000 gp",
     "flavorText": "Gloves that shift color faintly in the presence of the shadow.",
+    "description": "+1 AC. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -21023,6 +21874,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "9000 gp",
     "flavorText": "This studded leather armor was clearly made for someone who expected trouble involving fortune.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -21054,6 +21906,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "9000 gp",
     "flavorText": "This girdle was clearly made for someone who expected trouble involving the dawn.",
+    "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21073,6 +21926,7 @@ const canonicalItems = [
     "weight": 35,
     "value": "8000 gp",
     "flavorText": "A half plate armor passed down through a lineage that had a complicated history with the echo.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -21094,6 +21948,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "4000 gp",
     "flavorText": "A shield passed down through a lineage that had a complicated history with the void.",
+    "description": "+2 AC. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -21126,6 +21981,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "2000 gp",
     "flavorText": "Shield that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "description": "+2 AC. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -21148,6 +22004,7 @@ const canonicalItems = [
     "weight": 35,
     "value": "6500 gp",
     "flavorText": "This splint armor was clearly made for someone who expected trouble involving the tempest.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -21170,6 +22027,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "7000 gp",
     "flavorText": "This tower shield was clearly made for someone who expected trouble involving the tide.",
+    "description": "+3 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -21198,6 +22056,7 @@ const canonicalItems = [
     "weight": 28,
     "value": "5500 gp",
     "flavorText": "A splint armor passed down through a lineage that had a complicated history with the echo.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -21229,6 +22088,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "3500 gp",
     "flavorText": "A pair of boots passed down through a lineage that had a complicated history with the whisper.",
+    "description": "Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21248,6 +22108,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "3500 gp",
     "flavorText": "A tower shield that shifts color faintly in the presence of the venom.",
+    "description": "+3 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -21269,6 +22130,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "3500 gp",
     "flavorText": "Well-worn cloak, clearly built by someone who understood the shadow better than most.",
+    "description": "While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21288,6 +22150,7 @@ const canonicalItems = [
     "weight": 34,
     "value": "3500 gp",
     "flavorText": "Half Plate Armor that never seems to gather dust, dirt, or rust — as if the dawn kept it clean.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -21309,6 +22172,7 @@ const canonicalItems = [
     "weight": 32,
     "value": "5500 gp",
     "flavorText": "This padded armor was clearly made for someone who expected trouble involving swiftness.",
+    "description": "AC 11 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. The bearer finds it almost impossible to stand still — disadvantage on Stealth checks that require remaining motionless, and on checks to maintain concentration while stationary. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -21331,6 +22195,7 @@ const canonicalItems = [
     "weight": 31,
     "value": "5500 gp",
     "flavorText": "A ring mail passed down through a lineage that had a complicated history with the deep frost.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -21353,6 +22218,7 @@ const canonicalItems = [
     "weight": 24,
     "value": "6500 gp",
     "flavorText": "This breastplate was clearly made for someone who expected trouble involving the tempest.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -21374,6 +22240,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "7500 gp",
     "flavorText": "A padded armor that shifts color faintly in the presence of gravity.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -21400,6 +22267,7 @@ const canonicalItems = [
     "weight": 0.45,
     "value": "3200 gp",
     "flavorText": "A slender wand of pale, unmarked wood that hums unpredictably in the hand.",
+    "description": "7 charges. Expend 1, point at a target within 120 ft., and roll a random effect (from harmless lights and butterflies, to a Fireball, to the target growing or shrinking, to plants suddenly bursting from the ground) — the wand's magic is never quite the same twice. Recharges 1d6+1 charges each day.",
     "legacySource": {
       "tier": "rare",
       "index": 313,
@@ -21415,6 +22283,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "3800 gp",
     "flavorText": "A tangle of dull iron bands, dense and cold, that spring open at a spoken command.",
+    "description": "Speak the command word and throw this item at a Large or smaller creature within 60 ft. On a failed DC 20 Dexterity save, it becomes bound in iron bands, Restrained, and unable to move until it breaks free with a DC 20 Strength check (one attempt per action).",
     "legacySource": {
       "tier": "rare",
       "index": 314,
@@ -21430,6 +22299,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "4500 gp",
     "flavorText": "A dull grey iron band, unpleasantly cold no matter how long it's worn.",
+    "description": "While wearing this ring, you can use an action to see through solid matter (up to 30 ft. of nonmetal, nonlead material) for 1 minute. Repeated use risks temporary blindness, and after prolonged use the ring's true, more sinister nature has a way of asserting itself. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21448,6 +22318,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "3500 gp",
     "flavorText": "A heavy set of manacles, warded against every means of slipping free that magic has ever devised.",
+    "description": "These shackles can bind a creature of any size. Escaping requires a DC 30 Strength check, and a shackled creature can't teleport or travel to a different plane of existence by any means. Speaking the command word locks or unlocks the shackles.",
     "legacySource": {
       "tier": "rare",
       "index": 316,
@@ -21465,6 +22336,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "4200 gp",
     "flavorText": "A silver bowl, always beaded with cold water no matter how dry the room.",
+    "description": "Fill the bowl with water and speak the command word to summon and command a water elemental as if you had cast Conjure Elemental — no concentration required. It serves for 1 hour or until dismissed. Usable once per day.",
     "legacySource": {
       "tier": "rare",
       "index": 317,
@@ -21482,6 +22354,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "4200 gp",
     "flavorText": "A small, dense model of a fortress tower, heavier than its size should allow.",
+    "description": "Thrown to the ground and given its command word, this item unfolds within 1 minute into a full stone tower — 20-foot square base, 30 feet tall, arrow slits, a heavy door — sturdy enough to house a small company. Speaking the command word again folds it back down, ejecting (unharmed) anyone inside first.",
     "legacySource": {
       "tier": "rare",
       "index": 318,
@@ -21497,6 +22370,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2800 gp",
     "flavorText": "A small, heavy clay jar, sealed with wax and warded against ever drying out on its own.",
+    "description": "This jar holds 4 ounces of an adhesive that bonds two objects permanently within 1 minute of application, and can only be dissolved by Universal Solvent or a Wish. A single jar has enough for one use.",
     "legacySource": {
       "tier": "rare",
       "index": 319,
@@ -21512,6 +22386,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "3500 gp",
     "flavorText": "A plain, unassuming ring that hums faintly with a steady, watchful ward.",
+    "description": "+1 bonus to AC and all saving throws. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21530,6 +22405,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "4800 gp",
     "flavorText": "A heavy signet ring stamped with the curling horns of a ram.",
+    "description": "3 charges. As an action, expend 1-3 charges to make a ranged spell attack (+7 to hit) against a target within 60 ft.: 2d10 force damage per charge spent, and a Large or smaller target is pushed 5 ft. away per charge spent. Recharges 1d6+1 charges each dawn. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -21549,6 +22425,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "75000 gp",
     "flavorText": "A gleaming longsword of terrifying sharpness.",
+    "description": "+3 attack and damage. Natural 20: severs target's head (instantly killing most creatures). No effect on creatures that don't need heads. Ignores slashing resistance. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -21589,6 +22466,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "90000 gp",
     "flavorText": "A white-gold staff crackling with arcane energy.",
+    "description": "20 charges. +2 to attack rolls, damage rolls, AC, saving throws, and spell attack rolls while holding. Spells: Cone of Cold (5), Fireball 5th-level (5), Globe of Invulnerability (6), Hold Monster (5), Levitate (2), Lightning Bolt 5th-level (5), Magic Missile (1), Ray of Enfeeblement (1), Wall of Force (5). Retributive Strike: shatter the staff — 16d6 force damage in 30-ft radius (DC 17 Dex for half), and you take half of remaining charges as d6 force damage. Recharges 1d8+4 charges each day. Requires attunement by a sorcerer, warlock, or wizard.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -21624,6 +22502,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "48000 gp",
     "flavorText": "A plain gold ring bearing faint script. One wish remains.",
+    "description": "1 charge remaining. Expend to cast Wish. Ring becomes mundane after last charge. Stress effects possible: aging, disadvantage on attacks/saves for 2d4 days. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -21652,6 +22531,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "80000 gp",
     "flavorText": "A shimmering grey cloak. While hood is up, the wearer is completely invisible.",
+    "description": "Hood up while worn: Invisible. Up to 2 hours per day (in 1-minute increments). While not invisible, cloak is translucent. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -21671,6 +22551,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "48000 gp",
     "flavorText": "A white silk robe trimmed in gold.",
+    "description": "AC 15 + Dex modifier. +5 spell save DC. +5 spell attack bonus. Advantage on saves against spells. Requires attunement (sorcerer, warlock, wizard).",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -21691,6 +22572,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "30000 gp",
     "flavorText": "A 2-foot sphere of absolute void. Everything it touches is unmade.",
+    "description": "Hovering sphere of destruction. Creatures/objects touching it: reduced to nothing (no save for ≤100 HP; others DC 13 Con save). Controlled by DC 25 Arcana each round or it moves toward you. Talisman of the Sphere grants advantage.",
     "narrative": {
       "unlocks": [
         {
@@ -21716,6 +22598,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "32000 gp",
     "flavorText": "A golden sunburst pendant.",
+    "description": "7 charges. Expend 1: fiend or undead within 30 ft. makes DC 20 Dex save or falls into a radiant chasm, destroying it. Good-aligned cleric/paladin only. Loses magic if held by evil creature. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -21734,6 +22617,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "32000 gp",
     "flavorText": "A black iron disc.",
+    "description": "6 charges. Expend 1: celestial within 30 ft. makes DC 20 Dex save or falls into an abyssal chasm, destroying it. Evil-aligned cleric only. Loses magic if held by good creature. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -21762,14 +22646,35 @@ const canonicalItems = [
     "weight": 1,
     "value": "50000 gp",
     "flavorText": "A sapphire-bound book.",
+    "description": "Read over 48 hours across 6 days: Intelligence score and maximum Intelligence permanently +2. Loses magic after use. Recharges magic in a century.",
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "read",
+        "name": "Read",
+        "kind": "active_effect",
+        "effect": {
+          "kind": "permanent_stat_increase",
+          "statMods": [
+            {
+              "stat": "int",
+              "value": 2
+            }
+          ]
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "charges"
+        },
+        "usesLeft": 1,
+        "description": "Read over 48 hours across 6 days: Intelligence score and maximum Intelligence permanently +2. Loses magic after use. Recharges magic in a century."
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 8,
       "name": "Tome of Clear Thought"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "magic"
     }
   },
   {
@@ -21779,14 +22684,35 @@ const canonicalItems = [
     "weight": 2,
     "value": "50000 gp",
     "flavorText": "A gold-clasped tome.",
+    "description": "Read over 48 hours across 6 days: Charisma score and maximum Charisma permanently +2. Loses magic after use. Recharges magic in a century.",
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "read",
+        "name": "Read",
+        "kind": "active_effect",
+        "effect": {
+          "kind": "permanent_stat_increase",
+          "statMods": [
+            {
+              "stat": "cha",
+              "value": 2
+            }
+          ]
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "charges"
+        },
+        "usesLeft": 1,
+        "description": "Read over 48 hours across 6 days: Charisma score and maximum Charisma permanently +2. Loses magic after use. Recharges magic in a century."
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 9,
       "name": "Tome of Leadership and Influence"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "magic"
     }
   },
   {
@@ -21796,6 +22722,31 @@ const canonicalItems = [
     "weight": 2,
     "value": "50000 gp",
     "flavorText": "A silver-bound volume.",
+    "description": "Read over 48 hours across 6 days: Wisdom score and maximum Wisdom permanently +2. Loses magic after use. Recharges magic in a century.",
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "read",
+        "name": "Read",
+        "kind": "active_effect",
+        "effect": {
+          "kind": "permanent_stat_increase",
+          "statMods": [
+            {
+              "stat": "wis",
+              "value": 2
+            }
+          ]
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "charges"
+        },
+        "usesLeft": 1,
+        "description": "Read over 48 hours across 6 days: Wisdom score and maximum Wisdom permanently +2. Loses magic after use. Recharges magic in a century."
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -21810,10 +22761,6 @@ const canonicalItems = [
       "tier": "superrare",
       "index": 10,
       "name": "Tome of Understanding"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "magic"
     }
   },
   {
@@ -21823,6 +22770,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "40000 gp",
     "flavorText": "A circle of black silk eight feet across.",
+    "description": "Lay on any surface: two-way portal to a random plane for 1 minute. Fold to close. 1 use per day.",
     "legacySource": {
       "tier": "superrare",
       "index": 11,
@@ -21838,6 +22786,7 @@ const canonicalItems = [
     "weight": 0.65,
     "value": "100000 gp",
     "flavorText": "A sealed iron crab-shaped vessel — a one-person submersible.",
+    "description": "10-ft long, 500 lbs. Holds 2. Walk and swim speed 30 ft. AC 20, 200 HP. Claws: 1d10+4 bludgeoning. Lever-operated. Sealed to any water pressure depth.",
     "narrative": {
       "unlocks": [
         {
@@ -21864,6 +22813,7 @@ const canonicalItems = [
     "weight": 27,
     "value": "80000 gp",
     "flavorText": "Full plate armor. Once per day: immune to all non-magical damage.",
+    "description": "AC 18. Resistance to non-magical damage at all times. Action once per day: immunity to non-magical damage for 10 minutes. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -21885,6 +22835,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "25000 gp",
     "flavorText": "A broad leather belt with a giant-tooth buckle.",
+    "description": "Strength score is 27 while wearing. No effect if Strength already 27+. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -21903,6 +22854,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "40000 gp",
     "flavorText": "A dark purple cloak.",
+    "description": "Resistance to poison damage. Immune to Poisoned condition. Spider Climb (walls/ceilings). Immune to webs (magical and mundane). Cast Web (DC 13) once per day. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -21931,6 +22883,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "24000 gp",
     "flavorText": "A flawless crystal orb for scrying and telepathic communication.",
+    "description": "Scry on any creature (DC 17 Wisdom save to resist). While scrying: cast Detect Thoughts (DC 13) or communicate telepathically with target. Once per day, up to 1 hour. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -21946,6 +22899,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 1,
     "flavorText": "A deck of 16 illustrated cards, each face a small painted omen. No two decks of this kind are ever quite the same, but every one shares its nature: draw a card and its fate becomes yours, for better or worse, the instant it leaves the deck.",
+    "description": "Use the deck from your Inventory tab to draw a card. Each draw is permanent and immediate — good and bad alike. The deck cannot be destroyed by ordinary means and always has a card left to give.",
     "legacySource": {
       "tier": "superrare",
       "index": 17,
@@ -21962,6 +22916,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "24000 gp",
     "flavorText": "A longsword of elegant power.",
+    "description": "+3 attack and damage. Each turn before attacking: transfer any or all of the +3 bonus to your AC instead. Bonus resets each turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22001,6 +22956,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "60000 gp",
     "flavorText": "A stoppered brass bottle. Inside is an efreeti bound by old magic.",
+    "description": "Uncork (action): 1-in-4 chance efreeti is enraged (fights you). Otherwise: serves 1 hour, grants 3 wishes. After 3 wishes or 1 hour: bottle loses magic permanently.",
     "legacySource": {
       "tier": "superrare",
       "index": 19,
@@ -22015,6 +22971,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2,
     "flavorText": "A preserved humanoid eye that must replace the user's own.",
+    "description": "Remove your eye and press it in (1d6 necrotic damage). Gain: infinite Darkvision, Truesight 120 ft., X-Ray Vision (up to 4-ft solid). Once per day: Disintegrate (DC 18) or Dominate Monster (DC 18). Cannot be voluntarily removed.",
     "narrative": {
       "unlocks": [
         {
@@ -22041,6 +22998,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 0.7,
     "flavorText": "A severed mummified hand that must replace the user's own.",
+    "description": "Sever your hand (1 HP remaining). Attach the Hand (1 hour, 10 HP). Gain: +2 Strength, cold immunity, Clairvoyance 3/day, Finger of Death 1/day (DC 18), Telekinesis 2/day. Cannot be voluntarily removed once attached.",
     "legacySource": {
       "tier": "superrare",
       "index": 21,
@@ -22063,6 +23021,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "51000 gp",
     "flavorText": "A helm studded with gems of varying types.",
+    "description": "Contains 10 diamonds, 20 rubies, 30 fire opals, 40 opals. Each gem expends for a spell: diamond=Prismatic Spray (DC 18), ruby=Wall of Fire, fire opal=Fireball (DC 18), opal=Daylight. Undead within 30 ft. take 1d6 radiant/turn. On fire damage taken: DC 13 Dex or random gem explodes. Last gem removed: 6d6 radiant 30-ft radius, helm becomes mundane. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -22085,6 +23044,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "165000 gp",
     "flavorText": "A longsword inscribed with divine script.",
+    "description": "+3 attack and damage. +2d10 radiant against undead and fiends. 10-ft aura: creatures in aura have advantage on saves against spells and effects of fiends/undead. Requires attunement by a paladin.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22123,6 +23083,7 @@ const canonicalItems = [
     "weight": 0.45,
     "value": "24000 gp",
     "flavorText": "A pale lavender ellipsoid orbiting the wearer's head.",
+    "description": "Absorbs spells of 4th level or lower targeting you, destroying them harmlessly. Total absorption capacity: 50 levels before becoming nonmagical. Track cumulative absorption. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22138,6 +23099,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2.5,
     "flavorText": "A stoppered iron bottle sealed with a brass rune.",
+    "description": "Contains a powerful creature (GM assigns — often a demon lord, devil, elemental, or unique entity). Speak the rune while uncorking: DC 17 Charisma (Persuasion) or creature ignores you. On success: obeys for 1 hour. Can hold only one creature at a time.",
     "narrative": {
       "unlocks": [
         {
@@ -22164,6 +23126,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "60000 gp",
     "flavorText": "A shortsword of supernal fortune containing a Wish.",
+    "description": "+3 attack and damage. +1 to all saving throws. Once per day: reroll one attack, save, or ability check (before knowing result). Contains 1 Wish remaining. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -22193,6 +23156,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "30000 gp",
     "flavorText": "A heavy grey mantle.",
+    "description": "Advantage on all saving throws against spells and magical effects. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22211,6 +23175,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 8,
     "flavorText": "An elven longsword that bonds to a single bearer and grows in power.",
+    "description": "+1 attack and damage (minimum). Each new bearer adds a rune on attunement (roll on DMG p.217 Moonblade table). Max 5 runes. If bearer dies, blade seeks a worthy elf. Requires attunement (elf or half-elf).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22251,6 +23216,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "26000 gp",
     "flavorText": "A longsword that drains the life force of mortals.",
+    "description": "+2 attack and damage. Critical hit against creature <100 HP: DC 15 Con save or die instantly. Works up to 9 times before exhausted — track uses. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22280,6 +23246,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "18000 gp",
     "flavorText": "A white longbow that binds to a sworn enemy.",
+    "description": "Whisper enemy's name: they become your Sworn Enemy. Attacks against them: advantage, +3d6 piercing damage. Against all others while you have a Sworn Enemy: disadvantage. New oath after long rest once previous enemy is dead. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22325,6 +23292,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "75000 gp",
     "flavorText": "Full plate of extraordinary quality, magically reinforced.",
+    "description": "AC 21 (18 base + 3). Standard plate Stealth disadvantage applies. Requires heavy armor proficiency. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -22347,6 +23315,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "10000 gp",
     "flavorText": "A crackling electrified blue-white liquid.",
+    "description": "Strength set to 29 (Storm Giant) for 1 hour. No effect if Strength already 29+.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -22372,6 +23341,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "36000 gp",
     "flavorText": "A blue sapphire ring.",
+    "description": "Once per day: summon a Djinni (full stat block) that serves for 1 hour then returns to Elemental Plane of Air. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22390,6 +23360,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "36000 gp",
     "flavorText": "A ring attuned to one of the four elemental planes.",
+    "description": "Roll or GM assigns element. Grants: resistance to that element, Primordial speech, Dominate Elemental (DC 18) 1/day, elemental control spells (see DMG p.189). Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -22418,6 +23389,7 @@ const canonicalItems = [
     "weight": 0.15,
     "value": "24000 gp",
     "flavorText": "A plain ring that holds up to 5 levels of spells.",
+    "description": "Up to 5 levels of spells stored (any combinations adding up to 5). You or another creature can cast stored spells using stored DC and attack bonus. Recharge by having spells cast into it. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22436,6 +23408,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "50000 gp",
     "flavorText": "A silver rod that absorbs spells targeted at the wearer.",
+    "description": "Reaction: absorb a spell targeting only you. Regain spell slots equal to absorbed spell's level. Max 50 levels total before rod is inert. Track cumulative absorption. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22453,6 +23426,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "64000 gp",
     "flavorText": "A mace-shaped rod granting keen awareness.",
+    "description": "Advantage on Perception. Cannot be surprised while holding. Detect Evil/Good, Detect Magic, Detect Poison/Disease at will. Once per day: 60-ft protective aura (allies can't be surprised, have advantage on saves vs. Frightened). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -22481,6 +23455,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "flavorText": "A multi-function weapon rod.",
+    "description": "Button transforms rod: flaming longsword (+3, +2d6 fire), battle axe (+3), or spear (+3, reach). Also: drain life (DC 17 Con or 0 HP, 1/day), Aura of Fear (DC 17 Wisdom, 30-ft), paralysis (DC 17 Strength). 6 button charges. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22508,6 +23483,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "136000 gp",
     "flavorText": "A platinum rod.",
+    "description": "Once per 10 days: transport up to 200 willing creatures to an extradimensional paradise. Each can remain up to 200 days. No time passes outside. Creatures can choose to leave.",
     "narrative": {
       "unlocks": [
         {
@@ -22535,6 +23511,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "36000 gp",
     "flavorText": "A scarab beetle charm.",
+    "description": "12 charges. Advantage on saves against spells. Expend 1 charge: negate a spell targeting only you. Expend 1 charge: negate a disintegrate or power word effect. At 0 charges, crumbles to dust. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22551,6 +23528,7 @@ const canonicalItems = [
     "weight": 0.95,
     "value": "50000 gp",
     "flavorText": "A thick tome bound in dragonhide containing spells of every level.",
+    "description": "Contains 3d6 spells of each spell level from 1st through 9th (GM assigns). Copy into wizard spellbook: 50 gp and 2 hours per spell level.",
     "legacySource": {
       "tier": "superrare",
       "index": 41,
@@ -22569,6 +23547,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "168000 gp",
     "flavorText": "A long staff of black wood. Absorbs spells, holds 50 charges.",
+    "description": "50 charges. +2 attack and damage. Spell Absorption (reaction): absorb spell cast at you, regain equal spell levels. Spells: Conjure Elemental (7), Dispel Magic (3), Fireball 7th (7), Flaming Sphere (2), Ice Storm (4), Invisible Stalker (7), Knock (2), Lightning Bolt 7th (7), Passwall (5), Plane Shift (7), Telekinesis (5), Wall of Fire (4), Web (2). Retributive Strike: break staff, 16d6 force 30-ft. Recharges 4d6+2 charges each day. Requires attunement (sorcerer, warlock, wizard).",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -22608,6 +23587,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3,
     "flavorText": "One of nine swords keyed to the alignment of its god.",
+    "description": "+3 attack and damage. Counter: when creature within 5 ft. damages you, use reaction to make one melee attack against it. Advantage on this attack, don't add ability modifier to damage if positive. Requires attunement by a creature of the matching alignment.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22637,6 +23617,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "50000 gp",
     "flavorText": "A jet black disc.",
+    "description": "Intelligence (Arcana) checks to control a Sphere of Annihilation have advantage. Sphere moves 20 ft./round toward a designated target. On failed control check, sphere moves randomly. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -22665,6 +23646,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3,
     "flavorText": "The death wand of the Demon Prince of Undead. It smells of rot and whispers names of the newly dead.",
+    "description": "7 charges. +3 attack and damage. Spells: Animate Dead (1 charge, animates dead within 10 ft.; up to 500 HP total of undead obey you), Circle of Death (3, DC 18, 8d6 necrotic in 60-ft sphere), Finger of Death (3, DC 18, 7d8+30 necrotic; humanoid killed rises as zombie), Power Word Kill (5, kills creature with 100 HP or fewer instantly). Charges do not replenish — once spent, that power is gone. Orcus is aware of whoever carries this wand. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -22693,6 +23675,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 15,
     "flavorText": "A trident of the sea cresting with ocean-hued gems.",
+    "description": "Deals 1d6+3 piercing. Thrown (20/60). Trident of Fish Command at will. +2d6 damage against creatures with Amphibious or Swim Speed. Dominate Monster (aquatic, DC 20) 1/day. Water Walk and Water Breathing at will. Demands devotion to a sea deity. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -22727,6 +23710,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 25,
     "flavorText": "A dwarven warhammer of legendary lineage.",
+    "description": "+3 attack and damage. Thrown (20/60): returns to hand. On hit: DC 15 Con save or stunned until end of target's next turn. Fear Aura: giants/trolls within 30 ft. make DC 16 Wisdom save at turn start or Frightened. Detect: sense giant-kin within 240 ft. Requires attunement by a dwarf.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -22769,6 +23753,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 16,
     "flavorText": "A massive black-bladed sword that devours souls.",
+    "description": "+3 attack and damage. Soul Devouring: killing a creature absorbs its soul (creature cannot be resurrected until Blackrazor releases it). Gain 10 temporary HP per devoured soul. Bonus action: Haste for 1 minute. No kills in 3 days: cursed (disadvantage on attacks/saves) until you kill. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -22800,6 +23785,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 1.5,
     "flavorText": "A full-arm tattoo of absorbing darkness that drinks in all forms of energy.",
+    "description": "Requires attunement. Resistance to all damage from spells. Once per day: as a reaction to taking any damage, become immune to that damage type for 1 minute.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -22826,6 +23812,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "160000 gp",
     "flavorText": "A silver amulet set with a gem that shows a different starscape each morning.",
+    "description": "Requires attunement. Action: name a location on another plane — DC 15 Intelligence check (DC 21 if on a different plane than your destination). Success: Plane Shift to that location. Failure: roll on the Mishaps table — teleport to a random location on a random plane.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22844,6 +23831,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "10000 gp",
     "flavorText": "A broad leather belt with a white-furred buckle.",
+    "description": "Requires attunement. Strength score becomes 23 (Frost Giant). No effect if Strength is already 23+.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22862,6 +23850,7 @@ const canonicalItems = [
     "weight": 0.2,
     "value": "10000 gp",
     "flavorText": "A slate-grey belt with a stone-carved buckle.",
+    "description": "Requires attunement. Strength score becomes 23 (Stone Giant). No effect if Strength is already 23+.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -22890,6 +23879,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "16000 gp",
     "flavorText": "A red leather belt with iron studs.",
+    "description": "Requires attunement. Strength score becomes 25 (Fire Giant). No effect if Strength is already 25+.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22908,6 +23898,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "25000 gp",
     "flavorText": "A slender candle in the color of a specific deity's domain.",
+    "description": "Requires attunement by a cleric or druid of the matching alignment. Burn it: for up to 4 hours (non-consecutive), you and allies within 30 ft. have advantage on attack rolls, ability checks, and saves, and can cast one spell of 1st level without expending a spell slot. Burns for 4 hours then becomes mundane.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -22924,6 +23915,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "50000 gp",
     "flavorText": "A 6-inch perfectly clear crystal sphere.",
+    "description": "Requires attunement. Once per day: Scry (DC 17) on any creature on the same plane. You see through the orb. Session lasts up to 1 hour. Variants: Telepathy, True Seeing, Mind Reading (each more powerful). Standard version: scrying only.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -22951,6 +23943,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "25000 gp",
     "flavorText": "A helm studded with gem sockets — most now empty, a handful remaining.",
+    "description": "+1 AC. Contains 3 fire opals and 5 opals remaining. Each gem expends for a spell: fire opal = Fireball (DC 15), opal = Daylight. Undead within 30 ft. take 1d6 radiant per turn. On fire damage taken: DC 13 Dex save or remaining gem explodes. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -22972,6 +23965,31 @@ const canonicalItems = [
     "weight": 2,
     "value": "27500 gp",
     "flavorText": "A heavy leather-bound tome with an iron-embossed cover.",
+    "description": "Read over 48 hours across 6 days: Strength score and maximum Strength permanently increase by 2. Tome loses magic after use. Recharges magic in a century.",
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "read",
+        "name": "Read",
+        "kind": "active_effect",
+        "effect": {
+          "kind": "permanent_stat_increase",
+          "statMods": [
+            {
+              "stat": "str",
+              "value": 2
+            }
+          ]
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "charges"
+        },
+        "usesLeft": 1,
+        "description": "Read over 48 hours across 6 days: Strength score and maximum Strength permanently increase by 2. Tome loses magic after use. Recharges magic in a century."
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -22986,10 +24004,6 @@ const canonicalItems = [
       "tier": "superrare",
       "index": 57,
       "name": "Manual of Gainful Exercise"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "magic"
     }
   },
   {
@@ -22999,14 +24013,35 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "27500 gp",
     "flavorText": "A slender gilt-edged manual with quicksilver on the spine.",
+    "description": "Read over 48 hours across 6 days: Dexterity score and maximum Dexterity permanently increase by 2. Tome loses magic after use. Recharges magic in a century.",
+    "itemType": "wondrous",
+    "wondrous": {},
+    "abilities": [
+      {
+        "id": "read",
+        "name": "Read",
+        "kind": "active_effect",
+        "effect": {
+          "kind": "permanent_stat_increase",
+          "statMods": [
+            {
+              "stat": "dex",
+              "value": 2
+            }
+          ]
+        },
+        "uses": {
+          "max": 1,
+          "recharge": "charges"
+        },
+        "usesLeft": 1,
+        "description": "Read over 48 hours across 6 days: Dexterity score and maximum Dexterity permanently increase by 2. Tome loses magic after use. Recharges magic in a century."
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 58,
       "name": "Manual of Quickness of Action"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "magic"
     }
   },
   {
@@ -23017,6 +24052,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "30000 gp",
     "flavorText": "A crackling blue-white liquid in a stout flask.",
+    "description": "Strength set to 29 (Storm Giant) for 1 hour. No effect if Strength is already 29+.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -23042,6 +24078,7 @@ const canonicalItems = [
     "weight": 0.25,
     "value": "72000 gp",
     "flavorText": "A heavy platinum ring with a faceted black stone.",
+    "description": "Requires attunement. Cast Telekinesis (concentration, up to 10 minutes) at will. No spell slot required. Lift objects or creatures up to 1,000 lbs. within 60 ft. Strength contest if unwilling: +11 vs. their Athletics.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -23061,6 +24098,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "20000 gp",
     "flavorText": "A pale robe that bursts into swirling prismatic patterns when activated.",
+    "description": "+2 AC. Requires attunement. While wearing: as a bonus action, activate the colors for 1 minute. While active: attackers must make DC 15 Wisdom save or be Blinded until end of their next turn. Creatures within 25 ft. that can see you are Dazzled (disadvantage on attack rolls against you).",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -23092,6 +24130,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "15000 gp",
     "flavorText": "A scroll sealed with an arcane wax disc bearing a complex 5th-level sigil.",
+    "description": "Single use. DC 15 Arcana check if not on your class spell list. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -23118,6 +24157,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "20000 gp",
     "flavorText": "A heavily reinforced vellum scroll containing a powerful 6th-level spell.",
+    "description": "Single use. DC 16 Arcana check if not on your class spell list. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -23143,6 +24183,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 30,
     "flavorText": "A full-torso tattoo of interlocking plate-like scales.",
+    "description": "AC 18 while not wearing armor. If you wear armor, the tattoo provides no benefit. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -23165,6 +24206,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "10000 gp",
     "flavorText": "A silver censer on a chain, inscribed with holy script that shifts as you read it.",
+    "description": "+2 attack and damage (flail). Requires attunement by a cleric or paladin. While swinging (using the Attack action): allies within 10 ft. regain 1d6 HP at the start of your next turn. Once per day: cast Dispel Evil and Good without components.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -23204,6 +24246,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "10000 gp",
     "flavorText": "A smooth steel helm inset with a small mirror on the brow.",
+    "description": "+1 AC. Requires attunement. Advantage on initiative rolls. Cannot be surprised while conscious. If another creature would gain a surprise attack against you, it instead must make a DC 14 Dexterity save or lose the surprise.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -23226,6 +24269,7 @@ const canonicalItems = [
     "weight": 33,
     "value": "10000 gp",
     "flavorText": "Full suit of armor made from treated dragon hide, flexible yet incredibly durable.",
+    "description": "AC 15 + Dex modifier (max 2). Resistance to the damage type of the dragon whose hide this was. Advantage on saving throws against Frightful Presence and breath weapons of that dragon type. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -23247,6 +24291,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "20000 gp",
     "flavorText": "A vessel of dragon bone that radiates warmth.",
+    "description": "Requires attunement by a dragon or a creature with the Draconic Resistance trait. Once per day: as a bonus action, exhale draconic energy in a 30-ft cone — 8d6 damage of the dragon's type (Dex DC 15 for half). Also: resistance to that damage type while attuned.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -23274,6 +24319,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "24000 gp",
     "flavorText": "A longsword of exceptional magical potency.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). Counts as magical and overcomes any resistance or immunity to non-magical slashing. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -23306,6 +24352,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 4,
     "flavorText": "A broken shard of what was once a greater weapon, radiating necrotic energy.",
+    "description": "+1 attack and damage. 3 charges. Expend 1: animate one nearby corpse as a zombie (CR 1/4 or lower) that obeys your commands for 1 hour. Expend 2: Finger of Death (DC 15, 7d8+30 necrotic; humanoid killed rises as zombie). Charges do not replenish. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -23335,6 +24382,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "18000 gp",
     "flavorText": "Full plate forged from orichalcum, fitted to cover the torso, shoulders, and hips.",
+    "description": "AC 19. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. No Strength requirement and no Stealth disadvantage — the living metal shifts its own weight distribution as you move.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 19,
@@ -23357,6 +24405,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "2500 gp",
     "flavorText": "A full-face orichalcum helm matched to a plate armor set.",
+    "description": "+2 bonus to AC. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 2,
@@ -23378,6 +24427,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "2500 gp",
     "flavorText": "Articulated orichalcum gauntlets, hinged at the knuckles for a full grip.",
+    "description": "+2 bonus to AC. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 2,
@@ -23399,6 +24449,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "2500 gp",
     "flavorText": "Orichalcum greaves covering the thighs and shins, buckled at the sides.",
+    "description": "+2 bonus to AC. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 2,
@@ -23420,6 +24471,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "2500 gp",
     "flavorText": "Reinforced orichalcum sabatons with articulated toe plates.",
+    "description": "+2 bonus to AC. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 2,
@@ -23441,6 +24493,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "2800 gp",
     "flavorText": "A kite shield of solid orichalcum, sized to match a full plate ensemble.",
+    "description": "+3 AC. Exceeds the protection of a standard shield on its own merits. Does not require attunement.",
     "armor": {
       "armorType": "shield",
       "baseAC": 3,
@@ -23462,6 +24515,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "12000 gp",
     "flavorText": "A orichalcum a short, balanced blade suited to quick strikes.",
+    "description": "Finesse, light. +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -23494,6 +24548,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "12000 gp",
     "flavorText": "A orichalcum a straight double-edged blade about a yard long.",
+    "description": "Versatile (1d10). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -23526,6 +24581,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "12000 gp",
     "flavorText": "A orichalcum a short double-edged blade with a simple crossguard.",
+    "description": "Finesse, light, thrown (range 20/60). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -23558,6 +24614,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "12000 gp",
     "flavorText": "A orichalcum a flanged metal head on a sturdy haft.",
+    "description": "Bludgeoning. +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -23587,6 +24644,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "12000 gp",
     "flavorText": "A orichalcum a broad single-bladed axe head on a long haft.",
+    "description": "Versatile (1d10). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -23619,6 +24677,7 @@ const canonicalItems = [
     "weight": 21,
     "value": "12000 gp",
     "flavorText": "A orichalcum a heavy square hammerhead built for crushing blows.",
+    "description": "Versatile (1d10). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning",
@@ -23652,6 +24711,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "12000 gp",
     "flavorText": "A orichalcum a long haft tipped with a leaf-shaped point.",
+    "description": "Thrown (range 20/60), versatile (1d8). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -23685,6 +24745,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "8000 gp",
     "flavorText": "A young griffon, still growing into its wings, fiercely loyal to whoever raised it from the egg.",
+    "description": "Fly speed 60 ft. once fully grown (matures over roughly a year of ownership; grants advantage on Animal Handling checks involving flying beasts until then). Once grown, it fights alongside its owner once per short rest with its own claw attack (2d6+3 slashing).",
     "companion": {
       "companionType": "pet",
       "flySpeed": 60
@@ -23713,6 +24774,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "7500 gp",
     "flavorText": "A tiny fey warrior no taller than a hand, armed with a sword and a longbow sized to match.",
+    "description": "Can cast Heart Sight once per short rest on its owner's behalf. Advantage on saving throws against being charmed or frightened while it's within 10 ft. Its longbow (1d4 piercing plus 1d4 poison, DC 13 Con save or poisoned 1 minute) can be loosed once per short rest to assist its owner in combat.",
     "companion": {
       "companionType": "pet"
     },
@@ -23740,6 +24802,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "9000 gp",
     "flavorText": "A mischievous, glowing fey no bigger than a sparrow, who owes a debt it intends to repay exactly once.",
+    "description": "Can cast Polymorph on its owner once, ever, when the debt is called in (GM discretion on timing/target). Until then, it can turn invisible at will and cast Dancing Lights or Disguise Self on its owner's behalf freely, plus Confusion once per day as a personal favor.",
     "companion": {
       "companionType": "pet"
     },
@@ -23767,6 +24830,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "12000 gp",
     "flavorText": "A young displacer beast, its light-bending fur not yet fully reliable, tentacles still a bit clumsy.",
+    "description": "Once per short rest, grant its owner the Displacement effect for 1 minute (attacks against you have disadvantage) as a reaction. Its tentacles (2d6+3 bludgeoning each, two attacks) can assist its owner in combat once per short rest.",
     "companion": {
       "companionType": "pet"
     },
@@ -23794,6 +24858,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "15000 gp",
     "flavorText": "A small feathered serpent, radiant and gentle, sworn to protect one mortal it has judged worthy.",
+    "description": "Can cast Bless or Cure Wounds (as a 3rd-level spell) once per short rest each, no material components. Resistance to psychic and poison damage while its owner is within 10 ft.",
     "companion": {
       "companionType": "pet"
     },
@@ -23821,6 +24886,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "10000 gp",
     "flavorText": "A young mastiff-sized shadow beast, more curious than menacing, that can slip between patches of darkness.",
+    "description": "Can teleport up to 30 ft. between two dim or dark areas once per short rest — can carry its willing owner along if they're within 5 ft. Its bark forces a DC 13 Wisdom save or the target is frightened for 1 minute, usable once per short rest.",
     "companion": {
       "companionType": "pet"
     },
@@ -23848,6 +24914,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "9500 gp",
     "flavorText": "A flightless bird the size of a draft horse, bred more for loyalty than speed, but plenty fast regardless.",
+    "description": "Speed 60 ft.; advantage on Survival checks to navigate open plains or grassland while it's your guide. Its kick (2d6+4 bludgeoning) can assist its owner in combat once per short rest.",
     "companion": {
       "companionType": "pet",
       "speed": 60
@@ -23876,6 +24943,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "15000 gp",
     "flavorText": "Half horse, half eagle, entirely proud — a hippogriff accepts a rider only after being genuinely impressed.",
+    "description": "Speed 40 ft., fly speed 60 ft. Rider gains +2 to attack rolls made while mounted and airborne. Once per short rest, the hippogriff can make its own claw and beak attacks (2d6+4 slashing, 1d10+4 piercing) to assist the rider in a fight.",
     "companion": {
       "companionType": "mount",
       "ac": 14,
@@ -23912,6 +24980,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "18000 gp",
     "flavorText": "An elk the size of a small building, antlers spanning wider than a wagon, faintly touched by the Feywild.",
+    "description": "Speed 60 ft. Rider and mount both have advantage on saving throws against being charmed while mounted. Twice per day, the elk can Misty Step (itself and rider together) up to 30 ft. Rider also gains +1 to attack rolls while mounted.",
     "companion": {
       "companionType": "mount",
       "ac": 14,
@@ -23947,6 +25016,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "14000 gp",
     "flavorText": "An enormous, patient vulture trained from the egg to accept a rider — unsettling to look at, dependable in the air.",
+    "description": "Fly speed 60 ft. Advantage on checks to spot movement or death from high altitude while the rider scouts. Its beak and talons (2d6+3 piercing) can assist the rider in combat once per short rest.",
     "companion": {
       "companionType": "mount",
       "ac": 13,
@@ -23976,6 +25046,7 @@ const canonicalItems = [
     "weight": 31,
     "value": "69500 gp",
     "flavorText": "A battle-worn greataxe said to have been carried through a war fought over the tempest itself.",
+    "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -24025,6 +25096,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "78000 gp",
     "flavorText": "A battle-worn morningstar said to have been carried through a war fought over the decay itself.",
+    "description": "+3 to attack and damage rolls. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24061,6 +25133,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "75000 gp",
     "flavorText": "The edge of this glaive never quite looks the same twice — always faintly touched by the whisper.",
+    "description": "+3 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 2d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -24100,6 +25173,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "62500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this battle staff carries the shadow in its very grain.",
+    "description": "+3 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 2d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24136,6 +25210,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "44000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this rapier carries the dawn in its very grain.",
+    "description": "+3 to attack and damage rolls. Finesse. On a hit against an undead or fiend, deal an extra 2d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24175,6 +25250,7 @@ const canonicalItems = [
     "weight": 7,
     "value": "60000 gp",
     "flavorText": "The edge of this battle staff never quite looks the same twice — always faintly touched by the venom.",
+    "description": "+3 to attack and damage rolls. On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. The bearer's own blood thins with residual toxin — disadvantage on death saving throws. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24211,6 +25287,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "74000 gp",
     "flavorText": "This kukri feels heavier than it should, as if the tempest itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -24250,6 +25327,7 @@ const canonicalItems = [
     "weight": 44,
     "value": "80500 gp",
     "flavorText": "A warhammer that hums faintly with the decay, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24290,6 +25368,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "30500 gp",
     "flavorText": "A battle-worn longbow said to have been carried through a war fought over swiftness itself.",
+    "description": "+3 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24323,6 +25402,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "43500 gp",
     "flavorText": "The edge of this glaive never quite looks the same twice — always faintly touched by fortune.",
+    "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -24356,6 +25436,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "61000 gp",
     "flavorText": "A battle-worn pike said to have been carried through a war fought over the gale itself.",
+    "description": "+3 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -24395,6 +25476,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "59500 gp",
     "flavorText": "A trident that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+3). Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24435,6 +25517,7 @@ const canonicalItems = [
     "weight": 45,
     "value": "33000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this greatsword carries the gale in its very grain.",
+    "description": "+3 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -24474,6 +25557,7 @@ const canonicalItems = [
     "weight": 15,
     "value": "47000 gp",
     "flavorText": "This shortbow feels heavier than it should, as if the dawn itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 2d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24513,6 +25597,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "96500 gp",
     "flavorText": "A maul that hums faintly with the shadow, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 2d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -24552,6 +25637,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "29000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this greatsword carries fortune in its very grain.",
+    "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -24585,6 +25671,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "98000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this scimitar carries the decay in its very grain.",
+    "description": "+3 to attack and damage rolls. Finesse. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24634,6 +25721,7 @@ const canonicalItems = [
     "weight": 19,
     "value": "95000 gp",
     "flavorText": "The edge of this halberd never quite looks the same twice — always faintly touched by the tide.",
+    "description": "+3 to attack and damage rolls. On a hit, a wave of pressure adds an extra 2d6 cold damage and the target must succeed on a DC 16 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -24673,6 +25761,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "28500 gp",
     "flavorText": "A battle-worn longbow said to have been carried through a war fought over gravity itself.",
+    "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24712,6 +25801,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "81500 gp",
     "flavorText": "The edge of this battle staff never quite looks the same twice — always faintly touched by the tempest.",
+    "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24748,6 +25838,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "86000 gp",
     "flavorText": "This battleaxe feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24797,6 +25888,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "28500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this scimitar carries the shadow in its very grain.",
+    "description": "+3 to attack and damage rolls. Finesse. On a hit while you are in dim light or darkness, deal an extra 2d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24836,6 +25928,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "53000 gp",
     "flavorText": "This mace feels heavier than it should, as if the deep frost itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 2d6 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -24882,6 +25975,7 @@ const canonicalItems = [
     "weight": 33,
     "value": "69500 gp",
     "flavorText": "A warhammer that hums faintly with the tide, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, a wave of pressure adds an extra 2d6 cold damage and the target must succeed on a DC 16 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -24932,6 +26026,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "33000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this whip carries the warding in its very grain.",
+    "description": "+3 to attack and damage rolls. Finesse. While holding this weapon, gain a +2 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -24965,6 +26060,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "50500 gp",
     "flavorText": "A battleaxe that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25004,6 +26100,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "64000 gp",
     "flavorText": "A battle-worn quarterstaff said to have been carried through a war fought over gravity itself.",
+    "description": "+3 to attack and damage rolls. Versatile (1d8+3). On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25053,6 +26150,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "88500 gp",
     "flavorText": "A battle-worn quarterstaff said to have been carried through a war fought over the decay itself.",
+    "description": "+3 to attack and damage rolls. Versatile (1d8+3). On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25097,6 +26195,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "59000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this morningstar carries gravity in its very grain.",
+    "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. The bearer feels perpetually heavier — their jump distance is halved and swimming costs double movement. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25133,6 +26232,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "36500 gp",
     "flavorText": "This battleaxe feels heavier than it should, as if the ember flame itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound cauterizes into flame for an extra 2d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25172,6 +26272,7 @@ const canonicalItems = [
     "weight": 8.5,
     "value": "30000 gp",
     "flavorText": "A battle-worn shortbow said to have been carried through a war fought over swiftness itself.",
+    "description": "+3 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25205,6 +26306,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "51500 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this kukri carries the venom in its very grain.",
+    "description": "+3 to attack and damage rolls. Finesse. On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -25244,6 +26346,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "45500 gp",
     "flavorText": "A battle-worn glaive said to have been carried through a war fought over the echo itself.",
+    "description": "+3 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 2d6 thunder damage to every creature within 10 ft. of the target (DC 16 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -25283,6 +26386,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "96500 gp",
     "flavorText": "The edge of this dagger never quite looks the same twice — always faintly touched by the dawn.",
+    "description": "+3 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit against an undead or fiend, deal an extra 2d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -25322,6 +26426,7 @@ const canonicalItems = [
     "weight": 6.5,
     "value": "69500 gp",
     "flavorText": "This longsword feels heavier than it should, as if the ember flame itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound cauterizes into flame for an extra 2d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25361,6 +26466,7 @@ const canonicalItems = [
     "weight": 38,
     "value": "99000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this greataxe carries fortune in its very grain.",
+    "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Once per long rest, the DM secretly forces you to reroll a SUCCESSFUL roll of their choice and take the new result — the item's luck runs both ways. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -25394,6 +26500,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "35000 gp",
     "flavorText": "A battle staff that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25440,6 +26547,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "99000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this morningstar carries the gale in its very grain.",
+    "description": "+3 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25476,6 +26584,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "78500 gp",
     "flavorText": "The edge of this battleaxe never quite looks the same twice — always faintly touched by the tide.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, a wave of pressure adds an extra 2d6 cold damage and the target must succeed on a DC 16 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25515,6 +26624,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "52500 gp",
     "flavorText": "A pike that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -25554,6 +26664,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "44000 gp",
     "flavorText": "A longbow that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25593,6 +26704,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "81500 gp",
     "flavorText": "A battle-worn hand crossbow said to have been carried through a war fought over the venom itself.",
+    "description": "+3 to attack and damage rolls. Ammunition (range 80/320). On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25632,6 +26744,7 @@ const canonicalItems = [
     "weight": 49,
     "value": "68500 gp",
     "flavorText": "A greataxe that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -25681,6 +26794,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "32500 gp",
     "flavorText": "A warhammer that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -25731,6 +26845,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "90000 gp",
     "flavorText": "A battle-worn scimitar said to have been carried through a war fought over the wild itself.",
+    "description": "+3 to attack and damage rolls. Finesse. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 16 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25764,6 +26879,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "68000 gp",
     "flavorText": "The edge of this handaxe never quite looks the same twice — always faintly touched by the venom.",
+    "description": "+3 to attack and damage rolls. Thrown (range 20/60). On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25810,6 +26926,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "39500 gp",
     "flavorText": "A battle-worn wand blade said to have been carried through a war fought over the decay itself.",
+    "description": "+3 to attack and damage rolls. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -25856,6 +26973,7 @@ const canonicalItems = [
     "weight": 25,
     "value": "26500 gp",
     "flavorText": "The edge of this maul never quite looks the same twice — always faintly touched by the blood.",
+    "description": "+3 to attack and damage rolls. On a hit, drain 2d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -25895,6 +27013,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "58000 gp",
     "flavorText": "A mace that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -25941,6 +27060,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "57500 gp",
     "flavorText": "A battle-worn greataxe said to have been carried through a war fought over the echo itself.",
+    "description": "+3 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 2d6 thunder damage to every creature within 10 ft. of the target (DC 16 Constitution save for half). The item resonates constantly at a low hum only the bearer can hear — disadvantage on Perception checks that rely on hearing. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -25980,6 +27100,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "61500 gp",
     "flavorText": "The edge of this sickle never quite looks the same twice — always faintly touched by fortune.",
+    "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -26015,6 +27136,7 @@ const canonicalItems = [
     "weight": 34,
     "value": "57500 gp",
     "flavorText": "This warhammer feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a critical hit, a thunderclap deals an extra 2d6 thunder damage to every creature within 10 ft. of the target (DC 16 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -26055,6 +27177,7 @@ const canonicalItems = [
     "weight": 21,
     "value": "74500 gp",
     "flavorText": "A maul that hums faintly with swiftness, its metal cool to the touch even in a forge.",
+    "description": "+3 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. The bearer finds it almost impossible to stand still — disadvantage on Stealth checks that require remaining motionless, and on checks to maintain concentration while stationary. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -26093,6 +27216,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "26000 gp",
     "flavorText": "Forged by a smith who whispered to it as they worked, this greataxe carries the deep frost in its very grain.",
+    "description": "+3 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 2d6 cold damage and its speed is halved until the end of its next turn. The bearer's own hands run cold — disadvantage on checks requiring a delicate, warm touch (lockpicking, healer's kit, fine art). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -26132,6 +27256,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "50000 gp",
     "flavorText": "The edge of this greatsword never quite looks the same twice — always faintly touched by the decay.",
+    "description": "+3 to attack and damage rolls. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -26171,6 +27296,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "84500 gp",
     "flavorText": "This cloak was clearly made for someone who expected trouble involving the blood.",
+    "description": "+2 AC. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26209,6 +27335,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "61500 gp",
     "flavorText": "A ring mail passed down through a lineage that had a complicated history with the venom.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26230,6 +27357,7 @@ const canonicalItems = [
     "weight": 0.8,
     "value": "30000 gp",
     "flavorText": "This belt was clearly made for someone who expected trouble involving the decay.",
+    "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -26258,6 +27386,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "52500 gp",
     "flavorText": "Well-worn gloves, clearly built by someone who understood the wild better than most.",
+    "description": "Once per short rest, as a bonus action, regrow 2d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -26287,6 +27416,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "52000 gp",
     "flavorText": "This tower shield was clearly made for someone who expected trouble involving the echo.",
+    "description": "+4 AC. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 16 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -26319,6 +27449,7 @@ const canonicalItems = [
     "weight": 14,
     "value": "95500 gp",
     "flavorText": "Well-worn ring mail, clearly built by someone who understood the dawn better than most.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26341,6 +27472,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "54500 gp",
     "flavorText": "Buckler that never seems to gather dust, dirt, or rust — as if the shadow kept it clean.",
+    "description": "+2 AC. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -26373,6 +27505,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "35500 gp",
     "flavorText": "A circlet passed down through a lineage that had a complicated history with the whisper.",
+    "description": "+2 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26395,6 +27528,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "85000 gp",
     "flavorText": "Scale Mail that never seems to gather dust, dirt, or rust — as if the blood kept it clean.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -26417,6 +27551,7 @@ const canonicalItems = [
     "weight": 13,
     "value": "67000 gp",
     "flavorText": "Well-worn studded leather armor, clearly built by someone who understood the gale better than most.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -26439,6 +27574,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "60500 gp",
     "flavorText": "A ring mail passed down through a lineage that had a complicated history with the shadow.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26461,6 +27597,7 @@ const canonicalItems = [
     "weight": 38,
     "value": "39500 gp",
     "flavorText": "Well-worn leather armor, clearly built by someone who understood the whisper better than most.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26482,6 +27619,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "65500 gp",
     "flavorText": "This chain shirt was clearly made for someone who expected trouble involving the whisper.",
+    "description": "AC 13 + Dexterity modifier (max 2). Medium armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -26504,6 +27642,7 @@ const canonicalItems = [
     "weight": 32,
     "value": "60500 gp",
     "flavorText": "A padded armor passed down through a lineage that had a complicated history with the tempest.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 2d6 lightning damage to the attacker. Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26525,6 +27664,7 @@ const canonicalItems = [
     "weight": 32,
     "value": "83000 gp",
     "flavorText": "A breastplate that shifts color faintly in the presence of the warding.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +2 bonus to saving throws against spells, and advantage on saves against being Petrified. The warding sigils flare painfully whenever a spell targets the bearer, dealing them 1 psychic damage even on a successful save. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26546,6 +27686,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "76500 gp",
     "flavorText": "A studded leather armor passed down through a lineage that had a complicated history with the gale.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -26568,6 +27709,7 @@ const canonicalItems = [
     "weight": 18,
     "value": "46000 gp",
     "flavorText": "A studded leather armor passed down through a lineage that had a complicated history with the shadow.",
+    "description": "AC 12 + Dexterity modifier. Light armor. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -26600,6 +27742,7 @@ const canonicalItems = [
     "weight": 31,
     "value": "38500 gp",
     "flavorText": "A plate armor that shifts color faintly in the presence of the whisper.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26632,6 +27775,7 @@ const canonicalItems = [
     "weight": 16,
     "value": "75500 gp",
     "flavorText": "Well-worn hide armor, clearly built by someone who understood the gale better than most.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26652,6 +27796,7 @@ const canonicalItems = [
     "weight": 2,
     "value": "75500 gp",
     "flavorText": "Cape that never seems to gather dust, dirt, or rust — as if the warding kept it clean.",
+    "description": "+2 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -26681,6 +27826,7 @@ const canonicalItems = [
     "weight": 32,
     "value": "39500 gp",
     "flavorText": "Well-worn hide armor, clearly built by someone who understood fortune better than most.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26711,6 +27857,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "54000 gp",
     "flavorText": "Girdle that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "description": "Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -26730,6 +27877,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "53000 gp",
     "flavorText": "Splint Armor that never seems to gather dust, dirt, or rust — as if the gale kept it clean.",
+    "description": "AC 17. Heavy armor. Disadvantage on Stealth checks. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26762,6 +27910,7 @@ const canonicalItems = [
     "weight": 9.5,
     "value": "68500 gp",
     "flavorText": "A hide armor that shifts color faintly in the presence of the void.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26798,6 +27947,7 @@ const canonicalItems = [
     "weight": 0.5,
     "value": "94000 gp",
     "flavorText": "Well-worn girdle, clearly built by someone who understood fortune better than most.",
+    "description": "Once per long rest, reroll a failed saving throw and use either result. Once per long rest, the DM secretly forces you to reroll a SUCCESSFUL roll of their choice and take the new result — the item's luck runs both ways. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -26816,6 +27966,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "58500 gp",
     "flavorText": "Well-worn greaves, clearly built by someone who understood the decay better than most.",
+    "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -26833,6 +27984,7 @@ const canonicalItems = [
     "weight": 30,
     "value": "56000 gp",
     "flavorText": "Well-worn breastplate, clearly built by someone who understood swiftness better than most.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +2 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26854,6 +28006,7 @@ const canonicalItems = [
     "weight": 33,
     "value": "41500 gp",
     "flavorText": "Breastplate that never seems to gather dust, dirt, or rust — as if the void kept it clean.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26875,6 +28028,7 @@ const canonicalItems = [
     "weight": 36,
     "value": "42000 gp",
     "flavorText": "A leather armor that shifts color faintly in the presence of the venom.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -26895,6 +28049,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "84000 gp",
     "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the decay.",
+    "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -26914,6 +28069,7 @@ const canonicalItems = [
     "weight": 23,
     "value": "47500 gp",
     "flavorText": "Well-worn chain mail, clearly built by someone who understood the whisper better than most.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -26936,6 +28092,7 @@ const canonicalItems = [
     "weight": 0.5,
     "value": "52500 gp",
     "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the warding kept them clean.",
+    "description": "+2 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -26965,6 +28122,7 @@ const canonicalItems = [
     "weight": 7.5,
     "value": "82500 gp",
     "flavorText": "A ring mail that shifts color faintly in the presence of the deep frost.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -26987,6 +28145,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "93000 gp",
     "flavorText": "This chain shirt was clearly made for someone who expected trouble involving the void.",
+    "description": "AC 13 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -27009,6 +28168,7 @@ const canonicalItems = [
     "weight": 9,
     "value": "47000 gp",
     "flavorText": "This shield was clearly made for someone who expected trouble involving the dawn.",
+    "description": "+3 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -27031,6 +28191,7 @@ const canonicalItems = [
     "weight": 39,
     "value": "75500 gp",
     "flavorText": "Well-worn half plate armor, clearly built by someone who understood the tide better than most.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -27062,6 +28223,7 @@ const canonicalItems = [
     "weight": 35,
     "value": "56000 gp",
     "flavorText": "A scale mail passed down through a lineage that had a complicated history with the blood.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -27084,6 +28246,7 @@ const canonicalItems = [
     "weight": 17,
     "value": "98000 gp",
     "flavorText": "This half plate armor was clearly made for someone who expected trouble involving swiftness.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. +2 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -27115,6 +28278,7 @@ const canonicalItems = [
     "weight": 38,
     "value": "85000 gp",
     "flavorText": "A leather armor passed down through a lineage that had a complicated history with the void.",
+    "description": "AC 11 + Dexterity modifier. Light armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -27135,6 +28299,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "67500 gp",
     "flavorText": "Well-worn bracers, clearly built by someone who understood the shadow better than most.",
+    "description": "While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -27153,6 +28318,7 @@ const canonicalItems = [
     "weight": 0.35,
     "value": "86000 gp",
     "flavorText": "Boots that never seem to gather dust, dirt, or rust — as if the tempest kept them clean.",
+    "description": "Resistance to lightning damage. Once per long rest, when struck in melee, discharge 2d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -27182,6 +28348,7 @@ const canonicalItems = [
     "weight": 29,
     "value": "94000 gp",
     "flavorText": "Well-worn studded leather armor, clearly built by someone who understood the blood better than most.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -27204,6 +28371,7 @@ const canonicalItems = [
     "weight": 40,
     "value": "38500 gp",
     "flavorText": "A leather armor passed down through a lineage that had a complicated history with the echo.",
+    "description": "AC 11 + Dexterity modifier. Light armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 16 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -27225,6 +28393,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "31500 gp",
     "flavorText": "Circlet that never seems to gather dust, dirt, or rust — as if the dawn kept it clean.",
+    "description": "+2 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -27257,6 +28426,7 @@ const canonicalItems = [
     "weight": 5,
     "value": "63500 gp",
     "flavorText": "This buckler was clearly made for someone who expected trouble involving the wild.",
+    "description": "+2 AC. Once per short rest, as a bonus action, regrow 2d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -27289,6 +28459,7 @@ const canonicalItems = [
     "weight": 3,
     "value": "82500 gp",
     "flavorText": "Circlet that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "description": "+2 AC. Once per long rest, reroll a failed saving throw and use either result. Once per long rest, the DM secretly forces you to reroll a SUCCESSFUL roll of their choice and take the new result — the item's luck runs both ways. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -27311,6 +28482,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "55500 gp",
     "flavorText": "A helm that shifts color faintly in the presence of the venom.",
+    "description": "+2 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. The bearer's own blood thins with residual toxin — disadvantage on death saving throws. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -27333,6 +28505,7 @@ const canonicalItems = [
     "weight": 11,
     "value": "52000 gp",
     "flavorText": "Well-worn tower shield, clearly built by someone who understood the deep frost better than most.",
+    "description": "+4 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -27370,6 +28543,7 @@ const canonicalItems = [
     "weight": 0.3,
     "value": "38000 gp",
     "flavorText": "A thin, unremarkable band that seems to catch the eye less than it should.",
+    "description": "While wearing this ring, you can turn invisible as an action, remaining so until the ring is removed, you attack, or you cast a spell. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -27389,6 +28563,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "22000 gp",
     "flavorText": "A curved blade so perfectly balanced it seems to move before the wielder decides to swing it.",
+    "description": "+2 attack and damage. You can make one attack with this scimitar as a bonus action on each of your turns. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -27418,6 +28593,7 @@ const canonicalItems = [
     "weight": 1,
     "value": "28000 gp",
     "flavorText": "A twisted wand carved from a single piece of bone that was never entirely one shape to begin with.",
+    "description": "7 charges. Expend 1 charge and target a creature within 60 ft.: it must succeed on a DC 15 Wisdom saving throw or be transformed as per the Polymorph spell for 1 hour, until it drops to 0 HP, or until it uses an action to revert. Recharges 1d6+1 charges each dawn.",
     "legacySource": {
       "tier": "superrare",
       "index": 207,
@@ -27433,6 +28609,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "31000 gp",
     "flavorText": "A great curling warhorn, its bronze surface etched with the marching forms of ancient soldiers.",
+    "description": "Blowing this horn summons 3d4 spectral berserker warriors who fight loyally for you for 1 hour or until slain, then vanish. Using the horn again within 7 days has an increasing chance of summoning warriors who arrive hostile instead. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
@@ -27449,6 +28626,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "42000 gp",
     "flavorText": "A tall, ornate mirror in a gilded frame, its surface a little too still to be simple glass.",
+    "description": "Any creature that sees its own reflection in this mirror must succeed on a DC 15 Charisma save or be drawn inside, trapped in one of twelve extradimensional cells until released by the mirror's owner. Up to 12 creatures can be held at once.",
     "legacySource": {
       "tier": "superrare",
       "index": 209,
@@ -27464,6 +28642,7 @@ const canonicalItems = [
     "weight": 0.85,
     "value": "35000 gp",
     "flavorText": "A densely woven flying carpet, large enough to comfortably seat a small party.",
+    "description": "Speak the command word to make this carpet fly at 30 ft., carrying up to 800 lbs. (roughly four passengers) up to 400 feet above the ground. It obeys spoken directions from whoever sits nearest the front.",
     "legacySource": {
       "tier": "superrare",
       "index": 210,
@@ -27479,6 +28658,7 @@ const canonicalItems = [
     "weight": 0.5,
     "value": "24000 gp",
     "flavorText": "A set of four horseshoes, each impossibly light and faintly warm, as though touched by open sky.",
+    "description": "Sold as a set of four and fitted to a single mount's hooves, these horseshoes grant the mount a flying speed equal to its walking speed, and its hooves make no sound at all, mundane or magical.",
     "legacySource": {
       "tier": "superrare",
       "index": 211,
@@ -27494,6 +28674,7 @@ const canonicalItems = [
     "weight": 0.6,
     "value": "18000 gp",
     "flavorText": "A single vial of clear, faintly shimmering liquid, kept sealed against its own restless nature.",
+    "description": "This liquid instantly dissolves any adhesive, including Sovereign Glue, when applied to it. One use only.",
     "legacySource": {
       "tier": "superrare",
       "index": 212,
@@ -27512,6 +28693,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "32000 gp",
     "flavorText": "A longsword honed to an edge that doesn't so much cut as simply agree to no longer be attached.",
+    "description": "On an attack roll of 20 against a creature that has at least one limb, that target takes an extra 4d6 slashing damage. If this reduces it to 0 HP, the blow severs one of its limbs (DM's choice or randomly determined), with all the narrative and mechanical consequences that implies. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -27538,6 +28720,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "20000 gp",
     "flavorText": "A round shield that, once bonded to its bearer, no longer needs a hand to hold it up.",
+    "description": "+2 AC. As a bonus action, command the shield to animate and hover in front of you (retaining its AC bonus) or return to a normal held shield — while it's animated, both your hands are free. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -27559,6 +28742,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 14,
     "flavorText": "Blackened plate armor, its pauldrons shaped like leering, horned faces that seem to shift when unwatched.",
+    "description": "AC 19. Heavy armor. Once attuned, the armor's curse takes hold: it can't be removed by any means short of Remove Curse or a Wish, and the wearer has disadvantage on saving throws against being frightened. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -27581,6 +28765,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "26000 gp",
     "flavorText": "Masterwork plate armor forged in the old dwarven style, every joint and plate fitted with uncanny precision.",
+    "description": "AC 18. Heavy armor. This armor's craftsmanship is so exceptional that your walking speed isn't reduced by its weight, and you have advantage on Strength (Athletics) checks made to push, pull, lift, or break something while wearing it.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 18,
@@ -27601,6 +28786,7 @@ const canonicalItems = [
     "weight": 26,
     "value": "48000 gp",
     "flavorText": "Ornate, silver-chased plate armor that seems, at certain angles, slightly less solid than it should.",
+    "description": "AC 18. Heavy armor. Speak the armor's command word to become Ethereal for up to 10 minutes, along with anything you're wearing or carrying. Usable once per dawn. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -27621,6 +28807,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 21,
     "flavorText": "A massive greatsword forged from the fang of an ancient red wyrm and quenched in its own blood.",
+    "description": "+4 attack and damage. +2d6 fire damage against dragons and dragonkin. When a true dragon is within 100 ft., the blade hums and the hilt scales bristle. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -27678,6 +28865,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 4,
     "flavorText": "A slender rapier engraved with a name that has been scratched out.",
+    "description": "+4 attack and damage. Attacks with this blade are completely silent. If the wielder knowingly lies while holding it, the blade rings once with a mournful note. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -27728,6 +28916,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 48,
     "flavorText": "A warhammer grown from petrified heartwood of a corrupted treant.",
+    "description": "+4 attack and damage. Critical hit: thorny vines erupt from the wound, rooting the target until end of their next turn (DC 18 Strength to end early). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -27782,6 +28971,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2,
     "flavorText": "An elven longbow strung with a lock of hair from a dying god.",
+    "description": "+4 attack and damage. The nocked arrow seeks the first creature to have drawn the wielder's blood this combat (advantage on this attack). Requires attunement by an elf.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -27832,6 +29022,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 7,
     "flavorText": "A dwarven battleaxe carried by seven generations of mountain kings.",
+    "description": "+4 attack and damage. For each unhealed wound the wielder carries: +1d6 extra damage (max +3d6). The axe is warm when the bearer is being lied to. Requires attunement by a dwarf.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -27888,6 +29079,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 5.5,
     "flavorText": "A matched pair of curved daggers forged by shadow-dancers who worked only by moonlight.",
+    "description": "+4 attack and damage each. Finesse, light. Once per short rest: teleport up to 10 ft. to any area of dim light or darkness within sight. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -27942,6 +29134,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 28,
     "flavorText": "An enormous maul once belonging to a hill giant chieftain, later cursed and abandoned.",
+    "description": "+4 attack and damage. Critical hit: target knocked prone, ground cracks in 10-ft radius (difficult terrain). Heavy, two-handed. Requires attunement by a creature with Strength 20+.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -27992,6 +29185,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 16,
     "flavorText": "A masterwork siege crossbow that ended a famous siege with a single bolt from three hundred yards.",
+    "description": "+4 attack and damage. Range 200/800. The first bolt fired each day cannot miss (automatic hit). Loading: bonus action required. Two-handed. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -28042,6 +29236,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 23,
     "flavorText": "A greatsword of blue-white steel, always rimed with frost.",
+    "description": "+4 attack and damage, +2d8 cold damage on hit. Target's speed halved until end of their next turn. Wielder immune to cold damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -28098,6 +29293,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 5,
     "flavorText": "A pair of short swords forged from melted-down coins.",
+    "description": "+4 attack and damage each. Finesse, light. Once per day: a successful hit also pickpockets one small item from the target (GM discretion). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -28152,6 +29348,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 16,
     "flavorText": "Plate armor forged from the melted shields of a hundred knights who held a doomed line.",
+    "description": "AC 22. Once per long rest: if reduced to 0 HP, drop to 1 HP instead (armor rings audibly for 1 mile). Resistance to all damage while at 1–20 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -28194,6 +29391,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2.5,
     "flavorText": "A spymaster's cloak sewn from a hundred discarded illusions.",
+    "description": "Alter apparent face and voice at will (no action). True Seeing of 8th level or higher only can penetrate this disguise. Occasionally shows a random stranger's face in reflections. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -28234,6 +29432,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 20,
     "flavorText": "Chain from the hide of an ironback boar that took a village three days to bring down.",
+    "description": "AC 17. Resistance to piercing damage. Makes a low grunt when the wearer is startled or surprised. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -28276,6 +29475,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 11,
     "flavorText": "A tower shield passed down an unbroken line of border-guard captains for three centuries.",
+    "description": "+3 AC (on top of standard shield bonus — total +5 AC from this shield). Once per day: as a reaction, reduce one attack's damage to 0. A new notch appears on the rim each time this triggers. The shield has never been broken and is immune to the Shatter spell. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -28318,6 +29518,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "Worn by a king who walked away from his own coronation.",
+    "description": "Never fatigued from walking. Always sense direction of nearest settlement. Ignore non-magical difficult terrain. No attunement required.",
     "narrative": {
       "unlocks": [
         {
@@ -28356,6 +29557,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2,
     "flavorText": "Forged for a diplomat famous for ending a war with a spine-cracking handshake.",
+    "description": "Unarmed strikes deal 1d8 bludgeoning damage. Advantage on Strength (Athletics) grapple checks. Advantage on Charisma (Intimidation) when threatening physical force. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -28396,6 +29598,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 3,
     "flavorText": "Worn by an oracle who saw her own death three times and changed the outcome each time.",
+    "description": "+1 AC. Advantage on initiative rolls. Cannot be surprised while wearing it. Once per day: before making an initiative roll, you may declare you act first this round (overrides normal initiative order). Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -28439,6 +29642,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 15,
     "flavorText": "Woven by a monastic order trained in the eye of a hurricane.",
+    "description": "+2 AC. Immune to the Prone condition and cannot be moved against your will by wind, gust, or force effects. When a creature hits you with a melee attack: you can use your reaction to force them to make a DC 16 Strength save or be pushed back 10 ft. The hem moves at all times regardless of air. Requires attunement by a monk or druid.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -28482,6 +29686,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1,
     "flavorText": "Distilled from a single feather shed willingly by a phoenix.",
+    "description": "Restores 10d4+20 HP. If used on a creature at 0 HP: they rise wreathed in harmless warm flame for one round. Action to use on an unconscious ally.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -28524,6 +29729,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "An opalescent potion brewed for a client who was never named.",
+    "description": "Assume the exact appearance of any humanoid you have seen, for 24 hours. Provides the body — not the voice. Your own accent persists regardless.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -28565,6 +29771,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1,
     "flavorText": "A silvery liquid that moves against the current of its vial.",
+    "description": "Act twice on your next turn (two complete turns worth of actions). Immediately after: gain 1 level of exhaustion.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -28606,6 +29813,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.1,
     "flavorText": "A scroll of singing script — the last spell a legendary archmage cast before retiring.",
+    "description": "Cast any 6th-level spell you have personally witnessed cast, once, without components. The scroll burns away as ash shaped like musical notes.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -28647,6 +29855,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "A pouch of silvery dust ground from a fragment of a fallen star.",
+    "description": "Coat a weapon over 1 minute: +1d6 force damage on hit for 1 hour. Overcomes any resistance or immunity to non-magical damage. Weapon emits a sustained hum while active.",
     "consumable": {
       "consumableCategory": "coating",
       "effects": [
@@ -28688,6 +29897,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1,
     "flavorText": "A crystal vial of tears wept by a queen who refused to die before finishing her revenge.",
+    "description": "Restores 6d10+12 HP. Also cures any one curse or disease. The drinker weeps uncontrollably but harmlessly for about a minute.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -28729,6 +29939,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2.5,
     "flavorText": "A tarnished coin that has never once landed the way its holder wanted — except when it mattered most.",
+    "description": "Once per week: reroll any single failed roll (before knowing the outcome). Must accept the new result. Sometimes spins on its edge for exactly ten seconds before falling.",
     "narrative": {
       "unlocks": [
         {
@@ -28766,6 +29977,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 17,
     "flavorText": "A heavy signet ring bearing the crest of a house erased from every record.",
+    "description": "+3 AC (ring of protection). Opens any door or lock inscribed with a heraldic crest. Strangers occasionally show unearned deference, then look confused. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -28808,6 +30020,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.6,
     "flavorText": "A palm-sized hourglass whose sand does not fall at a consistent rate.",
+    "description": "Once per day: rewind the last 6 seconds for yourself alone (limited Timestop equivalent). One grain of sand always falls upward when this happens.",
     "narrative": {
       "unlocks": [
         {
@@ -28844,6 +30057,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.15,
     "flavorText": "An old brass compass that has never pointed north.",
+    "description": "Needle always points toward whatever the holder most fears to find. Spins wildly if pointed at the holder's own reflection. Cannot be set to point elsewhere.",
     "narrative": {
       "unlocks": [
         {
@@ -28875,6 +30089,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.45,
     "flavorText": "A plain wooden mask worn by a monastery that vowed never to be heard again.",
+    "description": "+2 AC. The wearer's voice cannot be heard beyond 5 feet unless they choose otherwise. Occasionally hums in perfect harmony with anyone nearby. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -28911,6 +30126,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.85,
     "flavorText": "A heavy leather ledger that binds any debt spoken aloud into its pages.",
+    "description": "Once per month: call in any recorded debt, compelling a single reasonable favor (Geas equivalent, DC 20 Wisdom save to resist). New entries occasionally appear on their own — debts the holder didn't know they owed.",
     "narrative": {
       "unlocks": [
         {
@@ -28948,6 +30164,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 39,
     "flavorText": "A massive warhammer with a head the size of a man's chest, inscribed with storm runes.",
+    "description": "Deals 2d6+1 bludgeoning damage. Giant-slaying: +2d6 additional damage vs. giants. Thrown (range 20/60): returns. On a hit against a giant: DC 17 Constitution save or stunned until end of their next turn. While attuned with Belt of Giant Strength AND Gauntlets of Ogre Power: +5 attack and damage, giant hit DC 17 Wisdom or Frightened of you for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -28994,6 +30211,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "A silver-strung lyre with a resonant wooden body.",
+    "description": "Requires attunement by a bard. While playing: structures and objects within 300 ft. are immune to damage from siege weapons and spells. Play for 30 minutes: construction magic — work of up to 100 workers for 24 hours is completed instantly (walls, bridges, buildings). Once per 30 days.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29027,6 +30245,7 @@ const canonicalItems = [
     "weight": 0.55,
     "value": "75000 gp",
     "flavorText": "A brilliant ruby potion that practically glows with life.",
+    "description": "Restores 10d4+20 hit points. Action to drink.",
     "consumable": {
       "consumableCategory": "potion",
       "effects": [
@@ -29064,6 +30283,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "75000 gp",
     "flavorText": "A scroll inscribed on shimmering silver vellum, sealed with multiple overlapping wax seals.",
+    "description": "Single use. DC 17 Arcana check if not on your class spell list. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -29100,6 +30320,7 @@ const canonicalItems = [
     "weight": 0.05,
     "value": "150000 gp",
     "flavorText": "An immense scroll on stretched vellum with an 8th-level spell in golden script.",
+    "description": "Single use. DC 18 Arcana check if not on your class spell list. Scroll crumbles after use.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -29136,6 +30357,7 @@ const canonicalItems = [
     "weight": 0.1,
     "value": "50000 gp",
     "flavorText": "A scroll contained in a sealed platinum tube. The inscription shifts as you read it.",
+    "description": "Single use. DC 19 Arcana check if not on your class spell list. Scroll crumbles after use. Contains a single 9th-level spell — roll or GM assigns.",
     "consumable": {
       "consumableCategory": "scroll",
       "effects": [
@@ -29170,6 +30392,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2,
     "flavorText": "A jagged crystal taken from the Astral Plane that still crackles with psychic energy.",
+    "description": "Requires attunement by a sorcerer. While holding: +2 to spell attack rolls and spell save DC. Once per day: when you use a Metamagic option, you can teleport up to 30 ft. to an unoccupied space you can see (bonus action).",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29201,6 +30424,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.25,
     "flavorText": "A massive cauldron of black iron etched with the faces of forgotten heroes.",
+    "description": "Requires attunement by a druid or cleric. Once per day: cast True Resurrection (no spell slot, no components other than 25,000 gp in diamonds, which the cauldron consumes). Additionally: creatures revived this way return with all their hit points and no exhaustion.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29232,6 +30456,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2.5,
     "flavorText": "An ornate crystal sphere that records and stores spell knowledge.",
+    "description": "Requires attunement by a wizard. Functions as a spellbook. +2 to spell save DC and spell attack rolls. While holding: can cast one spell from the Chronicle without expending a spell slot once per day. Chronicle holds up to 100 spells.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29263,6 +30488,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "A shard of crystallized unreality taken from the Far Realm. Looking at it too long is inadvisable.",
+    "description": "Requires attunement by a sorcerer. While holding: +2 to spell save DC. Once per day as a bonus action: when you cast a spell that deals damage, you can have one target take 3d8 psychic damage and become Incapacitated until end of their next turn (DC 15 Intelligence save to negate).",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29294,6 +30520,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "An enormous spellbook that seems to have no last page.",
+    "description": "Requires attunement by a wizard. +2 to spell save DC and spell attack rolls. The book has infinite pages — can store unlimited spells. Once per long rest: read aloud from it to cast any spell in it without expending a spell slot (8th level or lower).",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29326,6 +30553,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 22,
     "flavorText": "Full plate armor of volcanic obsidian inlaid with fire dragon scales, impossibly smooth.",
+    "description": "AC 19. Immunity to fire damage. While wearing: fire breath-like attacks you make deal +2d6 fire damage. As a bonus action: breathe fire in a 30-ft cone — 10d6 fire damage (DC 18 Dex for half). Once per day.",
     "armor": {
       "armorType": "heavy",
       "baseAC": 19,
@@ -29361,6 +30589,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 36,
     "flavorText": "A massive iron rod with a crackling crown of electrical energy.",
+    "description": "+3 attack and damage (2-handed, bludgeoning). On a critical hit: discharge 12d8 lightning in a 10-ft radius (DC 18 Dex for half). While holding: immune to lightning damage, can sense metallic objects within 60 ft. Once per day: cast Chain Lightning (DC 18, 10d8). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -29405,6 +30634,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 9,
     "flavorText": "Tanned hide armor made from the pelt of a celestial beast. Covered in glowing runes.",
+    "description": "AC 14 + Dex modifier (max 2). Requires attunement by a druid or ranger. While wearing: cast Polymorph (self only, beast form) once per day without concentration — lasts 1 hour. Beast form: maximum challenge rating equal to your level. While transformed: advantage on Perception and Survival checks.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -29440,6 +30670,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.35,
     "flavorText": "A hollow figurine of a dragon carved from clear crystal. A tiny heartbeat can be felt through it.",
+    "description": "Requires attunement. Once per long rest: speak the command word — the figurine shatters, calling the spirit of the dragon it represented. The spirit acts as a draconic ally for 1 hour (statistics of an Adult Dragon of its type, half maximum HP). After 1 hour or when reduced to 0 HP, the spirit departs and the figurine is destroyed.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -29472,6 +30703,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 6.5,
     "flavorText": "One of the legendary Vestiges of Divergence — a blade that grows with its wielder.",
+    "description": "Dormant: +2 attack/damage. Awakened (over time): +3 attack/damage, +1d6 radiant damage on hit. Exalted (over time): +3 attack/damage, +2d6 radiant, advantage on all saving throws. Requires attunement. Grows as the wielder achieves great deeds.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -29518,6 +30750,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "A miniature iron tower that fits in the palm of your hand, cold to the touch, with tiny lights visible in the windows.",
+    "description": "Once per day: place it on a surface — it expands to a 20-ft square, 60-ft tall stone tower with 4 floors, crenelations, and an iron door only you can open from outside. Fully furnished. Command word to collapse it (must be unoccupied). 30 creatures can shelter inside comfortably.",
     "narrative": {
       "unlocks": [
         {
@@ -29549,6 +30782,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 33,
     "flavorText": "A greatsword of ancient make, forged during the Age of Arcanum. The blade is covered in tiny fracture lines that glow red when drawn.",
+    "description": "+3 attack and damage. On a hit: deal +2d6 force damage. On a critical hit: the target must make DC 17 Constitution save or have one of their ability scores reduced by 1d4 (your choice which) until they complete a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -29601,6 +30835,7 @@ const canonicalItems = [
     "weight": 10,
     "value": "45000 gp",
     "flavorText": "Full plate forged from adamantine, fitted to cover the torso, shoulders, and hips.",
+    "description": "AC 20. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. While wearing this armor, any critical hit against you is treated as a normal hit instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -29630,6 +30865,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "7000 gp",
     "flavorText": "A full-face adamantine helm matched to a plate armor set.",
+    "description": "+2 bonus to AC. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -29658,6 +30894,7 @@ const canonicalItems = [
     "weight": 1.5,
     "value": "7000 gp",
     "flavorText": "Articulated adamantine gauntlets, hinged at the knuckles for a full grip.",
+    "description": "+2 bonus to AC. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -29686,6 +30923,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "7000 gp",
     "flavorText": "Adamantine greaves covering the thighs and shins, buckled at the sides.",
+    "description": "+2 bonus to AC. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -29714,6 +30952,7 @@ const canonicalItems = [
     "weight": 3.5,
     "value": "7000 gp",
     "flavorText": "Reinforced adamantine sabatons with articulated toe plates.",
+    "description": "+2 bonus to AC. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -29742,6 +30981,7 @@ const canonicalItems = [
     "weight": 12,
     "value": "8000 gp",
     "flavorText": "A kite shield of solid adamantine, sized to match a full plate ensemble.",
+    "description": "+3 AC. While actively blocking, a critical hit against you from the blocked direction is treated as a normal hit instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -29770,6 +31010,7 @@ const canonicalItems = [
     "weight": 4.5,
     "value": "25000 gp",
     "flavorText": "A adamantine a short, balanced blade suited to quick strikes.",
+    "description": "Finesse, light. +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -29807,6 +31048,7 @@ const canonicalItems = [
     "weight": 5.5,
     "value": "25000 gp",
     "flavorText": "A adamantine a straight double-edged blade about a yard long.",
+    "description": "Versatile (1d10). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -29844,6 +31086,7 @@ const canonicalItems = [
     "weight": 6,
     "value": "25000 gp",
     "flavorText": "A adamantine a short double-edged blade with a simple crossguard.",
+    "description": "Finesse, light, thrown (range 20/60). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "piercing",
@@ -29881,6 +31124,7 @@ const canonicalItems = [
     "weight": 2.5,
     "value": "25000 gp",
     "flavorText": "A adamantine a flanged metal head on a sturdy haft.",
+    "description": "Bludgeoning. +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -29915,6 +31159,7 @@ const canonicalItems = [
     "weight": 4,
     "value": "25000 gp",
     "flavorText": "A adamantine a broad single-bladed axe head on a long haft.",
+    "description": "Versatile (1d10). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "slashing",
@@ -29952,6 +31197,7 @@ const canonicalItems = [
     "weight": 23,
     "value": "25000 gp",
     "flavorText": "A adamantine a heavy square hammerhead built for crushing blows.",
+    "description": "Versatile (1d10). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning",
@@ -29990,6 +31236,7 @@ const canonicalItems = [
     "weight": 8,
     "value": "25000 gp",
     "flavorText": "A adamantine a long haft tipped with a leaf-shaped point.",
+    "description": "Thrown (range 20/60), versatile (1d8). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "piercing",
@@ -30028,6 +31275,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "60000 gp",
     "flavorText": "A young bronze dragon, not yet full-grown, who has sworn an oath of protection over its chosen companion for reasons it considers private.",
+    "description": "Breath weapon (twice per short rest): 40-ft line, 8d8 lightning damage, DC 17 Dex save for half — usable to defend its owner. Water breathing while nearby. Advantage on saving throws against being charmed or frightened while it's within 30 ft.",
     "companion": {
       "companionType": "pet"
     },
@@ -30061,6 +31309,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "90000 gp",
     "flavorText": "A newly-hatched phoenix, small and unassuming, faintly warm to the touch, radiating quiet certainty that it cannot really die.",
+    "description": "Once per long rest, if its owner drops to 0 HP, the chick can expend itself in a burst of restorative flame, fully healing the owner and removing one condition of the owner's choice — then requires a week to be reborn from its own ashes before it can do so again. While alive, it sheds warm light (20 ft.) and grants its owner resistance to fire damage.",
     "companion": {
       "companionType": "pet"
     },
@@ -30094,6 +31343,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "75000 gp",
     "flavorText": "A small sphere of gentle, ever-present light bound in perpetual service by an old and largely forgotten pact.",
+    "description": "Sheds bright light 30 ft., dim light 30 ft. beyond, at will. Can cast Daylight once per short rest and Guiding Bolt (4d6 radiant) once per short rest on its owner's behalf. Immune to being surprised by evil-aligned creatures while it's within 30 ft.",
     "companion": {
       "companionType": "pet"
     },
@@ -30127,6 +31377,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "80000 gp",
     "flavorText": "A winged horse of unmistakably noble bearing, who will only bear a rider it judges to be good at heart.",
+    "description": "Speed 60 ft., fly speed 90 ft. Rider gains +3 to attack rolls made while mounted and airborne. Advantage on all saving throws against being frightened while mounted. Once per short rest, the pegasus can dive-kick (4d6+5 bludgeoning) to assist the rider.",
     "companion": {
       "companionType": "mount",
       "ac": 15,
@@ -30169,6 +31420,7 @@ const canonicalItems = [
     "weight": 0,
     "value": "95000 gp",
     "flavorText": "A full-grown griffon, eagle-headed and lion-bodied, bonded for life to one rider it chose itself.",
+    "description": "Speed 50 ft., fly speed 80 ft. Rider gains +3 to attack rolls while mounted. The griffon fights alongside its rider every round, attacking independently with its own claws and beak (2d6+5 slashing, 2d10+5 piercing) — no per-day limit.",
     "companion": {
       "companionType": "mount",
       "ac": 15,
@@ -30210,6 +31462,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2,
     "flavorText": "Legend disagrees about who first made this scimitar — only that whoever it was clearly did not intend for it to still be in use. It reacts, faintly and unmistakably, to the presence of the gale.",
+    "description": "+4 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 2d8 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -30264,6 +31517,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 5.5,
     "flavorText": "Something about this war pick suggests it was never really finished being made — only set down, for a while. It reacts, faintly and unmistakably, to the presence of the shadow.",
+    "description": "+4 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 2d8 psychic damage. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -30314,6 +31568,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 4.5,
     "flavorText": "Legend disagrees about who first made this battleaxe — only that whoever it was clearly did not intend for it to still be in use. It reacts, faintly and unmistakably, to the presence of swiftness.",
+    "description": "+4 to attack and damage rolls. Versatile (1d10+4). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -30361,6 +31616,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 3.5,
     "flavorText": "This kukri has outlived every person who ever claimed to have tamed it. Those who have carried it long enough report dreams that smell, unmistakably, of the ember flame.",
+    "description": "+4 to attack and damage rolls. Finesse. On a hit, the wound cauterizes into flame for an extra 2d8 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -30414,6 +31670,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2,
     "flavorText": "Something about this trident suggests it was never really finished being made — only set down, for a while. Scholars who've studied it agree on exactly one thing: it is not finished with the tide yet.",
+    "description": "+4 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+4). On a hit, a wave of pressure adds an extra 2d8 cold damage and the target must succeed on a DC 18 Strength save or be knocked Prone. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -30467,6 +31724,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 35,
     "flavorText": "This greataxe has outlived every person who ever claimed to have tamed it. It does not ask permission before drawing on the gale. It simply does.",
+    "description": "+4 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d8 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -30517,6 +31775,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 34,
     "flavorText": "Legend disagrees about who first made this maul — only that whoever it was clearly did not intend for it to still be in use. Scholars who've studied it agree on exactly one thing: it is not finished with swiftness yet.",
+    "description": "+4 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -30561,6 +31820,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 3.5,
     "flavorText": "This trident was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It does not ask permission before drawing on the void. It simply does.",
+    "description": "+4 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+4). On a hit, unravel the target with starlight for an extra 2d8 radiant damage, ignoring resistance to radiant damage. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -30614,6 +31874,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 4,
     "flavorText": "Forged in an age nobody alive fully remembers, this war pick has changed hands more times than its current bearer knows. It has never once been fully explained how the shadow came to live inside it.",
+    "description": "+4 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 2d8 psychic damage. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -30665,6 +31926,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 27,
     "flavorText": "This warhammer was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the tempest came to live inside it.",
+    "description": "+4 to attack and damage rolls. Versatile (1d10+4). On a hit, arcs of lightning add an extra 2d8 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -30718,6 +31980,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 3,
     "flavorText": "This handaxe has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the whisper came to live inside it.",
+    "description": "+4 to attack and damage rolls. Thrown (range 20/60). On a hit, a lance of psychic feedback adds an extra 2d8 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -30774,6 +32037,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 24,
     "flavorText": "This maul was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the echo came to live inside it.",
+    "description": "+4 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 2d8 thunder damage to every creature within 10 ft. of the target (DC 18 Constitution save for half). Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -30828,6 +32092,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 22,
     "flavorText": "Forged in an age nobody alive fully remembers, this greataxe has changed hands more times than its current bearer knows. It does not ask permission before drawing on the warding. It simply does.",
+    "description": "+4 to attack and damage rolls. While holding this weapon, gain a +3 bonus to saving throws against spells. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d12",
@@ -30876,6 +32141,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 6,
     "flavorText": "This kukri has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the decay came to live inside it.",
+    "description": "+4 to attack and damage rolls. Finesse. On a hit, the wound withers for an extra 2d8 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -30929,6 +32195,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 3.5,
     "flavorText": "Something about this battle staff suggests it was never really finished being made — only set down, for a while. Scholars who've studied it agree on exactly one thing: it is not finished with the echo yet.",
+    "description": "+4 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 2d8 thunder damage to every creature within 10 ft. of the target (DC 18 Constitution save for half). Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -30979,6 +32246,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 7,
     "flavorText": "This morningstar has outlived every person who ever claimed to have tamed it. It reacts, faintly and unmistakably, to the presence of the ember flame.",
+    "description": "+4 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 2d8 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -31029,6 +32297,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 7.5,
     "flavorText": "Legend disagrees about who first made this battleaxe — only that whoever it was clearly did not intend for it to still be in use. It does not ask permission before drawing on the shadow. It simply does.",
+    "description": "+4 to attack and damage rolls. Versatile (1d10+4). On a hit while you are in dim light or darkness, deal an extra 2d8 psychic damage. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -31082,6 +32351,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2.5,
     "flavorText": "This longbow was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the tide yet.",
+    "description": "+4 to attack and damage rolls. On a hit, a wave of pressure adds an extra 2d8 cold damage and the target must succeed on a DC 18 Strength save or be knocked Prone. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -31132,6 +32402,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 16,
     "flavorText": "Legend disagrees about who first made this half plate armor — only that whoever it was clearly did not intend for it to still be in use. Scholars who've studied it agree on exactly one thing: it is not finished with the whisper yet.",
+    "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -31169,6 +32440,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 38,
     "flavorText": "This chain mail was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It does not ask permission before drawing on the blood. It simply does.",
+    "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d8 hit points instead. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -31207,6 +32479,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 24,
     "flavorText": "Something about this ring mail suggests it was never really finished being made — only set down, for a while. Those who have carried it long enough report dreams that smell, unmistakably, of the whisper.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -31244,6 +32517,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 7.5,
     "flavorText": "This studded leather armor has outlived every person who ever claimed to have tamed it. It reacts, faintly and unmistakably, to the presence of the whisper.",
+    "description": "AC 12 + Dexterity modifier. Light armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -31281,6 +32555,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1,
     "flavorText": "This cape was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Those who have carried it long enough report dreams that smell, unmistakably, of the ember flame.",
+    "description": "+2 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 2d8 fire damage at the attacker. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31318,6 +32593,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 33,
     "flavorText": "This hide armor has outlived every person who ever claimed to have tamed it. Those who have carried it long enough report dreams that smell, unmistakably, of the deep frost.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -31355,6 +32631,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2,
     "flavorText": "Legend disagrees about who first made this gauntlets — only that whoever it was clearly did not intend for it to still be in use. It does not ask permission before drawing on the gale. It simply does.",
+    "description": "+2 AC. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31392,6 +32669,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 12,
     "flavorText": "Forged in an age nobody alive fully remembers, this shield has changed hands more times than its current bearer knows. It has never once been fully explained how the tempest came to live inside it.",
+    "description": "+4 AC. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 2d8 lightning damage to the attacker. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "shield",
@@ -31429,6 +32707,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 29,
     "flavorText": "This shield has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the blood came to live inside it.",
+    "description": "+4 AC. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d8 hit points instead. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -31466,6 +32745,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1,
     "flavorText": "Forged in an age nobody alive fully remembers, this circlet has changed hands more times than its current bearer knows. It has never once been fully explained how the venom came to live inside it.",
+    "description": "+2 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31503,6 +32783,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 3,
     "flavorText": "This cape was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the deep frost yet.",
+    "description": "+2 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31540,6 +32821,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1,
     "flavorText": "Something about this gloves suggests it was never really finished being made — only set down, for a while. It reacts, faintly and unmistakably, to the presence of the dawn.",
+    "description": "+2 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31577,6 +32859,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "Forged in an age nobody alive fully remembers, this gauntlets has changed hands more times than its current bearer knows. It does not ask permission before drawing on the dawn. It simply does.",
+    "description": "+2 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31614,6 +32897,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "This gloves was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the tempest yet.",
+    "description": "+2 AC. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 2d8 lightning damage to the attacker. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31651,6 +32935,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 0.85,
     "flavorText": "Forged in an age nobody alive fully remembers, this gauntlets has changed hands more times than its current bearer knows. It has never once been fully explained how the whisper came to live inside it.",
+    "description": "+2 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31688,6 +32973,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 32,
     "flavorText": "This hide armor was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the ember flame yet.",
+    "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 2d8 fire damage at the attacker. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -31725,6 +33011,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 1.5,
     "flavorText": "Forged in an age nobody alive fully remembers, this crown has changed hands more times than its current bearer knows. Those who have carried it long enough report dreams that smell, unmistakably, of the whisper.",
+    "description": "+2 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -31761,6 +33048,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard of grey-black glass, cold to the touch no matter the weather. Looking into it too long shows you a face you've lost. It was not made — it was left behind, the way a scar is left behind.",
+    "description": "+3 Wisdom while attuned. Once per long rest, when you or a creature within 30 ft. drops to 0 HP, you may cast Revivify on them with no material component and no cost, and the target regains hit points equal to half their hit point maximum instead of the usual 1. Curse: whenever you finish a long rest, make a DC 14 Wisdom save or lose all Hit Dice you would otherwise regain that rest — the shard feeds on your capacity to recover, not your memories. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31792,6 +33080,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard the deep red of an old bruise, warm even in winter. It thrums faintly, like a held breath about to break. Whoever carved it out of whatever it came from did not do so gently.",
+    "description": "+3 Strength while attuned. Once per turn when you hit with a melee attack, deal an extra 3d6 damage. Curse: while below half your maximum HP, you cannot willingly end your turn without either attacking or moving toward the nearest hostile creature, and cannot choose to disengage or retreat. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31823,6 +33112,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1,
     "flavorText": "A shard so dark it seems to swallow candlelight near it. Holding it still, you can feel — faintly, at the edges — the specific fear of someone who is no longer around to be afraid.",
+    "description": "+3 Charisma while attuned. Once per short rest, force every creature of your choice within 30 ft. that can see you to make a DC 16 Wisdom save or become Frightened of you for 1 minute; any creature that fails by 5 or more also drops whatever it's holding and uses all of its movement fleeing directly away from you on its next turn. Curse: once per day, the GM secretly calls for a DC 14 Wisdom save from you; on a failure, you must spend your next turn fleeing the nearest threat, whether or not it is actually dangerous. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31854,6 +33144,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1.5,
     "flavorText": "A shard cut with too many facets, like it couldn't decide what it wanted to be. Every angle shows a different reflection — always slightly better looking, slightly more accomplished, than the one actually holding it.",
+    "description": "+3 Dexterity while attuned. Once per long rest, as a reaction to any attack roll, ability check, or saving throw made by a creature within 30 ft. (including you), you may force it to be rerolled and choose which of the two results is used — even assigning a result that wasn't originally yours to your own concurrent roll instead. Curse: you have disadvantage on Charisma (Persuasion) checks made toward any creature you believe to be wealthier, more accomplished, or more envied than you — the shard's judgment, not always yours to argue with. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31885,6 +33176,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard so heavy it seems to pull the hand that holds it downward. It doesn't glow, exactly — it dims everything around it a little, the way a bad memory dims a good day.",
+    "description": "+3 Constitution while attuned. While below half your maximum HP, you have resistance to all damage. Curse: whenever an ally within 30 ft. drops to 0 HP, you must succeed on a DC 16 Wisdom save or become Poisoned until the end of your next turn, overwhelmed by the shard's grief. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31916,6 +33208,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard the warm gold of late afternoon light, humming with something between a laugh and a held note. It is, unmistakably, the only fragment that seems happy to be held — which some who have carried it find more unsettling than any of the others.",
+    "description": "+3 Charisma while attuned. Once per long rest, cast Mass Cure Wounds without expending a spell slot or material components. Curse: you cannot willingly harm a creature that is not currently attacking you or an ally — the shard floods you with an indiscriminate, overriding love for everything around you. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31947,6 +33240,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 0.75,
     "flavorText": "A shard etched with fine lines that, from any distance, look like a face turned away. It is lighter than it looks, as though whatever weight it should have has been quietly passed along to whoever is holding it instead.",
+    "description": "+3 Wisdom while attuned. Once per day, when you fail a saving throw, you may choose to succeed instead — but the nearest ally within 30 ft. must immediately make the same saving throw in your place. Curse: whenever you knowingly cause harm to an innocent creature, you gain one level of Exhaustion that cannot be removed by any rest, only by an atonement the GM designs. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31978,6 +33272,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2,
     "flavorText": "A shard that is somehow both there and not — it catches no light, casts no reflection, and feels, when held, like touching something that has already stopped feeling anything at all.",
+    "description": "+3 to all saving throws against being Charmed, Frightened, or Possessed while attuned, and you cannot be read or located by any divination effect. Once per long rest, become utterly unreadable for 1 minute: advantage on all Deception checks, and immune to any effect that would reveal your emotions, alignment, thoughts, or intentions. Curse: you no longer benefit from any effect that relies on inspiring courage or willpower (Bardic Inspiration and similar), and you have disadvantage on Charisma checks that rely on expressing genuine emotion — the shard has hollowed out the part of you such things reach. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -32004,6 +33299,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 27,
     "flavorText": "A greatsword of living silver that has never fully decided whether it is a blade or a feather. The metal shifts like mercury when the light moves and the edge is too fine to see directly. It belonged to a seraph who chose to die defending something mortal, and the god who reforged it into a weapon did so without fully understanding what they were working with.",
+    "description": "+5 attack and damage. Deals radiant damage. +2d8 radiant on every hit; +4d8 radiant against fiends and undead. Fiends and undead that attempt to wield it take 4d6 radiant damage per round. Holy Aura: while attuned, you emit a 10-ft aura of divine light — fiends and undead within the aura have disadvantage on attack rolls against you. Once per day: cast Holy Aura (no spell slot, no components) centered on yourself for 1 minute. Requires attunement by a creature of good alignment.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -32055,6 +33351,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 22,
     "flavorText": "Full plate cut from the actual shield-skin of a titan who was slain by a god, then given by that god to the first mortal ever recorded showing a titan mercy. The armor is warm to the touch regardless of temperature and the engraving on the breastplate changes slowly over years to reflect whatever the wearer considers most worth protecting.",
+    "description": "AC 24. Immune to critical hits. A faint golden halo hovers above the wearer's head at all times, visible even in absolute darkness (cannot be suppressed). Resistance to all non-magical damage. Once per day as a bonus action: activate Eternal Ward — for 1 minute, the wearer has resistance to all damage types (including magical), immunity to the Frightened and Charmed conditions, and any creature that hits you with a melee attack takes 2d8 radiant damage. Requires attunement by a lawful creature.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -32092,6 +33389,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1,
     "flavorText": "A longbow strung with a single strand of actual night sky, pulled free before the sky noticed it was missing. It has been faintly cold since the moment it was made and has never once been fully silent — a sound too low to be called music plays from it whenever it is drawn, and it whispers the name of a different star each time. Astronomers who have seen it refuse to discuss what they observed.",
+    "description": "+5 attack and damage. Arrows loosed leave a fading constellation trail in the air for 1 round. Attacks against flying creatures cannot miss (automatic hit, resolve damage normally). Once per day: Starfall Shot — loose an arrow that detonates overhead in a 30-ft radius burst of starlight. All creatures of your choice in the radius take 8d8 radiant damage (DC 18 Dex save for half) and are Blinded until the end of their next turn on a failed save. The sky directly above the impact point shows the named constellation regardless of weather or time of day for 1 minute afterward. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -32142,6 +33440,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 21,
     "flavorText": "A robe woven by the Fates from a single thread they refused, for reasons unrecorded, to cut. The woven pattern changes slowly — not in response to anything the wearer does, but in response to what they are about to do. Scholars who have studied it closely report that the pattern is always approximately three decisions ahead. This is considered either very reassuring or very disturbing depending on the scholar.",
+    "description": "AC 16 + Dex modifier while not wearing armor. +3 to all saving throws. Concentration cannot be broken by taking damage while wearing this robe — you still make Constitution saves, but on a failure you simply choose to maintain concentration instead. Once per day: after seeing any die roll (yours or a creature's within 60 ft.), reroll it and choose which result stands. Once per long rest: impose a specific outcome on one die roll before it is made — the die shows whatever result you declare. Requires attunement by a spellcaster.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -32178,6 +33477,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 0.35,
     "flavorText": "A golden cup from a divine banquet where no guest ever left hungry.",
+    "description": "Restores 20d4+40 HP, removes all conditions, and restores all expended spell slots and class features. Refills once per week with a drink that tastes like the drinker's favorite childhood meal.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -32220,6 +33520,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 3.5,
     "flavorText": "Worn by the first mortal ruler ever crowned directly by the gods, at a ceremony that made several of the attending gods uncomfortable for reasons they declined to explain publicly. The crown is plain enough that people are surprised, on seeing it, that it is the thing in question. It gets warmer as morning approaches and cooler after noon, regardless of weather or what room you are in.",
+    "description": "+3 AC. Immunity to the Blinded condition and to magical darkness. Creatures of the Undead type within 30 ft. that start their turn in your presence must make DC 18 Constitution save or take 4d6 radiant damage and have disadvantage on attack rolls until the end of their next turn. Once per day: cast Sunbeam (8d8 radiant per ray, DC 18 Con save, blinds on failed save) as an action. Once per day as a bonus action: call the Dawn — a 60-ft radius of bright sunlight (counts as natural sunlight) fills the area centered on you for 1 minute. Sunrise arrives exactly on time within 1 mile of the wearer, regardless of season, weather, or plane of existence. Requires attunement by a lawful good creature.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -32257,6 +33558,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1.5,
     "flavorText": "A cloak sewn from feathers shed voluntarily by an entire heavenly choir on the day they chose exile over singing what they were told. The feathers are white but catch color at odd angles — a different one each time, never the same color twice in a row. The wearer occasionally hums in eight-part harmony without meaning to, particularly when frightened or moved, and particularly when they think no one is listening.",
+    "description": "+3 AC. Fly speed 90 ft. with the ability to hover (not capped to walking speed). Immune to the Frightened condition. While flying: attacks against you from grounded creatures have disadvantage. Once per day: Choir's Lament — release a resonant chord audible for 1 mile; all creatures of your choice within 60 ft. must make DC 18 Wisdom save or be Stunned until the end of their next turn. The chord counts as the sound of a full heavenly choir for any purpose that requires it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -32293,6 +33595,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A page torn from the book the gods use to write reality.",
+    "description": "Once per year: speak one sentence aloud that becomes true within 1 round (GM interprets spirit, not just words — equivalent to a non-mechanical Wish). Page goes blank until used, fills with unreadable script, then goes blank again.",
     "narrative": {
       "unlocks": [
         {
@@ -32324,6 +33627,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 2,
     "flavorText": "The cremated remains of a minor god who chose to die so that mortals might live a little longer. There is exactly one recorded account of a person drinking this and surviving to describe the taste — they described it as starlight and regret, and declined to elaborate further. The vial is always slightly warm.",
+    "description": "Restores the drinker to full hit points, removes all conditions, restores all expended spell slots and class features, and grants advantage on all attack rolls, ability checks, and saving throws for 1 hour. Reportedly tastes like starlight and regret.",
     "consumable": {
       "consumableCategory": "food",
       "effects": [
@@ -32365,6 +33669,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 27,
     "flavorText": "A ring forged by a celestial judge who refused to let a single soul it ever passed judgment on go unremembered. Every soul the judge released, condemned, or pardoned is recorded somewhere in the ring's metal in script too small to read with mortal eyes. The ring is always slightly warm and has never once gone cold, not even in the coldest recorded dungeon on any known plane.",
+    "description": "+3 AC. +3 to all death saving throws. Cast Revivify once per week without expending a spell slot or material component. Cast True Resurrection once per year (requires the ring to have been attuned for at least 30 days). The ring grows a fraction warmer each time it is used to save a life. Requires attunement by a lawful or good creature.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -32401,6 +33706,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 0.65,
     "flavorText": "A torch that has been burning since before the current age. Nobody remembers who lit it. The flame is a color that does not have a name in most languages — the closest any scholar has gotten is 'the color of something that refuses to stop.' It does not consume the torch. The torch is not hot.",
+    "description": "The flame cannot be extinguished by any means short of a god's direct intervention. Sheds bright light 60 ft. and dim light 60 ft. beyond that. Undead and fiends that enter the bright radius take 2d6 radiant damage at the start of each of their turns. Illusions within the bright radius are automatically revealed — they appear as translucent outlines. Once per day: touch the flame to a dead creature — cast Raise Dead (no components, no material cost) with a casting time of 1 action instead of 1 hour. The raised creature is fully healed. Requires no attunement.",
     "narrative": {
       "unlocks": [
         {
@@ -32432,6 +33738,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 3.5,
     "flavorText": "A shortsword that was used, once, to wound a god. The god in question survived and has since declined to discuss the incident. The blade carries a nick from where it struck divine bone, and the nick has never been filed out because no whetstone has ever been able to touch it. The sword is cold. Not unpleasant cold. The kind of cold that means business.",
+    "description": "+5 attack and damage. Finesse, light. Attacks with this blade bypass all damage immunities and resistances — including those granted by magical items, spells, or divine origin. On a critical hit: the target must succeed on DC 20 Constitution save or be reduced to 0 HP. This property works on creatures that are normally immune to HP reduction. Legendary Resistance does not apply to this save. Once per long rest only. Requires attunement by a creature with at least one failed death saving throw in its history.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d6",
@@ -32478,6 +33785,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1.5,
     "flavorText": "A large ceramic urn glazed in deep blue and silver, depicting a coastline that does not correspond to any known coast. The ocean in the painting is moving. Looking at it for too long produces a sound like distant surf. It is always cold to the touch and always slightly damp.",
+    "description": "Once per day: pour any liquid into the vessel and speak a creature's name. If the creature is dead and their soul has not been claimed by a greater power (GM discretion), they are restored to life fully healed and free of all conditions — as per True Resurrection but with no material component. The liquid transforms into sea water that smells of the place the creature died. Once per long rest: the vessel can also act as a portal to any body of water the user has visited — step through and emerge from the surface of that water. The portal remains open for 1 minute.",
     "narrative": {
       "unlocks": [
         {
@@ -32509,6 +33817,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 21,
     "flavorText": "Full plate armor made from the melted-down weapons of every army that ever tried to take a particular mountain pass and failed. The smith who made it spent forty years on the project and died the morning after completing it, reportedly satisfied. The armor is heavier than any armor has a right to be, and yet the wearer never tires from wearing it.",
+    "description": "AC 23. Immune to forced movement — no spell, ability, or physical force can move you against your will. Immune to the Prone, Grappled, and Restrained conditions. Once per day as a bonus action: plant yourself — until the start of your next turn, you cannot be moved by any means and any creature that attempts to move through your space takes 4d10 bludgeoning damage and is knocked prone (Strength DC 20 to avoid the prone). Requires attunement by a creature of lawful alignment.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -32544,6 +33853,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 0.65,
     "flavorText": "A small white candle, slightly shorter than it was when first found, that has allegedly been burning since the first mortal ever learned what fire was. It smells like oak and old stone and something that might be memory. It has never dripped. The wax has never melted. It is somehow, inexplicably, getting shorter.",
+    "description": "While the candle is lit within 60 ft. of you: you cannot be surprised. All allies within 60 ft. of the candle have advantage on death saving throws. Any spell of 5th level or lower cast within the bright light radius (20 ft.) requires no spell slot — the candle fuels it. Spells cast this way are pulled from the candle's light; the candle shortens perceptibly each time. Once extinguished: the candle relights itself at the next dawn. Considered by some scholars to be less an item and more a surviving piece of a much older story. Requires no attunement.",
     "narrative": {
       "unlocks": [
         {
@@ -32575,6 +33885,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 23,
     "flavorText": "A plain white burial shroud taken from a celestial who chose to be interred rather than return to the heavens, on the grounds that they had become too attached to the place they were in. The fabric is impossibly fine. It is translucent but not see-through. It never gets dirty. If it is ever fully spread out, the pattern woven into it — invisible until then — depicts a map of a place no one has been able to identify.",
+    "description": "+4 AC. Immune to necrotic damage and to the effects of dead magic zones — spells cast by the wearer function normally in antimagic fields and dead magic zones (the shroud sustains them). Once per day: become incorporeal for up to 10 minutes (can move through objects and creatures; immune to non-magical damage while incorporeal; end as a bonus action). While incorporeal: you can communicate telepathically with any creature within 120 ft. regardless of language. Once per long rest: a creature that dies within 30 ft. of you can be preserved — their soul is held in the shroud for up to 24 hours, during which they can be restored to life by any means without the soul first needing to be retrieved from another plane. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -32612,6 +33923,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 0,
     "flavorText": "Not quite a creature and not quite an object — a small mote of captured starlight that took on enough personality, over the centuries, to be considered a companion rather than a possession. It has no true form, only a shifting point of light about the size of a fist, and it seems to genuinely like whoever it's chosen to travel with, for reasons neither party has ever managed to explain.",
+    "description": "Sheds bright light 60 ft., dim light 60 ft. beyond. +2 to all saving throws while it's within 30 ft. Twice per day, it can flare into a Guardian of Faith-like effect (a stationary spectral guardian, 60 HP, 20 radiant damage to enemies that approach) for 8 hours. Once per day, it can cast Wish on its owner's behalf for a single specific request related to light, guidance, or finding something lost (GM discretion on exact scope). It cannot be destroyed by mundane or even most magical means — if 'harmed,' it simply winks out and reforms a week later somewhere nearby.",
     "companion": {
       "companionType": "pet"
     },
@@ -32644,6 +33956,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 0,
     "flavorText": "Not born but summoned — a horse-shaped avatar of moonlight and old oaths, said to have carried heroes across the sky since before written history. It answers only one rider at a time, chosen not by worthiness exactly, but by some calculus of the heart that no scholar has ever successfully described.",
+    "description": "Speed 80 ft., fly speed 120 ft., can also run across water, cloud, and open air as if they were solid ground. Rider gains +4 to attack rolls made while mounted and has resistance to all damage while mounted and above 0 HP. Immune to being frightened while mounted. Once per day, the steed can carry itself and up to 5 additional willing creatures through a Plane Shift-like leap to any location the rider has previously visited. Cannot be permanently killed — if reduced to 0 HP, it dissolves into moonlight and reforms at the next full moon.",
     "companion": {
       "companionType": "mount",
       "ac": 18,
@@ -32685,6 +33998,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 5.5,
     "flavorText": "Legend disagrees about who first made this longsword — only that whoever it was clearly did not intend for it to still be in use. It does not ask permission before drawing on the whisper. It simply does.",
+    "description": "+5 to attack and damage rolls. Versatile (1d10+5). On a hit, a lance of psychic feedback adds an extra 3d8 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -32738,6 +34052,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 4,
     "flavorText": "Something about this dagger suggests it was never really finished being made — only set down, for a while. Scholars who've studied it agree on exactly one thing: it is not finished with the venom yet.",
+    "description": "+5 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, inject venom for an extra 3d8 poison damage; the target must succeed on a DC 20 Constitution save or be Poisoned for 1 minute. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d4",
@@ -32792,6 +34107,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 5.5,
     "flavorText": "Something about this war pick suggests it was never really finished being made — only set down, for a while. Those who have carried it long enough report dreams that smell, unmistakably, of the warding.",
+    "description": "+5 to attack and damage rolls. While holding this weapon, gain a +4 bonus to saving throws against spells. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -32837,6 +34153,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 42,
     "flavorText": "This greatsword was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It reacts, faintly and unmistakably, to the presence of the tide.",
+    "description": "+5 to attack and damage rolls. On a hit, a wave of pressure adds an extra 3d8 cold damage and the target must succeed on a DC 20 Strength save or be knocked Prone. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -32887,6 +34204,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 14,
     "flavorText": "This heavy crossbow has outlived every person who ever claimed to have tamed it. It has never once been fully explained how the deep frost came to live inside it.",
+    "description": "+5 to attack and damage rolls. Ammunition (range 80/320). On a hit, the target's blood slows to frost for an extra 3d8 cold damage and its speed is halved until the end of its next turn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d10",
@@ -32942,6 +34260,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 32,
     "flavorText": "This maul was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the ember flame came to live inside it.",
+    "description": "+5 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 3d8 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -32992,6 +34311,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1.5,
     "flavorText": "This morningstar was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Those who have carried it long enough report dreams that smell, unmistakably, of swiftness.",
+    "description": "+5 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -33036,6 +34356,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 33,
     "flavorText": "This warhammer was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It does not ask permission before drawing on the decay. It simply does.",
+    "description": "+5 to attack and damage rolls. Versatile (1d10+5). On a hit, the wound withers for an extra 3d8 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "1d8",
@@ -33091,6 +34412,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 31,
     "flavorText": "Forged in an age nobody alive fully remembers, this breastplate has changed hands more times than its current bearer knows. It does not ask permission before drawing on the deep frost. It simply does.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -33128,6 +34450,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 21,
     "flavorText": "This ring mail was carried by someone whose name history kept, even after it stopped keeping the rest of their story. It has never once been fully explained how the void came to live inside it.",
+    "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -33166,6 +34489,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 37,
     "flavorText": "Legend disagrees about who first made this plate armor — only that whoever it was clearly did not intend for it to still be in use. Those who have carried it long enough report dreams that smell, unmistakably, of fortune.",
+    "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Once per long rest, reroll a failed saving throw and use either result. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -33204,6 +34528,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 8,
     "flavorText": "This greaves was carried by someone whose name history kept, even after it stopped keeping the rest of their story. Scholars who've studied it agree on exactly one thing: it is not finished with the blood yet.",
+    "description": "+3 AC. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 3d8 hit points instead. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -33241,6 +34566,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 15,
     "flavorText": "Legend disagrees about who first made this circlet — only that whoever it was clearly did not intend for it to still be in use. Those who have carried it long enough report dreams that smell, unmistakably, of the dawn.",
+    "description": "+3 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
@@ -33278,6 +34604,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 31,
     "flavorText": "Forged in an age nobody alive fully remembers, this breastplate has changed hands more times than its current bearer knows. Those who have carried it long enough report dreams that smell, unmistakably, of the blood.",
+    "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 3d8 hit points instead. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
@@ -33314,6 +34641,7 @@ const canonicalItems = [
     "rarity": "celestial",
     "weight": 1,
     "flavorText": "This girdle has outlived every person who ever claimed to have tamed it. Scholars who've studied it agree on exactly one thing: it is not finished with the deep frost yet.",
+    "description": "+3 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
@@ -33351,6 +34679,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 19,
     "flavorText": "The Lord Commander's greatsword, forged from meteoric iron and quenched in dragon's blood during the Ashcrown's conquest of the Cinder Coast. The blade never quite cools — Bastian Reave can light a torch off the edge in cold weather, and has, more than once, just to unsettle whoever he's meeting with.",
+    "description": "+2 attack and damage. Once per turn on a hit, deal an extra 2d6 fire damage. Requires attunement by a creature of Lawful alignment.",
     "requiresAttunement": true,
     "weapon": {
       "damageDice": "2d6",
@@ -33386,6 +34715,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3.5,
     "flavorText": "Not a book — a wand disguised as one, its spine bound in what the Archmagus insists is ordinary leather. Selwyn Vayle has carried it since his apprenticeship, and it's absorbed enough of his own spellwork over the decades that it now argues back, in a small dry voice only he claims to hear.",
+    "description": "+3 to spell attack rolls and spell save DC while wielded. Once per long rest, cast Counterspell without using a spell slot or reaction — it happens automatically, faster than thought, whether or not its owner wanted it to.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "bludgeoning"
@@ -33420,6 +34750,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 48,
     "flavorText": "General Thessaly Korrin's warhammer, cast from the melted-down chains of a rebellion she put down twenty years ago in the Cinder Coast — a trophy she commissioned herself, and wears without a trace of irony.",
+    "description": "+2 attack and damage. On a critical hit, the target is Stunned until the end of its next turn.",
     "weapon": {
       "damageDice": "2d6",
       "damageType": "bludgeoning"
@@ -33448,6 +34779,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3.5,
     "flavorText": "A slim, unremarkable dagger the Imperial spymaster carries openly, on the theory that a weapon nobody bothers hiding is never suspected of anything.",
+    "description": "Finesse, light, thrown (range 20/60). +1d6 poison damage on a hit against a creature that hasn't acted yet this combat.",
     "weapon": {
       "damageDice": "1d4",
       "damageType": "bludgeoning",
@@ -33474,6 +34806,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.7,
     "flavorText": "Not a weapon by trade — a magistrate's signet ring, heavy gold, that Darrow Vane has worn since he folded the old civil register into the Queen's Legion. Every ruling he's ever quietly redirected carries its impression.",
+    "description": "While worn: once per long rest, force one creature within 30 ft. to make a DC 16 Wisdom save or be compelled to answer your next direct question honestly. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
@@ -33507,6 +34840,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "flavorText": "The Grand Inquisitor's mace, blessed by a rite the Ashcrown temple no longer performs openly — it was meant, once, to be used against genuine heresy. Darrow Vane has widened the definition considerably.",
+    "description": "+2 attack and damage. +2d6 radiant damage against a creature that has lied to you in the last minute.",
     "weapon": {
       "damageDice": "1d6",
       "damageType": "bludgeoning",
@@ -33541,6 +34875,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 4,
     "flavorText": "Commander Elara Thorne's longsword — Imperial-forged, taken off a Lord Commander's second-in-command the night she deserted. She's never had it reforged or rehilted. She wants every rebel who sees it to know exactly where it came from.",
+    "description": "+2 attack and damage. Once per short rest, when you hit a creature wearing Ashcrown colors, gain advantage on your next attack roll against a different Ashcrown target within 1 minute.",
     "weapon": {
       "damageDice": "1d8",
       "damageType": "bludgeoning"
@@ -33568,6 +34903,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.4,
     "flavorText": "A collapsible printing frame small enough to fit in a courier's pack, used to run off pamphlets by moonlight and vanish before dawn. Not a weapon in any conventional sense — the Second Flame considers it one of their most dangerous assets anyway.",
+    "description": "A single sheet run from this press, distributed and read aloud in a town within Ashcrown territory, grants the reader advantage on the next Charisma (Persuasion) check made to recruit help from the local population, once per settlement per month.",
     "legacySource": {
       "tier": "rare",
       "index": 7,

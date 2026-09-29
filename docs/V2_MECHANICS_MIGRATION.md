@@ -705,30 +705,127 @@ look. What follows is a separate, larger finding surfaced while investigating th
 flagged for a decision, not acted on unilaterally, since it's well outside a "small item" fix and
 touches far more than 16 items:
 
-**A real, much larger content-preservation gap found, not fixed:** the six ability-score tomes above
-have a genuine, structured, permanently-missing mechanic — e.g. Manual of Bodily Health's `effect`
-reads "Read over 48 hours across 6 days: Constitution score and max HP permanently increase by 2. Tome
-loses magic after use. Recharges magic in a century," and NONE of that reaches the canonical item at
-all today (only `desc`, the flavor description, maps to `flavorText`; `effect` is dropped entirely
-whenever `type: 'misc'` migrates onto the `itemType: 'tool'` fallback, and `migrateNarrativeTool` —
-used for real `treasure`/`questitem`/`document` items — has the identical gap). Checked the scope:
-of 404 `type: 'misc'` items, 401 have non-empty `effect` text, and confirmed none of it is preserved
-anywhere in canonical output for any item that lands on the `tool` itemType (only `wondrous` items
-keep it, and only the numeric stat-bonus portion `extractStatDeltasFromText` can parse — the prose
-itself, e.g. a Torch's "Sheds bright light 20-ft radius..." or a Grappling Hook's "DC 10 Dexterity to
-set...", is lost too). `item-schema.js`'s own doc comment explicitly frames this as deliberate for
-`tool`-typed items generally ("nothing in this engine ever parses [flavorText] for mechanics") and for
-treasure/questitem/document specifically ("no real mechanic to model beyond identity/content/
-category") — whether that was written with full awareness of cases like the six tomes (a real,
-consistently-shaped, easily-structured mechanic, not narrative flavor) isn't something this pass can
-determine with confidence, so it's surfaced here rather than assumed either way. Two independent
-questions for a future, properly-scoped pass, not conflated: (1) should `effect`/prose-description text
-be preserved for display even where it's genuinely narrative/GM-adjudicated (a `tool`/narrative-item
-analog to `Ability.description`'s established "honest gap, preserved as free text" pattern), and (2) do
-the six ability-score tomes warrant an actual new structured mechanic (the schema has no "permanent
-stat increase on single use" concept today — `OnUseEffect`'s `statMods`/`durationMs` model a temporary
-buff, not a permanent absorb-and-consume effect). Out of scope for this pass; not silently dropped from
-the record either.
+**A real, much larger content-preservation gap found in Phase 14c, fixed in Phase 15 below:** see
+that phase for the full writeup — both of the two independent questions this note originally raised
+(display-text preservation generally, and whether the six ability-score tomes warrant a real
+structured mechanic) were taken on, by explicit request, rather than left open.
+
+## Phase 15: universal `effect`-text preservation, and a real mechanic for the six ability-score tomes
+
+Phase 14c's investigation surfaced a genuine content-preservation gap far larger than that phase's
+own 16-item scope: NO migrated item preserves its raw legacy `effect` text anywhere in canonical
+output unless a structured facet happens to capture all of it — confirmed across the whole catalog,
+401 of 404 `type: 'misc'` items have non-empty `effect` text, none of it preserved. Scoped and fixed
+as its own task, in two parts.
+
+### Part A: `Item.description` — a universal, display-only backstop
+
+Added `description` to the `Item` schema (`item-schema.js`) — same convention as the already-existing
+`Ability.description`: display-only, **never** parsed for mechanics, populated with the item's raw
+legacy `effect` text verbatim. Every migrator (`migrateWeapon`/`migrateArmor`/`migrateConsumable`/
+`migrateMisc`/`migrateCompanion`/`migrateNarrativeTool`) now sets `...(effect ? { description: effect
+} : {})` right alongside the existing `flavorText: desc` line — unconditional whenever `effect` is
+non-empty, deliberately not restricted to only the cases where something is "left over" after
+structured extraction (matching how `flavorText`/`desc` and `Ability.description` are themselves
+always preserved, not conditionally). A structured facet is still the one authoritative mechanic
+wherever one exists; `description` is a pure backstop against silent loss, consistent with this
+migration's core "no silent content changes" principle, now applied to `effect` text the same way it
+already was to everything else.
+
+This is a **canonical-data fix, not a live-app display fix** — worth being precise about since the
+distinction matters: the live monolith's tooltips already read the LEGACY `item.effect` field
+directly (`getItemEffectText`), which migration never touches or removes (`loot-data.js` itself is
+never modified — "migration is one-time, not runtime"), so nothing was ever missing from what a
+player sees in the app today. The gap was entirely in `mechanics/canonical/items.json` itself — what
+it contains matters for the project's stated end goal ("canonical structured data must be the
+permanent runtime source") and for any future consumer of that file, even though it wasn't yet
+causing a visible bug. Confirmed via the regenerated canonical data (every migrated item with
+non-empty legacy `effect` text now carries a matching `description`) and the full test suite.
+
+### Part B: the six ability-score tomes get a real, structured, permanent mechanic
+
+Manual of Bodily Health/Gainful Exercise/Quickness of Action and Tome of Clear Thought/Leadership and
+Influence/Understanding each have a genuine, structured mechanic Phase 14c found being silently
+dropped — e.g. Manual of Bodily Health's `effect`: "Read over 48 hours across 6 days: Constitution
+score and max HP permanently increase by 2. Tome loses magic after use. Recharges magic in a
+century." Unlike every other structured `Ability` in this app (which only ever flashes its
+description text for the table to resolve manually — see `convertNpcAbility`'s own comment: "the
+mechanical effect itself was not reduced to a structured OnUseEffect"), this genuinely reduces to a
+real, precisely-defined mechanic: a ONE-TIME, PERMANENT change to two of this app's own already-live,
+already-mutable fields (`characterAbilityScores`, `characterMaxHp`) — so, by explicit request, this
+phase builds it, not just documents it as text.
+
+**Schema (`item-schema.js`):** added `'permanent_stat_increase'` to `ON_USE_KINDS`, reusing the
+existing `OnUseEffect.statMods` field for a PERMANENT base-stat change (never `durationMs`) rather
+than adding a new field — documented directly in the typedef.
+
+**Migration (`migrate-legacy-content.js`):** `parsePermanentStatIncreaseEffect(effect)` matches the
+exact phrase shape confirmed directly against `loot-data.js` (not assumed) — two different phrasings
+mixed across the six items: Constitution's own entry ("...score and max HP permanently increase by
+2") and the other five's ("...score and maximum \<Ability\> permanently increase[s] by N" or
+"...permanently +N", mixed even among those five). Deliberately an exact-shape match, not a loose
+"permanently increase" scan, confirmed to match exactly these 6 items and nothing else in the
+catalog. A match short-circuits `migrateMisc` entirely into a real 5e Wondrous Item (the correct D&D
+categorization for these tomes — not `consumable`, not the generic `tool` fallback) with one
+structured `Ability`: `{id:'read', name:'Read', kind:'active_effect', effect:{kind:
+'permanent_stat_increase', statMods:[...]}, uses:{max:1, recharge:'charges'}, usesLeft:1,
+description: effect}`. `recharge:'charges'` (not `'longRest'`/`'shortRest'`) matters specifically:
+`game-engine.js`'s `refillAbilityUses` only auto-refills those two recharge kinds on a long rest/
+Simulate a Day, so this correctly never auto-recharges within any timescale this app tracks — matching
+"Recharges magic in a century" (rather than, say, "Recharges after 100 in-game long rests," which
+nothing here tries to track).
+
+**Live app wiring (the monolith):** this needed real, careful architecture work, not just reading a
+new field, because of a structural fact this phase had to establish first: `item.abilities` is a
+LIVE, per-instance array today only for hand-authored content (`npc-data.js`'s `NPC_WEAPONS`) — a
+migrated item's abilities live on `item.__canonical.abilities` instead, a TEMPLATE object SHARED by
+every instance of that item via `CANONICAL_BY_LEGACY_KEY`, and (per Phase 12's own established rule)
+never serialized — re-derived fresh on every page load. Reading or mutating it directly (e.g.
+decrementing `usesLeft` on it, the way every other structured ability already does on its own
+`item.abilities` array) would silently corrupt every instance of that item, for every player, and the
+mutation would vanish on the next reload anyway. New helper `ensureBridgedAbilities(item)` clones
+`item.__canonical.abilities` onto `item.abilities` (each ability and its own `uses` object shallow-
+copied) the first time anything actually reads it — idempotent, a no-op once `item.abilities` is
+already set (whether from this or real hand-authored content) — giving each real item INSTANCE its
+own independent, persisted-through-the-ordinary-save-path ability state, the same way `item.charges`
+already works for other per-instance mutable state. Called at the three places `item.abilities` is
+read: `itemHasUsableAbility`, the ability-bar's per-slot render loop, and `activateStructuredAbility`.
+
+`activateStructuredAbility` (the existing click handler for any structured `item.abilities` entry)
+now recognizes `ability.effect.kind === 'permanent_stat_increase'` and, uniquely among everything
+this function handles, actually APPLIES it — `updateAbilityScore`/`updateCharacterField` (the same
+functions the DM-edit character-sheet inputs already call, so no new mutation path was invented) for
+each `statMods` entry, always the acting account's own character (this ability bar only ever reflects
+`playerSlots`, never a DM's read-only view of another player — that path never reaches this function).
+Explicitly guarded against a real bug caught before shipping: the tome's own description text
+("...over 48 hours across 6 days...") would otherwise match `parseDurationMs`'s duration-phrase scan
+and spuriously start an unrelated 48-hour countdown in Active Effects alongside the real, already-
+applied permanent change — skipped outright for this ability kind, since nothing about it is
+time-tracked. Also fixed the ability-bar tooltip/message text to fall back to `ability.description`
+when the legacy `effectText` field is absent (true for every canonically-migrated ability, only
+`npc-data.js`'s hand-authored ones set `effectText`) — previously these would have shown no
+description text at all.
+
+**Verified live**, via a headless-browser session against the running app (not just unit tests, since
+the monolith has no coverage of its own): built a fresh, legacy-shaped item instance for Manual of
+Bodily Health with no `__canonical` yet (the same shape a real loot roll produces), equipped it,
+confirmed the "Read" button renders on the ability bar, clicked it, and confirmed — `characterAbilityScores.con`
++2, `characterMaxHp` +2, the ability's `usesLeft` now 0 (button now disabled), a second click is a
+correct no-op (stats unchanged), `activeTimedEffects` stayed empty (the duration-scan guard works),
+and — the one this whole bridge design exists to get right — the SHARED canonical template's own
+`usesLeft` stayed at `1`, untouched, confirming per-instance state is genuinely isolated and never
+corrupts the shared template other players' instances of the same item read from.
+
+**Deliberately not attempted:** enforcing the "over 48 hours across 6 days" downtime requirement
+mechanically — this app has no per-item, sub-day downtime tracker at all (only a DM's whole-party
+"Simulate a Day"), and building one would be a materially larger, separate feature. Matches this
+app's own existing precedent for narrative timing/requirements generally (e.g. Phase 13's note that
+`requiresAttunement` itself has no cap-enforcement anywhere today): the requirement stays as
+descriptive text (`description`), informational for the table, same as everywhere else in this app.
+Also not touched: the DM's offline "Apply to Player" tool (`applyItemEffectToState`,
+`server/websocket.js`) — structured `item.abilities` were never wired into that path for ANY item
+(not even `npc-data.js`'s hand-authored ones), so this stays consistent with that existing, unrelated
+scope boundary rather than expanding it as a side effect of this fix.
 
 ## Not yet done (future phases, same approach)
 
@@ -747,13 +844,10 @@ the live regex path it replaces (Phase 13, all above). What's left:
    reclassified; given an honest, specific `toolCategory` in Phase 14c rather than an invented generic
    one, but not moved to a different `itemType` (still worth a manual look, not urgent since nothing
    mechanical was lost or broken by staying `tool`-typed). Phase 14c's investigation also surfaced a
-   larger, separate, NOT-yet-fixed finding worth a properly-scoped pass of its own: none of a
-   `tool`-typed item's `effect`/prose text is preserved anywhere in canonical output (only `desc`→
-   `flavorText` is) — confirmed across all 404 `misc` items, 401 of which have non-empty `effect` text
-   that's silently absent from canonical data today, the six ability-score tomes' actual "permanently
-   increase a score" mechanic included. See Phase 14c for the full writeup and the two separate
-   questions (display-only text preservation vs. a genuinely new "permanent stat increase on use"
-   mechanic) a future pass would need to answer.
+   larger, separate finding — fixed in Phase 15, both parts of it: every migrated item now preserves
+   its raw legacy `effect` text as `Item.description` (a universal, display-only backstop), and the
+   six ability-score tomes are now real 5e Wondrous Items with a genuine, working, one-time permanent
+   stat-increase mechanic (itemType `wondrous`, not `tool`) — see Phase 15 for the full writeup.
 2. The rest of `npc-data.js` (creature stat blocks, combat definitions, relationship/connection
    data — `NPC_LIBRARY`/`NPC_COMBAT_DEFS`/`NPC_CONNECTIONS` and similar), journeys/puzzles/traps
    (`journey-data.js`/`puzzle-data.js`/`trap-data.js` — traps are already fully structured today,

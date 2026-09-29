@@ -4930,8 +4930,25 @@ function resolveAbilityIconDef(ability) {
 // Same-shaped non-mutating check as handleItemActivation's own precondition, so "does this item
 // show up in the bar at all" can never drift out of sync with "does right-clicking it do
 // anything" — one is just the read-only version of the other.
+// Phase 15 (docs/V2_MECHANICS_MIGRATION.md): item.abilities is a live, per-instance array today
+// only for hand-authored content (npc-data.js's NPC_WEAPONS) — a migrated item's own structured
+// abilities live on item.__canonical.abilities instead, a TEMPLATE shared by every instance of
+// this item (via CANONICAL_BY_LEGACY_KEY). That template must never be read or mutated directly:
+// decrementing usesLeft on it would corrupt every other instance of the same item across every
+// player, and it isn't serialized at all (attachCanonicalIfMigrated's own comment — re-derived
+// fresh from mechanics/canonical/items.js on every load), so any mutation would vanish on the next
+// page load anyway. This clones the template onto item.abilities the first time anything actually
+// needs to read it — a real, independent, per-instance array that lives directly on the item
+// object and so persists through the ordinary save path exactly like item.charges already does.
+// Idempotent (a no-op once item.abilities is already set, whether from this or from real
+// hand-authored content) and side-effect-free otherwise.
+function ensureBridgedAbilities(item) {
+  if (!item || item.abilities || !item.__canonical || !item.__canonical.abilities || !item.__canonical.abilities.length) return;
+  item.abilities = item.__canonical.abilities.map(a => ({ ...a, uses: a.uses ? { ...a.uses } : undefined }));
+}
 function itemHasUsableAbility(item) {
   if (!item) return false;
+  ensureBridgedAbilities(item);
   if (item.abilities && item.abilities.length) return true;
   if (parseUsablePowers(item)) return true;
   const text = getItemEffectText(item);
@@ -4994,6 +5011,7 @@ function renderAbilityBar() {
       </button>`);
       return;
     }
+    ensureBridgedAbilities(item);
     // Structured abilities (item.abilities) each get their own icon+button, ahead of and
     // instead of the legacy one-icon-per-item free-text path below — an item with both would
     // be unusual, but abilities.length check happens first so a converted item never shows a
@@ -5003,8 +5021,9 @@ function renderAbilityBar() {
         const usesLeft = ability.usesLeft != null ? ability.usesLeft : (ability.uses ? ability.uses.max : null);
         const outOfUses = usesLeft != null && usesLeft <= 0;
         const iconDef = resolveAbilityIconDef(ability);
+        const abilityTitleText = ability.effectText || ability.description || '';
         html.push(`<button class="ability-btn${outOfUses ? ' ability-btn-disabled' : ''}" ${outOfUses ? 'disabled' : `onclick="activateStructuredAbility('${slotId}','${ability.id}')"`}
-          title="${escapeHtml(ability.name + (ability.effectText ? ' — ' + ability.effectText : '') + (outOfUses ? ' (no uses left)' : ''))}">
+          title="${escapeHtml(ability.name + (abilityTitleText ? ' — ' + abilityTitleText : '') + (outOfUses ? ' (no uses left)' : ''))}">
           ${pixelIconSvg(iconDef, iconDef.colors, 26)}<span class="ability-btn-label">${escapeHtml(ability.name.slice(0, 10))}</span>
           ${usesLeft != null ? `<span class="ability-btn-cooldown">${usesLeft}</span>` : ''}
         </button>`);
@@ -5182,11 +5201,16 @@ function confirmCastSpell(name, level) {
 // spell-kind grant), and for spell-kind abilities that ALSO specify a buff duration still
 // routes through the existing startTimedEffect -- same countdown system a potion already uses,
 // so a granted buff spell shows up in Active Effects exactly like any other timed buff would.
+// Ability-score abbreviations characterAbilityScores actually uses as keys — 'permanent_stat_increase'
+// below only ever touches these plus the separate 'hp_max' case, both read off ability.effect.statMods
+// (see item-schema.js's OnUseEffect doc comment on this kind — Phase 15, docs/V2_MECHANICS_MIGRATION.md).
+const ABILITY_SCORE_KEYS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 function activateStructuredAbility(slotId, abilityId) {
   const key = playerSlots[slotId];
   const entry = key && TOKEN_INDEX[key];
   if (!entry) return;
   const item = entry.item;
+  ensureBridgedAbilities(item);
   const ability = (item.abilities || []).find(a => a.id === abilityId);
   if (!ability) return;
   if (ability.usesLeft == null && ability.uses) ability.usesLeft = ability.uses.max;
@@ -5194,15 +5218,45 @@ function activateStructuredAbility(slotId, abilityId) {
     if (ability.usesLeft <= 0) return;
     ability.usesLeft -= 1;
   }
+  const abilityText = ability.effectText || ability.description || '';
   let message = `${ability.name} used.`;
   if (ability.kind === 'spell' && ability.spellName) {
     const spell = (typeof spellDatabase !== 'undefined' ? spellDatabase : []).find(s => s.name === ability.spellName);
-    message = spell ? `${spell.name}: ${spell.description || ability.effectText || ''}`.slice(0, 400) : `${ability.spellName} cast. ${ability.effectText || ''}`;
-  } else if (ability.effectText) {
-    message = `${ability.name}: ${ability.effectText}`;
+    message = spell ? `${spell.name}: ${spell.description || abilityText}`.slice(0, 400) : `${ability.spellName} cast. ${abilityText}`;
+  } else if (abilityText) {
+    message = `${ability.name}: ${abilityText}`;
   }
-  const dur = parseDurationMs(ability.effectText || '');
-  if (dur) startTimedEffect(item, entry.key + ':' + ability.id, entry.rarity, ability.effectText, dur);
+  // Phase 15 (docs/V2_MECHANICS_MIGRATION.md): a real, PERMANENT change to the player's own base
+  // ability scores / max HP (an ability-score tome, e.g. "Read: Constitution score and max HP
+  // permanently increase by 2") — genuinely different from every other structured ability here,
+  // which only ever flashes text for the table to resolve manually (see convertNpcAbility's own
+  // comment: "the mechanical effect itself was not reduced to a structured OnUseEffect"). This is
+  // the one kind that actually IS reduced that far, so it's actually applied: updateAbilityScore/
+  // updateCharacterField already are the correct, sole way this app mutates those fields (the same
+  // functions the DM-edit character-sheet inputs call), each already re-rendering and scheduling
+  // its own save. Always the ACTING account's own character — this ability bar only ever reflects
+  // playerSlots, never a DM's read-only view of another player (that path never reaches this
+  // function at all; see resolveForeignItem/applyViewedPlayerState).
+  const isPermanentStatIncrease = ability.effect && ability.effect.kind === 'permanent_stat_increase' && Array.isArray(ability.effect.statMods);
+  if (isPermanentStatIncrease) {
+    const gains = [];
+    ability.effect.statMods.forEach(({ stat, value }) => {
+      if (!value) return;
+      if (stat === 'hp_max' && typeof characterMaxHp === 'number') {
+        updateCharacterField('characterMaxHp', characterMaxHp + value);
+        gains.push(`Max HP ${value >= 0 ? '+' : ''}${value}`);
+      } else if (ABILITY_SCORE_KEYS.includes(stat) && typeof characterAbilityScores === 'object') {
+        updateAbilityScore(stat, (characterAbilityScores[stat] || 10) + value);
+        gains.push(`${stat.toUpperCase()} ${value >= 0 ? '+' : ''}${value}`);
+      }
+    });
+    if (gains.length) message = `${abilityText ? abilityText + ' ' : ''}${gains.join(', ')} (permanent).`.trim();
+  }
+  // Never time-tracked: a permanent_stat_increase is already fully, directly applied above, so
+  // scanning its (often multi-day-referencing, e.g. "Read over 48 hours across 6 days...") prose
+  // for a duration phrase would spuriously start an unrelated countdown in Active Effects.
+  const dur = isPermanentStatIncrease ? null : parseDurationMs(abilityText);
+  if (dur) startTimedEffect(item, entry.key + ':' + ability.id, entry.rarity, abilityText, dur);
   renderPlayerSlots();
   renderActiveEffects();
   scheduleSave();
