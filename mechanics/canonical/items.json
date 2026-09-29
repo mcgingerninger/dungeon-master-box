@@ -13370,18 +13370,22 @@
   {
     "id": "aldrics-unsent-letter",
     "name": "Aldric's Unsent Letter",
+    "itemType": "tool",
     "rarity": "rare",
-    "weight": 0.4,
+    "weight": 0.85,
     "flavorText": "A folded letter in the Crown Prince's own hand, addressed to no one, admitting more about where his allowance actually goes than he's ever said aloud. It reads like something written to be burned, not sent — and never was.",
     "description": "Quest item. Confirms, in Aldric Draventh's own handwriting, that he is the Second Flame's anonymous Patron — the single most dangerous piece of paper in the Ashcrown Empire, depending entirely on whose hands it ends up in.",
+    "tool": {
+      "toolCategory": "artifact"
+    },
+    "extraInteractions": [
+      "quest_item",
+      "turn_in"
+    ],
     "legacySource": {
       "tier": "rare",
       "index": 6,
       "name": "Aldric's Unsent Letter"
-    },
-    "itemType": "tool",
-    "tool": {
-      "toolCategory": "personal"
     }
   },
   {
