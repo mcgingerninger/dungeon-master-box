@@ -521,3 +521,55 @@ describe('applyTrapEffectToState', () => {
     assert.deepEqual(next.activeTimedEffects, []);
   });
 });
+
+describe('deriveItemProperties/deriveItemTags — word-boundary regression guard', () => {
+  // Found via a direct audit (a "Tattered Treasure Map" with "edges burnt" in its description
+  // earned a Fire badge purely because "burn" is a substring of "burnt"). A full catalog scan
+  // found the same bug class elsewhere: bare "ice"/"king"/"elder"/"toxic" matching fragments of
+  // unrelated words. Fixed with word boundaries where a real bug was confirmed (royal: 109
+  // false positives across the catalog, cold: 77, ancient: 13, poison: 1); left bare where
+  // audited and found correct (lightning/necrotic/radiant, and dragon/ancient's own root words,
+  // including compound names like "Dragonhide"/"Dragonlance" that a strict \bdragon\b boundary
+  // would have wrongly excluded).
+  test('a burnt/charred physical description no longer earns a Fire badge', () => {
+    const map = { name: 'Tattered Treasure Map', desc: 'A hand-drawn map, edges burnt, marking an X in a location that may or may not still be accurate.', type: 'document', effect: "Marks the location of a specific cache of treasure." };
+    assert.deepEqual(GE.deriveItemProperties(map, 'uncommon'), []);
+  });
+  test('"marking"/"cooking"/"working"/"drinking" no longer earn the royal tag (bare "king" substring)', () => {
+    ['marking', 'cooking', 'working', 'drinking'].forEach(word => {
+      const item = { name: `Item for ${word}`, desc: `Used for ${word} things.` };
+      const props = GE.deriveItemProperties(item);
+      assert.ok(!GE.deriveItemTags(item, [], props).includes('royal'), `"${word}" should not trigger royal`);
+    });
+  });
+  test('"service"/"device"/"dice"/"twice" no longer earn a Cold badge (bare "ice" substring)', () => {
+    ['serviceable', 'device', 'dice', 'twice'].forEach(word => {
+      const item = { name: `Item`, desc: `A thing described as ${word}.` };
+      assert.ok(!GE.deriveItemProperties(item).includes('Cold'), `"${word}" should not trigger Cold`);
+    });
+  });
+  test('"wielder" no longer earns the ancient tag (bare "elder" substring)', () => {
+    const item = { name: 'Some Weapon', desc: 'Heals the wielder for half that amount.' };
+    const props = GE.deriveItemProperties(item);
+    assert.ok(!GE.deriveItemTags(item, [], props).includes('ancient'));
+  });
+  test('"intoxicating" no longer earns a Poison badge (bare "toxic" substring)', () => {
+    const tankard = { name: 'Tankard of Sobriety', desc: 'A plain clay tankard.', effect: 'Produces no intoxicating effect.' };
+    assert.ok(!GE.deriveItemProperties(tankard).includes('Poison'));
+  });
+  test('true positives still work: real fire/poison/royal/ancient mentions are still tagged', () => {
+    const torch = { name: 'Torch', effect: 'Burns for about an hour and casts bright light.' };
+    assert.ok(GE.deriveItemProperties(torch).includes('Fire'));
+    const antitoxin = { name: 'Vial of Antitoxin', effect: 'Neutralizes common poisons.' };
+    assert.ok(GE.deriveItemProperties(antitoxin).includes('Poison'));
+    const crown = { name: 'Royal Seal', desc: 'Bears the mark of the king.' };
+    const crownProps = GE.deriveItemProperties(crown);
+    assert.ok(GE.deriveItemTags(crown, [], crownProps).includes('royal'));
+    const relic = { name: 'Elder Rune', desc: 'An ancient relic.' };
+    const relicProps = GE.deriveItemProperties(relic);
+    assert.ok(GE.deriveItemTags(relic, [], relicProps).includes('ancient'));
+    const lance = { name: 'Dragonlance', desc: 'A lance forged to slay dragons.' };
+    const lanceProps = GE.deriveItemProperties(lance);
+    assert.ok(GE.deriveItemTags(lance, [], lanceProps).includes('dragon'));
+  });
+});

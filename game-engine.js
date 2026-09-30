@@ -417,10 +417,18 @@ export function deriveItemProperties(item, rarity) {
   if ((item.weight || 0) >= 15) props.push('Heavy');
   if (item.charges === undefined && item.type === 'weapon') props.push('Durable');
   if (/quest|bounty/.test(text)) props.push('Quest Item');
-  if (/\bfire\b|flame|burn|ember/.test(text)) props.push('Fire');
-  if (/\bcold\b|frost|ice\b/.test(text)) props.push('Cold');
+  // Word-boundary fix (found via a direct audit, e.g. a "Tattered Treasure Map"'s "edges
+  // burnt" wrongly earning a Fire badge): bare substrings without \b matched fragments of
+  // unrelated words — "ice" inside "serviceable"/"device"/"dice"/"twice" (-> Cold), "toxic"
+  // inside "intoxicating" (-> Poison). Left unbounded where audited and found correct:
+  // Lightning/Necrotic/Radiant/compound dragon-prefixed names elsewhere in this file — those
+  // already only match real thematic words, not substring accidents. "burnt"/"burned" are
+  // deliberately excluded from Fire's own trigger list (kept: burn/burns/burning) since past-
+  // tense "burnt" reads at least as often as physical wear/char ("burnt edges") as active fire.
+  if (/\bfire\b|\bflame(s)?\b|\bburn(s|ing)?\b|\bember(s)?\b/.test(text)) props.push('Fire');
+  if (/\bcold\b|\bfrost(y|bite)?\b|\bice\b/.test(text)) props.push('Cold');
   if (/lightning|thunder|shock/.test(text)) props.push('Lightning');
-  if (/poison|venom|toxic/.test(text)) props.push('Poison');
+  if (/\bpoison(s|ed|ous|ing)?\b|\bvenom(ous)?\b|\btoxic\b/.test(text)) props.push('Poison');
   if (/necrotic|undead|death\b/.test(text)) props.push('Necrotic');
   if (/radiant|\bholy\b(?!\s*days?)|\bdivine\b(?!\s*service)/.test(text)) props.push('Radiant');
   return [...new Set(props)];
@@ -439,8 +447,14 @@ export function deriveItemTags(item, classification, properties) {
   properties.forEach(p => { if (['Fire','Cold','Lightning','Poison','Necrotic','Radiant'].includes(p)) tags.add(p.toLowerCase()); });
   const text = ((item.name || '') + ' ' + (item.desc || '')).toLowerCase();
   if (/undead|zombie|skeleton|lich|ghoul|wraith/.test(text)) tags.add('undead');
-  if (/king|queen|royal|noble|crown|throne/.test(text)) tags.add('royal');
-  if (/ancient|primordial|elder/.test(text)) tags.add('ancient');
+  // Same word-boundary audit as deriveItemProperties above: bare "king"/"elder" matched
+  // fragments of "cooking"/"working"/"marking"/"drinking" and "wielder" respectively — real,
+  // confirmed false positives (109 and 13 items across the catalog), not judgment calls.
+  // "ancient"/"primordial"/"dragon"/"wyrm" left bare on purpose: audited and found correct,
+  // including compound dragon-prefixed item names ("Dragonhide", "Dragonlance") that a strict
+  // \bdragon\b boundary would have wrongly excluded.
+  if (/\bking(s|dom)?\b|\bqueen(s)?\b|\broyal(ty)?\b|\bnoble(s)?\b|\bcrown(s|ed)?\b|\bthrone(s)?\b/.test(text)) tags.add('royal');
+  if (/ancient|primordial|\belder\b/.test(text)) tags.add('ancient');
   if (/dragon|wyrm/.test(text)) tags.add('dragon');
   if (item.sourceMonster) tags.add(item.sourceMonster.toLowerCase().replace(/[^a-z0-9]+/g, ''));
   return [...tags].filter(Boolean);
