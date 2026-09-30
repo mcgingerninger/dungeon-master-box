@@ -10876,19 +10876,22 @@ const SUMMON_TIERS = [
 const SUMMON_NAMED_CHANCE = 0.15;
 // Returns { label, monster } — label is always a display string; monster is the full monster
 // record when the summon came from the database (so callers can surface AC/HP/size/etc.), or
-// null for a named-entity or generic SUMMON_TIERS result, neither of which have a stat block on
+// null for a generic SUMMON_TIERS/transformForms result, neither of which have a stat block on
 // file here.
+// Per direct request: summon's fallback now draws from the SAME generic GEN.transformForms
+// pool (via pickTier) that 'transform' already uses for its own fallback, instead of a
+// separate pool of proper-named unique individuals (GEN.summonEntities, e.g. "Zyrath the Flame
+// Tyrant") — that named-entity flavor read as too specific next to transform's plain "a dire
+// wolf"/"an iron golem" style. GEN.summonEntities/SUMMON_NAMED_CHANCE are now unused; left in
+// place rather than deleted, in case the named-flavor idea is wanted back later.
 function pickSummonEntity(idx) {
   const rarity = BAL.rarityOrder[idx];
-  if (rarity === 'celestial' && Math.random() < SUMMON_NAMED_CHANCE) {
-    return { label: ri(GEN.summonEntities), monster: null };
-  }
   const monster = pickMonsterForRarity(rarity, false);
   if (monster) return { label: withArticle(monster.name), monster };
   if (idx < SUMMON_TIERS.length) return { label: ri(SUMMON_TIERS[idx]), monster: null };
-  // Nothing in the database matched this CR band at all -- fall back to a named entity rather
-  // than coming back empty-handed.
-  return { label: ri(GEN.summonEntities), monster: null };
+  // Nothing in the database matched this CR band at all -- fall back to the same generic
+  // creature pool transform's own fallback uses, picked at the matching rarity tier.
+  return { label: pickTier(GEN.transformForms, rarity), monster: null };
 }
 // Compact stat snapshot for a summoned/transformed-into monster, captured at generation time so
 // it can be shown on the item itself later (AC/HP/size/etc.) without needing the full monster
