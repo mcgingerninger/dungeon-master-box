@@ -727,8 +727,14 @@ export function describeStatSources(sources) {
   ).join(', ');
 }
 
+// `bodyArmorStyle` is the equipped body armor's weight class ('light'/'medium'/'heavy'), read
+// from a canonical item's already-computed `armor.armorType` (migrateArmor sets this on every
+// migrated armor item, but nothing previously read it back out — see effectiveDexModForArmorStyle
+// below) or a legacy item's own `armorStyle` field (added going forward — see loot-data.js's armor
+// rebalance). null when no body armor is equipped, or an equipped legacy item predates that field
+// — both cases keep today's behavior (full, uncapped Dex mod) rather than assuming a weight class.
 export function collectEquippedAcBreakdown(slots, resolveItem) {
-  let base = 10, baseSource = null;
+  let base = 10, baseSource = null, bodyArmorStyle = null;
   const flatSources = [];
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
     const entry = resolveItem(key);
@@ -736,17 +742,35 @@ export function collectEquippedAcBreakdown(slots, resolveItem) {
     if (entry.item.__canonical) {
       const contribution = canonicalAcContribution(entry.item.__canonical);
       if (!contribution) return;
-      if (contribution.replaceBase != null) { base = contribution.replaceBase; baseSource = entry.item.name; }
+      if (contribution.replaceBase != null) {
+        base = contribution.replaceBase; baseSource = entry.item.name;
+        bodyArmorStyle = entry.item.__canonical.armor.armorType || null;
+      }
       else flatSources.push({ itemName: entry.item.name, amount: contribution.flatAmount });
       return;
     }
     const raw = String(entry.item.ac || '').trim();
     if (!raw) return;
-    if (slotId === 'armor' && /^\d+$/.test(raw)) { base = parseInt(raw, 10); baseSource = entry.item.name; return; }
+    if (slotId === 'armor' && /^\d+$/.test(raw)) {
+      base = parseInt(raw, 10); baseSource = entry.item.name;
+      bodyArmorStyle = entry.item.armorStyle || null;
+      return;
+    }
     const m = /^([+-]\d+)$/.exec(raw);
     if (m) flatSources.push({ itemName: entry.item.name, amount: parseInt(m[1], 10) });
   });
-  return { base, baseSource, flatSources };
+  return { base, baseSource, flatSources, bodyArmorStyle };
+}
+// Standard 5e Dex-mod-by-armor-weight rule, never previously applied live (armorType/addsDexMod/
+// dexModCap were computed by migrateArmor and stored on every canonical armor item, but nothing in
+// this file or the monolith ever read them back out — confirmed by a full-repo grep before this fix
+// — so Dex was added to AC unconditionally and uncapped for every armor weight, heavy included).
+// Light: full Dex mod. Medium: capped at +2. Heavy: none. No body armor equipped, or a legacy item
+// with no armorStyle field yet, passes `style` as null and keeps the prior uncapped behavior.
+export function effectiveDexModForArmorStyle(style, dexMod) {
+  if (style === 'heavy') return 0;
+  if (style === 'medium') return Math.min(dexMod, 2);
+  return dexMod;
 }
 
 export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveProfs, slots, resolveItem, baseMaxHp, baseSpeed, activeEffects) {
@@ -798,6 +822,7 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   });
   const acField = collectEquippedAcBreakdown(slots, resolveItem);
   const dex = abilities.dex;
+  const effectiveDexMod = effectiveDexModForArmorStyle(acField.bodyArmorStyle, dex.mod);
   const baseSourceEntry = acField.baseSource ? [{ itemName: acField.baseSource, amount: acField.base - 10, isBaseOverride: true }] : [];
   const viaDex = dex.modDelta ? dex.sources.map(s => ({ itemName: s.itemName, amount: s.amount, viaAbility: 'Dexterity' })) : [];
   const acFlatTotal = sumBreakdown(acField.flatSources);
@@ -807,7 +832,10 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   const acTextSources = breakdown['Armor Class'] || [];
   const acTextTotal = sumBreakdown(acTextSources);
   const acSources = [...baseSourceEntry, ...acField.flatSources, ...viaDex, ...acTextSources];
-  const acTotal = acField.base + dex.mod + acFlatTotal + acTextTotal;
+  // effectiveDexMod (not the raw dex.mod) so heavy/medium body armor actually caps/zeroes the Dex
+  // contribution to AC per standard rules (see effectiveDexModForArmorStyle) -- everywhere else
+  // dex.mod is used unchanged (skills, saves, etc.), since the weight-class cap is AC-specific.
+  const acTotal = acField.base + effectiveDexMod + acFlatTotal + acTextTotal;
   const acNet = (acField.base - 10) + acFlatTotal + dex.modDelta + acTextTotal;
   const ac = { total: acTotal, sources: acSources, status: statusFor(acNet), tooltip: describeStatSources(acSources) };
   const maxHpSources = breakdown['Maximum Hit Points'] || [];

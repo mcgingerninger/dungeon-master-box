@@ -110,6 +110,64 @@ describe('computeCharacterSheetFor', () => {
   });
 });
 
+describe('computeCharacterSheetFor / collectEquippedAcBreakdown: Dex-mod cap by armor weight class', () => {
+  // Real gap found by direct audit: migrateArmor computes and stores armorType/addsDexMod/
+  // dexModCap on every canonical armor item, but nothing previously read them back out in live AC
+  // math (confirmed by a full-repo grep) — Dex was added to AC unconditionally and uncapped for
+  // every armor weight, heavy included. These tests cover both legacy items (via the new
+  // `armorStyle` field) and already-migrated canonical items (via the existing `armor.armorType`
+  // field, which this fix makes live for the first time with no migration re-run needed).
+  const highDexScores = { dex: 18 }; // mod +4
+
+  test('light armor: full, uncapped Dex mod (legacy item, armorStyle field)', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Leather Armor', ac: '11', armorStyle: 'light' } } };
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 11 + 4);
+  });
+  test('medium armor: Dex mod capped at +2 (legacy item)', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Breastplate', ac: '14', armorStyle: 'medium' } } };
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 14 + 2); // capped, not +4
+  });
+  test('heavy armor: no Dex mod at all (legacy item)', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Plate Armor', ac: '18', armorStyle: 'heavy' } } };
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 18 + 0);
+  });
+  test('no armorStyle field (existing/not-yet-rebalanced item): unchanged prior behavior, full uncapped Dex', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Old-Style Plate', ac: '18' } } };
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 18 + 4); // no cap applied -- field absent, not zero
+  });
+  test('no body armor equipped: unaffected, base 10 + full Dex mod', () => {
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], {}, () => null, 10, 30);
+    assert.equal(sheet.ac.total, 10 + 4);
+  });
+  test('canonical (already-migrated) heavy armor item: cap applies via armor.armorType, no migration re-run needed', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Plate Armor', __canonical: { armor: { armorType: 'heavy', baseAC: 18, additive: false } } } } };
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 18 + 0);
+  });
+  test('canonical medium armor item: capped at +2 via armor.armorType', () => {
+    const slots = { armor: 'chestKey' };
+    const items = { chestKey: { item: { name: 'Breastplate', __canonical: { armor: { armorType: 'medium', baseAC: 14, additive: false } } } } };
+    const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 14 + 2);
+  });
+  test('effectiveDexModForArmorStyle directly: light/medium/heavy/null', () => {
+    assert.equal(GE.effectiveDexModForArmorStyle('light', 4), 4);
+    assert.equal(GE.effectiveDexModForArmorStyle('medium', 4), 2);
+    assert.equal(GE.effectiveDexModForArmorStyle('medium', 1), 1); // below the cap, unaffected
+    assert.equal(GE.effectiveDexModForArmorStyle('heavy', 4), 0);
+    assert.equal(GE.effectiveDexModForArmorStyle(null, 4), 4);
+  });
+});
+
 describe('computeCharacterSheetFor: text-driven Armor Class / Movement Speed (named traits, DM-attached modifiers)', () => {
   test('a "+N Armor Class" effect layers on top of the item\'s own .ac field rather than replacing it', () => {
     const slots = { armor: 'chestKey' };
