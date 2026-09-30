@@ -1573,7 +1573,12 @@
   .npc-card-field { font-size:0.86rem; line-height:1.45; margin-bottom:0.4rem; color:var(--text); }
   .npc-card-field strong { color:var(--gold); }
   .npc-card-appearance { font-size:0.85rem; line-height:1.45; margin-bottom:0.5rem; color:var(--text-dim); font-style:italic; }
-  .npc-card-traits { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem; }
+  /* Real, sentence-length personality traits, not short tag words — a horizontal chip cloud
+     (.tt-prop-chip, meant for 1-3 word item properties like "RARE"/"FINESSE") wrapped these
+     badly. A plain bulleted list reads correctly at any trait length. */
+  .npc-card-traits { list-style:none; margin:0 0 0.5rem; padding:0; }
+  .npc-card-traits li { font-size:0.86rem; line-height:1.4; color:var(--text); padding-left:1rem; position:relative; margin-bottom:0.2rem; }
+  .npc-card-traits li::before { content:'•'; position:absolute; left:0; color:var(--gold); }
   .npc-web-table-wrap { overflow-x:auto; }
   .npc-web-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
   .npc-web-table th { text-align:left; color:var(--gold); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; padding:0.5rem 0.7rem; border-bottom:1px solid var(--border); white-space:nowrap; }
@@ -7194,7 +7199,7 @@ function npcCardHtml(npc) {
     ${statsLine ? `<div class="npc-card-stats">${escapeHtml(statsLine)}</div>` : ''}
     <div class="npc-card-field"><strong>Role:</strong> ${escapeHtml(n.role)} · <strong>Alignment:</strong> ${escapeHtml(n.alignment)}</div>
     ${n.appearance ? `<div class="npc-card-appearance">${escapeHtml(n.appearance)}</div>` : ''}
-    ${n.traits && n.traits.length ? `<div class="npc-card-traits">${n.traits.map(t => `<span class="tt-prop-chip">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+    ${n.traits && n.traits.length ? `<ul class="npc-card-traits">${n.traits.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>` : ''}
     ${n.weapon ? `<div class="npc-card-field"><strong>Weapon:</strong> ${escapeHtml(n.weapon)}</div>` : ''}
     ${attacksHtml}
     <div class="npc-card-field">${escapeHtml(n.backstory)}</div>
