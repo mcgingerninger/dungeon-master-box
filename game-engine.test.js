@@ -32,6 +32,35 @@ describe('classifyItemFull', () => {
     assert.ok(potion.interactions.includes('apply')); // broadened beyond just named oils/salves
   });
 
+  test('a lootable Chest item (coffer/casket/strongbox synonyms) classifies as a mundane Container, not a Wondrous Item', () => {
+    // Found while authoring the 6 tiered Chest items: classifyItemHierarchy's container check
+    // only recognized "chest"/"crate"/"barrel"/"container" in the name, so "Coffer"/"Casket"/
+    // "Strongbox" fell through to the generic magic-item guess (any non-common rarity + any
+    // effect string) and got wrongly classified as a Wondrous Item.
+    const coffer = { name: 'Sealed Reliquary Coffer', type: 'misc', desc: 'A stone-lidded coffer.', effect: 'Open to find a haul of rare-tier loot and coin.', rarity: 'rare' };
+    GE.classifyItemFull(coffer, 'rare');
+    assert.deepEqual(coffer.classification, ['Miscellaneous', 'Household', 'Container']);
+    assert.ok(!coffer.tags.includes('wondrousitem'));
+
+    const casket = { name: "The Sovereign's Casket", type: 'misc', desc: 'A gilded casket.', effect: 'Open to find a haul of legendary-tier loot and coin.', rarity: 'legendary' };
+    GE.classifyItemFull(casket, 'legendary');
+    assert.deepEqual(casket.classification, ['Miscellaneous', 'Household', 'Container']);
+
+    const strongbox = { name: 'Weathered Strongbox', type: 'misc', desc: 'A dented wooden box.', effect: 'Open to find a haul of common-tier loot and coin.', rarity: 'common' };
+    GE.classifyItemFull(strongbox, 'common');
+    assert.deepEqual(strongbox.classification, ['Miscellaneous', 'Household', 'Container']);
+  });
+
+  test('open_chest is an explicit-opt-in interaction only, never auto-detected from text', () => {
+    // Deliberately mirrors the word-boundary bug fix above: a Chest item's own default must
+    // stay false so a keyword match on unrelated flavor text (e.g. some other item's "treasure
+    // chest" mention) could never silently make it openable.
+    const mentionsChestInText = { name: 'Old Map', type: 'misc', desc: 'Marks the way to a hidden treasure chest.', effect: '' };
+    assert.ok(!GE.canInteract(mentionsChestInText, 'open_chest'));
+    const realChest = { name: 'Iron-Banded Chest', type: 'misc', desc: '', effect: '', chestRarity: 'uncommon', extraInteractions: ['open_chest'] };
+    assert.ok(GE.canInteract(realChest, 'open_chest'));
+  });
+
   test('idempotent: does not overwrite an existing classification', () => {
     const item = { name: 'Test', type: 'misc', classification: ['Already', 'Set'] };
     GE.classifyItemFull(item);

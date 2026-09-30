@@ -12449,6 +12449,7 @@ const STORE_ICONS = {
   tool:       { viewBox:'0 0 8 8', rects:[[0,0,3,3],[3,3,2,2],[5,5,3,3]] },
   instrument: { viewBox:'0 0 6 10', rects:[[2,0,2,4],[1,4,4,5],[2,9,2,1]] },
   hook:       { viewBox:'0 0 8 8', rects:[[3,0,2,4],[1,4,2,2],[5,4,2,2],[0,6,2,2],[6,6,2,2]] },
+  chest:      { viewBox:'0 0 10 8', rects:[[1,0,8,2],[0,2,10,6],[4,2,2,4]] },
   // Recurring named-artifact tropes found during the legendary/celestial icon review (Phase I) --
   // worth having as real shapes rather than one-off overrides, since these tropes recur.
   hourglass:  { viewBox:'0 0 6 8', rects:[[0,0,6,1],[1,1,4,1],[2,2,2,1],[2,3,2,2],[2,5,2,1],[1,6,4,1],[0,7,6,1]] },
@@ -15624,12 +15625,30 @@ function inventoryItemContextMenu(evt, placementId) {
   if (!TOKEN_INDEX[p.key]) buildTokenIndex();
   const entry = TOKEN_INDEX[p.key];
   if (!entry) return;
+  // A lootable Chest has no body slot to equip into (see chestRarity below), so it's checked
+  // first and handled entirely separately from the equip path.
+  if (entry.item.chestRarity) { openChestItem(entry, p.key); return; }
   if (equipTokenToFirstOpenSlot(p.key)) {
     removeFromInventory(placementId);
     flashInvMessage(`${entry.item.name} equipped.`);
   } else {
     flashInvMessage(`No open slot for ${entry.item.name}.`, true);
   }
+}
+// Double-clicking a lootable Chest item (item.chestRarity — see loot-data.js's celestial-tier
+// "A Chest That Shouldn't Exist" etc.) opens it: reuses awardChestOfRarity exactly as-is (the
+// same rarity-cascade cascade the Bounty reward path already calls — see claimBounty above),
+// which rolls a real loot batch and pushes it into chestResults, so the opened loot shows up
+// in the Treasure Chest tab exactly like a DM-rolled chest, ready to Save/Loot/Discard/reveal
+// there. The chest item itself is then fully consumed (removeTokenEverywhere) — a one-time
+// open, like a spent consumable, not something left inert in inventory afterward.
+function openChestItem(entry, key) {
+  const rarity = entry.item.chestRarity;
+  const name = entry.item.name;
+  awardChestOfRarity(rarity);
+  removeTokenEverywhere(key);
+  updateInventorySummary();
+  flashInvMessage(`${name} opened — a ${rarityNames[rarity] || rarity} haul was rolled into the Treasure Chest tab.`);
 }
 // Right-click handler for every "Your Inventory" mirror inside the Store tab (see
 // INV_GRID_MIRRORS' storeContext flag) — deliberately never equips. Routes to whichever slot

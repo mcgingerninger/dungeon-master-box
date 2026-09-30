@@ -2,6 +2,24 @@
 // data) and docs/V2_MECHANICS_MIGRATION.md.
 const canonicalItems = [
   {
+    "id": "weathered-strongbox",
+    "name": "Weathered Strongbox",
+    "rarity": "common",
+    "weight": 0.15,
+    "value": "10 gp",
+    "flavorText": "A dented, travel-worn wooden box banded in cheap iron, its lock long since rusted past caring who opens it.",
+    "description": "Open to find a haul of common-tier loot and coin.",
+    "legacySource": {
+      "tier": "common",
+      "index": 0,
+      "name": "Weathered Strongbox"
+    },
+    "itemType": "tool",
+    "tool": {
+      "toolCategory": "container"
+    }
+  },
+  {
     "id": "torch",
     "name": "Torch",
     "rarity": "common",
@@ -11,7 +29,7 @@ const canonicalItems = [
     "description": "Sheds bright light 20-ft radius, dim light 20 ft further. Burns 1 hour.",
     "legacySource": {
       "tier": "common",
-      "index": 0,
+      "index": 1,
       "name": "Torch"
     },
     "itemType": "tool",
@@ -28,7 +46,7 @@ const canonicalItems = [
     "flavorText": "Sturdy hempen rope, coiled. Fraying at one end but still reliable.",
     "legacySource": {
       "tier": "common",
-      "index": 1,
+      "index": 2,
       "name": "Rope, Hempen (50 ft.)"
     },
     "itemType": "tool",
@@ -59,7 +77,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 2,
+      "index": 3,
       "name": "Iron Rations (1 day)"
     }
   },
@@ -72,7 +90,7 @@ const canonicalItems = [
     "flavorText": "A tanned leather pouch sealed with a cork. Holds about a quart.",
     "legacySource": {
       "tier": "common",
-      "index": 3,
+      "index": 4,
       "name": "Waterskin"
     },
     "itemType": "tool",
@@ -90,7 +108,7 @@ const canonicalItems = [
     "description": "Lights a torch or fire in 1 action (calm). Takes 1 minute in wind or rain.",
     "legacySource": {
       "tier": "common",
-      "index": 4,
+      "index": 5,
       "name": "Tinderbox"
     },
     "itemType": "tool",
@@ -108,7 +126,7 @@ const canonicalItems = [
     "description": "Stabilize a dying creature or bind a wound during a short rest. Grants +1 to one Hit Die roll when used intentionally.",
     "legacySource": {
       "tier": "common",
-      "index": 5,
+      "index": 6,
       "name": "Bandage Roll"
     },
     "itemType": "tool",
@@ -131,7 +149,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 6,
+      "index": 7,
       "name": "Wooden Stake"
     }
   },
@@ -145,7 +163,7 @@ const canonicalItems = [
     "description": "Look around corners without exposing yourself. May reveal vampires or certain illusions.",
     "legacySource": {
       "tier": "common",
-      "index": 7,
+      "index": 8,
       "name": "Small Mirror"
     },
     "itemType": "tool",
@@ -163,7 +181,7 @@ const canonicalItems = [
     "description": "Sheds bright light 5-ft radius, dim light 5 ft further. Burns 1 hour.",
     "legacySource": {
       "tier": "common",
-      "index": 8,
+      "index": 9,
       "name": "Candle"
     },
     "itemType": "tool",
@@ -180,7 +198,7 @@ const canonicalItems = [
     "flavorText": "A short stick of white chalk.",
     "legacySource": {
       "tier": "common",
-      "index": 9,
+      "index": 10,
       "name": "Chalk"
     },
     "itemType": "tool",
@@ -198,7 +216,7 @@ const canonicalItems = [
     "description": "Holds up to 30 lbs. / 1 cubic foot.",
     "legacySource": {
       "tier": "common",
-      "index": 10,
+      "index": 11,
       "name": "Sack"
     },
     "itemType": "tool",
@@ -216,7 +234,7 @@ const canonicalItems = [
     "description": "Advantage on Strength checks to force open sealed or stuck objects.",
     "legacySource": {
       "tier": "common",
-      "index": 11,
+      "index": 12,
       "name": "Crowbar"
     },
     "itemType": "tool",
@@ -234,7 +252,7 @@ const canonicalItems = [
     "description": "DC 10 Dexterity to set on first throw. Anchors a rope for climbing.",
     "legacySource": {
       "tier": "common",
-      "index": 12,
+      "index": 13,
       "name": "Grappling Hook"
     },
     "itemType": "tool",
@@ -258,7 +276,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 13,
+      "index": 14,
       "name": "Handaxe"
     }
   },
@@ -281,7 +299,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 14,
+      "index": 15,
       "name": "Dagger"
     }
   },
@@ -304,7 +322,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 15,
+      "index": 16,
       "name": "Sling"
     }
   },
@@ -318,7 +336,7 @@ const canonicalItems = [
     "description": "20 cp. Enough for a cheap meal, a poorhouse night, or a small bribe.",
     "legacySource": {
       "tier": "common",
-      "index": 16,
+      "index": 17,
       "name": "Pouch of Copper Coins (20 cp)"
     },
     "itemType": "tool",
@@ -335,7 +353,7 @@ const canonicalItems = [
     "description": "GM determines if this key fits any lock in the current dungeon.",
     "legacySource": {
       "tier": "common",
-      "index": 17,
+      "index": 18,
       "name": "Rusty Key"
     },
     "itemType": "tool",
@@ -353,7 +371,7 @@ const canonicalItems = [
     "description": "Warmth in cold environments. Advantage on Con saves vs. mild cold (not magical cold).",
     "legacySource": {
       "tier": "common",
-      "index": 18,
+      "index": 19,
       "name": "Wool Cloak"
     },
     "itemType": "wondrous",
@@ -371,7 +389,7 @@ const canonicalItems = [
     "description": "Required for a normal long rest in the wilderness. Without one: DC 10 Con save or gain 1 level of exhaustion.",
     "legacySource": {
       "tier": "common",
-      "index": 19,
+      "index": 20,
       "name": "Bedroll"
     },
     "itemType": "tool",
@@ -389,7 +407,7 @@ const canonicalItems = [
     "description": "Restore a blade to serviceable condition after heavy use. Takes 1 minute.",
     "legacySource": {
       "tier": "common",
-      "index": 20,
+      "index": 21,
       "name": "Whetstone"
     },
     "itemType": "tool",
@@ -407,7 +425,7 @@ const canonicalItems = [
     "description": "Jam doors open or shut. Function as pitons for rope anchoring on stone.",
     "legacySource": {
       "tier": "common",
-      "index": 21,
+      "index": 22,
       "name": "Iron Spikes (bundle of 6)"
     },
     "itemType": "tool",
@@ -425,7 +443,7 @@ const canonicalItems = [
     "description": "Bright light 30-ft radius, dim light 30 ft further. Burns 1 flask of oil per hour. Hood reduces to 5-ft cone.",
     "legacySource": {
       "tier": "common",
-      "index": 22,
+      "index": 23,
       "name": "Lantern, Hooded"
     },
     "itemType": "tool",
@@ -456,7 +474,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 23,
+      "index": 24,
       "name": "Flask of Oil"
     }
   },
@@ -470,7 +488,7 @@ const canonicalItems = [
     "description": "Holds up to 6 lbs. / 1/5 cubic foot.",
     "legacySource": {
       "tier": "common",
-      "index": 24,
+      "index": 25,
       "name": "Belt Pouch"
     },
     "itemType": "tool",
@@ -488,7 +506,7 @@ const canonicalItems = [
     "description": "Required for cooking camp meals. 10 lbs. — heavy but nearly indestructible.",
     "legacySource": {
       "tier": "common",
-      "index": 25,
+      "index": 26,
       "name": "Iron Pot"
     },
     "itemType": "tool",
@@ -506,7 +524,7 @@ const canonicalItems = [
     "description": "Required for writing maps, letters, or copying spells. Ink for approximately 2 pages.",
     "legacySource": {
       "tier": "common",
-      "index": 26,
+      "index": 27,
       "name": "Quill and Ink"
     },
     "itemType": "tool",
@@ -524,7 +542,7 @@ const canonicalItems = [
     "description": "For maps, notes, or copying spells. One sheet.",
     "legacySource": {
       "tier": "common",
-      "index": 27,
+      "index": 28,
       "name": "Blank Parchment (sheet)"
     },
     "itemType": "tool",
@@ -542,7 +560,7 @@ const canonicalItems = [
     "description": "Substitute for one Herbalism Kit use. DC 12 Medicine or Nature to apply medicinal benefit (GM discretion).",
     "legacySource": {
       "tier": "common",
-      "index": 28,
+      "index": 29,
       "name": "Dried Herbs (bundle)"
     },
     "itemType": "tool",
@@ -560,7 +578,7 @@ const canonicalItems = [
     "description": "Essential for food preservation. Scattered in a 5-ft line — may deter certain supernatural creatures.",
     "legacySource": {
       "tier": "common",
-      "index": 29,
+      "index": 30,
       "name": "Pouch of Salt"
     },
     "itemType": "tool",
@@ -578,7 +596,7 @@ const canonicalItems = [
     "description": "Rig as a simple tripwire alarm. Audible up to 60 ft. in quiet dungeon conditions.",
     "legacySource": {
       "tier": "common",
-      "index": 30,
+      "index": 31,
       "name": "Small Bell"
     },
     "itemType": "tool",
@@ -596,7 +614,7 @@ const canonicalItems = [
     "description": "DC 12 Survival to set. DC 13 Perception to spot. Catches Small or smaller creatures. Requires a short rest to set.",
     "legacySource": {
       "tier": "common",
-      "index": 31,
+      "index": 32,
       "name": "Wire Snare"
     },
     "itemType": "tool",
@@ -614,7 +632,7 @@ const canonicalItems = [
     "description": "Audible 600 ft. in open air, 300 ft. in dungeon corridors. For use as a signal device.",
     "legacySource": {
       "tier": "common",
-      "index": 32,
+      "index": 33,
       "name": "Bone Whistle"
     },
     "itemType": "tool",
@@ -632,7 +650,7 @@ const canonicalItems = [
     "description": "Waterproof thread, seal small containers, or make a wax key impression (DC 12 Sleight of Hand). Also a fire accelerant.",
     "legacySource": {
       "tier": "common",
-      "index": 33,
+      "index": 34,
       "name": "Beeswax Block"
     },
     "itemType": "tool",
@@ -663,7 +681,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 34,
+      "index": 35,
       "name": "Dried Mushroom"
     }
   },
@@ -676,7 +694,7 @@ const canonicalItems = [
     "description": "GM determines relevance. Advantage on the first Navigation check in a connected area if applicable.",
     "legacySource": {
       "tier": "common",
-      "index": 35,
+      "index": 36,
       "name": "Rough Map Fragment"
     },
     "itemType": "tool",
@@ -702,7 +720,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 36,
+      "index": 37,
       "name": "Sling Stone"
     }
   },
@@ -715,7 +733,7 @@ const canonicalItems = [
     "description": "GM determines what it depicts. Advantage on first Navigation or Investigation check when exploring the illustrated area.",
     "legacySource": {
       "tier": "common",
-      "index": 37,
+      "index": 38,
       "name": "Crude Map"
     },
     "itemType": "tool",
@@ -741,7 +759,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 38,
+      "index": 39,
       "name": "Cracked Wooden Shield"
     }
   },
@@ -763,7 +781,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 40,
+      "index": 41,
       "name": "Worn Leather Armor"
     }
   },
@@ -787,7 +805,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 41,
+      "index": 42,
       "name": "Shortbow"
     }
   },
@@ -801,7 +819,7 @@ const canonicalItems = [
     "description": "20 standard arrows for shortbows or longbows.",
     "legacySource": {
       "tier": "common",
-      "index": 42,
+      "index": 43,
       "name": "Quiver of Arrows (20)"
     },
     "itemType": "tool",
@@ -825,7 +843,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 43,
+      "index": 44,
       "name": "Club"
     }
   },
@@ -849,7 +867,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 44,
+      "index": 45,
       "name": "Spear"
     }
   },
@@ -869,7 +887,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 45,
+      "index": 46,
       "name": "Javelin"
     }
   },
@@ -892,7 +910,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 46,
+      "index": 47,
       "name": "Quarterstaff"
     }
   },
@@ -906,7 +924,7 @@ const canonicalItems = [
     "description": "5 sp. Covers several days of modest travel expenses.",
     "legacySource": {
       "tier": "common",
-      "index": 47,
+      "index": 48,
       "name": "Pouch of Silver Coins (5 sp)"
     },
     "itemType": "tool",
@@ -924,7 +942,7 @@ const canonicalItems = [
     "description": "Required for social interactions in settled areas. Dungeon-stained gear imposes disadvantage on Persuasion in most towns.",
     "legacySource": {
       "tier": "common",
-      "index": 48,
+      "index": 49,
       "name": "Common Clothes (Set)"
     },
     "itemType": "tool",
@@ -942,7 +960,7 @@ const canonicalItems = [
     "description": "Repairs torn clothing or leather gear. 10 minutes per item.",
     "legacySource": {
       "tier": "common",
-      "index": 49,
+      "index": 50,
       "name": "Mending Kit"
     },
     "itemType": "tool",
@@ -960,7 +978,7 @@ const canonicalItems = [
     "description": "DC 10 Survival check per hour to catch fish in suitable water. Can rig as a tripwire.",
     "legacySource": {
       "tier": "common",
-      "index": 50,
+      "index": 51,
       "name": "Fishing Line and Hook"
     },
     "itemType": "tool",
@@ -987,7 +1005,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 51,
+      "index": 52,
       "name": "Small Knife"
     }
   },
@@ -1000,7 +1018,7 @@ const canonicalItems = [
     "description": "GM determines the contents — love letter, orders, a debt record, or family news. May be relevant to the dungeon or purely personal.",
     "legacySource": {
       "tier": "common",
-      "index": 52,
+      "index": 53,
       "name": "Crumpled Letter"
     },
     "itemType": "tool",
@@ -1017,7 +1035,7 @@ const canonicalItems = [
     "description": "Unbroken seal may be worth opening carefully (DC 13 Dex to avoid obvious tampering). Contents GM's discretion.",
     "legacySource": {
       "tier": "common",
-      "index": 53,
+      "index": 54,
       "name": "Wax-Sealed Note"
     },
     "itemType": "tool",
@@ -1034,7 +1052,7 @@ const canonicalItems = [
     "description": "GM determines if the subject is a PC, an NPC, or the creature that was carrying it. The reward amount is still legible: 1d10 × 10 gp.",
     "legacySource": {
       "tier": "common",
-      "index": 54,
+      "index": 55,
       "name": "Wanted Poster (Folded)"
     },
     "itemType": "tool",
@@ -1051,7 +1069,7 @@ const canonicalItems = [
     "description": "Reading (10 minutes) gives the GM an opportunity to reveal information about the dungeon, its inhabitants, or the person who carried it.",
     "legacySource": {
       "tier": "common",
-      "index": 55,
+      "index": 56,
       "name": "Half-Written Journal"
     },
     "itemType": "tool",
@@ -1068,7 +1086,7 @@ const canonicalItems = [
     "description": "Not a dungeon map. Shows where this person was going or came from. GM may use it to establish backstory or a point of interest.",
     "legacySource": {
       "tier": "common",
-      "index": 56,
+      "index": 57,
       "name": "Folded Map (Personal)"
     },
     "itemType": "tool",
@@ -1085,7 +1103,7 @@ const canonicalItems = [
     "description": "Purely personal. May give the GM material for a character's history.",
     "legacySource": {
       "tier": "common",
-      "index": 57,
+      "index": 58,
       "name": "Tally Stick"
     },
     "itemType": "tool",
@@ -1103,7 +1121,7 @@ const canonicalItems = [
     "description": "Worth 2 sp as brass. The engraving suggests it was a gift or a wedding band. May be recognizable to the right NPC.",
     "legacySource": {
       "tier": "common",
-      "index": 58,
+      "index": 59,
       "name": "Brass Ring"
     },
     "itemType": "wondrous",
@@ -1121,7 +1139,7 @@ const canonicalItems = [
     "description": "Worth 1 sp. The inside has the faint ghost of a painted miniature — something was here until recently.",
     "legacySource": {
       "tier": "common",
-      "index": 59,
+      "index": 60,
       "name": "Locket (Empty)"
     },
     "itemType": "wondrous",
@@ -1139,7 +1157,7 @@ const canonicalItems = [
     "description": "Worth 2 sp. The painted subject may be recognizable to a GM-determined NPC. Returning it might earn goodwill.",
     "legacySource": {
       "tier": "common",
-      "index": 60,
+      "index": 61,
       "name": "Locket with Portrait"
     },
     "itemType": "wondrous",
@@ -1157,7 +1175,7 @@ const canonicalItems = [
     "description": "Worth 1 sp as iron. GM may use this to establish a surviving spouse or family somewhere.",
     "legacySource": {
       "tier": "common",
-      "index": 61,
+      "index": 62,
       "name": "Worn Wedding Band"
     },
     "itemType": "tool",
@@ -1175,7 +1193,7 @@ const canonicalItems = [
     "description": "A religious keepsake, worth nothing materially. Clerics and priests of the relevant faith may recognize the patron saint.",
     "legacySource": {
       "tier": "common",
-      "index": 62,
+      "index": 63,
       "name": "Saint's Token"
     },
     "itemType": "tool",
@@ -1193,7 +1211,7 @@ const canonicalItems = [
     "description": "Purely sentimental. May hold significance to druids, tribal cultures, or anyone who recognizes the carving style.",
     "legacySource": {
       "tier": "common",
-      "index": 63,
+      "index": 64,
       "name": "Carved Bone Charm"
     },
     "itemType": "tool",
@@ -1210,7 +1228,7 @@ const canonicalItems = [
     "description": "A keepsake. May be used as a material component for certain divination or scrying spells targeting the hair's original owner.",
     "legacySource": {
       "tier": "common",
-      "index": 64,
+      "index": 65,
       "name": "Lock of Hair (Tied)"
     },
     "itemType": "tool",
@@ -1227,7 +1245,7 @@ const canonicalItems = [
     "description": "Personal. The flower species may be identifiable (DC 12 Nature) and could indicate region of origin.",
     "legacySource": {
       "tier": "common",
-      "index": 65,
+      "index": 66,
       "name": "Pressed Flower"
     },
     "itemType": "tool",
@@ -1244,7 +1262,7 @@ const canonicalItems = [
     "description": "Purely personal. No mechanical use. A detail for the GM's world-building.",
     "legacySource": {
       "tier": "common",
-      "index": 66,
+      "index": 67,
       "name": "Small Painted Stone"
     },
     "itemType": "tool",
@@ -1262,7 +1280,7 @@ const canonicalItems = [
     "description": "Can hold about half a pint of liquid. Worth 3 sp empty. If found with contents, GM determines what it holds (water, ale, spirits, or something worse).",
     "legacySource": {
       "tier": "common",
-      "index": 67,
+      "index": 68,
       "name": "Pewter Drinking Flask"
     },
     "itemType": "tool",
@@ -1280,7 +1298,7 @@ const canonicalItems = [
     "description": "Functional smoking pipe. Worth 5 sp. Common in working-class and rural populations. Some cultures use pipes during negotiation or oath-swearing.",
     "legacySource": {
       "tier": "common",
-      "index": 68,
+      "index": 69,
       "name": "Carved Pipe"
     },
     "itemType": "tool",
@@ -1307,7 +1325,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 69,
+      "index": 70,
       "name": "Pocket Knife"
     }
   },
@@ -1321,7 +1339,7 @@ const canonicalItems = [
     "description": "Restore a blade edge in 1 minute. Works as a full Whetstone for all purposes.",
     "legacySource": {
       "tier": "common",
-      "index": 70,
+      "index": 71,
       "name": "Whetstone (Small)"
     },
     "itemType": "tool",
@@ -1339,7 +1357,7 @@ const canonicalItems = [
     "description": "Roughly 30–40 ft. of usable cordage. Lighter and thinner than rope — not suitable for climbing, but fine for binding, marking paths, or rigging simple traps.",
     "legacySource": {
       "tier": "common",
-      "index": 71,
+      "index": 72,
       "name": "Ball of Twine"
     },
     "itemType": "tool",
@@ -1357,7 +1375,7 @@ const canonicalItems = [
     "description": "Can repair a small tear in clothing or leather. Not suitable for heavy canvas or armor. Can also be used to suture a wound (DC 10 Medicine, heals 1 HP if successful).",
     "legacySource": {
       "tier": "common",
-      "index": 72,
+      "index": 73,
       "name": "Sewing Needle and Thread"
     },
     "itemType": "tool",
@@ -1375,7 +1393,7 @@ const canonicalItems = [
     "description": "Enough soap for 2–3 uses. Useful for washing before entering noble company. Also produces lather that can make a surface slippery (covers 1 sq ft., DC 10 Acrobatics to avoid falling).",
     "legacySource": {
       "tier": "common",
-      "index": 73,
+      "index": 74,
       "name": "Bar of Soap"
     },
     "itemType": "tool",
@@ -1393,7 +1411,7 @@ const canonicalItems = [
     "description": "Personal grooming. Worth almost nothing. Advantage on Charisma (Persuasion) checks in social situations where grooming would matter, if you've used it for at least 1 minute beforehand.",
     "legacySource": {
       "tier": "common",
-      "index": 74,
+      "index": 75,
       "name": "Iron Comb"
     },
     "itemType": "tool",
@@ -1411,7 +1429,7 @@ const canonicalItems = [
     "description": "+2 to Sleight of Hand checks to cut a purse or sever a thin cord.",
     "legacySource": {
       "tier": "common",
-      "index": 75,
+      "index": 76,
       "name": "Small Scissors"
     },
     "itemType": "tool",
@@ -1429,7 +1447,7 @@ const canonicalItems = [
     "description": "Worth 1 cp. Can be used as a finger-guard, a small cup, or a dice cup in a pinch. Makes a small metallic tap when struck.",
     "legacySource": {
       "tier": "common",
-      "index": 76,
+      "index": 77,
       "name": "Copper Thimble"
     },
     "itemType": "tool",
@@ -1460,7 +1478,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 77,
+      "index": 78,
       "name": "Tinned Salve"
     }
   },
@@ -1474,7 +1492,7 @@ const canonicalItems = [
     "description": "Enough to seal 3–4 letters or vials. Can also be used to mark a surface, plug a small hole, or set as a primitive tripwire indicator (fresh wax on a door joint breaks cleanly if the door is opened).",
     "legacySource": {
       "tier": "common",
-      "index": 78,
+      "index": 79,
       "name": "Stub of Sealing Wax"
     },
     "itemType": "tool",
@@ -1492,7 +1510,7 @@ const canonicalItems = [
     "description": "Single-use bandage. Can stabilize a dying creature as an action without a Medicine check (replaces the Medicine roll entirely, once).",
     "legacySource": {
       "tier": "common",
-      "index": 79,
+      "index": 80,
       "name": "Folded Cloth Bandage"
     },
     "itemType": "tool",
@@ -1510,7 +1528,7 @@ const canonicalItems = [
     "description": "Makes bold marks on nearly any surface. Useful for writing messages on walls, marking dungeon passages, or leaving signs. 4 sticks, each lasting about 10 uses.",
     "legacySource": {
       "tier": "common",
-      "index": 80,
+      "index": 81,
       "name": "Small Tin of Charcoal Sticks"
     },
     "itemType": "tool",
@@ -1541,7 +1559,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 81,
+      "index": 82,
       "name": "Half-Eaten Ration"
     }
   },
@@ -1568,7 +1586,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 82,
+      "index": 83,
       "name": "Piece of Dried Fruit"
     }
   },
@@ -1595,7 +1613,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 83,
+      "index": 84,
       "name": "Wax-Wrapped Cheese"
     }
   },
@@ -1622,7 +1640,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 84,
+      "index": 85,
       "name": "Corked Vial of Spirits"
     }
   },
@@ -1649,7 +1667,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 85,
+      "index": 86,
       "name": "Lump of Hard Candy"
     }
   },
@@ -1676,7 +1694,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 86,
+      "index": 87,
       "name": "Pouch of Trail Mix"
     }
   },
@@ -1690,7 +1708,7 @@ const canonicalItems = [
     "description": "Roll 1d6: result in silver pieces, plus 1d4 copper. One coin in five is a foreign denomination worth the same but unrecognizable to most merchants (DC 12 History to identify).",
     "legacySource": {
       "tier": "common",
-      "index": 87,
+      "index": 88,
       "name": "Handful of Mixed Coins"
     },
     "itemType": "tool",
@@ -1708,7 +1726,7 @@ const canonicalItems = [
     "description": "Worth 1 gp. The profile may be identifiable (DC 14 History) to determine its nation of origin and approximate age.",
     "legacySource": {
       "tier": "common",
-      "index": 88,
+      "index": 89,
       "name": "Single Gold Coin"
     },
     "itemType": "tool",
@@ -1726,7 +1744,7 @@ const canonicalItems = [
     "description": "Roll 1d4 copper pieces, plus a bone button worth nothing and a receipt from a pawnbroker for something already sold.",
     "legacySource": {
       "tier": "common",
-      "index": 89,
+      "index": 90,
       "name": "Beggar's Purse"
     },
     "itemType": "tool",
@@ -1743,7 +1761,7 @@ const canonicalItems = [
     "description": "Worth 1 gp to a collector or historian (DC 13 History to identify its origin). Local merchants may refuse it or accept it at half value.",
     "legacySource": {
       "tier": "common",
-      "index": 90,
+      "index": 91,
       "name": "Foreign Coin"
     },
     "itemType": "tool",
@@ -1760,7 +1778,7 @@ const canonicalItems = [
     "description": "GM determines what it references. Could lead to a few copper hidden in a wall or something more valuable. Requires Investigation (DC 14) plus roleplay to follow up.",
     "legacySource": {
       "tier": "common",
-      "index": 91,
+      "index": 92,
       "name": "Hidden Cache Note"
     },
     "itemType": "tool",
@@ -1778,7 +1796,7 @@ const canonicalItems = [
     "description": "Useless on its own. Could be used as a container, a pillow, or thrown as an improvised weapon (1d3 bludgeoning, 20-ft range).",
     "legacySource": {
       "tier": "common",
-      "index": 92,
+      "index": 93,
       "name": "Spare Boot (Single)"
     },
     "itemType": "tool",
@@ -1796,7 +1814,7 @@ const canonicalItems = [
     "description": "Wearing them: advantage on Con saves vs. frostbitten feet in extreme cold while traveling on foot. Also dry your boots.",
     "legacySource": {
       "tier": "common",
-      "index": 93,
+      "index": 94,
       "name": "Pair of Wool Socks"
     },
     "itemType": "wondrous",
@@ -1814,7 +1832,7 @@ const canonicalItems = [
     "description": "Wrap around face and neck: advantage on Con saves vs. dust, smoke inhalation, or mild cold.",
     "legacySource": {
       "tier": "common",
-      "index": 94,
+      "index": 95,
       "name": "Patched Scarf"
     },
     "itemType": "tool",
@@ -1832,7 +1850,7 @@ const canonicalItems = [
     "description": "Protect hands from minor cuts and abrasions. Advantage on Strength (Athletics) checks involving sustained grip (climbing, hauling) for up to 1 hour before they impair fine dexterity.",
     "legacySource": {
       "tier": "common",
-      "index": 95,
+      "index": 96,
       "name": "Worn Work Gloves"
     },
     "itemType": "wondrous",
@@ -1850,7 +1868,7 @@ const canonicalItems = [
     "description": "Filter water through it (removes sediment, not contamination). Bind a wound. Keep dust out of your face. Carry small objects. Ten uses without tearing with care.",
     "legacySource": {
       "tier": "common",
-      "index": 96,
+      "index": 97,
       "name": "Folded Headscarf"
     },
     "itemType": "tool",
@@ -1868,7 +1886,7 @@ const canonicalItems = [
     "description": "Can be used to repair a broken belt or strap (takes 10 minutes and a sewing needle). Also a flat, heavy object usable as an improvised hammer for light tasks.",
     "legacySource": {
       "tier": "common",
-      "index": 97,
+      "index": 98,
       "name": "Pewter Belt Buckle"
     },
     "itemType": "wondrous",
@@ -1886,7 +1904,7 @@ const canonicalItems = [
     "description": "Standard dice for gambling. The weighted die gives a subtle advantage (GM may grant +1 to Deception when cheating, opposed by victim's Insight or Investigation).",
     "legacySource": {
       "tier": "common",
-      "index": 98,
+      "index": 99,
       "name": "Pair of Bone Dice"
     },
     "itemType": "tool",
@@ -1904,7 +1922,7 @@ const canonicalItems = [
     "description": "Standard card deck, minus one card (which one is GM's choice). Advantage on Charisma (Persuasion) checks in gambling contexts — showing a deck establishes rapport.",
     "legacySource": {
       "tier": "common",
-      "index": 99,
+      "index": 100,
       "name": "Deck of Playing Cards"
     },
     "itemType": "tool",
@@ -1922,7 +1940,7 @@ const canonicalItems = [
     "description": "The owner clearly believed in this. Once per session: if you fail a saving throw by exactly 1, you may choose to succeed instead. The GM narrates a fortunate coincidence. Whether the foot caused it is unclear.",
     "legacySource": {
       "tier": "common",
-      "index": 100,
+      "index": 101,
       "name": "Lucky Rabbit's Foot"
     },
     "itemType": "tool",
@@ -1940,7 +1958,7 @@ const canonicalItems = [
     "description": "Functions as a standard padlock (DC 15 Thieves' Tools to pick). No key present. Worth 5 sp. Useful for securing things you need securing.",
     "legacySource": {
       "tier": "common",
-      "index": 101,
+      "index": 102,
       "name": "Small Iron Padlock (No Key)"
     },
     "itemType": "tool",
@@ -1958,7 +1976,7 @@ const canonicalItems = [
     "description": "Someone owned this specifically. The name may be recognizable to a GM-determined NPC. Functions as a standard cup.",
     "legacySource": {
       "tier": "common",
-      "index": 102,
+      "index": 103,
       "name": "Etched Tin Cup"
     },
     "itemType": "tool",
@@ -1976,7 +1994,7 @@ const canonicalItems = [
     "description": "Purely personal. A child's toy, carried by someone who missed home. May be used to establish rapport with a child NPC (automatic friendly reaction).",
     "legacySource": {
       "tier": "common",
-      "index": 103,
+      "index": 104,
       "name": "Small Wooden Toy"
     },
     "itemType": "tool",
@@ -1994,7 +2012,7 @@ const canonicalItems = [
     "description": "Enough ink for approximately 3 pages of dense writing. Can also be splashed as an improvised distraction: targets within 5 ft. make DC 10 Con save or are Blinded until end of their next turn (ink in eyes).",
     "legacySource": {
       "tier": "common",
-      "index": 104,
+      "index": 105,
       "name": "Bottle of Ink (Half-Empty)"
     },
     "itemType": "tool",
@@ -2012,7 +2030,7 @@ const canonicalItems = [
     "description": "Worth 5 cp as fabric. May indicate the carrier's origin (DC 13 History to identify the weaving tradition).",
     "legacySource": {
       "tier": "common",
-      "index": 105,
+      "index": 106,
       "name": "Scrap of Foreign Cloth"
     },
     "itemType": "tool",
@@ -2030,7 +2048,7 @@ const canonicalItems = [
     "description": "The margin notes are the valuable part. GM determines what was noted — meeting times, prices, names, or routes. One piece of useful information for the GM to reveal.",
     "legacySource": {
       "tier": "common",
-      "index": 106,
+      "index": 107,
       "name": "Almanac (Previous Year)"
     },
     "itemType": "tool",
@@ -2061,7 +2079,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 107,
+      "index": 108,
       "name": "Pouch of Pipe Weed"
     }
   },
@@ -2075,7 +2093,7 @@ const canonicalItems = [
     "description": "Makes marks on most surfaces. About 15 uses remaining. Can write on stone, wood, or cloth. Smudges easily.",
     "legacySource": {
       "tier": "common",
-      "index": 108,
+      "index": 109,
       "name": "Stub of Charcoal Pencil"
     },
     "itemType": "tool",
@@ -2093,7 +2111,7 @@ const canonicalItems = [
     "description": "Look around corners without exposing yourself. Check for breath from an unconscious creature. Reflect sunlight as a signal (visible up to 1 mile in clear weather).",
     "legacySource": {
       "tier": "common",
-      "index": 109,
+      "index": 110,
       "name": "Small Hand Mirror"
     },
     "itemType": "tool",
@@ -2111,7 +2129,7 @@ const canonicalItems = [
     "description": "Reading it (20 minutes) can pass the time during a watch. GM may plant a relevant detail in the text — a real place name, a referenced person, a historical event.",
     "legacySource": {
       "tier": "common",
-      "index": 110,
+      "index": 111,
       "name": "Dog-Eared Chapbook"
     },
     "itemType": "tool",
@@ -2128,7 +2146,7 @@ const canonicalItems = [
     "description": "Places the carrier in a specific location recently. The shop named may exist in the GM's world and could be visited. The transaction value (1d6 × 10 gp) hints at what was bought or sold.",
     "legacySource": {
       "tier": "common",
-      "index": 111,
+      "index": 112,
       "name": "Merchant's Receipt"
     },
     "itemType": "tool",
@@ -2146,7 +2164,7 @@ const canonicalItems = [
     "description": "Points magnetic north. Takes 1 full round to settle after movement. Advantage on Survival (Navigation) checks in the wilderness while consulting it.",
     "legacySource": {
       "tier": "common",
-      "index": 112,
+      "index": 113,
       "name": "Small Compass"
     },
     "itemType": "tool",
@@ -2164,7 +2182,7 @@ const canonicalItems = [
     "description": "Functions as a blank parchment supply for notes, maps, or spells. The existing entries are the GM's to determine — a personal diary, field observations, or a ledger.",
     "legacySource": {
       "tier": "common",
-      "index": 113,
+      "index": 114,
       "name": "Worn Leather Notebook"
     },
     "itemType": "tool",
@@ -2182,7 +2200,7 @@ const canonicalItems = [
     "description": "Each candle burns 1 hour, shedding bright light 5 ft., dim light 5 ft. further. Cheaper and smellier than wax candles — the smell attracts some creatures and deters others (GM discretion).",
     "legacySource": {
       "tier": "common",
-      "index": 114,
+      "index": 115,
       "name": "Bundle of Tallow Candles (3)"
     },
     "itemType": "tool",
@@ -2200,7 +2218,7 @@ const canonicalItems = [
     "description": "Mask a smell within 5 ft. (advantage on checks to resist nausea from odors). Can be slipped into a pocket to detect pickpockets — the smell lingers on a thief's hand (DC 12 Perception to detect).",
     "legacySource": {
       "tier": "common",
-      "index": 115,
+      "index": 116,
       "name": "Pouch of Dried Lavender"
     },
     "itemType": "tool",
@@ -2218,7 +2236,7 @@ const canonicalItems = [
     "description": "Required equipment for fishing alongside a fishing line. Each hook can be used as an improvised clasp, catch, or light anchor for thin cord.",
     "legacySource": {
       "tier": "common",
-      "index": 116,
+      "index": 117,
       "name": "Iron Fishhook (3)"
     },
     "itemType": "tool",
@@ -2236,7 +2254,7 @@ const canonicalItems = [
     "description": "A religious comfort object. Clerics and paladins who recognize the faith may react positively. Can be used as an improvised garrote (1d4 bludgeoning on a successful grapple attempt).",
     "legacySource": {
       "tier": "common",
-      "index": 117,
+      "index": 118,
       "name": "Traveler's Prayer Beads"
     },
     "itemType": "tool",
@@ -2254,7 +2272,7 @@ const canonicalItems = [
     "description": "Used for gambling (each bone has four sides of unequal probability). Advantage on Charisma (Persuasion) checks to join a group of soldiers or laborers when you produce them — universal currency of boredom.",
     "legacySource": {
       "tier": "common",
-      "index": 118,
+      "index": 119,
       "name": "Knucklebone Set (4)"
     },
     "itemType": "tool",
@@ -2281,7 +2299,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 119,
+      "index": 120,
       "name": "Iron Plate Armor"
     }
   },
@@ -2303,7 +2321,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 120,
+      "index": 121,
       "name": "Iron Plate Helm"
     }
   },
@@ -2325,7 +2343,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 121,
+      "index": 122,
       "name": "Iron Plate Gauntlets"
     }
   },
@@ -2347,7 +2365,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 122,
+      "index": 123,
       "name": "Iron Plate Greaves"
     }
   },
@@ -2369,7 +2387,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 123,
+      "index": 124,
       "name": "Iron Plate Boots"
     }
   },
@@ -2391,7 +2409,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 124,
+      "index": 125,
       "name": "Iron Plate Shield"
     }
   },
@@ -2414,7 +2432,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 125,
+      "index": 126,
       "name": "Iron Shortsword"
     }
   },
@@ -2437,7 +2455,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 126,
+      "index": 127,
       "name": "Iron Longsword"
     }
   },
@@ -2460,7 +2478,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 127,
+      "index": 128,
       "name": "Iron Dagger"
     }
   },
@@ -2480,7 +2498,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 128,
+      "index": 129,
       "name": "Iron Mace"
     }
   },
@@ -2503,7 +2521,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 129,
+      "index": 130,
       "name": "Iron Battleaxe"
     }
   },
@@ -2527,7 +2545,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 130,
+      "index": 131,
       "name": "Iron Warhammer"
     }
   },
@@ -2551,7 +2569,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 131,
+      "index": 132,
       "name": "Iron Spear"
     }
   },
@@ -2579,7 +2597,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 133,
+      "index": 134,
       "name": "Barn Cat"
     }
   },
@@ -2607,7 +2625,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 134,
+      "index": 135,
       "name": "Messenger Pigeon"
     }
   },
@@ -2635,7 +2653,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 135,
+      "index": 136,
       "name": "Mutt Puppy"
     }
   },
@@ -2663,7 +2681,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 136,
+      "index": 137,
       "name": "Field Mouse"
     }
   },
@@ -2691,7 +2709,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 137,
+      "index": 138,
       "name": "Garden Toad"
     }
   },
@@ -2719,7 +2737,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 138,
+      "index": 139,
       "name": "Weasel"
     }
   },
@@ -2747,7 +2765,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 139,
+      "index": 140,
       "name": "Crow"
     }
   },
@@ -2775,7 +2793,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 140,
+      "index": 141,
       "name": "Hedgehog"
     }
   },
@@ -2803,7 +2821,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 141,
+      "index": 142,
       "name": "Tamed Housefly Swarm"
     }
   },
@@ -2831,7 +2849,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 142,
+      "index": 143,
       "name": "Ferret"
     }
   },
@@ -2859,7 +2877,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 143,
+      "index": 144,
       "name": "Imprinted Duckling"
     }
   },
@@ -2887,7 +2905,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 144,
+      "index": 145,
       "name": "Chicken"
     }
   },
@@ -2915,7 +2933,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 145,
+      "index": 146,
       "name": "Black Housecat"
     }
   },
@@ -2943,7 +2961,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 146,
+      "index": 147,
       "name": "Old Tortoise"
     }
   },
@@ -2971,7 +2989,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 147,
+      "index": 148,
       "name": "Songbird"
     }
   },
@@ -2999,7 +3017,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 148,
+      "index": 149,
       "name": "Clever Sewer Rat"
     }
   },
@@ -3029,7 +3047,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 149,
+      "index": 150,
       "name": "Riding Pony"
     }
   },
@@ -3059,7 +3077,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 150,
+      "index": 151,
       "name": "Draft Mule"
     }
   },
@@ -3089,7 +3107,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 151,
+      "index": 152,
       "name": "Riding Horse"
     }
   },
@@ -3120,7 +3138,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 152,
+      "index": 153,
       "name": "Mountain Goat"
     }
   },
@@ -3138,7 +3156,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 153,
+      "index": 154,
       "name": "Traveler's Journal"
     }
   },
@@ -3159,7 +3177,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "common",
-      "index": 154,
+      "index": 155,
       "name": "Cartographer's Dungeon Map"
     }
   },
@@ -3177,7 +3195,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 155,
+      "index": 156,
       "name": "Stack of Gold Coins"
     }
   },
@@ -3195,7 +3213,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "common",
-      "index": 156,
+      "index": 157,
       "name": "Chipped Rose Quartz"
     }
   },
@@ -3217,7 +3235,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "common",
-      "index": 157,
+      "index": 158,
       "name": "Corroded Vault Key"
     }
   },
@@ -3238,7 +3256,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "common",
-      "index": 158,
+      "index": 159,
       "name": "Bloodstained Evidence Cloth"
     }
   },
@@ -3252,7 +3270,7 @@ const canonicalItems = [
     "description": "Proficiency with a cartographer's tools lets you produce an accurate map of any area you've thoroughly explored.",
     "legacySource": {
       "tier": "common",
-      "index": 159,
+      "index": 160,
       "name": "Cartographer's Surveying Set"
     },
     "itemType": "tool",
@@ -3270,7 +3288,7 @@ const canonicalItems = [
     "description": "A musical instrument. Proficiency with it lets you use it as a spellcasting focus (bard) or simply to play — and possibly earn a meal and a bed for the night.",
     "legacySource": {
       "tier": "common",
-      "index": 160,
+      "index": 161,
       "name": "Traveling Minstrel's Lute"
     },
     "itemType": "tool",
@@ -3288,7 +3306,7 @@ const canonicalItems = [
     "description": "A minor religious keepsake. No mechanical effect, though it may be recognized by followers of whatever it depicts.",
     "legacySource": {
       "tier": "common",
-      "index": 161,
+      "index": 162,
       "name": "Carved Wooden Idol"
     },
     "itemType": "tool",
@@ -3306,7 +3324,7 @@ const canonicalItems = [
     "description": "A decorative curiosity. Worth more to a collector than to anyone practical.",
     "legacySource": {
       "tier": "common",
-      "index": 162,
+      "index": 163,
       "name": "Dusty Porcelain Figurine"
     },
     "itemType": "tool",
@@ -3324,7 +3342,7 @@ const canonicalItems = [
     "description": "A complete (if boardless) game set — draw a grid in the dirt and you're back in business.",
     "legacySource": {
       "tier": "common",
-      "index": 163,
+      "index": 164,
       "name": "Set of Carved Game Pieces"
     },
     "itemType": "tool",
@@ -3342,12 +3360,30 @@ const canonicalItems = [
     "description": "Holds a drink. That's it. That's the whole item.",
     "legacySource": {
       "tier": "common",
-      "index": 164,
+      "index": 165,
       "name": "Chipped Clay Mug"
     },
     "itemType": "tool",
     "tool": {
       "toolCategory": "utensil"
+    }
+  },
+  {
+    "id": "iron-banded-chest",
+    "name": "Iron-Banded Chest",
+    "rarity": "uncommon",
+    "weight": 1.5,
+    "value": "40 gp",
+    "flavorText": "A solid oak chest reinforced with crossed iron bands, its lock newer and more confident than the wood around it.",
+    "description": "Open to find a haul of uncommon-tier loot and coin.",
+    "legacySource": {
+      "tier": "uncommon",
+      "index": 0,
+      "name": "Iron-Banded Chest"
+    },
+    "itemType": "tool",
+    "tool": {
+      "toolCategory": "container"
     }
   },
   {
@@ -3374,7 +3410,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 0,
+      "index": 1,
       "name": "Potion of Healing"
     }
   },
@@ -3402,7 +3438,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 1,
+      "index": 2,
       "name": "Potion of Greater Healing"
     }
   },
@@ -3433,7 +3469,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 2,
+      "index": 3,
       "name": "Silver Dagger"
     },
     "abilities": [],
@@ -3451,7 +3487,7 @@ const canonicalItems = [
     "description": "Required for picking locks and disarming traps. Proficiency required for full effectiveness.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 3,
+      "index": 4,
       "name": "Thieves' Tools"
     },
     "itemType": "tool",
@@ -3469,7 +3505,7 @@ const canonicalItems = [
     "description": "Anchor yourself while climbing. You cannot fall more than 25 feet while anchored and moving at half speed.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 4,
+      "index": 5,
       "name": "Climber's Kit"
     },
     "itemType": "tool",
@@ -3487,7 +3523,7 @@ const canonicalItems = [
     "description": "Contains 1d4 random 1st-level wizard spells and 1 2nd-level spell. A wizard can copy them: 50 gp and 2 hours per spell level.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 5,
+      "index": 6,
       "name": "Damaged Spellbook"
     },
     "itemType": "tool",
@@ -3518,7 +3554,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 6,
+      "index": 7,
       "name": "Potion of Darkvision"
     }
   },
@@ -3532,7 +3568,7 @@ const canonicalItems = [
     "description": "DC 15 Strength (Athletics) check (instead of normal) to escape knots. Disadvantage on escape attempts.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 7,
+      "index": 8,
       "name": "Rope of Entangling"
     },
     "itemType": "tool",
@@ -3551,7 +3587,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 8,
+      "index": 9,
       "name": "Gloves of the Thief"
     },
     "itemType": "wondrous",
@@ -3578,7 +3614,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 9,
+      "index": 10,
       "name": "Amulet of Natural Armor +1"
     }
   },
@@ -3593,7 +3629,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 10,
+      "index": 11,
       "name": "Ring of Warmth"
     },
     "itemType": "wondrous",
@@ -3624,7 +3660,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 11,
+      "index": 12,
       "name": "Vial of Antitoxin"
     }
   },
@@ -3651,7 +3687,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 12,
+      "index": 13,
       "name": "Oil of Slipperiness"
     }
   },
@@ -3678,7 +3714,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 13,
+      "index": 14,
       "name": "Dust of Disappearance"
     }
   },
@@ -3692,7 +3728,7 @@ const canonicalItems = [
     "description": "Holds 500 lbs. / 64 cubic feet. Always weighs 15 lbs. Creatures inside suffocate after 10 minutes. Do not place inside another extradimensional space.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 14,
+      "index": 15,
       "name": "Bag of Holding"
     },
     "itemType": "wondrous",
@@ -3709,7 +3745,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 15,
+      "index": 16,
       "name": "Boots of Elvenkind"
     },
     "itemType": "wondrous",
@@ -3728,7 +3764,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 16,
+      "index": 17,
       "name": "Cloak of Elvenkind"
     },
     "itemType": "wondrous",
@@ -3746,7 +3782,7 @@ const canonicalItems = [
     "description": "Grants Darkvision 60 ft. If you already have Darkvision, range increases by 60 ft.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 17,
+      "index": 18,
       "name": "Goggles of Night"
     },
     "itemType": "wondrous",
@@ -3777,7 +3813,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 18,
+      "index": 19,
       "name": "Potion of Water Breathing"
     }
   },
@@ -3804,7 +3840,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 19,
+      "index": 20,
       "name": "Potion of Climbing"
     }
   },
@@ -3838,7 +3874,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 20,
+      "index": 21,
       "name": "Longsword +1"
     }
   },
@@ -3861,7 +3897,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 21,
+      "index": 22,
       "name": "Shield +1"
     }
   },
@@ -3884,7 +3920,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 22,
+      "index": 23,
       "name": "Mithral Chain Shirt"
     },
     "passive": [],
@@ -3903,7 +3939,7 @@ const canonicalItems = [
     "description": "Spellcasting focus (cleric, paladin, druid). Silver construction works in certain anti-undead rituals. Worth 25 gp as silver.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 23,
+      "index": 24,
       "name": "Silver Holy Symbol"
     },
     "itemType": "wondrous",
@@ -3934,7 +3970,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 25,
+      "index": 26,
       "name": "Scroll of Fireball"
     }
   },
@@ -3961,7 +3997,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 26,
+      "index": 27,
       "name": "Scroll of Invisibility"
     }
   },
@@ -3975,7 +4011,7 @@ const canonicalItems = [
     "description": "Advantage on Strength checks to break down doors. Solo: +4 bonus. With helper: +6 bonus and advantage.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 27,
+      "index": 28,
       "name": "Portable Ram"
     },
     "itemType": "wondrous",
@@ -3991,7 +4027,7 @@ const canonicalItems = [
     "description": "Hold one stone, speak up to 25 words — the other stone's holder hears you. Works across any distance on the same plane. Each stone: once per day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 28,
+      "index": 29,
       "name": "Sending Stones (pair)"
     },
     "itemType": "wondrous",
@@ -4020,7 +4056,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 29,
+      "index": 30,
       "name": "Alchemist's Fire (flask)"
     }
   },
@@ -4047,7 +4083,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 30,
+      "index": 31,
       "name": "Thunderstone"
     }
   },
@@ -4074,7 +4110,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 31,
+      "index": 32,
       "name": "Tanglefoot Bag"
     }
   },
@@ -4101,7 +4137,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 32,
+      "index": 33,
       "name": "Smokestick"
     }
   },
@@ -4132,7 +4168,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 33,
+      "index": 34,
       "name": "Masterwork Longsword"
     },
     "abilities": [],
@@ -4171,7 +4207,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 34,
+      "index": 35,
       "name": "Masterwork Heavy Crossbow"
     },
     "abilities": [],
@@ -4189,7 +4225,7 @@ const canonicalItems = [
     "description": "Functions as a hooded lantern but requires no oil and cannot be extinguished by wind. Only dispel magic or submersion can extinguish it temporarily.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 35,
+      "index": 36,
       "name": "Eternal Lantern"
     },
     "itemType": "tool",
@@ -4207,7 +4243,7 @@ const canonicalItems = [
     "description": "Cannot be picked (immune to Thieves' Tools), forced with Strength, or destroyed by non-magical means. Magical attacks deal half damage.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 36,
+      "index": 37,
       "name": "Lock of Eternal Binding"
     },
     "itemType": "tool",
@@ -4238,7 +4274,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 37,
+      "index": 38,
       "name": "Potion of Heroism"
     }
   },
@@ -4261,7 +4297,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 38,
+      "index": 39,
       "name": "Bracers of Armor (+1)"
     }
   },
@@ -4276,7 +4312,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 39,
+      "index": 40,
       "name": "Ring of Feather Falling"
     },
     "itemType": "wondrous",
@@ -4307,7 +4343,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 40,
+      "index": 41,
       "name": "Potion of Enlarge"
     }
   },
@@ -4334,7 +4370,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 41,
+      "index": 42,
       "name": "Potion of Reduce"
     }
   },
@@ -4361,7 +4397,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 42,
+      "index": 43,
       "name": "Necklace of Fireballs"
     }
   },
@@ -4376,7 +4412,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 43,
+      "index": 44,
       "name": "Hat of Disguise"
     },
     "itemType": "wondrous",
@@ -4395,7 +4431,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 44,
+      "index": 45,
       "name": "Pipes of the Sewers"
     },
     "itemType": "wondrous",
@@ -4411,7 +4447,7 @@ const canonicalItems = [
     "description": "50 charges. Expend 1: bright light 30-ft, dim 30-ft (1 min). Expend 5: sunlight 30-ft (1 min). Expend 10: DC 15 Con save or blinded 1 min in 30-ft radius. Recharges 1d50 charges each day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 45,
+      "index": 46,
       "name": "Gem of Brightness"
     },
     "itemType": "wondrous",
@@ -4427,7 +4463,7 @@ const canonicalItems = [
     "description": "Advantage on Investigation checks for details within 1 ft. Can read text as small as 1 mm. Detects hidden writing.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 46,
+      "index": 47,
       "name": "Eyes of Minute Seeing"
     },
     "itemType": "wondrous",
@@ -4445,7 +4481,7 @@ const canonicalItems = [
     "description": "1 charge. Once per day: Scorching Ray (+5 ranged spell attack, 2d6 fire on hit). Recharges 1 charge each day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 47,
+      "index": 48,
       "name": "Circlet of Blasting"
     },
     "itemType": "wondrous",
@@ -4463,7 +4499,7 @@ const canonicalItems = [
     "description": "'Stream': 1 gallon/action. 'Fountain': 5 gallons/action. 'Geyser': 30 gallons/action, DC 13 Strength save or knocked prone.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 48,
+      "index": 49,
       "name": "Decanter of Endless Water"
     },
     "itemType": "wondrous",
@@ -4479,7 +4515,7 @@ const canonicalItems = [
     "description": "No audible sound. Up to 6 designated creatures within 600 ft. are mentally alerted. Works through walls. 1 use per short rest.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 49,
+      "index": 50,
       "name": "Horn of Silent Alarm"
     },
     "itemType": "wondrous",
@@ -4495,7 +4531,7 @@ const canonicalItems = [
     "description": "Press button: rod is fixed in place — holds up to 8,000 lbs. Press again or DC 30 Strength check to move it. Infinite uses.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 50,
+      "index": 51,
       "name": "Immovable Rod"
     },
     "itemType": "tool",
@@ -4519,7 +4555,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 51,
+      "index": 52,
       "name": "Javelin of Lightning"
     }
   },
@@ -4534,7 +4570,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 52,
+      "index": 53,
       "name": "Medallion of Thoughts"
     },
     "itemType": "wondrous",
@@ -4553,7 +4589,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 53,
+      "index": 54,
       "name": "Pearl of Power"
     },
     "itemType": "wondrous",
@@ -4570,7 +4606,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 54,
+      "index": 55,
       "name": "Periapt of Health"
     },
     "itemType": "wondrous",
@@ -4601,7 +4637,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 55,
+      "index": 56,
       "name": "Potion of Gaseous Form"
     }
   },
@@ -4628,7 +4664,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 56,
+      "index": 57,
       "name": "Potion of Growth"
     }
   },
@@ -4643,7 +4679,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 57,
+      "index": 58,
       "name": "Ring of Jumping"
     },
     "itemType": "wondrous",
@@ -4662,7 +4698,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 58,
+      "index": 59,
       "name": "Ring of Mind Shielding"
     },
     "itemType": "wondrous",
@@ -4681,7 +4717,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 59,
+      "index": 60,
       "name": "Ring of Swimming"
     },
     "itemType": "wondrous",
@@ -4699,7 +4735,7 @@ const canonicalItems = [
     "description": "Contains 2d4+4 patches. Each detached patch becomes a real item (roll on DMG p.195 Robe of Useful Items table). Once detached, patches cannot be reattached.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 60,
+      "index": 61,
       "name": "Robe of Useful Items"
     },
     "itemType": "wondrous",
@@ -4715,7 +4751,7 @@ const canonicalItems = [
     "description": "Command it to fasten, unfasten, knot, or unknot. Moves up to 10 ft./round. Holds 3,000 lbs. AC 10, 20 HP.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 61,
+      "index": 62,
       "name": "Rope of Climbing"
     },
     "itemType": "tool",
@@ -4734,7 +4770,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 62,
+      "index": 63,
       "name": "Slippers of Spider Climbing"
     },
     "itemType": "wondrous",
@@ -4752,7 +4788,7 @@ const canonicalItems = [
     "description": "+1 bonus to all ability checks and saving throws while you possess and are attuned to this stone. Does not require you to be holding it.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 63,
+      "index": 64,
       "name": "Stone of Good Luck"
     },
     "itemType": "wondrous",
@@ -4768,7 +4804,7 @@ const canonicalItems = [
     "description": "3 charges. Action: wand vibrates if any secret door or hidden compartment is within 30 ft. Recharges 1d3 charges each day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 64,
+      "index": 65,
       "name": "Wand of Secrets"
     },
     "itemType": "wondrous",
@@ -4785,7 +4821,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 65,
+      "index": 66,
       "name": "Winged Boots"
     },
     "itemType": "wondrous",
@@ -4804,7 +4840,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 66,
+      "index": 67,
       "name": "Cape of the Mountebank"
     },
     "itemType": "wondrous",
@@ -4822,7 +4858,7 @@ const canonicalItems = [
     "description": "10 charges. Ring within 120 ft. of a lock, latch, or sealed container: it opens. On last charge: roll d20 — on 1, the chime cracks and is destroyed.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 67,
+      "index": 68,
       "name": "Chime of Opening"
     },
     "itemType": "wondrous",
@@ -4838,7 +4874,7 @@ const canonicalItems = [
     "description": "Burns oil normally. Invisible creatures within its 30-ft bright radius become visible as faintly glowing outlines.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 68,
+      "index": 69,
       "name": "Lantern of Revealing"
     },
     "itemType": "tool",
@@ -4865,7 +4901,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 69,
+      "index": 70,
       "name": "Mithral Shield"
     },
     "passive": [],
@@ -4885,7 +4921,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 70,
+      "index": 71,
       "name": "Necklace of Adaptation"
     },
     "itemType": "wondrous",
@@ -4916,7 +4952,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 71,
+      "index": 72,
       "name": "Oil of Etherealness"
     }
   },
@@ -4931,7 +4967,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 72,
+      "index": 73,
       "name": "Pipes of Haunting"
     },
     "itemType": "wondrous",
@@ -4948,7 +4984,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 73,
+      "index": 74,
       "name": "Ring of Animal Influence"
     },
     "itemType": "wondrous",
@@ -4974,7 +5010,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 74,
+      "index": 75,
       "name": "Silvered Longsword"
     },
     "passive": [],
@@ -5000,7 +5036,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 75,
+      "index": 76,
       "name": "Staff of the Adder"
     }
   },
@@ -5014,7 +5050,7 @@ const canonicalItems = [
     "description": "3 charges. Expend 1: Detect Magic (concentration, 10 minutes). Recharges 1d3 charges each day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 76,
+      "index": 77,
       "name": "Wand of Magic Detection"
     },
     "itemType": "wondrous",
@@ -5031,7 +5067,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 77,
+      "index": 78,
       "name": "Wand of Web"
     },
     "itemType": "wondrous",
@@ -5047,7 +5083,7 @@ const canonicalItems = [
     "description": "5 charges. Expend 1: Gust of Wind until end of next turn. Expend 3: wind wall 50 ft. long, 15 ft. high. Recharges 1d4 charges each day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 78,
+      "index": 79,
       "name": "Wind Fan"
     },
     "itemType": "wondrous",
@@ -5064,7 +5100,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 79,
+      "index": 80,
       "name": "Brooch of Shielding"
     },
     "itemType": "wondrous",
@@ -5083,7 +5119,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 80,
+      "index": 81,
       "name": "Driftglobe"
     },
     "itemType": "wondrous",
@@ -5099,7 +5135,7 @@ const canonicalItems = [
     "description": "Three forms: Block, Rowboat (10×4 ft., holds 4), or Sailing Vessel (24×8 ft., holds 15). Contents ejected on folding.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 81,
+      "index": 82,
       "name": "Folding Boat"
     },
     "itemType": "wondrous",
@@ -5115,7 +5151,7 @@ const canonicalItems = [
     "description": "Cannot be dismounted while conscious. DC 10 Strength save to stay mounted when effects would unseat you.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 82,
+      "index": 83,
       "name": "Saddle of the Cavalier"
     },
     "itemType": "wondrous",
@@ -5138,7 +5174,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 83,
+      "index": 84,
       "name": "Staff of the Woodlands"
     }
   },
@@ -5153,7 +5189,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 84,
+      "index": 85,
       "name": "Boots of Striding and Springing"
     },
     "itemType": "wondrous",
@@ -5171,7 +5207,7 @@ const canonicalItems = [
     "description": "Extradimensional space 6 ft. across, 10 ft. deep. Air lasts 10 minutes for one Medium creature. Placing inside a Bag of Holding causes a rift to the Astral Plane, destroying both.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 85,
+      "index": 86,
       "name": "Portable Hole"
     },
     "itemType": "wondrous",
@@ -5200,7 +5236,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 86,
+      "index": 87,
       "name": "Spell Scroll (1st Level)"
     }
   },
@@ -5227,7 +5263,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 87,
+      "index": 88,
       "name": "Spell Scroll (2nd Level)"
     }
   },
@@ -5241,7 +5277,7 @@ const canonicalItems = [
     "description": "Produces one of many liquids per day: acid (8 oz), basic poison (1/2 oz), beer (4 gallons), honey (1 gallon), mayonnaise (2 gallons), oil (1 quart), vinegar (2 gallons), water (8 gallons), wine (1 gallon). Each liquid takes 1 minute to flow.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 88,
+      "index": 89,
       "name": "Alchemy Jug"
     },
     "itemType": "tool",
@@ -5267,7 +5303,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 89,
+      "index": 90,
       "name": "Armor of Gleaming"
     }
   },
@@ -5293,7 +5329,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 90,
+      "index": 91,
       "name": "Bead of Nourishment"
     }
   },
@@ -5319,7 +5355,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 91,
+      "index": 92,
       "name": "Bead of Refreshment"
     }
   },
@@ -5334,7 +5370,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 92,
+      "index": 93,
       "name": "Boots of the Winterlands"
     },
     "itemType": "wondrous",
@@ -5351,7 +5387,7 @@ const canonicalItems = [
     "description": "Burns for 1 hour. Light is bright in a 5-ft radius, dim in 10 ft. The flame is not extinguished by wind or water — it can even burn while fully submerged.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 93,
+      "index": 94,
       "name": "Candle of the Deep"
     },
     "itemType": "wondrous",
@@ -5375,7 +5411,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 94,
+      "index": 95,
       "name": "Cast-Off Armor"
     }
   },
@@ -5388,7 +5424,7 @@ const canonicalItems = [
     "description": "While holding this six-sided die and speaking its command word, you can have it show any number. Once it leaves your hand, it behaves normally.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 95,
+      "index": 96,
       "name": "Charlatan's Die"
     },
     "itemType": "wondrous",
@@ -5403,7 +5439,7 @@ const canonicalItems = [
     "description": "As a bonus action, cause the cloak to billow dramatically. Pure cosmetic effect — it billows in any direction you choose, even with no wind. Useful for intimidation or theatrics.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 96,
+      "index": 97,
       "name": "Cloak of Billowing"
     },
     "itemType": "wondrous",
@@ -5420,7 +5456,7 @@ const canonicalItems = [
     "description": "As a bonus action, alter the cloak's apparent style, color, and cut. It cannot duplicate specific garments or materials, but it can appear as any ordinary cloak, robe, or cape.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 97,
+      "index": 98,
       "name": "Cloak of Many Fashions"
     },
     "itemType": "wondrous",
@@ -5437,7 +5473,7 @@ const canonicalItems = [
     "description": "When you make an attack roll, you can forgo rolling and treat the d20 result as a 10 (before adding modifiers). Once per day.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 98,
+      "index": 99,
       "name": "Clockwork Amulet"
     },
     "itemType": "wondrous",
@@ -5454,7 +5490,7 @@ const canonicalItems = [
     "description": "Torn, cut, or burnt portions of the garment repair themselves within 1 hour. The clothes always look clean and well-pressed. Will not repair damage that was not done to the garment itself.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 99,
+      "index": 100,
       "name": "Clothes of Mending"
     },
     "itemType": "tool",
@@ -5472,7 +5508,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 100,
+      "index": 101,
       "name": "Dark Shard Amulet"
     },
     "itemType": "wondrous",
@@ -5489,7 +5525,7 @@ const canonicalItems = [
     "description": "While holding this to your ear: you can make out whispered conversations up to 30 ft. away that you normally wouldn't hear. Advantage on Wisdom (Perception) checks involving hearing.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 102,
+      "index": 103,
       "name": "Ear Horn of Hearing"
     },
     "itemType": "wondrous",
@@ -5506,7 +5542,7 @@ const canonicalItems = [
     "description": "A wizard's spellbook that is immune to fire and water damage. Also immune to the disintegrate spell (and similar spell-based destruction effects).",
     "legacySource": {
       "tier": "uncommon",
-      "index": 103,
+      "index": 104,
       "name": "Enduring Spellbook"
     },
     "itemType": "tool",
@@ -5524,7 +5560,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 104,
+      "index": 105,
       "name": "Ersatz Eye"
     },
     "itemType": "wondrous",
@@ -5542,7 +5578,7 @@ const canonicalItems = [
     "description": "Open the cap: smoke billows out, filling a 60-ft radius in 1 round, expanding 10 ft. per round after. Smoke heavily obscures. Removing the bottle from the area or stoppered again collapses smoke in 10 minutes.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 105,
+      "index": 106,
       "name": "Eversmoking Bottle"
     },
     "itemType": "wondrous",
@@ -5559,7 +5595,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 106,
+      "index": 107,
       "name": "Eyes of Charming"
     },
     "itemType": "wondrous",
@@ -5576,7 +5612,7 @@ const canonicalItems = [
     "description": "+5 to Dexterity (Sleight of Hand) checks. +5 to Dexterity checks made to pick locks. The gloves are invisible while worn.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 107,
+      "index": 108,
       "name": "Gloves of Thievery"
     },
     "itemType": "wondrous",
@@ -5594,7 +5630,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 108,
+      "index": 109,
       "name": "Goggles of Object Reading"
     },
     "itemType": "wondrous",
@@ -5613,7 +5649,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 109,
+      "index": 110,
       "name": "Instrument of the Bards (Doss Lute)"
     },
     "itemType": "wondrous",
@@ -5643,7 +5679,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 110,
+      "index": 111,
       "name": "Keoghtom's Ointment"
     }
   },
@@ -5656,7 +5692,7 @@ const canonicalItems = [
     "description": "The key has a 5% chance of opening any lock it is inserted into (roll a d20; on 20, it opens). It cannot open the same lock twice.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 111,
+      "index": 112,
       "name": "Mystery Key"
     },
     "itemType": "tool",
@@ -5673,7 +5709,7 @@ const canonicalItems = [
     "description": "Point the orb: the needle points toward magnetic north. While outdoors, the orb also tells you what time of day it is (within 1 hour).",
     "legacySource": {
       "tier": "uncommon",
-      "index": 112,
+      "index": 113,
       "name": "Orb of Direction"
     },
     "itemType": "wondrous",
@@ -5688,7 +5724,7 @@ const canonicalItems = [
     "description": "While holding the orb: you can tell within 1 hour how long until dawn or dusk (whichever is sooner). Also tells you how many days, months, and years have passed since a date you specify.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 113,
+      "index": 114,
       "name": "Orb of Time"
     },
     "itemType": "wondrous",
@@ -5716,7 +5752,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 114,
+      "index": 115,
       "name": "Perfume of Bewitching"
     }
   },
@@ -5729,7 +5765,7 @@ const canonicalItems = [
     "description": "While smoking: you can exhale smoke in the shape of any creature you've seen. The smoke shape lasts 1 minute, can move at 20 ft. per round, and appears real — but has no substance. Particularly useful for deception.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 115,
+      "index": 116,
       "name": "Pipe of Smoke Monsters"
     },
     "itemType": "wondrous",
@@ -5744,7 +5780,7 @@ const canonicalItems = [
     "description": "Command word extends it from 1 to 10 feet. Second command word collapses it. Useful for prodding things safely, testing floor stability, or bridging gaps.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 116,
+      "index": 117,
       "name": "Pole of Collapsing"
     },
     "itemType": "wondrous",
@@ -5759,7 +5795,7 @@ const canonicalItems = [
     "description": "Plant a shrub in this pot and tend it for 30 days. After 30 days the shrub becomes an Awakened Shrub (see MM). The shrub is friendly and follows your commands. Once used, the pot loses its magic.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 117,
+      "index": 118,
       "name": "Pot of Awakening"
     },
     "itemType": "wondrous",
@@ -5787,7 +5823,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 118,
+      "index": 119,
       "name": "Pressure Capsule"
     }
   },
@@ -5800,7 +5836,7 @@ const canonicalItems = [
     "description": "Functions as the missing limb in all respects. Cannot be removed against your will while attuned. Made of wood, stone, or metal depending on the version.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 119,
+      "index": 120,
       "name": "Prosthetic Limb"
     },
     "itemType": "wondrous",
@@ -5815,7 +5851,7 @@ const canonicalItems = [
     "description": "Cut into pieces: they automatically reattach and rejoin when the ends are pressed together. Takes 1 minute for pieces to reconnect fully. Destroyed pieces regenerate over 24 hours.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 120,
+      "index": 121,
       "name": "Rope of Mending"
     },
     "itemType": "tool",
@@ -5834,7 +5870,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 121,
+      "index": 122,
       "name": "Ruby of the War Mage"
     },
     "itemType": "wondrous",
@@ -5859,7 +5895,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 122,
+      "index": 123,
       "name": "Sentinel Shield"
     }
   },
@@ -5880,7 +5916,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 123,
+      "index": 124,
       "name": "Shield of Expression"
     }
   },
@@ -5894,7 +5930,7 @@ const canonicalItems = [
     "description": "While wearing on ice: movement speed increases by 10 ft. and you can move across ice without any chance of falling. You can also skate on water that has been frozen by any magical effect.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 124,
+      "index": 125,
       "name": "Skates of the Ice Queen"
     },
     "itemType": "wondrous",
@@ -5919,7 +5955,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 125,
+      "index": 126,
       "name": "Smoldering Armor"
     }
   },
@@ -5938,7 +5974,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 126,
+      "index": 127,
       "name": "Staff of Adornment"
     }
   },
@@ -5957,7 +5993,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 127,
+      "index": 128,
       "name": "Staff of Birdcalls"
     }
   },
@@ -5976,7 +6012,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 128,
+      "index": 129,
       "name": "Staff of Flowers"
     }
   },
@@ -5989,7 +6025,7 @@ const canonicalItems = [
     "description": "Any alcoholic beverage poured into it tastes exactly as it should — but produces no intoxicating effect. You can drink freely from it without risk of drunkenness.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 129,
+      "index": 130,
       "name": "Tankard of Sobriety"
     },
     "itemType": "wondrous",
@@ -6004,7 +6040,7 @@ const canonicalItems = [
     "description": "As a bonus action, speak the command word: the cane becomes a longsword (1d8 slashing, versatile 1d10). Speak again or sheathe it to return it to cane form. Counts as magical.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 130,
+      "index": 131,
       "name": "Veteran's Cane"
     },
     "itemType": "wondrous",
@@ -6019,7 +6055,7 @@ const canonicalItems = [
     "description": "3 charges. Expend 1: a phantom orchestra plays a tune of your choice for 1 minute, audible within 60 ft. Recharges 1d3 charges each day. If all charges spent: roll d20 — on 1, wand emits a sad trombone noise and becomes mundane.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 132,
+      "index": 133,
       "name": "Wand of Conducting"
     },
     "itemType": "wondrous",
@@ -6034,7 +6070,7 @@ const canonicalItems = [
     "description": "7 charges. Expend 1: shoot a harmless shower of colored sparks (Prestidigitation effect). Recharges 1d6+1 charges each day. Can ignite flammable objects. Fireworks travel up to 60 ft. and produce a small bang audible within 300 ft.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 133,
+      "index": 134,
       "name": "Wand of Pyrotechnics"
     },
     "itemType": "wondrous",
@@ -6049,7 +6085,7 @@ const canonicalItems = [
     "description": "3 charges. Expend 1: target creature within 30 ft. must succeed on a DC 12 Charisma save or have its face locked in a scowl for 1 hour. Purely cosmetic — imposes no mechanical penalty but may affect social encounters at GM discretion.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 134,
+      "index": 135,
       "name": "Wand of Scowls"
     },
     "itemType": "wondrous",
@@ -6064,7 +6100,7 @@ const canonicalItems = [
     "description": "3 charges. Expend 1: target creature within 30 ft. must succeed on a DC 12 Charisma save or smile uncontrollably for 1 minute. Purely cosmetic — imposes no mechanical penalty.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 135,
+      "index": 136,
       "name": "Wand of Smiles"
     },
     "itemType": "wondrous",
@@ -6080,7 +6116,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 136,
+      "index": 137,
       "name": "Absorbing Tattoo"
     },
     "itemType": "wondrous",
@@ -6104,7 +6140,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 137,
+      "index": 138,
       "name": "Barrier Tattoo (Medium)"
     }
   },
@@ -6119,7 +6155,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 138,
+      "index": 139,
       "name": "Bloodwell Vial"
     },
     "itemType": "wondrous",
@@ -6136,7 +6172,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 139,
+      "index": 140,
       "name": "Cauldron of Rebirth"
     },
     "itemType": "wondrous",
@@ -6152,7 +6188,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 140,
+      "index": 141,
       "name": "Coiling Grasp Tattoo"
     },
     "itemType": "wondrous",
@@ -6168,7 +6204,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 141,
+      "index": 142,
       "name": "Eldritch Claw Tattoo"
     },
     "itemType": "wondrous",
@@ -6184,7 +6220,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 142,
+      "index": 143,
       "name": "Ghost Step Tattoo"
     },
     "itemType": "wondrous",
@@ -6200,7 +6236,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 143,
+      "index": 144,
       "name": "Illuminator's Tattoo"
     },
     "itemType": "wondrous",
@@ -6216,7 +6252,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 144,
+      "index": 145,
       "name": "Masquerade Tattoo"
     },
     "itemType": "wondrous",
@@ -6241,7 +6277,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 145,
+      "index": 146,
       "name": "Peregrine Mask"
     }
   },
@@ -6256,7 +6292,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 146,
+      "index": 147,
       "name": "Rhythm-Maker's Drum"
     },
     "itemType": "wondrous",
@@ -6272,7 +6308,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 147,
+      "index": 148,
       "name": "Luba's Tarokka of Souls"
     },
     "itemType": "wondrous",
@@ -6301,7 +6337,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 148,
+      "index": 149,
       "name": "Potion of Maximum Power"
     }
   },
@@ -6328,7 +6364,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 149,
+      "index": 150,
       "name": "Spell Scroll (3rd Level)"
     }
   },
@@ -6355,7 +6391,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 150,
+      "index": 151,
       "name": "Spell Scroll (4th Level)"
     }
   },
@@ -6386,7 +6422,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 151,
+      "index": 152,
       "name": "Acheron Blade"
     }
   },
@@ -6399,7 +6435,7 @@ const canonicalItems = [
     "description": "While holding: you have advantage on Intelligence (History) checks related to gnomish inventions and Tinker lore. Once per day: cast Identify without components.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 152,
+      "index": 153,
       "name": "Fragment of Yerroppi"
     },
     "itemType": "wondrous",
@@ -6424,7 +6460,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 153,
+      "index": 154,
       "name": "Hunter's Coat"
     }
   },
@@ -6451,7 +6487,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 154,
+      "index": 155,
       "name": "Potion of Comprehension"
     }
   },
@@ -6478,7 +6514,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 155,
+      "index": 156,
       "name": "Potion of Possibility"
     }
   },
@@ -6501,7 +6537,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 156,
+      "index": 157,
       "name": "Prosper Helm"
     }
   },
@@ -6515,7 +6551,7 @@ const canonicalItems = [
     "description": "Once per day: absorb a spell targeting only you (up to 4th level) into the bottle. The spell has no effect on you. Within 24 hours, you can uncork the bottle to release the spell, targeting a creature within 30 ft. using the original caster's DC and attack bonus.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 157,
+      "index": 158,
       "name": "Spell Bottle"
     },
     "itemType": "wondrous",
@@ -6556,7 +6592,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 158,
+      "index": 159,
       "name": "Veteran's Blade"
     }
   },
@@ -6579,7 +6615,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 159,
+      "index": 160,
       "name": "Steel Plate Armor"
     }
   },
@@ -6601,7 +6637,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 160,
+      "index": 161,
       "name": "Steel Plate Helm"
     }
   },
@@ -6623,7 +6659,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 161,
+      "index": 162,
       "name": "Steel Plate Gauntlets"
     }
   },
@@ -6645,7 +6681,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 162,
+      "index": 163,
       "name": "Steel Plate Greaves"
     }
   },
@@ -6667,7 +6703,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 163,
+      "index": 164,
       "name": "Steel Plate Boots"
     }
   },
@@ -6689,7 +6725,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 164,
+      "index": 165,
       "name": "Steel Plate Shield"
     }
   },
@@ -6712,7 +6748,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 165,
+      "index": 166,
       "name": "Silver Plate Armor"
     }
   },
@@ -6734,7 +6770,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 166,
+      "index": 167,
       "name": "Silver Plate Helm"
     }
   },
@@ -6756,7 +6792,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 167,
+      "index": 168,
       "name": "Silver Plate Gauntlets"
     }
   },
@@ -6778,7 +6814,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 168,
+      "index": 169,
       "name": "Silver Plate Greaves"
     }
   },
@@ -6800,7 +6836,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 169,
+      "index": 170,
       "name": "Silver Plate Boots"
     }
   },
@@ -6822,7 +6858,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 170,
+      "index": 171,
       "name": "Silver Plate Shield"
     }
   },
@@ -6855,7 +6891,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 171,
+      "index": 172,
       "name": "Steel Shortsword"
     }
   },
@@ -6888,7 +6924,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 172,
+      "index": 173,
       "name": "Steel Longsword"
     }
   },
@@ -6921,7 +6957,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 173,
+      "index": 174,
       "name": "Steel Dagger"
     }
   },
@@ -6951,7 +6987,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 174,
+      "index": 175,
       "name": "Steel Mace"
     }
   },
@@ -6984,7 +7020,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 175,
+      "index": 176,
       "name": "Steel Battleaxe"
     }
   },
@@ -7018,7 +7054,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 176,
+      "index": 177,
       "name": "Steel Warhammer"
     }
   },
@@ -7052,7 +7088,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 177,
+      "index": 178,
       "name": "Steel Spear"
     }
   },
@@ -7087,7 +7123,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 179,
+      "index": 180,
       "name": "Silver Shortsword"
     },
     "abilities": [],
@@ -7123,7 +7159,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 180,
+      "index": 181,
       "name": "Silver Mace"
     },
     "abilities": [],
@@ -7162,7 +7198,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 181,
+      "index": 182,
       "name": "Silver Battleaxe"
     },
     "abilities": [],
@@ -7202,7 +7238,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 182,
+      "index": 183,
       "name": "Silver Warhammer"
     },
     "abilities": [],
@@ -7242,7 +7278,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 183,
+      "index": 184,
       "name": "Silver Spear"
     },
     "abilities": [],
@@ -7274,7 +7310,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 185,
+      "index": 186,
       "name": "Trained Hawk"
     }
   },
@@ -7302,7 +7338,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 186,
+      "index": 187,
       "name": "Familiar-Trained Owl"
     }
   },
@@ -7330,7 +7366,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 187,
+      "index": 188,
       "name": "Fox Kit"
     }
   },
@@ -7358,7 +7394,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 188,
+      "index": 189,
       "name": "Docile Giant Frog"
     }
   },
@@ -7386,7 +7422,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 189,
+      "index": 190,
       "name": "Bonded Constrictor Snake"
     }
   },
@@ -7414,7 +7450,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 190,
+      "index": 191,
       "name": "Badger"
     }
   },
@@ -7442,7 +7478,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 191,
+      "index": 192,
       "name": "Speaking Raven"
     }
   },
@@ -7470,7 +7506,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 192,
+      "index": 193,
       "name": "Docile Giant Fire Beetle"
     }
   },
@@ -7498,7 +7534,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 193,
+      "index": 194,
       "name": "Guard-Trained Mastiff"
     }
   },
@@ -7526,7 +7562,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 194,
+      "index": 195,
       "name": "Tide-Tamed Giant Crab"
     }
   },
@@ -7554,7 +7590,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 195,
+      "index": 196,
       "name": "Carrion-Trained Vulture"
     }
   },
@@ -7583,7 +7619,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 196,
+      "index": 197,
       "name": "River Otter"
     }
   },
@@ -7611,7 +7647,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 197,
+      "index": 198,
       "name": "Muzzled Giant Centipede"
     }
   },
@@ -7647,7 +7683,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 198,
+      "index": 199,
       "name": "Warhorse"
     }
   },
@@ -7677,7 +7713,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 199,
+      "index": 200,
       "name": "Desert Camel"
     }
   },
@@ -7707,7 +7743,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 200,
+      "index": 201,
       "name": "Riding-Trained Elk"
     }
   },
@@ -7738,7 +7774,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 201,
+      "index": 202,
       "name": "Giant Goat"
     }
   },
@@ -7759,7 +7795,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 202,
+      "index": 203,
       "name": "Sealed Royal Decree"
     }
   },
@@ -7780,7 +7816,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 203,
+      "index": 204,
       "name": "Tattered Treasure Map"
     }
   },
@@ -7798,7 +7834,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 204,
+      "index": 205,
       "name": "Ancient Silver Ingot"
     }
   },
@@ -7816,7 +7852,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 205,
+      "index": 206,
       "name": "Antique Gold Necklace"
     }
   },
@@ -7837,7 +7873,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 206,
+      "index": 207,
       "name": "Sigil of the Silver Order"
     }
   },
@@ -7858,7 +7894,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 207,
+      "index": 208,
       "name": "Wax-Sealed Noble's Pass"
     }
   },
@@ -7879,7 +7915,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 208,
+      "index": 209,
       "name": "Rune-Carved Puzzle Stone"
     }
   },
@@ -7893,7 +7929,7 @@ const canonicalItems = [
     "description": "Proficiency with this kit grants advantage on checks made to perform surgery, stabilize a dying creature, or treat a serious wound beyond what a basic healer's kit can manage.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 209,
+      "index": 210,
       "name": "Surgeon's Kit"
     },
     "itemType": "tool",
@@ -7911,7 +7947,7 @@ const canonicalItems = [
     "description": "A superior set of thieves' tools. Grants a +2 bonus on checks made to pick locks or disarm mechanical traps, on top of normal tool proficiency.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 210,
+      "index": 211,
       "name": "Master Thief's Lockpick Set"
     },
     "itemType": "tool",
@@ -7929,7 +7965,7 @@ const canonicalItems = [
     "description": "A hunting trophy. No mechanical effect, but it makes a statement wherever it's hung.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 211,
+      "index": 212,
       "name": "Mounted Boar's Head Trophy"
     },
     "itemType": "tool",
@@ -7970,7 +8006,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 212,
+      "index": 213,
       "name": "Celestine Battle Staff"
     }
   },
@@ -8010,7 +8046,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 213,
+      "index": 214,
       "name": "Voltaic Hand Crossbow"
     }
   },
@@ -8044,7 +8080,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 214,
+      "index": 215,
       "name": "Wildroot Longbow"
     }
   },
@@ -8084,7 +8120,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 215,
+      "index": 216,
       "name": "Steel Hand Crossbow of the Deep Frost"
     }
   },
@@ -8135,7 +8171,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 216,
+      "index": 217,
       "name": "Spear of the Brinewrought"
     }
   },
@@ -8169,7 +8205,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 217,
+      "index": 218,
       "name": "Kukri of the Verdant"
     }
   },
@@ -8210,7 +8246,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 218,
+      "index": 219,
       "name": "Zephyr-Touched Trident"
     }
   },
@@ -8251,7 +8287,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 219,
+      "index": 220,
       "name": "Crushing Trident"
     }
   },
@@ -8291,7 +8327,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 220,
+      "index": 221,
       "name": "Bronze Longbow of Gravity"
     }
   },
@@ -8328,7 +8364,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 221,
+      "index": 222,
       "name": "Bronze War Pick of the Shadow"
     }
   },
@@ -8369,7 +8405,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 222,
+      "index": 223,
       "name": "Trident of the Grave-Touched"
     }
   },
@@ -8403,7 +8439,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 223,
+      "index": 224,
       "name": "Warded Shortsword"
     }
   },
@@ -8443,7 +8479,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 224,
+      "index": 225,
       "name": "Brinewrought Kukri"
     }
   },
@@ -8494,7 +8530,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 225,
+      "index": 226,
       "name": "Stormcalled Heavy Crossbow"
     }
   },
@@ -8534,7 +8570,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 226,
+      "index": 227,
       "name": "Bloodletting Shortbow"
     }
   },
@@ -8574,7 +8610,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 227,
+      "index": 228,
       "name": "Maul of the Echoing"
     }
   },
@@ -8614,7 +8650,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 228,
+      "index": 229,
       "name": "Galebound Longbow"
     }
   },
@@ -8665,7 +8701,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 229,
+      "index": 230,
       "name": "Heavy Crossbow of the Starforged"
     }
   },
@@ -8705,7 +8741,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 230,
+      "index": 231,
       "name": "Scimitar of the Grave-Touched"
     }
   },
@@ -8746,7 +8782,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 231,
+      "index": 232,
       "name": "Oaken Sickle of the Wild"
     }
   },
@@ -8786,7 +8822,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 232,
+      "index": 233,
       "name": "Steel Maul of the Dawn"
     }
   },
@@ -8827,7 +8863,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 233,
+      "index": 234,
       "name": "Iron Heavy Crossbow of the Gale"
     }
   },
@@ -8877,7 +8913,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 234,
+      "index": 235,
       "name": "Hoarfrost Longsword"
     }
   },
@@ -8917,7 +8953,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 235,
+      "index": 236,
       "name": "Iron Shortbow of Gravity"
     }
   },
@@ -8957,7 +8993,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 236,
+      "index": 237,
       "name": "Oaken Maul of the Gale"
     }
   },
@@ -8999,7 +9035,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 237,
+      "index": 238,
       "name": "Silvered Whip of the Tide"
     },
     "abilities": [],
@@ -9043,7 +9079,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 238,
+      "index": 239,
       "name": "Gloomforged Kukri"
     }
   },
@@ -9083,7 +9119,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 239,
+      "index": 240,
       "name": "Soundbound Scimitar"
     }
   },
@@ -9127,7 +9163,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 240,
+      "index": 241,
       "name": "Iron Dagger of the Wild"
     }
   },
@@ -9161,7 +9197,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 241,
+      "index": 242,
       "name": "Runescribed Shortbow"
     }
   },
@@ -9201,7 +9237,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 242,
+      "index": 243,
       "name": "Dagger of the Deathly"
     }
   },
@@ -9251,7 +9287,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 243,
+      "index": 244,
       "name": "Iron Battleaxe of the Deep Frost"
     }
   },
@@ -9301,7 +9337,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 244,
+      "index": 245,
       "name": "Bronze Dagger of the Tide"
     }
   },
@@ -9348,7 +9384,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 245,
+      "index": 246,
       "name": "Icebound War Pick"
     }
   },
@@ -9393,7 +9429,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 246,
+      "index": 247,
       "name": "Oaken Trident of Swiftness"
     }
   },
@@ -9433,7 +9469,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 247,
+      "index": 248,
       "name": "Grave-Touched Greataxe (Cursed)"
     }
   },
@@ -9464,7 +9500,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 248,
+      "index": 249,
       "name": "Mace of the Wind-Runner"
     }
   },
@@ -9511,7 +9547,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 249,
+      "index": 250,
       "name": "Mace of the Echoing"
     }
   },
@@ -9552,7 +9588,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 250,
+      "index": 251,
       "name": "Oaken Trident of the Tempest (Cursed)"
     }
   },
@@ -9592,7 +9628,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 251,
+      "index": 252,
       "name": "Glaive of the Bloodletting"
     }
   },
@@ -9632,7 +9668,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 252,
+      "index": 253,
       "name": "Zephyr-Touched Shortsword"
     }
   },
@@ -9683,7 +9719,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 253,
+      "index": 254,
       "name": "Vein-Etched Trident"
     }
   },
@@ -9723,7 +9759,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 254,
+      "index": 255,
       "name": "Cognizant Rapier"
     }
   },
@@ -9763,7 +9799,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 255,
+      "index": 256,
       "name": "Rapier of the Frostbound"
     }
   },
@@ -9797,7 +9833,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 256,
+      "index": 257,
       "name": "Glyphguard Greataxe"
     }
   },
@@ -9828,7 +9864,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 257,
+      "index": 258,
       "name": "Iron Sickle of the Wild"
     }
   },
@@ -9869,7 +9905,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 258,
+      "index": 259,
       "name": "Warhammer of the Echoing"
     }
   },
@@ -9900,7 +9936,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 259,
+      "index": 260,
       "name": "Wand Blade of the Wildroot"
     }
   },
@@ -9937,7 +9973,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 260,
+      "index": 261,
       "name": "Bronze War Pick of the Decay"
     }
   },
@@ -9977,7 +10013,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 261,
+      "index": 262,
       "name": "Longbow of the Rime"
     }
   },
@@ -10014,7 +10050,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 262,
+      "index": 263,
       "name": "Icebound Mace"
     }
   },
@@ -10045,7 +10081,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 263,
+      "index": 264,
       "name": "Oaken Battle Staff of Swiftness"
     }
   },
@@ -10085,7 +10121,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 264,
+      "index": 265,
       "name": "Pike of the Gustwoven"
     }
   },
@@ -10126,7 +10162,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 265,
+      "index": 266,
       "name": "Heavy Crossbow of the Umbral"
     }
   },
@@ -10176,7 +10212,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 266,
+      "index": 267,
       "name": "Leadweight Kukri"
     }
   },
@@ -10216,7 +10252,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 267,
+      "index": 268,
       "name": "Celestine Hand Crossbow"
     }
   },
@@ -10256,7 +10292,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 268,
+      "index": 269,
       "name": "Iron Whip of the Echo"
     }
   },
@@ -10296,7 +10332,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 269,
+      "index": 270,
       "name": "Dagger of the Thoughtwoven"
     }
   },
@@ -10336,7 +10372,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 270,
+      "index": 271,
       "name": "Steel Shortsword of the Tempest"
     }
   },
@@ -10380,7 +10416,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 271,
+      "index": 272,
       "name": "Glyphguard Scimitar"
     }
   },
@@ -10417,7 +10453,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 272,
+      "index": 273,
       "name": "Duskwoven Mace"
     }
   },
@@ -10457,7 +10493,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 273,
+      "index": 274,
       "name": "Quarterstaff of the Sunforged"
     }
   },
@@ -10497,7 +10533,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 274,
+      "index": 275,
       "name": "Nightfall Greataxe"
     }
   },
@@ -10534,7 +10570,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 275,
+      "index": 276,
       "name": "Bellowing Wand Blade"
     }
   },
@@ -10581,7 +10617,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 276,
+      "index": 277,
       "name": "Oaken Handaxe of Gravity"
     }
   },
@@ -10631,7 +10667,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 277,
+      "index": 278,
       "name": "Steel Quarterstaff of the Decay"
     }
   },
@@ -10671,7 +10707,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 278,
+      "index": 279,
       "name": "Greatsword of the Sunfire"
     }
   },
@@ -10705,7 +10741,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 279,
+      "index": 280,
       "name": "Quarterstaff of the Racing"
     }
   },
@@ -10746,7 +10782,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 280,
+      "index": 281,
       "name": "Trident of the Leadweight"
     }
   },
@@ -10786,7 +10822,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 281,
+      "index": 282,
       "name": "Longsword of the Venomfang"
     }
   },
@@ -10820,7 +10856,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 282,
+      "index": 283,
       "name": "Glaive of the Fortune"
     }
   },
@@ -10860,7 +10896,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 283,
+      "index": 284,
       "name": "Blazing Longsword"
     }
   },
@@ -10897,7 +10933,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 284,
+      "index": 285,
       "name": "Serpent-Kissed Handaxe"
     }
   },
@@ -10928,7 +10964,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 285,
+      "index": 286,
       "name": "Battle Staff of the Verdant"
     }
   },
@@ -10968,7 +11004,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 286,
+      "index": 287,
       "name": "Bronze Glaive of the Tide"
     }
   },
@@ -11008,7 +11044,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 287,
+      "index": 288,
       "name": "Void-Touched Shortsword"
     }
   },
@@ -11048,7 +11084,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 288,
+      "index": 289,
       "name": "Longbow of the Mindshard"
     }
   },
@@ -11082,7 +11118,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 289,
+      "index": 290,
       "name": "Warded Rapier"
     }
   },
@@ -11119,7 +11155,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 290,
+      "index": 291,
       "name": "Glacial War Pick"
     }
   },
@@ -11158,7 +11194,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 291,
+      "index": 292,
       "name": "Silvered Sickle of the Decay"
     },
     "abilities": [],
@@ -11202,7 +11238,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 292,
+      "index": 293,
       "name": "Void-Touched Longsword"
     }
   },
@@ -11239,7 +11275,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 293,
+      "index": 294,
       "name": "War Pick of the Skyborn"
     }
   },
@@ -11286,7 +11322,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 294,
+      "index": 295,
       "name": "Steel Battle Staff of Gravity"
     }
   },
@@ -11327,7 +11363,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 295,
+      "index": 296,
       "name": "Steel Spear of the Shadow"
     }
   },
@@ -11367,7 +11403,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "uncommon",
-      "index": 296,
+      "index": 297,
       "name": "Blightvenom Shortbow"
     }
   },
@@ -11382,7 +11418,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 297,
+      "index": 298,
       "name": "Galebound Gloves"
     },
     "itemType": "wondrous",
@@ -11408,7 +11444,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 298,
+      "index": 299,
       "name": "Iron Padded Armor of the Blood"
     }
   },
@@ -11423,7 +11459,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 299,
+      "index": 300,
       "name": "Glacial Bracers"
     },
     "itemType": "wondrous",
@@ -11450,7 +11486,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 300,
+      "index": 301,
       "name": "Scale Mail of the Brinewrought"
     }
   },
@@ -11465,7 +11501,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 301,
+      "index": 302,
       "name": "Astral Gloves"
     },
     "itemType": "wondrous",
@@ -11502,7 +11538,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 302,
+      "index": 303,
       "name": "Steel Buckler of the Tide"
     }
   },
@@ -11517,7 +11553,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 303,
+      "index": 304,
       "name": "Gravitum Cape"
     },
     "itemType": "wondrous",
@@ -11543,7 +11579,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 304,
+      "index": 305,
       "name": "Breastplate of the Bramblebound"
     }
   },
@@ -11566,7 +11602,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 305,
+      "index": 306,
       "name": "Chain Shirt of the Rotwood"
     }
   },
@@ -11581,7 +11617,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 306,
+      "index": 307,
       "name": "Silvered Boots of the Void"
     },
     "itemType": "wondrous",
@@ -11607,7 +11643,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 307,
+      "index": 308,
       "name": "Gravebound Breastplate"
     }
   },
@@ -11630,7 +11666,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 308,
+      "index": 309,
       "name": "Oaken Plate Armor of the Deep Frost"
     }
   },
@@ -11645,7 +11681,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 309,
+      "index": 310,
       "name": "Gloves of the Stormcalled (Cursed)"
     },
     "itemType": "wondrous",
@@ -11664,7 +11700,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 310,
+      "index": 311,
       "name": "Steel Girdle of the Wild"
     },
     "itemType": "wondrous",
@@ -11691,7 +11727,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 311,
+      "index": 312,
       "name": "Oaken Tower Shield of the Ember Flame"
     }
   },
@@ -11714,7 +11750,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 312,
+      "index": 313,
       "name": "Duskwoven Plate Armor"
     }
   },
@@ -11736,7 +11772,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 313,
+      "index": 314,
       "name": "Bronze Hide Armor of the Venom"
     }
   },
@@ -11759,7 +11795,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 314,
+      "index": 315,
       "name": "Gauntlets of the Umbral"
     }
   },
@@ -11791,7 +11827,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 315,
+      "index": 316,
       "name": "Breastplate of the Scorching"
     }
   },
@@ -11814,7 +11850,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 316,
+      "index": 317,
       "name": "Steel Ring Mail of the Deep Frost"
     }
   },
@@ -11829,7 +11865,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 317,
+      "index": 318,
       "name": "Bracers of the Grave-Touched (Cursed)"
     },
     "itemType": "wondrous",
@@ -11855,7 +11891,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 318,
+      "index": 319,
       "name": "Half Plate Armor of the Hallowed (Cursed)"
     }
   },
@@ -11878,7 +11914,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 319,
+      "index": 320,
       "name": "Undertow Ring Mail"
     }
   },
@@ -11893,7 +11929,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 320,
+      "index": 321,
       "name": "Leadweight Boots"
     },
     "itemType": "wondrous",
@@ -11919,7 +11955,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 321,
+      "index": 322,
       "name": "Skyborn Hide Armor"
     }
   },
@@ -11934,7 +11970,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 323,
+      "index": 324,
       "name": "Starforged Gauntlets"
     },
     "itemType": "wondrous",
@@ -11963,7 +11999,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 324,
+      "index": 325,
       "name": "Voltaic Boots"
     },
     "itemType": "wondrous",
@@ -11982,7 +12018,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 325,
+      "index": 326,
       "name": "Toxic Bracers"
     },
     "itemType": "wondrous",
@@ -12001,7 +12037,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 326,
+      "index": 327,
       "name": "Gloves of the Starforged"
     },
     "itemType": "wondrous",
@@ -12027,7 +12063,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 327,
+      "index": 328,
       "name": "Leather Armor of the Aegis-Marked"
     }
   },
@@ -12042,7 +12078,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 328,
+      "index": 329,
       "name": "Skyborn Girdle"
     },
     "itemType": "wondrous",
@@ -12068,7 +12104,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 329,
+      "index": 330,
       "name": "Cinder Half Plate Armor"
     }
   },
@@ -12091,7 +12127,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 330,
+      "index": 331,
       "name": "Chain Shirt of the Dawnlit"
     }
   },
@@ -12114,7 +12150,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 331,
+      "index": 332,
       "name": "Astral Cape"
     }
   },
@@ -12129,7 +12165,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 332,
+      "index": 333,
       "name": "Steel Greaves of the Wild"
     },
     "itemType": "wondrous",
@@ -12154,7 +12190,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 333,
+      "index": 334,
       "name": "Bronze Shield of the Venom"
     }
   },
@@ -12176,7 +12212,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 334,
+      "index": 335,
       "name": "Steel Breastplate of the Warding"
     }
   },
@@ -12199,7 +12235,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 335,
+      "index": 336,
       "name": "Iron Shield of the Tide"
     }
   },
@@ -12214,7 +12250,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 336,
+      "index": 337,
       "name": "Rotwood Gloves"
     },
     "itemType": "wondrous",
@@ -12252,7 +12288,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 338,
+      "index": 339,
       "name": "Bloodbound Chain Mail"
     }
   },
@@ -12275,7 +12311,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 339,
+      "index": 340,
       "name": "Thundering Ring Mail"
     }
   },
@@ -12297,7 +12333,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 341,
+      "index": 342,
       "name": "Bloodbound Half Plate Armor"
     }
   },
@@ -12320,7 +12356,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 342,
+      "index": 343,
       "name": "Cloak of the Thornwoven (Cursed)"
     }
   },
@@ -12343,7 +12379,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 344,
+      "index": 345,
       "name": "Buckler of the Whisperbound"
     }
   },
@@ -12358,7 +12394,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 345,
+      "index": 346,
       "name": "Cape of the Mindshard"
     },
     "itemType": "wondrous",
@@ -12385,7 +12421,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 346,
+      "index": 347,
       "name": "Tower Shield of the Rotwood"
     }
   },
@@ -12410,7 +12446,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 347,
+      "index": 348,
       "name": "Bronze Belt of the Deep Frost"
     },
     "itemType": "wondrous",
@@ -12438,7 +12474,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 348,
+      "index": 349,
       "name": "Sunblessed Chain Mail"
     }
   },
@@ -12461,7 +12497,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 349,
+      "index": 350,
       "name": "Brinewrought Gloves"
     }
   },
@@ -12485,7 +12521,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 350,
+      "index": 351,
       "name": "Chain Mail of the Thundering"
     }
   },
@@ -12518,7 +12554,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 351,
+      "index": 352,
       "name": "Steel Studded Leather Armor of the Decay"
     }
   },
@@ -12541,7 +12577,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 352,
+      "index": 353,
       "name": "Echoing Ring Mail"
     }
   },
@@ -12563,7 +12599,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 353,
+      "index": 354,
       "name": "Breastplate of the Storm"
     }
   },
@@ -12586,7 +12622,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 354,
+      "index": 355,
       "name": "Steel Splint Armor of the Echo"
     }
   },
@@ -12609,7 +12645,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 355,
+      "index": 356,
       "name": "Steel Shield of Swiftness"
     }
   },
@@ -12632,7 +12668,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 356,
+      "index": 357,
       "name": "Iron Splint Armor of the Void (Cursed)"
     }
   },
@@ -12655,7 +12691,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 359,
+      "index": 360,
       "name": "Winterkissed Belt"
     }
   },
@@ -12678,7 +12714,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 360,
+      "index": 361,
       "name": "Tower Shield of the Ember"
     }
   },
@@ -12703,7 +12739,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 361,
+      "index": 362,
       "name": "Belt of the Fleetfoot"
     },
     "itemType": "wondrous",
@@ -12722,7 +12758,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 362,
+      "index": 363,
       "name": "Greaves of the Tidebound"
     },
     "itemType": "wondrous",
@@ -12748,7 +12784,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 364,
+      "index": 365,
       "name": "Silvered Chain Mail of the Venom"
     }
   },
@@ -12763,7 +12799,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 365,
+      "index": 366,
       "name": "Belt of the Blazing"
     },
     "itemType": "wondrous",
@@ -12790,7 +12826,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 366,
+      "index": 367,
       "name": "Blighted Girdle (Cursed)"
     }
   },
@@ -12805,7 +12841,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 367,
+      "index": 368,
       "name": "Bracers of the Blightvenom"
     },
     "itemType": "wondrous",
@@ -12824,7 +12860,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 368,
+      "index": 369,
       "name": "Gloves of the Radiant"
     },
     "itemType": "wondrous",
@@ -12851,7 +12887,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 369,
+      "index": 370,
       "name": "Blightvenom Scale Mail"
     }
   },
@@ -12866,7 +12902,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 370,
+      "index": 371,
       "name": "Sigil-Bound Belt"
     },
     "itemType": "wondrous",
@@ -12892,7 +12928,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 371,
+      "index": 372,
       "name": "Oaken Half Plate Armor of the Tempest"
     }
   },
@@ -12917,7 +12953,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 372,
+      "index": 373,
       "name": "Bronze Gloves of the Wild"
     },
     "itemType": "wondrous",
@@ -12953,7 +12989,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 373,
+      "index": 374,
       "name": "Breastplate of the Celestine"
     }
   },
@@ -12975,7 +13011,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 374,
+      "index": 375,
       "name": "Hide Armor of the Adderstruck"
     }
   },
@@ -13000,7 +13036,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 375,
+      "index": 376,
       "name": "Radiant Greaves"
     },
     "itemType": "wondrous",
@@ -13025,7 +13061,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 376,
+      "index": 377,
       "name": "Runescribed Gloves"
     }
   },
@@ -13048,7 +13084,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 377,
+      "index": 378,
       "name": "Buckler of the Wildroot"
     }
   },
@@ -13063,7 +13099,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 378,
+      "index": 379,
       "name": "Oaken Greaves of Gravity"
     },
     "itemType": "wondrous",
@@ -13087,7 +13123,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "uncommon",
-      "index": 381,
+      "index": 382,
       "name": "Leather Armor of the Toxic"
     }
   },
@@ -13101,7 +13137,7 @@ const canonicalItems = [
     "description": "While wearing these lenses over your eyes, you have advantage on Wisdom (Perception) checks that rely on sight. In addition, you can see up to 1 mile away with no difficulty, able to discern even fine details as though looking at something within 100 feet of you.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 382,
+      "index": 383,
       "name": "Eyes of the Eagle"
     },
     "itemType": "wondrous",
@@ -13119,7 +13155,7 @@ const canonicalItems = [
     "description": "Each of the quiver's three compartments connects to a small extradimensional space: one holds up to 60 arrows/bolts/crossbow bolts, one holds up to 18 javelins or similar weapons, and one holds up to 6 weapons with a slot size no larger than 2. You can draw any item the quiver holds as if from a regular quiver or scabbard.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 383,
+      "index": 384,
       "name": "Efficient Quiver"
     },
     "itemType": "wondrous",
@@ -13135,7 +13171,7 @@ const canonicalItems = [
     "description": "Once per day, the cauldron can produce 2d4 x 10 pounds of nourishing (if bland) meat, enough to feed a dozen or more people, provided it's filled partway with water first.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 384,
+      "index": 385,
       "name": "Cauldron of Plentiful Meat"
     },
     "itemType": "wondrous",
@@ -13151,7 +13187,7 @@ const canonicalItems = [
     "description": "Crushing this gem and speaking its command word summons an elemental as if you had cast Conjure Elemental, requiring no concentration and no components. The elemental serves you for 1 hour before returning to its home plane. The gem is consumed.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 385,
+      "index": 386,
       "name": "Elemental Gem"
     },
     "itemType": "wondrous",
@@ -13166,7 +13202,7 @@ const canonicalItems = [
     "description": "Functions as a Bag of Holding for nonliving matter. Any living plant matter placed inside decays to compost in 1 round. Any other living creature or organic material placed inside is instead attacked by unseen mouths that devour it whole (destroying it, in the case of an object; killing and permanently consuming a creature that fails a DC 15 Dexterity save). The bag's true nature is only ever revealed the hard way.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 386,
+      "index": 387,
       "name": "Bag of Devouring"
     },
     "itemType": "wondrous",
@@ -13181,7 +13217,7 @@ const canonicalItems = [
     "description": "Indistinguishable from a masterwork rug until it animates — typically when a creature stands on it. It attacks by smothering, imposing the Grappled condition and attempting to suffocate its victim. Functions mechanically as a monster (see the DM), not as a usable magic item.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 387,
+      "index": 388,
       "name": "Rug of Smothering"
     },
     "itemType": "wondrous",
@@ -13197,7 +13233,7 @@ const canonicalItems = [
     "description": "You can stand on and move across any liquid surface — water, acid, mud, snow, quicksand, or lava — as if it were solid ground.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 390,
+      "index": 391,
       "name": "Ring of Water Walking"
     },
     "itemType": "wondrous",
@@ -13215,7 +13251,7 @@ const canonicalItems = [
     "description": "Speak the command word and the broom rises to hover, ready to carry you. It can fly up to 50 ft. per round (400 lb. carrying capacity, allowing a second rider), or fly on its own to a named destination within 1 mile if released.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 391,
+      "index": 392,
       "name": "Broom of Flying"
     },
     "itemType": "wondrous",
@@ -13232,7 +13268,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "uncommon",
-      "index": 392,
+      "index": 393,
       "name": "Cloak of Protection"
     },
     "itemType": "wondrous",
@@ -13250,7 +13286,7 @@ const canonicalItems = [
     "description": "You can breathe underwater, and you have a swimming speed of 60 feet.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 393,
+      "index": 394,
       "name": "Cloak of the Manta Ray"
     },
     "itemType": "wondrous",
@@ -13268,11 +13304,29 @@ const canonicalItems = [
     "description": "Sold and used in pairs. Speaking a message while holding one stone sends it to whoever holds its twin, wherever they are, along with a brief reply if given within 1 round. Usable once per day per stone; if a stone is destroyed, its twin becomes nonmagical.",
     "legacySource": {
       "tier": "uncommon",
-      "index": 394,
+      "index": 395,
       "name": "Sending Stones"
     },
     "itemType": "wondrous",
     "wondrous": {}
+  },
+  {
+    "id": "sealed-reliquary-coffer",
+    "name": "Sealed Reliquary Coffer",
+    "rarity": "rare",
+    "weight": 0.85,
+    "value": "150 gp",
+    "flavorText": "A stone-lidded coffer carved with worn devotional script, sealed with wax that's cracked but unbroken — whatever rite closed it hasn't been undone.",
+    "description": "Open to find a haul of rare-tier loot and coin.",
+    "legacySource": {
+      "tier": "rare",
+      "index": 0,
+      "name": "Sealed Reliquary Coffer"
+    },
+    "itemType": "tool",
+    "tool": {
+      "toolCategory": "container"
+    }
   },
   {
     "id": "forged-imperial-seal-ring",
@@ -13284,7 +13338,7 @@ const canonicalItems = [
     "description": "While worn and presented confidently, grants advantage on Charisma (Deception) checks made to pass as a minor Imperial courier or official. A genuinely thorough background check — cross-referencing actual civil service records — still exposes it.",
     "legacySource": {
       "tier": "rare",
-      "index": 0,
+      "index": 1,
       "name": "Forged Imperial Seal-Ring"
     },
     "itemType": "wondrous",
@@ -13301,7 +13355,7 @@ const canonicalItems = [
     "description": "Quest item. Names three court officials currently indebted to the Black Books — real, usable leverage in the hands of whoever holds it, and a page Auditor Voss Ferrand would pay an enormous, quiet sum to get back.",
     "legacySource": {
       "tier": "rare",
-      "index": 1,
+      "index": 2,
       "name": "The Black Books' Missing Page"
     },
     "itemType": "wondrous",
@@ -13316,7 +13370,7 @@ const canonicalItems = [
     "description": "Quest item. Concrete evidence that the Ashbond's inner circle has been disappearing its own devotees under the guise of a holy rite — proof that could turn Zaharos's own faithful against Firewarden Emberlyn's circle, if it ever reached them.",
     "legacySource": {
       "tier": "rare",
-      "index": 2,
+      "index": 3,
       "name": "The Ashbond's Sealed Devotee Rolls"
     },
     "itemType": "wondrous",
@@ -13331,7 +13385,7 @@ const canonicalItems = [
     "description": "Once per day, sound the whistle to summon the nearest sympathetic patrol or courier within 5 miles, if any are in range — response time and who (if anyone) actually shows up is the DM's call.",
     "legacySource": {
       "tier": "rare",
-      "index": 3,
+      "index": 4,
       "name": "Second Flame Signal Whistle"
     },
     "itemType": "wondrous",
@@ -13346,7 +13400,7 @@ const canonicalItems = [
     "description": "Quest item. Damning, first-hand proof of exactly what the Ashbond's inner circle does to its most devoted followers, written in the handwriting of the woman who leads it.",
     "legacySource": {
       "tier": "rare",
-      "index": 4,
+      "index": 5,
       "name": "Cassia's Deepening Records"
     },
     "itemType": "wondrous",
@@ -13361,7 +13415,7 @@ const canonicalItems = [
     "description": "Quest item, not a magic item. A genuine, personal way to reach Darrow Vane emotionally — through his estranged sister Lysette — that no threat or bribe could manage.",
     "legacySource": {
       "tier": "rare",
-      "index": 5,
+      "index": 6,
       "name": "The Vane Locket"
     },
     "itemType": "wondrous",
@@ -13386,7 +13440,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 6,
+      "index": 7,
       "name": "Aldric's Unsent Letter"
     }
   },
@@ -13399,7 +13453,7 @@ const canonicalItems = [
     "description": "Quest item. Proof that a supposedly executed Cinder Coast rebel is alive, which is either a devastating embarrassment for General Korrin's official record or confirmation of something she's long suspected and never said aloud.",
     "legacySource": {
       "tier": "rare",
-      "index": 7,
+      "index": 8,
       "name": "Old Marrow's Service Record"
     },
     "itemType": "wondrous",
@@ -13414,7 +13468,7 @@ const canonicalItems = [
     "description": "Use the deck from your Inventory tab to cast a rune. Drawing one grants its bearer a temporary boon for the next hour. The deck is never spent or destroyed by casting — cast as often as you like.",
     "legacySource": {
       "tier": "rare",
-      "index": 8,
+      "index": 9,
       "name": "Elder Runes Deck"
     },
     "itemType": "wondrous",
@@ -13460,7 +13514,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 9,
+      "index": 10,
       "name": "Longsword +2"
     }
   },
@@ -13481,7 +13535,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 10,
+      "index": 11,
       "name": "Staff of Fire"
     }
   },
@@ -13496,7 +13550,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 11,
+      "index": 12,
       "name": "Ring of Protection +1"
     },
     "itemType": "wondrous",
@@ -13525,7 +13579,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 12,
+      "index": 13,
       "name": "Cloak of Displacement"
     },
     "itemType": "wondrous",
@@ -13544,7 +13598,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 13,
+      "index": 14,
       "name": "Boots of Speed"
     },
     "itemType": "wondrous",
@@ -13563,7 +13617,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 14,
+      "index": 15,
       "name": "Bracers of Archery"
     },
     "itemType": "wondrous",
@@ -13610,7 +13664,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 15,
+      "index": 16,
       "name": "Flame Tongue Longsword"
     }
   },
@@ -13643,7 +13697,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 16,
+      "index": 17,
       "name": "Frost Brand Longsword"
     }
   },
@@ -13658,7 +13712,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 17,
+      "index": 18,
       "name": "Wand of Fireballs"
     },
     "itemType": "wondrous",
@@ -13675,7 +13729,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 18,
+      "index": 19,
       "name": "Amulet of Health"
     },
     "itemType": "wondrous",
@@ -13704,7 +13758,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 19,
+      "index": 20,
       "name": "Belt of Hill Giant Strength"
     },
     "itemType": "wondrous",
@@ -13723,7 +13777,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 20,
+      "index": 21,
       "name": "Cube of Force"
     },
     "itemType": "wondrous",
@@ -13739,7 +13793,7 @@ const canonicalItems = [
     "description": "Place on the ground and speak command word: expands to a 20-ft square, 30-ft tall iron tower with crenelations, arrow slits, an iron door, and two floors. AC 20, 100 HP per 10-ft section. Command word to collapse — must be completely unoccupied or collapse fails.",
     "legacySource": {
       "tier": "rare",
-      "index": 21,
+      "index": 22,
       "name": "Daern's Instant Fortress"
     },
     "itemType": "wondrous",
@@ -13765,7 +13819,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 22,
+      "index": 23,
       "name": "Figurine of Wondrous Power"
     },
     "itemType": "wondrous",
@@ -13782,7 +13836,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 23,
+      "index": 24,
       "name": "Gem of Seeing"
     },
     "itemType": "wondrous",
@@ -13799,7 +13853,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 24,
+      "index": 25,
       "name": "Headband of Intellect"
     },
     "itemType": "wondrous",
@@ -13827,7 +13881,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 25,
+      "index": 26,
       "name": "Horn of Blasting"
     },
     "itemType": "wondrous",
@@ -13844,7 +13898,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 26,
+      "index": 27,
       "name": "Ioun Stone of Sustenance"
     },
     "itemType": "wondrous",
@@ -13888,7 +13942,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 27,
+      "index": 28,
       "name": "Manual of Bodily Health"
     }
   },
@@ -13903,7 +13957,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 28,
+      "index": 29,
       "name": "Necklace of Prayer Beads"
     },
     "itemType": "wondrous",
@@ -13934,7 +13988,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 29,
+      "index": 30,
       "name": "Oil of Sharpness"
     }
   },
@@ -13959,7 +14013,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 30,
+      "index": 31,
       "name": "Periapt of Wound Closure"
     },
     "itemType": "wondrous",
@@ -13990,7 +14044,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 31,
+      "index": 32,
       "name": "Potion of Flying"
     }
   },
@@ -14017,7 +14071,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 32,
+      "index": 33,
       "name": "Potion of Invulnerability"
     }
   },
@@ -14032,7 +14086,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 33,
+      "index": 34,
       "name": "Ring of Evasion"
     },
     "itemType": "wondrous",
@@ -14051,7 +14105,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 34,
+      "index": 35,
       "name": "Ring of Free Action"
     },
     "itemType": "wondrous",
@@ -14080,7 +14134,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 35,
+      "index": 36,
       "name": "Ring of Regeneration"
     },
     "itemType": "wondrous",
@@ -14099,7 +14153,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 36,
+      "index": 37,
       "name": "Ring of Resistance"
     },
     "itemType": "wondrous",
@@ -14118,7 +14172,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 37,
+      "index": 38,
       "name": "Ring of Shooting Stars"
     },
     "itemType": "wondrous",
@@ -14144,7 +14198,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 38,
+      "index": 39,
       "name": "Robe of Eyes"
     }
   },
@@ -14169,7 +14223,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 39,
+      "index": 40,
       "name": "Rod of Rulership"
     },
     "itemType": "wondrous",
@@ -14185,7 +14239,7 @@ const canonicalItems = [
     "description": "Command (action): shoots out to Restrain a creature within 20 ft. DC 15 Strength (action) to escape. The rope: AC 10, 20 HP, resistance to piercing.",
     "legacySource": {
       "tier": "rare",
-      "index": 40,
+      "index": 41,
       "name": "Rope of Entanglement"
     },
     "itemType": "tool",
@@ -14212,7 +14266,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 41,
+      "index": 42,
       "name": "Shield +2"
     }
   },
@@ -14245,7 +14299,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 42,
+      "index": 43,
       "name": "Spellguard Shield"
     }
   },
@@ -14266,7 +14320,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 43,
+      "index": 44,
       "name": "Staff of Healing"
     }
   },
@@ -14287,7 +14341,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 44,
+      "index": 45,
       "name": "Staff of Withering"
     }
   },
@@ -14331,7 +14385,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 45,
+      "index": 46,
       "name": "Sun Blade"
     }
   },
@@ -14362,7 +14416,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 46,
+      "index": 47,
       "name": "Sword of Life Stealing"
     }
   },
@@ -14393,7 +14447,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 47,
+      "index": 48,
       "name": "Sword of Wounding"
     }
   },
@@ -14427,7 +14481,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 48,
+      "index": 49,
       "name": "Trident of Fish Command"
     }
   },
@@ -14466,7 +14520,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 49,
+      "index": 50,
       "name": "Vicious Weapon (+2)"
     }
   },
@@ -14481,7 +14535,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 50,
+      "index": 51,
       "name": "Wand of Binding"
     },
     "itemType": "wondrous",
@@ -14497,7 +14551,7 @@ const canonicalItems = [
     "description": "7 charges. Action, expend 1: for 1 minute, wand points toward nearest hostile creature within 60 ft. (bypasses walls and invisibility). Recharges 1d6+1 charges each day.",
     "legacySource": {
       "tier": "rare",
-      "index": 51,
+      "index": 52,
       "name": "Wand of Enemy Detection"
     },
     "itemType": "wondrous",
@@ -14524,7 +14578,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 52,
+      "index": 53,
       "name": "Wand of Fear"
     },
     "itemType": "wondrous",
@@ -14541,7 +14595,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 53,
+      "index": 54,
       "name": "Wand of Lightning Bolts"
     },
     "itemType": "wondrous",
@@ -14558,7 +14612,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 54,
+      "index": 55,
       "name": "Wand of Paralysis"
     },
     "itemType": "wondrous",
@@ -14575,7 +14629,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 55,
+      "index": 56,
       "name": "Wand of the War Mage +2"
     },
     "itemType": "wondrous",
@@ -14602,7 +14656,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 56,
+      "index": 57,
       "name": "Wings of Flying"
     },
     "itemType": "wondrous",
@@ -14625,7 +14679,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 57,
+      "index": 58,
       "name": "Staff of Swarming Insects"
     }
   },
@@ -14656,7 +14710,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 58,
+      "index": 59,
       "name": "Staff of the Woodlands (Greater)"
     }
   },
@@ -14692,7 +14746,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 59,
+      "index": 60,
       "name": "Javelin of Lightning (Greater)"
     }
   },
@@ -14715,7 +14769,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 61,
+      "index": 62,
       "name": "Armor +2"
     }
   },
@@ -14756,7 +14810,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 62,
+      "index": 63,
       "name": "Arrow of Slaying"
     }
   },
@@ -14771,7 +14825,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 63,
+      "index": 64,
       "name": "Belt of Dwarvenkind"
     },
     "itemType": "wondrous",
@@ -14806,7 +14860,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 64,
+      "index": 65,
       "name": "Berserker Axe"
     }
   },
@@ -14821,7 +14875,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 65,
+      "index": 66,
       "name": "Boots of Levitation"
     },
     "itemType": "wondrous",
@@ -14858,7 +14912,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 66,
+      "index": 67,
       "name": "Bracers of Defense"
     }
   },
@@ -14873,7 +14927,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 67,
+      "index": 68,
       "name": "Cape of Enlargement"
     },
     "itemType": "wondrous",
@@ -14911,7 +14965,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 68,
+      "index": 69,
       "name": "Dagger of Blindsight"
     }
   },
@@ -14954,7 +15008,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 69,
+      "index": 70,
       "name": "Dagger of Venom"
     }
   },
@@ -14985,7 +15039,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 70,
+      "index": 71,
       "name": "Dancing Sword"
     }
   },
@@ -15008,7 +15062,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 71,
+      "index": 72,
       "name": "Dragon Scale Mail"
     }
   },
@@ -15039,7 +15093,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 72,
+      "index": 73,
       "name": "Dragon Slayer Longsword"
     }
   },
@@ -15072,7 +15126,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 73,
+      "index": 74,
       "name": "Elven Chain"
     }
   },
@@ -15087,7 +15141,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 74,
+      "index": 75,
       "name": "Gauntlets of Ogre Power"
     },
     "itemType": "wondrous",
@@ -15114,7 +15168,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 75,
+      "index": 76,
       "name": "Glamoured Studded Leather"
     }
   },
@@ -15147,7 +15201,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 76,
+      "index": 77,
       "name": "Helm of Telepathy"
     }
   },
@@ -15162,7 +15216,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 77,
+      "index": 78,
       "name": "Ioun Stone (Awareness)"
     },
     "itemType": "wondrous",
@@ -15179,7 +15233,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 78,
+      "index": 79,
       "name": "Ioun Stone (Protection)"
     },
     "itemType": "wondrous",
@@ -15206,7 +15260,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 79,
+      "index": 80,
       "name": "Ioun Stone (Reserve)"
     },
     "itemType": "wondrous",
@@ -15239,7 +15293,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 80,
+      "index": 81,
       "name": "Javelin +2"
     }
   },
@@ -15276,7 +15330,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 81,
+      "index": 82,
       "name": "Mace of Disruption"
     }
   },
@@ -15306,7 +15360,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 82,
+      "index": 83,
       "name": "Mace of Smiting"
     }
   },
@@ -15347,7 +15401,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 83,
+      "index": 84,
       "name": "Mace of Terror"
     }
   },
@@ -15369,7 +15423,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 84,
+      "index": 85,
       "name": "Mithral Plate"
     },
     "passive": [],
@@ -15402,7 +15456,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 85,
+      "index": 86,
       "name": "Potion of Superior Healing"
     }
   },
@@ -15429,7 +15483,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 86,
+      "index": 87,
       "name": "Potion of Mind Reading"
     }
   },
@@ -15463,7 +15517,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 87,
+      "index": 88,
       "name": "Rapier +2"
     }
   },
@@ -15488,7 +15542,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 88,
+      "index": 89,
       "name": "Ring of Spell Turning"
     },
     "itemType": "wondrous",
@@ -15507,7 +15561,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 89,
+      "index": 90,
       "name": "Ring of X-Ray Vision"
     },
     "itemType": "wondrous",
@@ -15545,7 +15599,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 90,
+      "index": 91,
       "name": "Shortbow +2"
     }
   },
@@ -15566,7 +15620,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 91,
+      "index": 92,
       "name": "Staff of Charming"
     }
   },
@@ -15607,7 +15661,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 92,
+      "index": 93,
       "name": "Staff of the Python"
     }
   },
@@ -15638,7 +15692,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 93,
+      "index": 94,
       "name": "Sword of Vengeance"
     }
   },
@@ -15653,7 +15707,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 94,
+      "index": 95,
       "name": "Wand of the War Mage +3"
     },
     "itemType": "wondrous",
@@ -15701,7 +15755,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 95,
+      "index": 96,
       "name": "Warlock's Scepter"
     }
   },
@@ -15736,7 +15790,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 96,
+      "index": 97,
       "name": "Warhammer +2"
     }
   },
@@ -15766,7 +15820,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 97,
+      "index": 98,
       "name": "Windvane"
     }
   },
@@ -15806,7 +15860,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 98,
+      "index": 99,
       "name": "Dragon's Wrath Weapon"
     }
   },
@@ -15821,7 +15875,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 99,
+      "index": 100,
       "name": "Dragonhide Belt"
     },
     "itemType": "wondrous",
@@ -15865,7 +15919,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 100,
+      "index": 101,
       "name": "Dragonlance"
     }
   },
@@ -15880,7 +15934,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 101,
+      "index": 102,
       "name": "Scaled Ornament"
     },
     "itemType": "wondrous",
@@ -15906,7 +15960,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 102,
+      "index": 103,
       "name": "Mage's Paraphernalia"
     },
     "itemType": "wondrous",
@@ -15923,7 +15977,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 103,
+      "index": 104,
       "name": "Silverquill Silverstep Pendant"
     },
     "itemType": "wondrous",
@@ -15940,7 +15994,7 @@ const canonicalItems = [
     "description": "While carrying the pennant: advantage on Charisma checks with creatures affiliated with that college. Once per long rest: one Intelligence or Charisma ability check gains advantage.",
     "legacySource": {
       "tier": "rare",
-      "index": 104,
+      "index": 105,
       "name": "Strixhaven Pennant"
     },
     "itemType": "wondrous",
@@ -15972,7 +16026,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 105,
+      "index": 106,
       "name": "Arcane Cannon"
     }
   },
@@ -16012,7 +16066,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 106,
+      "index": 107,
       "name": "Gloom Blade"
     }
   },
@@ -16027,7 +16081,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 107,
+      "index": 108,
       "name": "Ring of Obscuring"
     },
     "itemType": "wondrous",
@@ -16045,7 +16099,7 @@ const canonicalItems = [
     "description": "Wind it up and whisper a message (up to 1 minute). It walks at 30 ft. toward any creature that has spoken a specific sound, phrase, or name. When it reaches its target: plays back the recorded message. If damaged or falls 20 ft.: broken.",
     "legacySource": {
       "tier": "rare",
-      "index": 108,
+      "index": 109,
       "name": "Vox Seeker"
     },
     "itemType": "wondrous",
@@ -16070,7 +16124,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 109,
+      "index": 110,
       "name": "Mithral Plate Helm"
     },
     "passive": [],
@@ -16098,7 +16152,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 110,
+      "index": 111,
       "name": "Mithral Plate Gauntlets"
     },
     "passive": [],
@@ -16126,7 +16180,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 111,
+      "index": 112,
       "name": "Mithral Plate Greaves"
     },
     "passive": [],
@@ -16154,7 +16208,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 112,
+      "index": 113,
       "name": "Mithral Plate Boots"
     },
     "passive": [],
@@ -16182,7 +16236,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 113,
+      "index": 114,
       "name": "Mithral Plate Shield"
     },
     "passive": [],
@@ -16220,7 +16274,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 114,
+      "index": 115,
       "name": "Mithral Shortsword"
     }
   },
@@ -16253,7 +16307,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 115,
+      "index": 116,
       "name": "Mithral Longsword"
     }
   },
@@ -16286,7 +16340,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 116,
+      "index": 117,
       "name": "Mithral Dagger"
     }
   },
@@ -16316,7 +16370,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 117,
+      "index": 118,
       "name": "Mithral Mace"
     }
   },
@@ -16349,7 +16403,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 118,
+      "index": 119,
       "name": "Mithral Battleaxe"
     }
   },
@@ -16383,7 +16437,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 119,
+      "index": 120,
       "name": "Mithral Warhammer"
     }
   },
@@ -16417,7 +16471,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 120,
+      "index": 121,
       "name": "Mithral Spear"
     }
   },
@@ -16445,7 +16499,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 122,
+      "index": 123,
       "name": "Bonded Pseudodragon"
     }
   },
@@ -16473,7 +16527,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 123,
+      "index": 124,
       "name": "Bound Imp"
     }
   },
@@ -16501,7 +16555,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 124,
+      "index": 125,
       "name": "Blink Dog"
     }
   },
@@ -16530,7 +16584,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 125,
+      "index": 126,
       "name": "Speaking Giant Owl"
     }
   },
@@ -16558,7 +16612,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 126,
+      "index": 127,
       "name": "Bound Quasit"
     }
   },
@@ -16586,7 +16640,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 127,
+      "index": 128,
       "name": "Crafted Homunculus"
     }
   },
@@ -16614,7 +16668,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 128,
+      "index": 129,
       "name": "Loyal Giant Toad"
     }
   },
@@ -16642,7 +16696,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 129,
+      "index": 130,
       "name": "Winter Wolf Pup"
     }
   },
@@ -16670,7 +16724,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 130,
+      "index": 131,
       "name": "Chaotic Faerie Dragon"
     }
   },
@@ -16699,7 +16753,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 131,
+      "index": 132,
       "name": "Trained Giant Weasel"
     }
   },
@@ -16735,7 +16789,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 132,
+      "index": 133,
       "name": "Saddle-Broken Dire Wolf"
     }
   },
@@ -16772,7 +16826,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 133,
+      "index": 134,
       "name": "Riding Giant Lizard"
     }
   },
@@ -16802,7 +16856,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 134,
+      "index": 135,
       "name": "Giant Seahorse"
     }
   },
@@ -16838,7 +16892,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 135,
+      "index": 136,
       "name": "Broken Axe Beak"
     }
   },
@@ -16856,7 +16910,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 136,
+      "index": 137,
       "name": "Grimoire of Forgotten Arcana"
     }
   },
@@ -16874,7 +16928,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 137,
+      "index": 138,
       "name": "Illustrated Bestiary of Vile Beasts"
     }
   },
@@ -16892,7 +16946,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 138,
+      "index": 139,
       "name": "Flawless Sapphire"
     }
   },
@@ -16910,7 +16964,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 139,
+      "index": 140,
       "name": "Marble Statue of a Forgotten Hero"
     }
   },
@@ -16932,7 +16986,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 140,
+      "index": 141,
       "name": "Everbright Key of Warding"
     }
   },
@@ -16946,7 +17000,7 @@ const canonicalItems = [
     "description": "A set of divination tools. Proficiency with them grants advantage on checks made while casting or interpreting divination magic, such as scrying or augury.",
     "legacySource": {
       "tier": "rare",
-      "index": 141,
+      "index": 142,
       "name": "Diviner's Scrying Kit"
     },
     "itemType": "tool",
@@ -16964,7 +17018,7 @@ const canonicalItems = [
     "description": "A set of ritual tools. Using them while casting a spell with the ritual tag grants advantage on any ability check required as part of the casting.",
     "legacySource": {
       "tier": "rare",
-      "index": 142,
+      "index": 143,
       "name": "Ritual Candle Set of the Pale Circle"
     },
     "itemType": "tool",
@@ -17005,7 +17059,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 143,
+      "index": 144,
       "name": "Handaxe of the Soundbound"
     }
   },
@@ -17042,7 +17096,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 144,
+      "index": 145,
       "name": "Handaxe of the Withering"
     }
   },
@@ -17083,7 +17137,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 145,
+      "index": 146,
       "name": "Deathly Trident"
     }
   },
@@ -17123,7 +17177,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 146,
+      "index": 147,
       "name": "Hand Crossbow of the Galebound"
     }
   },
@@ -17168,7 +17222,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 147,
+      "index": 148,
       "name": "Heavy Crossbow of the Gilt-Edged"
     }
   },
@@ -17208,7 +17262,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 148,
+      "index": 149,
       "name": "Runeetched Glaive of the Venom"
     }
   },
@@ -17248,7 +17302,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 149,
+      "index": 150,
       "name": "Cold-Forged Shortbow of the Gale"
     }
   },
@@ -17279,7 +17333,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 150,
+      "index": 151,
       "name": "Fortune's Mace"
     }
   },
@@ -17314,7 +17368,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 151,
+      "index": 152,
       "name": "Glaive of the Bramblebound (Cursed)"
     }
   },
@@ -17358,7 +17412,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 152,
+      "index": 153,
       "name": "Runescribed Longsword"
     }
   },
@@ -17393,7 +17447,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 153,
+      "index": 154,
       "name": "Quicksilver Trident"
     }
   },
@@ -17433,7 +17487,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 154,
+      "index": 155,
       "name": "Mindshard Glaive"
     }
   },
@@ -17467,7 +17521,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 155,
+      "index": 156,
       "name": "Cold-Forged Longbow of Fortune"
     }
   },
@@ -17507,7 +17561,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 156,
+      "index": 157,
       "name": "Mithral Hand Crossbow of the Deep Frost (Cursed)"
     }
   },
@@ -17547,7 +17601,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 157,
+      "index": 158,
       "name": "Fulmination Rapier (Cursed)"
     }
   },
@@ -17587,7 +17641,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 158,
+      "index": 159,
       "name": "Quarterstaff of the Void-Touched"
     }
   },
@@ -17622,7 +17676,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 159,
+      "index": 160,
       "name": "Blacksteel Warhammer of the Warding"
     }
   },
@@ -17656,7 +17710,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 160,
+      "index": 161,
       "name": "Runeetched Shortbow of Swiftness"
     }
   },
@@ -17693,7 +17747,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 161,
+      "index": 162,
       "name": "Morningstar of the Sunblessed"
     }
   },
@@ -17724,7 +17778,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 162,
+      "index": 163,
       "name": "Cold-Forged Wand Blade of Fortune"
     }
   },
@@ -17765,7 +17819,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 163,
+      "index": 164,
       "name": "Sunfire Trident"
     }
   },
@@ -17815,7 +17869,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 164,
+      "index": 165,
       "name": "Crimson Greataxe"
     }
   },
@@ -17866,7 +17920,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 165,
+      "index": 166,
       "name": "Runeetched Heavy Crossbow of the Whisper"
     }
   },
@@ -17906,7 +17960,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 166,
+      "index": 167,
       "name": "Greataxe of the Scorching"
     }
   },
@@ -17946,7 +18000,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 167,
+      "index": 168,
       "name": "Hand Crossbow of the Mindshard"
     }
   },
@@ -17983,7 +18037,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 168,
+      "index": 169,
       "name": "Sanguine Morningstar"
     }
   },
@@ -18023,7 +18077,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 169,
+      "index": 170,
       "name": "Blacksteel Scimitar of the Gale"
     }
   },
@@ -18064,7 +18118,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 170,
+      "index": 171,
       "name": "Spear of the Sunfire"
     }
   },
@@ -18104,7 +18158,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 171,
+      "index": 172,
       "name": "Cold-Forged Glaive of the Gale"
     }
   },
@@ -18144,7 +18198,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 172,
+      "index": 173,
       "name": "Anchor-Forged Maul"
     }
   },
@@ -18178,7 +18232,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 173,
+      "index": 174,
       "name": "Glaive of the Thornwoven"
     }
   },
@@ -18218,7 +18272,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 174,
+      "index": 175,
       "name": "Cold-Forged Rapier of the Tempest"
     }
   },
@@ -18268,7 +18322,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 175,
+      "index": 176,
       "name": "Mithral Longbow of the Ember Flame"
     }
   },
@@ -18308,7 +18362,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 176,
+      "index": 177,
       "name": "Fulmination Kukri"
     }
   },
@@ -18343,7 +18397,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 177,
+      "index": 178,
       "name": "Fleetfoot Trident"
     }
   },
@@ -18383,7 +18437,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 178,
+      "index": 179,
       "name": "Whip of the Gloomforged"
     }
   },
@@ -18427,7 +18481,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 179,
+      "index": 180,
       "name": "Silverwrought Greatsword of the Warding"
     }
   },
@@ -18474,7 +18528,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 180,
+      "index": 181,
       "name": "Flail of the Galebound"
     }
   },
@@ -18524,7 +18578,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 181,
+      "index": 182,
       "name": "Serpent-Kissed Shortbow"
     }
   },
@@ -18574,7 +18628,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 182,
+      "index": 183,
       "name": "Blighted Pike"
     }
   },
@@ -18614,7 +18668,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 183,
+      "index": 184,
       "name": "Hand Crossbow of the Blighted"
     }
   },
@@ -18654,7 +18708,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 184,
+      "index": 185,
       "name": "Dawnlit Whip"
     }
   },
@@ -18701,7 +18755,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 185,
+      "index": 186,
       "name": "Blacksteel Wand Blade of the Blood"
     }
   },
@@ -18741,7 +18795,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 186,
+      "index": 187,
       "name": "Runeetched Halberd of the Tempest (Cursed)"
     }
   },
@@ -18788,7 +18842,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 187,
+      "index": 188,
       "name": "Flail of the Tempest"
     }
   },
@@ -18828,7 +18882,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 188,
+      "index": 189,
       "name": "Galebound Scimitar"
     }
   },
@@ -18868,7 +18922,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 189,
+      "index": 190,
       "name": "Runeetched Halberd of the Whisper"
     }
   },
@@ -18918,7 +18972,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 190,
+      "index": 191,
       "name": "Longsword of the Celestine"
     }
   },
@@ -18958,7 +19012,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 191,
+      "index": 192,
       "name": "Longsword of the Stargazer"
     }
   },
@@ -18998,7 +19052,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 192,
+      "index": 193,
       "name": "Mithral Dagger of the Venom"
     }
   },
@@ -19029,7 +19083,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 193,
+      "index": 194,
       "name": "Handaxe of the Wind-Runner"
     }
   },
@@ -19069,7 +19123,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 194,
+      "index": 195,
       "name": "Soundbound Greatsword"
     }
   },
@@ -19109,7 +19163,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 195,
+      "index": 196,
       "name": "Hoarfrost Maul"
     }
   },
@@ -19149,7 +19203,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 196,
+      "index": 197,
       "name": "Hand Crossbow of the Withering"
     }
   },
@@ -19183,7 +19237,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 197,
+      "index": 198,
       "name": "Shortbow of the Swift"
     }
   },
@@ -19220,7 +19274,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 198,
+      "index": 199,
       "name": "Storm Battle Staff"
     }
   },
@@ -19254,7 +19308,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 199,
+      "index": 200,
       "name": "Greataxe of the Wind-Runner"
     }
   },
@@ -19295,7 +19349,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 200,
+      "index": 201,
       "name": "Cold-Forged Spear of the Venom"
     }
   },
@@ -19335,7 +19389,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 201,
+      "index": 202,
       "name": "Shortsword of the Echoing"
     }
   },
@@ -19375,7 +19429,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 202,
+      "index": 203,
       "name": "Silverwrought Quarterstaff of the Decay"
     }
   },
@@ -19415,7 +19469,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 203,
+      "index": 204,
       "name": "Whip of the Ashfall"
     }
   },
@@ -19452,7 +19506,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 204,
+      "index": 205,
       "name": "Morningstar of the Radiant"
     }
   },
@@ -19489,7 +19543,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 205,
+      "index": 206,
       "name": "Starforged Sickle (Cursed)"
     }
   },
@@ -19520,7 +19574,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 206,
+      "index": 207,
       "name": "Warded Handaxe"
     }
   },
@@ -19570,7 +19624,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 207,
+      "index": 208,
       "name": "Kukri of the Cinder"
     }
   },
@@ -19611,7 +19665,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 208,
+      "index": 209,
       "name": "Spear of the Deep-Sea"
     }
   },
@@ -19642,7 +19696,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 209,
+      "index": 210,
       "name": "Glyphguard Wand Blade"
     }
   },
@@ -19689,7 +19743,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 210,
+      "index": 211,
       "name": "Deathly Mace"
     }
   },
@@ -19729,7 +19783,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 211,
+      "index": 212,
       "name": "Scimitar of the Tidebound"
     }
   },
@@ -19773,7 +19827,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 212,
+      "index": 213,
       "name": "Silverwrought Whip of the Wild"
     }
   },
@@ -19813,7 +19867,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 213,
+      "index": 214,
       "name": "Battleaxe of the Blighted"
     }
   },
@@ -19850,7 +19904,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 214,
+      "index": 215,
       "name": "Silverwrought Flail of the Tide"
     }
   },
@@ -19890,7 +19944,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 215,
+      "index": 216,
       "name": "Scorching Shortbow"
     }
   },
@@ -19924,7 +19978,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 216,
+      "index": 217,
       "name": "Fleetfoot Maul"
     }
   },
@@ -19958,7 +20012,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 217,
+      "index": 218,
       "name": "Mithral Kukri of the Warding"
     }
   },
@@ -19998,7 +20052,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 218,
+      "index": 219,
       "name": "Abyssal-Blue Rapier"
     }
   },
@@ -20042,7 +20096,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 219,
+      "index": 220,
       "name": "Glaive of the Racing"
     }
   },
@@ -20092,7 +20146,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 220,
+      "index": 221,
       "name": "Astral Halberd"
     }
   },
@@ -20129,7 +20183,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 221,
+      "index": 222,
       "name": "Gravebound Wand Blade"
     }
   },
@@ -20163,7 +20217,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 222,
+      "index": 223,
       "name": "Runeetched Quarterstaff of Swiftness"
     }
   },
@@ -20204,7 +20258,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 223,
+      "index": 224,
       "name": "Deathly Spear (Cursed)"
     }
   },
@@ -20251,7 +20305,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 224,
+      "index": 225,
       "name": "Mace of the Anchor-Forged"
     }
   },
@@ -20282,7 +20336,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 225,
+      "index": 226,
       "name": "Fatebound Flail"
     }
   },
@@ -20322,7 +20376,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 226,
+      "index": 227,
       "name": "Whip of the Zephyr-Touched"
     }
   },
@@ -20362,7 +20416,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "rare",
-      "index": 227,
+      "index": 228,
       "name": "Deep-Sea Rapier"
     }
   },
@@ -20377,7 +20431,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 228,
+      "index": 229,
       "name": "Bellowing Gloves"
     },
     "itemType": "wondrous",
@@ -20404,7 +20458,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 229,
+      "index": 230,
       "name": "Tower Shield of the Scorching"
     }
   },
@@ -20427,7 +20481,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 230,
+      "index": 231,
       "name": "Blacksteel Plate Armor of the Ember Flame"
     }
   },
@@ -20450,7 +20504,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 231,
+      "index": 232,
       "name": "Cinder Scale Mail"
     }
   },
@@ -20475,7 +20529,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 232,
+      "index": 233,
       "name": "Fleetfoot Belt"
     },
     "itemType": "wondrous",
@@ -20501,7 +20555,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 234,
+      "index": 235,
       "name": "Withering Leather Armor"
     }
   },
@@ -20526,7 +20580,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 235,
+      "index": 236,
       "name": "Hallowed Girdle"
     },
     "itemType": "wondrous",
@@ -20554,7 +20608,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 236,
+      "index": 237,
       "name": "Mithral Buckler of the Venom"
     },
     "passive": [],
@@ -20592,7 +20646,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 237,
+      "index": 238,
       "name": "Wyrdwoven Plate Armor"
     }
   },
@@ -20607,7 +20661,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 238,
+      "index": 239,
       "name": "Belt of the Thornwoven"
     },
     "itemType": "wondrous",
@@ -20636,7 +20690,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 240,
+      "index": 241,
       "name": "Belt of the Blightvenom"
     },
     "itemType": "wondrous",
@@ -20655,7 +20709,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 241,
+      "index": 242,
       "name": "Silverwrought Gloves of the Warding"
     },
     "itemType": "wondrous",
@@ -20682,7 +20736,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 242,
+      "index": 243,
       "name": "Swift Studded Leather Armor"
     }
   },
@@ -20705,7 +20759,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 243,
+      "index": 244,
       "name": "Crimson Splint Armor"
     }
   },
@@ -20728,7 +20782,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 244,
+      "index": 245,
       "name": "Splint Armor of the Gloomforged"
     }
   },
@@ -20751,7 +20805,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 245,
+      "index": 246,
       "name": "Shield of the Adderstruck"
     }
   },
@@ -20774,7 +20828,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 246,
+      "index": 247,
       "name": "Tempest Tower Shield"
     }
   },
@@ -20798,7 +20852,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 248,
+      "index": 249,
       "name": "Chain Mail of the Frostbound"
     }
   },
@@ -20821,7 +20875,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 249,
+      "index": 250,
       "name": "Buckler of the Thundering"
     }
   },
@@ -20854,7 +20908,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 250,
+      "index": 251,
       "name": "Adderstruck Plate Armor"
     }
   },
@@ -20886,7 +20940,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 251,
+      "index": 252,
       "name": "Wyrdwoven Half Plate Armor"
     }
   },
@@ -20910,7 +20964,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 252,
+      "index": 253,
       "name": "Runeetched Chain Mail of Swiftness"
     }
   },
@@ -20933,7 +20987,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 253,
+      "index": 254,
       "name": "Belt of the Toxic"
     }
   },
@@ -20955,7 +21009,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 254,
+      "index": 255,
       "name": "Dawnlit Hide Armor"
     }
   },
@@ -20970,7 +21024,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 256,
+      "index": 257,
       "name": "Cape of the Wind-Runner"
     },
     "itemType": "wondrous",
@@ -20997,7 +21051,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 257,
+      "index": 258,
       "name": "Lucky Chain Shirt"
     }
   },
@@ -21012,7 +21066,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 259,
+      "index": 260,
       "name": "Wyrdwoven Belt"
     },
     "itemType": "wondrous",
@@ -21041,7 +21095,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 260,
+      "index": 261,
       "name": "Cold-Forged Gloves of the Ember Flame"
     },
     "itemType": "wondrous",
@@ -21068,7 +21122,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 261,
+      "index": 262,
       "name": "Cold-Forged Shield of the Deep Frost"
     }
   },
@@ -21091,7 +21145,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 262,
+      "index": 263,
       "name": "Blazing Plate Armor"
     }
   },
@@ -21114,7 +21168,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 263,
+      "index": 264,
       "name": "Venomfang Splint Armor"
     }
   },
@@ -21147,7 +21201,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 264,
+      "index": 265,
       "name": "Tower Shield of the Glyphguard"
     }
   },
@@ -21170,7 +21224,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 265,
+      "index": 266,
       "name": "Blacksteel Ring Mail of the Gale"
     }
   },
@@ -21193,7 +21247,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 266,
+      "index": 267,
       "name": "Deathly Scale Mail"
     }
   },
@@ -21225,7 +21279,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 267,
+      "index": 268,
       "name": "Runeetched Padded Armor of the Tempest"
     }
   },
@@ -21248,7 +21302,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 268,
+      "index": 269,
       "name": "Rotwood Tower Shield"
     }
   },
@@ -21271,7 +21325,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 269,
+      "index": 270,
       "name": "Greaves of the Racing"
     }
   },
@@ -21294,7 +21348,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 270,
+      "index": 271,
       "name": "Mithral Breastplate of the Gale"
     },
     "passive": [],
@@ -21321,7 +21375,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 271,
+      "index": 272,
       "name": "Blacksteel Breastplate of the Warding"
     }
   },
@@ -21344,7 +21398,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 272,
+      "index": 273,
       "name": "Silverwrought Crown of the Deep Frost"
     }
   },
@@ -21376,7 +21430,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 273,
+      "index": 274,
       "name": "Gravebound Half Plate Armor"
     }
   },
@@ -21391,7 +21445,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 274,
+      "index": 275,
       "name": "Cape of the Shadeborn"
     },
     "itemType": "wondrous",
@@ -21410,7 +21464,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 275,
+      "index": 276,
       "name": "Resonant Cape"
     },
     "itemType": "wondrous",
@@ -21436,7 +21490,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 276,
+      "index": 277,
       "name": "Half Plate Armor of the Icebound"
     }
   },
@@ -21459,7 +21513,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 277,
+      "index": 278,
       "name": "Buckler of the Mindshard"
     }
   },
@@ -21481,7 +21535,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 278,
+      "index": 279,
       "name": "Racing Leather Armor"
     }
   },
@@ -21504,7 +21558,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 279,
+      "index": 280,
       "name": "Plate Armor of the Resonant"
     }
   },
@@ -21527,7 +21581,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 280,
+      "index": 281,
       "name": "Rime Tower Shield"
     }
   },
@@ -21542,7 +21596,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 281,
+      "index": 282,
       "name": "Gloves of the Bloodbound"
     },
     "itemType": "wondrous",
@@ -21568,7 +21622,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 282,
+      "index": 283,
       "name": "Runeetched Hide Armor of the Wild"
     }
   },
@@ -21591,7 +21645,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 283,
+      "index": 284,
       "name": "Blacksteel Scale Mail of the Wild (Cursed)"
     }
   },
@@ -21624,7 +21678,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 284,
+      "index": 285,
       "name": "Buckler of the Scorching"
     }
   },
@@ -21646,7 +21700,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 285,
+      "index": 286,
       "name": "Breastplate of the Venomfang"
     }
   },
@@ -21678,7 +21732,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 286,
+      "index": 287,
       "name": "Hide Armor of the Verdant"
     }
   },
@@ -21701,7 +21755,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 287,
+      "index": 288,
       "name": "Tempest Studded Leather Armor"
     }
   },
@@ -21724,7 +21778,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 288,
+      "index": 289,
       "name": "Great Helm of the Fortune"
     }
   },
@@ -21739,7 +21793,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 289,
+      "index": 290,
       "name": "Runeetched Greaves of the Venom"
     },
     "itemType": "wondrous",
@@ -21775,7 +21829,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 290,
+      "index": 291,
       "name": "Mithral Scale Mail of the Tempest"
     },
     "passive": [],
@@ -21802,7 +21856,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 291,
+      "index": 292,
       "name": "Blacksteel Padded Armor of the Tide"
     }
   },
@@ -21824,7 +21878,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 292,
+      "index": 293,
       "name": "Blacksteel Half Plate Armor of the Echo"
     }
   },
@@ -21839,7 +21893,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 294,
+      "index": 295,
       "name": "Sunfire Gloves"
     },
     "itemType": "wondrous",
@@ -21866,7 +21920,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 295,
+      "index": 296,
       "name": "Gloves of the Shadeborn"
     }
   },
@@ -21899,7 +21953,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 296,
+      "index": 297,
       "name": "Lucky Studded Leather Armor"
     }
   },
@@ -21914,7 +21968,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 297,
+      "index": 298,
       "name": "Runeetched Girdle of the Dawn (Cursed)"
     },
     "itemType": "wondrous",
@@ -21940,7 +21994,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 298,
+      "index": 299,
       "name": "Half Plate Armor of the Echoing"
     }
   },
@@ -21973,7 +22027,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 299,
+      "index": 300,
       "name": "Shield of the Starforged"
     }
   },
@@ -21996,7 +22050,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 300,
+      "index": 301,
       "name": "Bramblebound Shield"
     }
   },
@@ -22019,7 +22073,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 301,
+      "index": 302,
       "name": "Runeetched Splint Armor of the Tempest"
     }
   },
@@ -22043,7 +22097,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 302,
+      "index": 303,
       "name": "Mithral Tower Shield of the Tide"
     },
     "passive": [],
@@ -22081,7 +22135,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 303,
+      "index": 304,
       "name": "Warcry Splint Armor"
     }
   },
@@ -22096,7 +22150,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 304,
+      "index": 305,
       "name": "Mindforged Boots"
     },
     "itemType": "wondrous",
@@ -22123,7 +22177,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 305,
+      "index": 306,
       "name": "Tower Shield of the Adderstruck"
     }
   },
@@ -22138,7 +22192,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 306,
+      "index": 307,
       "name": "Nightfall Cloak"
     },
     "itemType": "wondrous",
@@ -22164,7 +22218,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 307,
+      "index": 308,
       "name": "Silverwrought Half Plate Armor of the Dawn (Cursed)"
     }
   },
@@ -22187,7 +22241,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 308,
+      "index": 309,
       "name": "Padded Armor of the Racing (Cursed)"
     }
   },
@@ -22210,7 +22264,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 309,
+      "index": 310,
       "name": "Cold-Forged Ring Mail of the Deep Frost"
     }
   },
@@ -22232,7 +22286,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 311,
+      "index": 312,
       "name": "Thundering Breastplate"
     }
   },
@@ -22255,7 +22309,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "rare",
-      "index": 312,
+      "index": 313,
       "name": "Mithral Padded Armor of Gravity"
     },
     "passive": [],
@@ -22274,7 +22328,7 @@ const canonicalItems = [
     "description": "7 charges. Expend 1, point at a target within 120 ft., and roll a random effect (from harmless lights and butterflies, to a Fireball, to the target growing or shrinking, to plants suddenly bursting from the ground) — the wand's magic is never quite the same twice. Recharges 1d6+1 charges each day.",
     "legacySource": {
       "tier": "rare",
-      "index": 313,
+      "index": 314,
       "name": "Wand of Wonder"
     },
     "itemType": "wondrous",
@@ -22290,7 +22344,7 @@ const canonicalItems = [
     "description": "Speak the command word and throw this item at a Large or smaller creature within 60 ft. On a failed DC 20 Dexterity save, it becomes bound in iron bands, Restrained, and unable to move until it breaks free with a DC 20 Strength check (one attempt per action).",
     "legacySource": {
       "tier": "rare",
-      "index": 314,
+      "index": 315,
       "name": "Iron Bands of Bilarro"
     },
     "itemType": "wondrous",
@@ -22307,7 +22361,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 315,
+      "index": 316,
       "name": "Ring of X-ray Vision"
     },
     "itemType": "wondrous",
@@ -22325,7 +22379,7 @@ const canonicalItems = [
     "description": "These shackles can bind a creature of any size. Escaping requires a DC 30 Strength check, and a shackled creature can't teleport or travel to a different plane of existence by any means. Speaking the command word locks or unlocks the shackles.",
     "legacySource": {
       "tier": "rare",
-      "index": 316,
+      "index": 317,
       "name": "Dimensional Shackles"
     },
     "itemType": "tool",
@@ -22343,7 +22397,7 @@ const canonicalItems = [
     "description": "Fill the bowl with water and speak the command word to summon and command a water elemental as if you had cast Conjure Elemental — no concentration required. It serves for 1 hour or until dismissed. Usable once per day.",
     "legacySource": {
       "tier": "rare",
-      "index": 317,
+      "index": 318,
       "name": "Bowl of Commanding Water Elementals"
     },
     "itemType": "tool",
@@ -22361,7 +22415,7 @@ const canonicalItems = [
     "description": "Thrown to the ground and given its command word, this item unfolds within 1 minute into a full stone tower — 20-foot square base, 30 feet tall, arrow slits, a heavy door — sturdy enough to house a small company. Speaking the command word again folds it back down, ejecting (unharmed) anyone inside first.",
     "legacySource": {
       "tier": "rare",
-      "index": 318,
+      "index": 319,
       "name": "Instant Fortress"
     },
     "itemType": "wondrous",
@@ -22377,7 +22431,7 @@ const canonicalItems = [
     "description": "This jar holds 4 ounces of an adhesive that bonds two objects permanently within 1 minute of application, and can only be dissolved by Universal Solvent or a Wish. A single jar has enough for one use.",
     "legacySource": {
       "tier": "rare",
-      "index": 319,
+      "index": 320,
       "name": "Sovereign Glue"
     },
     "itemType": "wondrous",
@@ -22394,7 +22448,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 320,
+      "index": 321,
       "name": "Ring of Protection"
     },
     "itemType": "wondrous",
@@ -22413,12 +22467,30 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "rare",
-      "index": 321,
+      "index": 322,
       "name": "Ring of the Ram"
     },
     "itemType": "wondrous",
     "wondrous": {
       "slot": "ring"
+    }
+  },
+  {
+    "id": "warded-vault-chest",
+    "name": "Warded Vault-Chest",
+    "rarity": "superrare",
+    "weight": 0.75,
+    "value": "500 gp",
+    "flavorText": "A steel-cornered chest etched with a ward-glyph that hums faintly when approached — armed, but not against you, not right now.",
+    "description": "Open to find a haul of superrare-tier loot and coin.",
+    "legacySource": {
+      "tier": "superrare",
+      "index": 0,
+      "name": "Warded Vault-Chest"
+    },
+    "itemType": "tool",
+    "tool": {
+      "toolCategory": "container"
     }
   },
   {
@@ -22458,7 +22530,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 0,
+      "index": 1,
       "name": "Vorpal Sword"
     }
   },
@@ -22495,7 +22567,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 1,
+      "index": 2,
       "name": "Staff of Power"
     }
   },
@@ -22520,7 +22592,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 2,
+      "index": 3,
       "name": "Ring of Three Wishes"
     },
     "itemType": "wondrous",
@@ -22539,7 +22611,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 3,
+      "index": 4,
       "name": "Cloak of Invisibility"
     },
     "itemType": "wondrous",
@@ -22565,7 +22637,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 4,
+      "index": 5,
       "name": "Robe of the Archmagi"
     }
   },
@@ -22589,7 +22661,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 5,
+      "index": 6,
       "name": "Sphere of Annihilation"
     },
     "itemType": "wondrous",
@@ -22606,7 +22678,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 6,
+      "index": 7,
       "name": "Talisman of Pure Good"
     },
     "itemType": "wondrous",
@@ -22635,7 +22707,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 7,
+      "index": 8,
       "name": "Talisman of Ultimate Evil"
     },
     "itemType": "wondrous",
@@ -22677,7 +22749,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 8,
+      "index": 9,
       "name": "Tome of Clear Thought"
     }
   },
@@ -22715,7 +22787,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 9,
+      "index": 10,
       "name": "Tome of Leadership and Influence"
     }
   },
@@ -22763,7 +22835,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 10,
+      "index": 11,
       "name": "Tome of Understanding"
     }
   },
@@ -22777,7 +22849,7 @@ const canonicalItems = [
     "description": "Lay on any surface: two-way portal to a random plane for 1 minute. Fold to close. 1 use per day.",
     "legacySource": {
       "tier": "superrare",
-      "index": 11,
+      "index": 12,
       "name": "Well of Many Worlds"
     },
     "itemType": "wondrous",
@@ -22803,7 +22875,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 12,
+      "index": 13,
       "name": "Apparatus of Kwalish"
     },
     "itemType": "wondrous",
@@ -22828,7 +22900,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 13,
+      "index": 14,
       "name": "Armor of Invulnerability"
     }
   },
@@ -22843,7 +22915,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 14,
+      "index": 15,
       "name": "Belt of Cloud Giant Strength"
     },
     "itemType": "wondrous",
@@ -22872,7 +22944,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 15,
+      "index": 16,
       "name": "Cloak of Arachnida"
     },
     "itemType": "wondrous",
@@ -22891,7 +22963,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 16,
+      "index": 17,
       "name": "Crystal Ball of Telepathy"
     },
     "itemType": "wondrous",
@@ -22906,7 +22978,7 @@ const canonicalItems = [
     "description": "Use the deck from your Inventory tab to draw a card. Each draw is permanent and immediate — good and bad alike. The deck cannot be destroyed by ordinary means and always has a card left to give.",
     "legacySource": {
       "tier": "superrare",
-      "index": 17,
+      "index": 18,
       "name": "Deck of Many Things"
     },
     "itemType": "wondrous",
@@ -22949,7 +23021,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 18,
+      "index": 19,
       "name": "Defender Longsword"
     }
   },
@@ -22963,7 +23035,7 @@ const canonicalItems = [
     "description": "Uncork (action): 1-in-4 chance efreeti is enraged (fights you). Otherwise: serves 1 hour, grants 3 wishes. After 3 wishes or 1 hour: bottle loses magic permanently.",
     "legacySource": {
       "tier": "superrare",
-      "index": 19,
+      "index": 20,
       "name": "Efreeti Bottle"
     },
     "itemType": "wondrous",
@@ -22988,7 +23060,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 20,
+      "index": 21,
       "name": "Eye of Vecna"
     },
     "itemType": "wondrous",
@@ -23005,7 +23077,7 @@ const canonicalItems = [
     "description": "Sever your hand (1 HP remaining). Attach the Hand (1 hour, 10 HP). Gain: +2 Strength, cold immunity, Clairvoyance 3/day, Finger of Death 1/day (DC 18), Telekinesis 2/day. Cannot be voluntarily removed once attached.",
     "legacySource": {
       "tier": "superrare",
-      "index": 21,
+      "index": 22,
       "name": "Hand of Vecna"
     },
     "itemType": "wondrous",
@@ -23036,7 +23108,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 22,
+      "index": 23,
       "name": "Helm of Brilliance"
     }
   },
@@ -23076,7 +23148,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 23,
+      "index": 24,
       "name": "Holy Avenger"
     }
   },
@@ -23091,7 +23163,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 24,
+      "index": 25,
       "name": "Ioun Stone of Absorption"
     },
     "itemType": "wondrous",
@@ -23116,7 +23188,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 25,
+      "index": 26,
       "name": "Iron Flask"
     },
     "itemType": "wondrous",
@@ -23149,7 +23221,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 26,
+      "index": 27,
       "name": "Luck Blade"
     }
   },
@@ -23164,7 +23236,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 27,
+      "index": 28,
       "name": "Mantle of Spell Resistance"
     },
     "itemType": "wondrous",
@@ -23208,7 +23280,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 28,
+      "index": 29,
       "name": "Moonblade"
     }
   },
@@ -23238,7 +23310,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 29,
+      "index": 30,
       "name": "Nine Lives Stealer"
     }
   },
@@ -23284,7 +23356,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 30,
+      "index": 31,
       "name": "Oathbow"
     }
   },
@@ -23307,7 +23379,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 31,
+      "index": 32,
       "name": "Plate Armor +3"
     }
   },
@@ -23334,7 +23406,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 32,
+      "index": 33,
       "name": "Potion of Storm Giant Strength"
     }
   },
@@ -23349,7 +23421,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 33,
+      "index": 34,
       "name": "Ring of Djinni Summoning"
     },
     "itemType": "wondrous",
@@ -23378,7 +23450,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 34,
+      "index": 35,
       "name": "Ring of Elemental Command"
     },
     "itemType": "wondrous",
@@ -23397,7 +23469,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 35,
+      "index": 36,
       "name": "Ring of Spell Storing"
     },
     "itemType": "wondrous",
@@ -23416,7 +23488,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 36,
+      "index": 37,
       "name": "Rod of Absorption"
     },
     "itemType": "wondrous",
@@ -23448,7 +23520,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 37,
+      "index": 38,
       "name": "Rod of Alertness"
     }
   },
@@ -23476,7 +23548,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 38,
+      "index": 39,
       "name": "Rod of Lordly Might"
     }
   },
@@ -23500,7 +23572,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 39,
+      "index": 40,
       "name": "Rod of Security"
     },
     "itemType": "tool",
@@ -23519,7 +23591,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 40,
+      "index": 41,
       "name": "Scarab of Protection"
     },
     "itemType": "wondrous",
@@ -23535,7 +23607,7 @@ const canonicalItems = [
     "description": "Contains 3d6 spells of each spell level from 1st through 9th (GM assigns). Copy into wizard spellbook: 50 gp and 2 hours per spell level.",
     "legacySource": {
       "tier": "superrare",
-      "index": 41,
+      "index": 42,
       "name": "Spellbook of the Archmage"
     },
     "itemType": "tool",
@@ -23580,7 +23652,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 42,
+      "index": 43,
       "name": "Staff of the Magi"
     }
   },
@@ -23610,7 +23682,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 43,
+      "index": 44,
       "name": "Sword of Answering"
     }
   },
@@ -23635,7 +23707,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 44,
+      "index": 45,
       "name": "Talisman of the Sphere"
     },
     "itemType": "wondrous",
@@ -23668,7 +23740,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 45,
+      "index": 46,
       "name": "Wand of Orcus"
     }
   },
@@ -23703,7 +23775,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 46,
+      "index": 47,
       "name": "Wave (Trident Artifact)"
     }
   },
@@ -23746,7 +23818,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 47,
+      "index": 48,
       "name": "Whelm (Warhammer Artifact)"
     }
   },
@@ -23779,7 +23851,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 48,
+      "index": 49,
       "name": "Blackrazor (Greatsword Artifact)"
     }
   },
@@ -23803,7 +23875,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 49,
+      "index": 50,
       "name": "Absorbing Tattoo (Greater)"
     },
     "itemType": "wondrous",
@@ -23820,7 +23892,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 50,
+      "index": 51,
       "name": "Amulet of the Planes"
     },
     "itemType": "wondrous",
@@ -23839,7 +23911,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 51,
+      "index": 52,
       "name": "Belt of Giant Strength (Frost Giant)"
     },
     "itemType": "wondrous",
@@ -23868,7 +23940,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 52,
+      "index": 53,
       "name": "Belt of Giant Strength (Stone Giant)"
     },
     "itemType": "wondrous",
@@ -23887,7 +23959,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 53,
+      "index": 54,
       "name": "Belt of Giant Strength (Fire Giant)"
     },
     "itemType": "wondrous",
@@ -23906,7 +23978,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 54,
+      "index": 55,
       "name": "Candle of Invocation"
     },
     "itemType": "wondrous",
@@ -23933,7 +24005,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 55,
+      "index": 56,
       "name": "Crystal Ball (Standard)"
     },
     "itemType": "wondrous",
@@ -23958,7 +24030,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 56,
+      "index": 57,
       "name": "Helm of Brilliance (Depleted)"
     }
   },
@@ -24006,7 +24078,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 57,
+      "index": 58,
       "name": "Manual of Gainful Exercise"
     }
   },
@@ -24044,7 +24116,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 58,
+      "index": 59,
       "name": "Manual of Quickness of Action"
     }
   },
@@ -24071,7 +24143,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 59,
+      "index": 60,
       "name": "Potion of Giant Strength (Storm)"
     }
   },
@@ -24086,7 +24158,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 60,
+      "index": 61,
       "name": "Ring of Telekinesis"
     },
     "itemType": "wondrous",
@@ -24122,7 +24194,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 61,
+      "index": 62,
       "name": "Robe of Scintillating Colors"
     }
   },
@@ -24149,7 +24221,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 62,
+      "index": 63,
       "name": "Spell Scroll (5th Level)"
     }
   },
@@ -24176,7 +24248,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 63,
+      "index": 64,
       "name": "Spell Scroll (6th Level)"
     }
   },
@@ -24198,7 +24270,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 64,
+      "index": 65,
       "name": "Barrier Tattoo (Heavy)"
     }
   },
@@ -24238,7 +24310,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 65,
+      "index": 66,
       "name": "Devotee's Censer"
     }
   },
@@ -24261,7 +24333,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 66,
+      "index": 67,
       "name": "Helm of Awareness"
     }
   },
@@ -24284,7 +24356,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 67,
+      "index": 68,
       "name": "Dragonhide Armor"
     }
   },
@@ -24309,7 +24381,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 68,
+      "index": 69,
       "name": "Dragon Vessel"
     },
     "itemType": "wondrous",
@@ -24345,7 +24417,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 69,
+      "index": 70,
       "name": "Sword +3"
     }
   },
@@ -24374,7 +24446,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 70,
+      "index": 71,
       "name": "Wand of Orcus (Fragment)"
     }
   },
@@ -24397,7 +24469,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 71,
+      "index": 72,
       "name": "Orichalcum Plate Armor"
     }
   },
@@ -24419,7 +24491,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 72,
+      "index": 73,
       "name": "Orichalcum Plate Helm"
     }
   },
@@ -24441,7 +24513,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 73,
+      "index": 74,
       "name": "Orichalcum Plate Gauntlets"
     }
   },
@@ -24463,7 +24535,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 74,
+      "index": 75,
       "name": "Orichalcum Plate Greaves"
     }
   },
@@ -24485,7 +24557,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 75,
+      "index": 76,
       "name": "Orichalcum Plate Boots"
     }
   },
@@ -24507,7 +24579,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 76,
+      "index": 77,
       "name": "Orichalcum Plate Shield"
     }
   },
@@ -24540,7 +24612,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 77,
+      "index": 78,
       "name": "Orichalcum Shortsword"
     }
   },
@@ -24573,7 +24645,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 78,
+      "index": 79,
       "name": "Orichalcum Longsword"
     }
   },
@@ -24606,7 +24678,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 79,
+      "index": 80,
       "name": "Orichalcum Dagger"
     }
   },
@@ -24636,7 +24708,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 80,
+      "index": 81,
       "name": "Orichalcum Mace"
     }
   },
@@ -24669,7 +24741,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 81,
+      "index": 82,
       "name": "Orichalcum Battleaxe"
     }
   },
@@ -24703,7 +24775,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 82,
+      "index": 83,
       "name": "Orichalcum Warhammer"
     }
   },
@@ -24737,7 +24809,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 83,
+      "index": 84,
       "name": "Orichalcum Spear"
     }
   },
@@ -24766,7 +24838,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 85,
+      "index": 86,
       "name": "Baby Griffon"
     }
   },
@@ -24794,7 +24866,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 86,
+      "index": 87,
       "name": "Sworn Sprite"
     }
   },
@@ -24822,7 +24894,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 87,
+      "index": 88,
       "name": "Pixie Bound by Favor"
     }
   },
@@ -24850,7 +24922,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 88,
+      "index": 89,
       "name": "Displacer Beast Cub"
     }
   },
@@ -24878,7 +24950,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 89,
+      "index": 90,
       "name": "Sworn Young Couatl"
     }
   },
@@ -24906,7 +24978,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 90,
+      "index": 91,
       "name": "Shadow Mastiff Pup"
     }
   },
@@ -24935,7 +25007,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 91,
+      "index": 92,
       "name": "Tamed Giant Strider"
     }
   },
@@ -24972,7 +25044,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 92,
+      "index": 93,
       "name": "Hippogriff"
     }
   },
@@ -25008,7 +25080,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 93,
+      "index": 94,
       "name": "Fey-Touched Giant Elk"
     }
   },
@@ -25038,7 +25110,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 94,
+      "index": 95,
       "name": "Trained Giant Vulture"
     }
   },
@@ -25088,7 +25160,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 95,
+      "index": 96,
       "name": "Voidsteel Greataxe of the Tempest"
     }
   },
@@ -25125,7 +25197,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 96,
+      "index": 97,
       "name": "Starmetal Morningstar of the Decay"
     }
   },
@@ -25165,7 +25237,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 97,
+      "index": 98,
       "name": "Sunsteel Glaive of the Whisper"
     }
   },
@@ -25202,7 +25274,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 98,
+      "index": 99,
       "name": "Battle Staff of the Shadeborn"
     }
   },
@@ -25242,7 +25314,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 99,
+      "index": 100,
       "name": "Radiant Rapier"
     }
   },
@@ -25279,7 +25351,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 100,
+      "index": 101,
       "name": "Serpent-Kissed Battle Staff (Cursed)"
     }
   },
@@ -25319,7 +25391,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 101,
+      "index": 102,
       "name": "Kukri of the Voltaic"
     }
   },
@@ -25360,7 +25432,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 102,
+      "index": 103,
       "name": "Warhammer of the Withering"
     }
   },
@@ -25394,7 +25466,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 103,
+      "index": 104,
       "name": "Longbow of the Quicksilver"
     }
   },
@@ -25428,7 +25500,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 104,
+      "index": 105,
       "name": "Sunsteel Glaive of Fortune"
     }
   },
@@ -25468,7 +25540,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 105,
+      "index": 106,
       "name": "Windcaller Pike"
     }
   },
@@ -25509,7 +25581,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 106,
+      "index": 107,
       "name": "Dragonbone Trident of the Gale"
     }
   },
@@ -25549,7 +25621,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 107,
+      "index": 108,
       "name": "Windcaller Greatsword"
     }
   },
@@ -25589,7 +25661,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 108,
+      "index": 109,
       "name": "Starmetal Shortbow of the Dawn (Cursed)"
     }
   },
@@ -25629,7 +25701,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 109,
+      "index": 110,
       "name": "Dragonbone Maul of the Shadow"
     }
   },
@@ -25663,7 +25735,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 110,
+      "index": 111,
       "name": "Greatsword of the Gilt-Edged"
     }
   },
@@ -25713,7 +25785,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 111,
+      "index": 112,
       "name": "Scimitar of the Deathly"
     }
   },
@@ -25753,7 +25825,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 112,
+      "index": 113,
       "name": "Tidebound Halberd"
     }
   },
@@ -25793,7 +25865,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 113,
+      "index": 114,
       "name": "Anchor-Forged Longbow"
     }
   },
@@ -25830,7 +25902,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 114,
+      "index": 115,
       "name": "Voidsteel Battle Staff of the Tempest"
     }
   },
@@ -25880,7 +25952,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 115,
+      "index": 116,
       "name": "Starmetal Battleaxe of the Decay"
     }
   },
@@ -25920,7 +25992,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 116,
+      "index": 117,
       "name": "Sunsteel Scimitar of the Shadow"
     }
   },
@@ -25967,7 +26039,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 117,
+      "index": 118,
       "name": "Voidsteel Mace of the Deep Frost"
     }
   },
@@ -26018,7 +26090,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 118,
+      "index": 119,
       "name": "Warhammer of the Undertow"
     }
   },
@@ -26052,7 +26124,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 119,
+      "index": 120,
       "name": "Whip of the Glyphguard"
     }
   },
@@ -26092,7 +26164,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 120,
+      "index": 121,
       "name": "Battleaxe of the Anchor-Forged"
     }
   },
@@ -26142,7 +26214,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 121,
+      "index": 122,
       "name": "Quarterstaff of the Gravitum"
     }
   },
@@ -26183,7 +26255,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 122,
+      "index": 123,
       "name": "Adamantine Quarterstaff of the Decay (Cursed)"
     },
     "abilities": [],
@@ -26224,7 +26296,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 123,
+      "index": 124,
       "name": "Morningstar of the Crushing (Cursed)"
     }
   },
@@ -26264,7 +26336,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 124,
+      "index": 125,
       "name": "Ember Battleaxe"
     }
   },
@@ -26298,7 +26370,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 125,
+      "index": 126,
       "name": "Dragonbone Shortbow of Swiftness"
     }
   },
@@ -26338,7 +26410,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 126,
+      "index": 127,
       "name": "Venomfang Kukri"
     }
   },
@@ -26378,7 +26450,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 127,
+      "index": 128,
       "name": "Resonant Glaive"
     }
   },
@@ -26418,7 +26490,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 128,
+      "index": 129,
       "name": "Radiant Dagger (Cursed)"
     }
   },
@@ -26458,7 +26530,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 129,
+      "index": 130,
       "name": "Longsword of the Sunfire"
     }
   },
@@ -26492,7 +26564,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 130,
+      "index": 131,
       "name": "Dragonbone Greataxe of Fortune (Cursed)"
     }
   },
@@ -26539,7 +26611,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 131,
+      "index": 132,
       "name": "Crushing Battle Staff"
     }
   },
@@ -26576,7 +26648,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 132,
+      "index": 133,
       "name": "Skyborn Morningstar"
     }
   },
@@ -26616,7 +26688,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 133,
+      "index": 134,
       "name": "Brinewrought Battleaxe"
     }
   },
@@ -26656,7 +26728,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 134,
+      "index": 135,
       "name": "Voidsteel Pike of Gravity"
     }
   },
@@ -26696,7 +26768,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 135,
+      "index": 136,
       "name": "Longbow of the Stormcalled"
     }
   },
@@ -26736,7 +26808,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 136,
+      "index": 137,
       "name": "Hand Crossbow of the Serpent-Kissed"
     }
   },
@@ -26786,7 +26858,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 137,
+      "index": 138,
       "name": "Thundering Greataxe"
     }
   },
@@ -26837,7 +26909,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 138,
+      "index": 139,
       "name": "Fulmination Warhammer"
     }
   },
@@ -26871,7 +26943,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 139,
+      "index": 140,
       "name": "Voidsteel Scimitar of the Wild"
     }
   },
@@ -26918,7 +26990,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 140,
+      "index": 141,
       "name": "Adderstruck Handaxe"
     }
   },
@@ -26965,7 +27037,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 141,
+      "index": 142,
       "name": "Wand Blade of the Grave-Touched"
     }
   },
@@ -27005,7 +27077,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 142,
+      "index": 143,
       "name": "Crimson Maul"
     }
   },
@@ -27052,7 +27124,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 143,
+      "index": 144,
       "name": "Tempest Mace"
     }
   },
@@ -27092,7 +27164,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 144,
+      "index": 145,
       "name": "Greataxe of the Echoing (Cursed)"
     }
   },
@@ -27124,7 +27196,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 145,
+      "index": 146,
       "name": "Adamantine Sickle of Fortune"
     },
     "abilities": [],
@@ -27169,7 +27241,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 146,
+      "index": 147,
       "name": "Dragonbone Warhammer of the Echo"
     }
   },
@@ -27204,7 +27276,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 147,
+      "index": 148,
       "name": "Adamantine Maul of Swiftness (Cursed)"
     },
     "abilities": [],
@@ -27248,7 +27320,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 148,
+      "index": 149,
       "name": "Rime Greataxe (Cursed)"
     }
   },
@@ -27288,7 +27360,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 149,
+      "index": 150,
       "name": "Grave-Touched Greatsword (Cursed)"
     }
   },
@@ -27322,7 +27394,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 150,
+      "index": 151,
       "name": "Adamantine Cloak of the Blood"
     },
     "passive": [],
@@ -27350,7 +27422,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 151,
+      "index": 152,
       "name": "Ring Mail of the Adderstruck"
     }
   },
@@ -27375,7 +27447,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 152,
+      "index": 153,
       "name": "Belt of the Grave-Touched"
     },
     "itemType": "wondrous",
@@ -27404,7 +27476,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 153,
+      "index": 154,
       "name": "Gloves of the Bramblebound"
     },
     "itemType": "wondrous",
@@ -27441,7 +27513,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 154,
+      "index": 155,
       "name": "Voidsteel Tower Shield of the Echo"
     }
   },
@@ -27464,7 +27536,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 155,
+      "index": 156,
       "name": "Ring Mail of the Sunblessed"
     }
   },
@@ -27497,7 +27569,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 156,
+      "index": 157,
       "name": "Duskwoven Buckler"
     }
   },
@@ -27520,7 +27592,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 157,
+      "index": 158,
       "name": "Sunsteel Circlet of the Whisper"
     }
   },
@@ -27543,7 +27615,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 158,
+      "index": 159,
       "name": "Dragonbone Scale Mail of the Blood"
     }
   },
@@ -27566,7 +27638,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 159,
+      "index": 160,
       "name": "Voidsteel Studded Leather Armor of the Gale"
     }
   },
@@ -27589,7 +27661,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 160,
+      "index": 161,
       "name": "Ring Mail of the Duskwoven"
     }
   },
@@ -27611,7 +27683,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 161,
+      "index": 162,
       "name": "Thoughtwoven Leather Armor"
     }
   },
@@ -27634,7 +27706,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 162,
+      "index": 163,
       "name": "Cognizant Chain Shirt"
     }
   },
@@ -27656,7 +27728,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 163,
+      "index": 164,
       "name": "Storm Padded Armor (Cursed)"
     }
   },
@@ -27678,7 +27750,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 164,
+      "index": 165,
       "name": "Aegis-Marked Breastplate (Cursed)"
     }
   },
@@ -27701,7 +27773,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 165,
+      "index": 166,
       "name": "Gustwoven Studded Leather Armor"
     }
   },
@@ -27734,7 +27806,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 167,
+      "index": 168,
       "name": "Umbral Studded Leather Armor"
     }
   },
@@ -27767,7 +27839,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 168,
+      "index": 169,
       "name": "Sunsteel Plate Armor of the Whisper"
     }
   },
@@ -27789,7 +27861,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 169,
+      "index": 170,
       "name": "Gustwoven Hide Armor"
     }
   },
@@ -27814,7 +27886,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 170,
+      "index": 171,
       "name": "Cape of the Runescribed"
     },
     "itemType": "wondrous",
@@ -27850,7 +27922,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 171,
+      "index": 172,
       "name": "Lucky Hide Armor"
     }
   },
@@ -27865,7 +27937,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 172,
+      "index": 173,
       "name": "Wyrdwoven Girdle"
     },
     "itemType": "wondrous",
@@ -27902,7 +27974,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 173,
+      "index": 174,
       "name": "Starmetal Splint Armor of the Gale"
     }
   },
@@ -27935,7 +28007,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 175,
+      "index": 176,
       "name": "Adamantine Hide Armor of the Void"
     },
     "passive": [],
@@ -27955,7 +28027,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 176,
+      "index": 177,
       "name": "Adamantine Girdle of Fortune (Cursed)"
     },
     "itemType": "wondrous",
@@ -27974,7 +28046,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 177,
+      "index": 178,
       "name": "Sunsteel Greaves of the Decay"
     },
     "itemType": "wondrous",
@@ -27998,7 +28070,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 178,
+      "index": 179,
       "name": "Breastplate of the Racing"
     }
   },
@@ -28020,7 +28092,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 179,
+      "index": 180,
       "name": "Stargazer's Breastplate"
     }
   },
@@ -28042,7 +28114,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 181,
+      "index": 182,
       "name": "Venomfang Leather Armor"
     }
   },
@@ -28057,7 +28129,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 183,
+      "index": 184,
       "name": "Deathly Gloves"
     },
     "itemType": "wondrous",
@@ -28085,7 +28157,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 184,
+      "index": 185,
       "name": "Sunsteel Chain Mail of the Whisper"
     }
   },
@@ -28110,7 +28182,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 185,
+      "index": 186,
       "name": "Glyphguard Gloves"
     },
     "itemType": "wondrous",
@@ -28137,7 +28209,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 186,
+      "index": 187,
       "name": "Ring Mail of the Winterkissed"
     }
   },
@@ -28160,7 +28232,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 188,
+      "index": 189,
       "name": "Celestine Chain Shirt"
     }
   },
@@ -28183,7 +28255,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 189,
+      "index": 190,
       "name": "Sunblessed Shield (Cursed)"
     }
   },
@@ -28215,7 +28287,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 190,
+      "index": 191,
       "name": "Dragonbone Half Plate Armor of the Tide"
     }
   },
@@ -28238,7 +28310,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 191,
+      "index": 192,
       "name": "Starmetal Scale Mail of the Blood"
     }
   },
@@ -28270,7 +28342,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 192,
+      "index": 193,
       "name": "Wind-Runner's Half Plate Armor"
     }
   },
@@ -28292,7 +28364,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 193,
+      "index": 194,
       "name": "Sunsteel Leather Armor of the Void"
     }
   },
@@ -28307,7 +28379,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 194,
+      "index": 195,
       "name": "Bracers of the Gloomforged"
     },
     "itemType": "wondrous",
@@ -28336,7 +28408,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 195,
+      "index": 196,
       "name": "Tempest Boots"
     },
     "itemType": "wondrous",
@@ -28363,7 +28435,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 197,
+      "index": 198,
       "name": "Bloodletting Studded Leather Armor"
     }
   },
@@ -28385,7 +28457,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 198,
+      "index": 199,
       "name": "Warcry Leather Armor"
     }
   },
@@ -28418,7 +28490,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 199,
+      "index": 200,
       "name": "Dragonbone Circlet of the Dawn"
     }
   },
@@ -28451,7 +28523,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 200,
+      "index": 201,
       "name": "Buckler of the Thornwoven"
     }
   },
@@ -28474,7 +28546,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 201,
+      "index": 202,
       "name": "Gilt-Edged Circlet (Cursed)"
     }
   },
@@ -28497,7 +28569,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 202,
+      "index": 203,
       "name": "Sunsteel Helm of the Venom (Cursed)"
     }
   },
@@ -28531,7 +28603,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 204,
+      "index": 205,
       "name": "Adamantine Tower Shield of the Deep Frost"
     },
     "passive": [],
@@ -28551,7 +28623,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 205,
+      "index": 206,
       "name": "Ring of Invisibility"
     },
     "itemType": "wondrous",
@@ -28586,7 +28658,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "superrare",
-      "index": 206,
+      "index": 207,
       "name": "Scimitar of Speed"
     }
   },
@@ -28600,7 +28672,7 @@ const canonicalItems = [
     "description": "7 charges. Expend 1 charge and target a creature within 60 ft.: it must succeed on a DC 15 Wisdom saving throw or be transformed as per the Polymorph spell for 1 hour, until it drops to 0 HP, or until it uses an action to revert. Recharges 1d6+1 charges each dawn.",
     "legacySource": {
       "tier": "superrare",
-      "index": 207,
+      "index": 208,
       "name": "Wand of Polymorph"
     },
     "itemType": "wondrous",
@@ -28617,7 +28689,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "legacySource": {
       "tier": "superrare",
-      "index": 208,
+      "index": 209,
       "name": "Horn of Valhalla (Bronze)"
     },
     "itemType": "wondrous",
@@ -28633,7 +28705,7 @@ const canonicalItems = [
     "description": "Any creature that sees its own reflection in this mirror must succeed on a DC 15 Charisma save or be drawn inside, trapped in one of twelve extradimensional cells until released by the mirror's owner. Up to 12 creatures can be held at once.",
     "legacySource": {
       "tier": "superrare",
-      "index": 209,
+      "index": 210,
       "name": "Mirror of Life Trapping"
     },
     "itemType": "wondrous",
@@ -28649,7 +28721,7 @@ const canonicalItems = [
     "description": "Speak the command word to make this carpet fly at 30 ft., carrying up to 800 lbs. (roughly four passengers) up to 400 feet above the ground. It obeys spoken directions from whoever sits nearest the front.",
     "legacySource": {
       "tier": "superrare",
-      "index": 210,
+      "index": 211,
       "name": "Carpet of Flying (6 ft. x 9 ft.)"
     },
     "itemType": "wondrous",
@@ -28665,7 +28737,7 @@ const canonicalItems = [
     "description": "Sold as a set of four and fitted to a single mount's hooves, these horseshoes grant the mount a flying speed equal to its walking speed, and its hooves make no sound at all, mundane or magical.",
     "legacySource": {
       "tier": "superrare",
-      "index": 211,
+      "index": 212,
       "name": "Horseshoes of a Zephyr"
     },
     "itemType": "wondrous",
@@ -28681,7 +28753,7 @@ const canonicalItems = [
     "description": "This liquid instantly dissolves any adhesive, including Sovereign Glue, when applied to it. One use only.",
     "legacySource": {
       "tier": "superrare",
-      "index": 212,
+      "index": 213,
       "name": "Universal Solvent"
     },
     "itemType": "tool",
@@ -28712,7 +28784,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 213,
+      "index": 214,
       "name": "Sword of Sharpness"
     }
   },
@@ -28735,7 +28807,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 214,
+      "index": 215,
       "name": "Animated Shield"
     }
   },
@@ -28757,7 +28829,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 215,
+      "index": 216,
       "name": "Demon Armor (Cursed)"
     }
   },
@@ -28778,7 +28850,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 216,
+      "index": 217,
       "name": "Dwarven Plate"
     }
   },
@@ -28800,8 +28872,26 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "superrare",
-      "index": 217,
+      "index": 218,
       "name": "Plate Armor of Etherealness"
+    }
+  },
+  {
+    "id": "the-sovereigns-casket",
+    "name": "The Sovereign's Casket",
+    "rarity": "legendary",
+    "weight": 3,
+    "value": "2000 gp",
+    "flavorText": "A gilded casket bearing a crest no living house claims anymore, its lock a mechanism of interlocking gold teeth that shouldn't still turn after all this time — and does.",
+    "description": "Open to find a haul of legendary-tier loot and coin.",
+    "legacySource": {
+      "tier": "legendary",
+      "index": 0,
+      "name": "The Sovereign's Casket"
+    },
+    "itemType": "tool",
+    "tool": {
+      "toolCategory": "container"
     }
   },
   {
@@ -28858,7 +28948,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 0,
+      "index": 1,
       "name": "Emberfang, the Wyrmslayer Blade"
     }
   },
@@ -28909,7 +28999,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 1,
+      "index": 2,
       "name": "Widow's Whisper"
     }
   },
@@ -28964,7 +29054,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 2,
+      "index": 3,
       "name": "Thornmaul"
     }
   },
@@ -29015,7 +29105,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 3,
+      "index": 4,
       "name": "The Last Word"
     }
   },
@@ -29072,7 +29162,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 4,
+      "index": 5,
       "name": "Grudgebearer"
     }
   },
@@ -29127,7 +29217,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 5,
+      "index": 6,
       "name": "Nightsong (Paired Daggers)"
     }
   },
@@ -29178,7 +29268,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 6,
+      "index": 7,
       "name": "Bonecrusher, the Giant's Toy"
     }
   },
@@ -29229,7 +29319,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 7,
+      "index": 8,
       "name": "The Fair Warning"
     }
   },
@@ -29286,7 +29376,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 8,
+      "index": 9,
       "name": "Frosthowl"
     }
   },
@@ -29341,7 +29431,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 9,
+      "index": 10,
       "name": "Coinsplitter (Twin Shortswords)"
     }
   },
@@ -29385,7 +29475,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 10,
+      "index": 11,
       "name": "Aegis of the Last Stand"
     }
   },
@@ -29421,7 +29511,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 11,
+      "index": 12,
       "name": "Cloak of the Hundred Faces"
     },
     "itemType": "wondrous",
@@ -29468,7 +29558,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 12,
+      "index": 13,
       "name": "Ironhide Vestments"
     }
   },
@@ -29512,7 +29602,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 13,
+      "index": 14,
       "name": "Shield of the Unbroken Line"
     }
   },
@@ -29547,7 +29637,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 14,
+      "index": 15,
       "name": "Boots of the Wanderer King"
     },
     "itemType": "wondrous",
@@ -29587,7 +29677,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 15,
+      "index": 16,
       "name": "Gauntlets of the Iron Handshake"
     },
     "itemType": "wondrous",
@@ -29635,7 +29725,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 16,
+      "index": 17,
       "name": "Helm of the Second Sight"
     }
   },
@@ -29679,7 +29769,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 17,
+      "index": 18,
       "name": "Robes of the Still Storm"
     }
   },
@@ -29722,7 +29812,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 18,
+      "index": 19,
       "name": "Elixir of the Phoenix's Breath"
     }
   },
@@ -29764,7 +29854,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 19,
+      "index": 20,
       "name": "Draught of a Thousand Faces"
     }
   },
@@ -29806,7 +29896,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 20,
+      "index": 21,
       "name": "Vial of Borrowed Time"
     }
   },
@@ -29848,7 +29938,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 21,
+      "index": 22,
       "name": "Scroll of the Final Verse"
     }
   },
@@ -29890,7 +29980,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 22,
+      "index": 23,
       "name": "Powdered Star-Iron"
     }
   },
@@ -29933,7 +30023,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 23,
+      "index": 24,
       "name": "Tears of the Unburied Queen"
     }
   },
@@ -29968,7 +30058,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 24,
+      "index": 25,
       "name": "The Gambler's Last Coin"
     },
     "itemType": "wondrous",
@@ -30014,7 +30104,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 25,
+      "index": 26,
       "name": "Signet of the Forgotten House"
     }
   },
@@ -30049,7 +30139,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 26,
+      "index": 27,
       "name": "The Hourglass That Lies"
     },
     "itemType": "wondrous",
@@ -30080,7 +30170,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 27,
+      "index": 28,
       "name": "Compass of the Wayward Star"
     },
     "itemType": "wondrous",
@@ -30120,7 +30210,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 28,
+      "index": 29,
       "name": "Mask of the Silent Choir"
     }
   },
@@ -30155,7 +30245,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 29,
+      "index": 30,
       "name": "The Debt Collector's Ledger"
     },
     "itemType": "wondrous",
@@ -30205,7 +30295,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 30,
+      "index": 31,
       "name": "Hammer of Thunderbolts"
     }
   },
@@ -30235,7 +30325,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 31,
+      "index": 32,
       "name": "Lyre of Building"
     },
     "itemType": "wondrous",
@@ -30275,7 +30365,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 32,
+      "index": 33,
       "name": "Potion of Supreme Healing"
     }
   },
@@ -30312,7 +30402,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 33,
+      "index": 34,
       "name": "Spell Scroll (7th Level)"
     }
   },
@@ -30349,7 +30439,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 34,
+      "index": 35,
       "name": "Spell Scroll (8th Level)"
     }
   },
@@ -30386,7 +30476,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 35,
+      "index": 36,
       "name": "Spell Scroll (9th Level)"
     }
   },
@@ -30416,7 +30506,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 36,
+      "index": 37,
       "name": "Astral Shard"
     },
     "itemType": "wondrous",
@@ -30448,7 +30538,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 37,
+      "index": 38,
       "name": "Cauldron of Rebirth (Greater)"
     },
     "itemType": "wondrous",
@@ -30480,7 +30570,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 38,
+      "index": 39,
       "name": "Crystalline Chronicle"
     },
     "itemType": "wondrous",
@@ -30512,7 +30602,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 39,
+      "index": 40,
       "name": "Far Realm Shard"
     },
     "itemType": "wondrous",
@@ -30544,7 +30634,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 40,
+      "index": 41,
       "name": "Grimoire Infinitus"
     },
     "itemType": "wondrous",
@@ -30582,7 +30672,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 41,
+      "index": 42,
       "name": "Obsidian Flint Dragon Plate"
     }
   },
@@ -30627,7 +30717,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 42,
+      "index": 43,
       "name": "Rod of the Vonindod"
     }
   },
@@ -30664,7 +30754,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 43,
+      "index": 44,
       "name": "Hide of the Feral Guardian"
     }
   },
@@ -30694,7 +30784,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 44,
+      "index": 45,
       "name": "Hollow Dragon"
     },
     "itemType": "wondrous",
@@ -30744,7 +30834,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 45,
+      "index": 46,
       "name": "Sword of Answering (Wildemount)"
     }
   },
@@ -30773,7 +30863,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 46,
+      "index": 47,
       "name": "The Wandering Tower"
     },
     "itemType": "wondrous",
@@ -30827,7 +30917,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 47,
+      "index": 48,
       "name": "Calamity Blade"
     }
   },
@@ -30852,7 +30942,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 48,
+      "index": 49,
       "name": "Adamantine Plate Armor"
     },
     "passive": [],
@@ -30881,7 +30971,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 49,
+      "index": 50,
       "name": "Adamantine Plate Helm"
     },
     "passive": [],
@@ -30910,7 +31000,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 50,
+      "index": 51,
       "name": "Adamantine Plate Gauntlets"
     },
     "passive": [],
@@ -30939,7 +31029,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 51,
+      "index": 52,
       "name": "Adamantine Plate Greaves"
     },
     "passive": [],
@@ -30968,7 +31058,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 52,
+      "index": 53,
       "name": "Adamantine Plate Boots"
     },
     "passive": [],
@@ -30997,7 +31087,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 53,
+      "index": 54,
       "name": "Adamantine Plate Shield"
     },
     "passive": [],
@@ -31036,7 +31126,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 54,
+      "index": 55,
       "name": "Adamantine Shortsword"
     },
     "abilities": [],
@@ -31074,7 +31164,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 55,
+      "index": 56,
       "name": "Adamantine Longsword"
     },
     "abilities": [],
@@ -31112,7 +31202,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 56,
+      "index": 57,
       "name": "Adamantine Dagger"
     },
     "abilities": [],
@@ -31147,7 +31237,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 57,
+      "index": 58,
       "name": "Adamantine Mace"
     },
     "abilities": [],
@@ -31185,7 +31275,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 58,
+      "index": 59,
       "name": "Adamantine Battleaxe"
     },
     "abilities": [],
@@ -31224,7 +31314,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 59,
+      "index": 60,
       "name": "Adamantine Warhammer"
     },
     "abilities": [],
@@ -31263,7 +31353,7 @@ const canonicalItems = [
     ],
     "legacySource": {
       "tier": "legendary",
-      "index": 60,
+      "index": 61,
       "name": "Adamantine Spear"
     },
     "abilities": [],
@@ -31301,7 +31391,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 62,
+      "index": 63,
       "name": "Sworn Bronze Wyrmling"
     }
   },
@@ -31335,7 +31425,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 63,
+      "index": 64,
       "name": "Phoenix Chick"
     }
   },
@@ -31369,7 +31459,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 64,
+      "index": 65,
       "name": "Bound Lantern Archon"
     }
   },
@@ -31412,7 +31502,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 65,
+      "index": 66,
       "name": "Pegasus"
     }
   },
@@ -31455,7 +31545,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 66,
+      "index": 67,
       "name": "Bonded Griffon"
     }
   },
@@ -31510,7 +31600,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 67,
+      "index": 68,
       "name": "Scimitar of the Galebound"
     }
   },
@@ -31561,7 +31651,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 68,
+      "index": 69,
       "name": "Nalion, the Mindbreaker"
     }
   },
@@ -31609,7 +31699,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 69,
+      "index": 70,
       "name": "Myrith, the Faithful"
     }
   },
@@ -31663,7 +31753,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 70,
+      "index": 71,
       "name": "Sileth Grimion, the Burning Vow"
     }
   },
@@ -31717,7 +31807,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 71,
+      "index": 72,
       "name": "Silorn Fenume, the Winter's Edge"
     }
   },
@@ -31768,7 +31858,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 72,
+      "index": 73,
       "name": "Nalorn, the Echo of War"
     }
   },
@@ -31813,7 +31903,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 73,
+      "index": 74,
       "name": "Grimorn Aethion, the Keeper"
     }
   },
@@ -31867,7 +31957,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 74,
+      "index": 75,
       "name": "Goreth Koreth, the Hallowed Light"
     }
   },
@@ -31919,7 +32009,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 75,
+      "index": 76,
       "name": "Gloomforged War Pick"
     }
   },
@@ -31973,7 +32063,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 76,
+      "index": 77,
       "name": "Nalara, the Stormcaller"
     }
   },
@@ -32026,7 +32116,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 77,
+      "index": 78,
       "name": "Adamantine Handaxe of the Whisper"
     },
     "abilities": [],
@@ -32085,7 +32175,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 78,
+      "index": 79,
       "name": "Soundbound Maul"
     }
   },
@@ -32134,7 +32224,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 79,
+      "index": 80,
       "name": "Warded Greataxe"
     }
   },
@@ -32188,7 +32278,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 80,
+      "index": 81,
       "name": "Kelume Vexand, the Deathless"
     }
   },
@@ -32239,7 +32329,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 81,
+      "index": 82,
       "name": "Zareth Thalith, the Deafening"
     }
   },
@@ -32290,7 +32380,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 82,
+      "index": 83,
       "name": "Siland Thalael, the Burning Vow"
     }
   },
@@ -32344,7 +32434,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 83,
+      "index": 84,
       "name": "Grimoth Vyrion, the Silent Scream"
     }
   },
@@ -32395,7 +32485,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 84,
+      "index": 85,
       "name": "Grimand, the Frostbitten"
     }
   },
@@ -32433,7 +32523,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 85,
+      "index": 86,
       "name": "Vexiel, the Silent Scream"
     }
   },
@@ -32472,7 +32562,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 86,
+      "index": 87,
       "name": "Vyrorn Aethash, the Gravebound"
     }
   },
@@ -32510,7 +32600,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 87,
+      "index": 88,
       "name": "Cognizant Ring Mail"
     }
   },
@@ -32548,7 +32638,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 88,
+      "index": 89,
       "name": "Vyrith Solara, the Mindbreaker"
     }
   },
@@ -32586,7 +32676,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 89,
+      "index": 90,
       "name": "Korara Vexael, the Wildfire"
     }
   },
@@ -32624,7 +32714,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 90,
+      "index": 91,
       "name": "Feniel Zariel, the Long Winter"
     }
   },
@@ -32662,7 +32752,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 91,
+      "index": 92,
       "name": "Keland Silith, the Bellower"
     }
   },
@@ -32700,7 +32790,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 92,
+      "index": 93,
       "name": "Shield of the Voltaic"
     }
   },
@@ -32738,7 +32828,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 93,
+      "index": 94,
       "name": "Vorax, the Gravebound"
     }
   },
@@ -32776,7 +32866,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 94,
+      "index": 95,
       "name": "Circlet of the Blightvenom"
     }
   },
@@ -32814,7 +32904,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 95,
+      "index": 96,
       "name": "Vexeth Vororn, the Long Winter"
     }
   },
@@ -32852,7 +32942,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 96,
+      "index": 97,
       "name": "Vorith Kelwyn, the Dawnbringer"
     }
   },
@@ -32890,7 +32980,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 97,
+      "index": 98,
       "name": "Thalwyn Korwyn, the Hallowed Light"
     }
   },
@@ -32928,7 +33018,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 98,
+      "index": 99,
       "name": "Vexiel Kelael, the Thunderstruck"
     }
   },
@@ -32966,7 +33056,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 99,
+      "index": 100,
       "name": "Vexith Myroth, the Silent Scream"
     }
   },
@@ -33004,7 +33094,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 100,
+      "index": 101,
       "name": "Silwyn Vorith, the Last Ember"
     }
   },
@@ -33042,8 +33132,26 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "legendary",
-      "index": 101,
+      "index": 102,
       "name": "Crown of the Whisperbound"
+    }
+  },
+  {
+    "id": "a-chest-that-shouldnt-exist",
+    "name": "A Chest That Shouldn't Exist",
+    "rarity": "celestial",
+    "weight": 0.25,
+    "value": "8000 gp",
+    "flavorText": "An ordinary-looking chest that is, by every account anyone can find, not supposed to be here — no ledger lists it, no mason recalls sealing it into this wall, and the dust around it undisturbed for longer than the building has stood.",
+    "description": "Open to find a haul of celestial-tier loot and coin.",
+    "legacySource": {
+      "tier": "celestial",
+      "index": 0,
+      "name": "A Chest That Shouldn't Exist"
+    },
+    "itemType": "tool",
+    "tool": {
+      "toolCategory": "container"
     }
   },
   {
@@ -33066,7 +33174,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 0,
+      "index": 1,
       "name": "Fragment of Grief"
     },
     "itemType": "wondrous",
@@ -33098,7 +33206,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 1,
+      "index": 2,
       "name": "Fragment of Rage"
     },
     "itemType": "wondrous",
@@ -33130,7 +33238,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 2,
+      "index": 3,
       "name": "Fragment of Dread"
     },
     "itemType": "wondrous",
@@ -33162,7 +33270,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 3,
+      "index": 4,
       "name": "Fragment of Envy"
     },
     "itemType": "wondrous",
@@ -33194,7 +33302,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 4,
+      "index": 5,
       "name": "Fragment of Despair"
     },
     "itemType": "wondrous",
@@ -33226,7 +33334,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 5,
+      "index": 6,
       "name": "Fragment of Ecstasy"
     },
     "itemType": "wondrous",
@@ -33258,7 +33366,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 6,
+      "index": 7,
       "name": "Fragment of Guilt"
     },
     "itemType": "wondrous",
@@ -33290,7 +33398,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 7,
+      "index": 8,
       "name": "Fragment of the Hollow"
     },
     "itemType": "wondrous",
@@ -33344,7 +33452,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 8,
+      "index": 9,
       "name": "Seraph's Wing Blade"
     }
   },
@@ -33382,7 +33490,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 9,
+      "index": 10,
       "name": "Aegis Eternal"
     }
   },
@@ -33433,7 +33541,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 10,
+      "index": 11,
       "name": "The Last Star"
     }
   },
@@ -33470,7 +33578,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 11,
+      "index": 12,
       "name": "Robe of the Unwritten Fate"
     }
   },
@@ -33513,7 +33621,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 12,
+      "index": 13,
       "name": "Chalice of Endless Grace"
     }
   },
@@ -33551,7 +33659,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 13,
+      "index": 14,
       "name": "Crown of the First Dawn"
     }
   },
@@ -33589,7 +33697,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 14,
+      "index": 15,
       "name": "Wings of the Fallen Choir"
     }
   },
@@ -33618,7 +33726,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 15,
+      "index": 16,
       "name": "The Unspoken Word"
     },
     "itemType": "wondrous",
@@ -33662,7 +33770,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 16,
+      "index": 17,
       "name": "Ashes of a Dying God"
     }
   },
@@ -33700,7 +33808,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 17,
+      "index": 18,
       "name": "The Mercykeeper's Sigil"
     }
   },
@@ -33729,7 +33837,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 18,
+      "index": 19,
       "name": "The Undying Flame"
     },
     "itemType": "wondrous",
@@ -33779,7 +33887,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 19,
+      "index": 20,
       "name": "Godbane Edge"
     }
   },
@@ -33808,7 +33916,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 20,
+      "index": 21,
       "name": "Vessel of Returning Tides"
     },
     "itemType": "wondrous",
@@ -33847,7 +33955,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 21,
+      "index": 22,
       "name": "Plate of the Immovable Saint"
     }
   },
@@ -33876,7 +33984,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 22,
+      "index": 23,
       "name": "The First Candle"
     },
     "itemType": "wondrous",
@@ -33916,7 +34024,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 23,
+      "index": 24,
       "name": "Shroud of the Silent Heaven"
     }
   },
@@ -33949,7 +34057,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 24,
+      "index": 25,
       "name": "Fragment of a Fallen Star"
     }
   },
@@ -33991,7 +34099,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 25,
+      "index": 26,
       "name": "Celestial Steed of the Silver Path"
     }
   },
@@ -34045,7 +34153,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 26,
+      "index": 27,
       "name": "Solash Zarax, the Whisper"
     }
   },
@@ -34100,7 +34208,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 27,
+      "index": 28,
       "name": "Blightvenom Dagger"
     }
   },
@@ -34146,7 +34254,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 28,
+      "index": 29,
       "name": "Sigil-Bound War Pick"
     }
   },
@@ -34197,7 +34305,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 29,
+      "index": 30,
       "name": "Draoth Vyrael, the Winter's Edge"
     }
   },
@@ -34253,7 +34361,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 30,
+      "index": 31,
       "name": "Heavy Crossbow of the Rime"
     }
   },
@@ -34304,7 +34412,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 31,
+      "index": 32,
       "name": "Thalith, the Burning Vow"
     }
   },
@@ -34349,7 +34457,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 32,
+      "index": 33,
       "name": "Draorn, the Faithful"
     }
   },
@@ -34405,7 +34513,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 33,
+      "index": 34,
       "name": "Astral Warhammer of the Decay"
     }
   },
@@ -34443,7 +34551,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 34,
+      "index": 35,
       "name": "Thalara, the Frostbitten"
     }
   },
@@ -34482,7 +34590,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 35,
+      "index": 36,
       "name": "Whisume Soliel, the Sunward"
     }
   },
@@ -34521,7 +34629,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 36,
+      "index": 37,
       "name": "Vyrume Briara, the Unbroken"
     }
   },
@@ -34559,7 +34667,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 37,
+      "index": 38,
       "name": "Voroth, the Deathless"
     }
   },
@@ -34597,7 +34705,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 38,
+      "index": 39,
       "name": "Myross Koross, the Sunward"
     }
   },
@@ -34634,7 +34742,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 39,
+      "index": 40,
       "name": "Breastplate of the Bloodletting"
     }
   },
@@ -34672,7 +34780,7 @@ const canonicalItems = [
     },
     "legacySource": {
       "tier": "celestial",
-      "index": 40,
+      "index": 41,
       "name": "Zareth Nalen, the Frostbitten"
     }
   },

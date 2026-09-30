@@ -94,6 +94,13 @@ export const INTERACTIONS = {
   unlock:           { cat: 'World',       label: 'Unlock',             default: it => it.type === 'questitem' && it.subcategory === 'key' },
   quest_item:       { cat: 'Quest',       label: 'Quest Item',         default: it => it.type === 'questitem' },
   turn_in:          { cat: 'Quest',       label: 'Turn-In',            default: it => it.type === 'questitem' },
+  // Deliberately explicit-opt-in only (default always false, never keyword-guessed from
+  // name/desc text) — see deriveItemProperties/deriveItemTags's own word-boundary bug fix
+  // above for exactly why a "does this text merely mention a chest" regex would be unreliable.
+  // Real chest items set item.chestRarity directly (loot-data.js) and are opened via
+  // openChestItem (the monolith), which checks that field, not this table, at click time —
+  // this entry exists for the Compendium tooltip's Interactions chip, for discoverability.
+  open_chest:       { cat: 'World',       label: 'Open',               default: it => false },
 };
 
 export function computeItemInteractions(item) {
@@ -370,7 +377,12 @@ export function classifyItemHierarchy(item, rarity) {
   if (/tapestry/.test(n)) return ['Miscellaneous','Decoration','Tapestry'];
   if (/ornament/.test(n)) return ['Miscellaneous','Decoration','Ornament'];
   if (/\bmug\b|\bcup\b|utensil|cutlery|\bplate\b|\bbowl\b/.test(n)) return ['Miscellaneous','Household','Utensil'];
-  if (/\bcrate\b|\bchest\b|\bbarrel\b|\bcontainer\b/.test(n)) return ['Miscellaneous','Household','Container'];
+  // "coffer"/"casket"/"strongbox" added alongside chest/crate/barrel/container: found while
+  // authoring lootable Chest items under those synonyms ("Sealed Reliquary Coffer", "The
+  // Sovereign's Casket") — without them, this check (which runs before the magic-item guess
+  // below) missed them entirely, so a mundane container fell through to being classified as a
+  // "Wondrous Item" purely for having a non-common rarity and an effect string.
+  if (/\bcrate\b|\bchest\b|\bbarrel\b|\bcontainer\b|\bcoffer\b|\bcasket\b|\bstrongbox\b/.test(n)) return ['Miscellaneous','Household','Container'];
   if (/\bchair\b|furniture/.test(text) || (/\btable\b/.test(text) && !/roll (on|a)|\bdmg\b|reference table|\bchart\b/.test(text))) return ['Miscellaneous','Household','Furniture'];
   if (/toy\b|game piece|board game/.test(text)) return ['Miscellaneous','Entertainment','Toy'];
   if (/\bgame\b|\bdice\b|playing cards/.test(text)) return ['Miscellaneous','Entertainment','Game'];
