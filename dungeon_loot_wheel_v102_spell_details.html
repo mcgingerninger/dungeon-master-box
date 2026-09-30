@@ -9654,16 +9654,32 @@ const WEAPON_BASE_TYPES = [
 // cloak/belt pieces are accessories layered on top of body armor, so they contribute a small flat
 // bonus instead of a full suit's AC -- matching how those slots already work everywhere else in
 // this app (a helm was never meant to carry the same AC as a breastplate).
+// Phase 5 of the armor rework (docs/V2_MECHANICS_MIGRATION.md): baseAC values and the new
+// isBodySlot/weightClass fields mirror mechanics/data/armor-pieces.js's ARMOR_PIECES exactly —
+// that's the Node-side copy (consumed by scripts/migrate-legacy-content.js), this is the
+// browser-side copy (classic <script>, so it can't import an ES module at top-level parse time
+// the way game-engine.js is imported — see that module's own ordering-hazard comment above).
+// Keep both in sync by hand if either ever changes; same non-shared-file relationship
+// MATERIAL_MODIFIERS/ITEM_AFFIXES already have between their Node-side and browser-side forms.
 const ARMOR_BASE_TYPES = [
-  { name: 'Padded Armor', baseAC: 11 }, { name: 'Leather Armor', baseAC: 11 }, { name: 'Studded Leather', baseAC: 12 },
-  { name: 'Hide Armor', baseAC: 12 }, { name: 'Chain Shirt', baseAC: 13 }, { name: 'Ring Mail', baseAC: 14 },
-  { name: 'Scale Mail', baseAC: 14 }, { name: 'Breastplate', baseAC: 14 }, { name: 'Half Plate', baseAC: 15 },
-  { name: 'Chain Mail', baseAC: 16 }, { name: 'Splint Armor', baseAC: 17 }, { name: 'Plate Armor', baseAC: 18 },
-  { name: 'Buckler Shield', baseAC: 1 }, { name: 'Round Shield', baseAC: 1 }, { name: 'Kite Shield', baseAC: 2 }, { name: 'Tower Shield', baseAC: 3 },
-  { name: 'Iron Cap', baseAC: 1 }, { name: 'Great Helm', baseAC: 2 }, { name: 'War Helm', baseAC: 2 },
-  { name: 'Leather Gauntlets', baseAC: 1 }, { name: 'Steel Bracers', baseAC: 1 },
-  { name: 'Reinforced Greaves', baseAC: 1 }, { name: 'Leather Boots', baseAC: 1 },
-  { name: "Traveler's Cloak", baseAC: 1 }, { name: 'Battle Mantle', baseAC: 1 }, { name: 'Studded Belt', baseAC: 1 },
+  { name: 'Padded Armor', baseAC: 6, isBodySlot: true, weightClass: 'light' },
+  { name: 'Leather Armor', baseAC: 6, isBodySlot: true, weightClass: 'light' },
+  { name: 'Studded Leather', baseAC: 7, isBodySlot: true, weightClass: 'light' },
+  { name: 'Hide Armor', baseAC: 7, isBodySlot: true, weightClass: 'medium' },
+  { name: 'Chain Shirt', baseAC: 7, isBodySlot: true, weightClass: 'medium' },
+  { name: 'Ring Mail', baseAC: 8, isBodySlot: true, weightClass: 'heavy' },
+  { name: 'Scale Mail', baseAC: 8, isBodySlot: true, weightClass: 'medium' },
+  { name: 'Breastplate', baseAC: 8, isBodySlot: true, weightClass: 'medium' },
+  { name: 'Half Plate', baseAC: 8, isBodySlot: true, weightClass: 'medium' },
+  { name: 'Chain Mail', baseAC: 9, isBodySlot: true, weightClass: 'heavy' },
+  { name: 'Splint Armor', baseAC: 10, isBodySlot: true, weightClass: 'heavy' },
+  { name: 'Plate Armor', baseAC: 10, isBodySlot: true, weightClass: 'heavy' },
+  { name: 'Buckler Shield', baseAC: 2, isBodySlot: false }, { name: 'Round Shield', baseAC: 2, isBodySlot: false },
+  { name: 'Kite Shield', baseAC: 3, isBodySlot: false }, { name: 'Tower Shield', baseAC: 4, isBodySlot: false },
+  { name: 'Iron Cap', baseAC: 1, isBodySlot: false }, { name: 'Great Helm', baseAC: 2, isBodySlot: false }, { name: 'War Helm', baseAC: 2, isBodySlot: false },
+  { name: 'Leather Gauntlets', baseAC: 1, isBodySlot: false }, { name: 'Steel Bracers', baseAC: 2, isBodySlot: false },
+  { name: 'Reinforced Greaves', baseAC: 2, isBodySlot: false }, { name: 'Leather Boots', baseAC: 1, isBodySlot: false },
+  { name: "Traveler's Cloak", baseAC: 1, isBodySlot: false }, { name: 'Battle Mantle', baseAC: 1, isBodySlot: false }, { name: 'Studded Belt', baseAC: 1, isBodySlot: false },
 ];
 // Container/delivery forms only -- the actual magical effect comes from the same buff/debuff
 // modifier roll every other item category already gets (see generateModifierOfType), and
@@ -10323,11 +10339,16 @@ function buildItemName(baseName, rarity, stats = {}, mods = []) {
 // alone decided damage/AC and the weapon/armor's actual type was purely cosmetic text.
 const RARITY_EXTRA_DICE = { common:0, uncommon:0, rare:1, superrare:1, legendary:2, celestial:3 };
 const RARITY_AC_BONUS = { common:0, uncommon:1, rare:2, superrare:3, legendary:5, celestial:8 };
+// Accessory pieces (isBodySlot: false) never scaled this hard even in the static loot-data.js
+// catalog — their old flat AC only varied ~0-2 across all six tiers, never the full 0-8 spread
+// RARITY_AC_BONUS gives a body piece. Applying RARITY_AC_BONUS to a baseAC of 1-4 would have put
+// a celestial Iron Cap at 9 AC, wildly out of line with every hand-authored helm in loot-data.js.
+const RARITY_ACC_AC_BONUS = { common:0, uncommon:0, rare:0, superrare:1, legendary:1, celestial:2 };
 function rollItemStats(cat, rarity, baseName) {
   const subcategory = classifySubcategory(baseName, cat, rarity);
   const slotSize = SUBCATEGORY_SLOT_SIZE[subcategory] || 1;
   const s = GEN.scale[rarity];
-  let dmg = '', ac = '', hp = '', requirement = '', charges = '';
+  let dmg = '', ac = '', hp = '', requirement = '', charges = '', armorStyle, isBodySlot;
   if (cat === 'weapon') {
     const base = WEAPON_BASE_TYPES.find(w => w.name === baseName);
     const [baseDieCount, dieSize] = base ? base.dmgDie.split('d').map(Number) : [1, 6];
@@ -10337,16 +10358,27 @@ function rollItemStats(cat, rarity, baseName) {
   }
   if (cat === 'armor') {
     const base = ARMOR_BASE_TYPES.find(a => a.name === baseName);
-    const baseAC = base ? base.baseAC : 11;
-    ac = String(baseAC + (RARITY_AC_BONUS[rarity] || 0));
-    requirement = baseAC >= 16 ? 'Heavy armor proficiency' : baseAC >= 13 ? 'Medium armor proficiency' : 'No proficiency required';
+    const baseAC = base ? base.baseAC : 6;
+    isBodySlot = base ? base.isBodySlot : true;
+    // Body pieces replace the wearer's base AC (a plain number, matching loot-data.js's own
+    // convention for the 'armor' slot); accessory pieces add a flat bonus on top ("+N" — without
+    // the leading sign, collectEquippedAcBreakdown's flat-source regex wouldn't recognize it at
+    // all and the item would silently contribute 0 AC, same bug this phase is fixing).
+    if (isBodySlot) {
+      armorStyle = base ? base.weightClass : 'medium';
+      ac = String(baseAC + (RARITY_AC_BONUS[rarity] || 0));
+      requirement = armorStyle === 'heavy' ? 'Heavy armor proficiency' : armorStyle === 'medium' ? 'Medium armor proficiency' : 'No proficiency required';
+    } else {
+      ac = '+' + String(baseAC + (RARITY_ACC_AC_BONUS[rarity] || 0));
+      requirement = 'No proficiency required';
+    }
   }
   if (cat === 'consumable') {
     const dieCount = rarity === 'celestial' ? rn(15,30) : rarity === 'legendary' ? rn(10,20) : rarity === 'superrare' ? rn(6,12) : rarity === 'rare' ? rn(4,8) : rarity === 'uncommon' ? rn(2,4) : rn(1,2);
     hp = `${dieCount}d8+${rn(s.min * 2, s.max * 3)}`;
     charges = rollConsumableCharges(subcategory, rarity);
   }
-  return { subcategory, slotSize, dmg, ac, hp, requirement, charges };
+  return { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot };
 }
 
 function generateUniqueItem() {
@@ -10364,7 +10396,7 @@ function generateUniqueItem() {
 
   // Stats — subcategory/slotSize/dmg/ac/hp/charges all come from the shared roller so
   // this matches the Store's items exactly.
-  const { subcategory, slotSize, dmg, ac, hp, requirement, charges } = rollItemStats(cat, rarity, baseName);
+  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = rollItemStats(cat, rarity, baseName);
   const gp = scaledGP(rarity);
 
   // --- Weapon/armor affixes (materials + enchantments — see ITEM_AFFIXES) — rolled first and
@@ -10443,7 +10475,7 @@ function generateUniqueItem() {
 
   const descParagraphsHtml = renderDescParagraphs(descParagraphs);
 
-  const itemObj = { name: itemName, rarity, cat, type: cat, subcategory, gp, dmg, ac, hp, requirement, charges, slotSize, weight, mods, flavor, descParagraphs, tags };
+  const itemObj = { name: itemName, rarity, cat, type: cat, subcategory, gp, dmg, ac, hp, requirement, charges, slotSize, weight, mods, flavor, descParagraphs, tags, ...(armorStyle ? { armorStyle } : {}), ...(isBodySlot !== undefined ? { isBodySlot } : {}) };
   window._lastGenItem = itemObj;
 
   const safeFlavorForTextarea = flavor.replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -12957,7 +12989,7 @@ function generateStoreItem(merchantKey) {
 
   // Same shared stat roller the Unique Item Generator uses — subcategory/slotSize/
   // dmg/ac/hp/charges are built identically regardless of which tab produced the item.
-  const { subcategory, slotSize, dmg, ac, hp, requirement, charges } = rollItemStats(cat, rarity, baseName);
+  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = rollItemStats(cat, rarity, baseName);
 
   // Weapon/armor affixes (materials + enchantments — see ITEM_AFFIXES) roll the same way here
   // as in the Unique Item Generator, so Store wares stack "Flaming Sharp"-style prefixes too
@@ -12985,7 +13017,7 @@ function generateStoreItem(merchantKey) {
   const gp = formatGpAmount(commercePrice(rarity, mods.length, rollPowerRatio(cat, rarity, dmg, ac, hp, mods)));
   const weight = computeItemWeight({ type: cat, subcategory, name: itemName });
 
-  return { name:itemName, rarity, cat, type:cat, subcategory, gp, dmg, ac, hp, requirement, charges, slotSize, weight, mods, flavor, descParagraphs, tags, merchant:merchantKey };
+  return { name:itemName, rarity, cat, type:cat, subcategory, gp, dmg, ac, hp, requirement, charges, slotSize, weight, mods, flavor, descParagraphs, tags, merchant:merchantKey, ...(armorStyle ? { armorStyle } : {}), ...(isBodySlot !== undefined ? { isBodySlot } : {}) };
 }
 
 let currentMerchant = null;
