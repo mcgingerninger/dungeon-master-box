@@ -600,8 +600,8 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
   const slot = SLOT_MAP[effectiveSlotCategory] || 'chest';
 
   // Only the BODY armor slot ('chest') ever has its armorType actually read for mechanics
-  // (addsDexMod/dexModCap in mechanics/engine/character/equipment.js's computeEquippedArmorClass —
-  // every other slot, additive by definition, contributes only its flat baseAC regardless of
+  // (addsDexMod/dexModCap, in the live app's own equipped-AC computation) — every other slot,
+  // additive by definition, contributes only its flat baseAC regardless of
   // armorType). So only a genuine body-armor item with an unresolved weight class is worth
   // flagging as ambiguous; for every additive accessory slot (offhand/head/handwear/boots/
   // leggings/cloak/facewear/beltwaist) armorType is cosmetic only — best-effort from

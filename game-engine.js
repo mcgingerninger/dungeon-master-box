@@ -550,15 +550,15 @@ export function uniqueEquippedSlotEntries(slots) {
 
 // ===================== MIGRATED-ITEM BRIDGE =====================
 // A migrated item (see docs/V2_MECHANICS_MIGRATION.md) carries its passive stat bonuses as a
-// structured `passive: [{stat, value}]` array (mechanics/engine/items/item-schema.js), computed
+// structured `passive: [{stat, value}]` array, computed
 // ONCE by the migration script from the exact same extractStatDeltasFromText/extractStatSetValuesFromText
 // regex this file already runs — so reading `passive` back out here reproduces the live-regex
 // result exactly, just from the migration's frozen structured output instead of re-parsing prose
 // on every call (the canonical data becomes the runtime source, not a live conversion of it).
 // Ability-score keys ('str'..'cha') carry the SAME raw-score-delta convention legacy .effect text
-// always meant (e.g. "+2 Strength" -> a 2-point SCORE bump) — not the modifier-delta convention
-// mechanics/engine/character/stat-modifiers.js documents for V2's own hand-authored content, since
-// these numbers were extracted from migrated legacy items, not authored fresh against that spec.
+// always meant (e.g. "+2 Strength" -> a 2-point SCORE bump) — not a modifier-delta convention,
+// since these numbers were extracted from migrated legacy items, not authored fresh against a
+// different spec.
 // 'attackRoll'/'damageRoll' are deliberately excluded: those feed weapon-attack math, a separate
 // concern from the character sheet (see computeWeaponAttackRoll in the monolith).
 const CANONICAL_STAT_TO_BREAKDOWN_LABEL = {

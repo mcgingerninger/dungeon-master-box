@@ -944,6 +944,32 @@ the live regex path it replaces (Phase 13, all above). What's left:
    double-counting a weapon's own restated base damage — were fixed in Phase 13 and Phase 14
    respectively; see those sections above.)
 
+## Post-merge cleanup: removed unused `mechanics/engine/**` files
+
+Audited (per a direct request, after this migration was already merged to `main`) which of the
+ported V2 engine files the live app actually calls. Precise import-graph check, not a guess:
+`mechanics/engine/items/monster-parts.js` is genuinely live (imported directly by the monolith),
+and `validate-item.js`/`modifiers.js`/`ability-scores.js` are genuinely used (by
+`scripts/migrate-legacy-content.js`, or transitively via `monster-parts.js`). The other 10 files —
+`interactions.js`, `item-schema.js`, `abilities.js`, `consume.js`, `attack.js`, `dice.js`,
+`character-sheet.js`, `hp.js`, `stat-modifiers.js`, `equipment.js` — had **zero real importers**
+anywhere: not the live app, not `scripts/migrate-legacy-content.js`, and (`equipment.js`'s two
+assertions in `scripts/migrate-legacy-content.test.js` aside — removed along with it, since they
+checked the unused module's own slot logic rather than anything the live app runs) no meaningful
+test coverage either. The actual runtime bridge for migrated items (`canonicalWeaponAttackData`,
+`canonicalConsumableHealDice`, `canonicalPassiveDeltas`, `canonicalAcContribution` — Phases 7-9
+above) is hand-written directly in `game-engine.js`, reusing the live app's own existing
+attack/heal/AC computation rather than calling these ported modules — a deliberate choice (avoid a
+second, competing engine for the same math), not an oversight, but it left these 10 files as inert
+reference code with no path to ever running.
+
+**Removed them.** `game-engine.js` is already the project's shared, portable engine layer (no DOM
+dependency, already imported by `server/websocket.js` for `applyLongRestToPlayerState` etc.), so
+nothing about future server-authoritative scalability depended on these particular files — that
+concern is already addressed by where the live bridge logic already lives. Kept:
+`monster-parts.js` (+ its test), `validate-item.js`, `modifiers.js`, `ability-scores.js`. Full
+suite still 368/368 after removal (unsurprising — nothing imported them).
+
 ## Running the migration tool
 
 ```

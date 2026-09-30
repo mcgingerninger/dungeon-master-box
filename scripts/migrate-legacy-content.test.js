@@ -22,7 +22,6 @@ import {
   convertNpcAbility, migrateNpcWeapon, parsePermanentStatIncreaseEffect,
 } from './migrate-legacy-content.js';
 import { validateItem } from '../mechanics/engine/items/validate-item.js';
-import { equipmentSlotsForItem } from '../mechanics/engine/character/equipment.js';
 
 describe('loadLootData', () => {
   test('loads the real loot-data.js without modifying it, and does not export from it', () => {
@@ -561,7 +560,6 @@ describe('migrateMisc — wondrous/tool split', () => {
     const result = migrateMisc(item, 'common', 0, makeIdGenerator(), [], []);
     assert.equal(result.itemType, 'wondrous');
     assert.equal(result.wondrous.slot, 'ring');
-    assert.deepEqual(equipmentSlotsForItem(result), ['ring1', 'ring2', 'ring3', 'ring4']);
     assert.ok(validateItem(result).valid);
   });
 
@@ -570,7 +568,6 @@ describe('migrateMisc — wondrous/tool split', () => {
     const result = migrateMisc(item, 'legendary', 0, makeIdGenerator(), [], []);
     assert.equal(result.itemType, 'wondrous');
     assert.deepEqual(result.wondrous, {});
-    assert.deepEqual(equipmentSlotsForItem(result), []);
   });
 
   test('a "+N stat" effect makes an otherwise slot-less item wondrous, and extracts the real bonus', () => {
