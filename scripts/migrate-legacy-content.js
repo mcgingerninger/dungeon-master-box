@@ -609,6 +609,14 @@ function migrateArmor(item, tier, index, nextId, ambiguous, fixes) {
   let armorType;
   if (effectiveSlotCategory === 'offhand') {
     armorType = 'shield';
+  } else if (item.armorStyle) {
+    // The Phase 3 armor rework (docs/V2_MECHANICS_MIGRATION.md) authors light/medium/heavy
+    // directly on rebalanced items via mechanics/data/armor-pieces.js — read it straight instead
+    // of re-deriving from classifyItemHierarchy, which was only ever a flavor-archetype guesser
+    // (checked directly: it disagrees with real 5e on several pieces, e.g. bucketing Chain Shirt/
+    // Studded Leather/Chain Mail all under "Medium Armor" by matching the bare words "chain"/
+    // "studded") and was never validated as a source of mechanical truth.
+    armorType = item.armorStyle;
   } else if (isBodySlot) {
     const leaf = classification[1]; // 'Heavy Armor'|'Medium Armor'|'Light Armor'|'Exotic Material'
     if (leaf === 'Heavy Armor') armorType = 'heavy';

@@ -774,7 +774,7 @@ const canonicalItems = [
     "description": "AC 11 + Dexterity modifier. Light armor. No Stealth disadvantage.",
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 6,
       "addsDexMod": true,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -2291,7 +2291,7 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 16,
+      "baseAC": 8,
       "addsDexMod": false,
       "slot": "chest",
       "strengthRequirement": 15,
@@ -2358,7 +2358,7 @@ const canonicalItems = [
     "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 1,
+      "baseAC": 2,
       "addsDexMod": false,
       "slot": "leggings",
       "additive": true
@@ -2402,11 +2402,17 @@ const canonicalItems = [
     "description": "+2 AC.",
     "armor": {
       "armorType": "shield",
-      "baseAC": 2,
+      "baseAC": 3,
       "addsDexMod": true,
       "slot": "shield",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "common",
       "index": 125,
@@ -3912,7 +3918,7 @@ const canonicalItems = [
     "description": "AC 13 + Dex modifier. Light armor. No Stealth disadvantage. Can be worn under clothes without notice.",
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest",
@@ -4289,9 +4295,10 @@ const canonicalItems = [
     "description": "AC 13 + Dex modifier while wearing no armor and no shield. Requires attunement. Incompatible with armor.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 13,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "handwear",
       "additive": true
     },
@@ -4893,18 +4900,23 @@ const canonicalItems = [
     "description": "+2 AC. No Stealth disadvantage. No Dex modifier penalty. Silent.",
     "armor": {
       "armorType": "shield",
-      "baseAC": 2,
+      "baseAC": 3,
       "addsDexMod": true,
       "slot": "shield",
       "stealthDisadvantage": false,
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "uncommon",
       "index": 70,
       "name": "Mithral Shield"
     },
-    "passive": [],
     "abilities": [],
     "appliedModifiers": [
       "material-mithral"
@@ -5296,7 +5308,7 @@ const canonicalItems = [
     "description": "AC 13 + Dex modifier (max 2) as a chain shirt, though this enchantment can be applied to any armor (use that armor's normal AC). The armor never gets dirty. Cleaning it requires no effort. Useful for social encounters.",
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -5403,10 +5415,9 @@ const canonicalItems = [
     "flavorText": "Light or medium armor with buckles and releases designed for fast removal.",
     "description": "AC 13 + Dex modifier (max 2) as studded leather. You can doff this armor as a bonus action instead of the normal 5 minutes. Useful in situations where armor becomes a liability.",
     "armor": {
-      "armorType": "medium",
-      "baseAC": 13,
+      "armorType": "light",
+      "baseAC": 7,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -5946,10 +5957,9 @@ const canonicalItems = [
     "flavorText": "Dark plate mail that occasionally vents smoke from the joints.",
     "description": "AC 16 (standard chain mail AC). When a creature within 5 ft. hits you: it takes 1 fire damage. Smoke vents from the armor as a purely cosmetic effect. No Stealth disadvantage.",
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -6133,7 +6143,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 15,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -6452,10 +6462,9 @@ const canonicalItems = [
     "description": "AC 12 + Dex modifier. Requires attunement. While wearing: advantage on Wisdom (Survival) checks made to track creatures. You always know the direction of the last creature that dealt you damage within the past hour.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -6607,7 +6616,7 @@ const canonicalItems = [
     "description": "AC 17. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. Superior tempering resists rust and chipping far better than plain iron.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "strengthRequirement": 15,
@@ -6674,7 +6683,7 @@ const canonicalItems = [
     "description": "+1 bonus to AC.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 1,
+      "baseAC": 2,
       "addsDexMod": false,
       "slot": "leggings",
       "additive": true
@@ -6718,11 +6727,17 @@ const canonicalItems = [
     "description": "+2 AC.",
     "armor": {
       "armorType": "shield",
-      "baseAC": 2,
+      "baseAC": 3,
       "addsDexMod": true,
       "slot": "shield",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "uncommon",
       "index": 165,
@@ -6740,7 +6755,7 @@ const canonicalItems = [
     "description": "AC 17. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. Prized as much for its ceremonial shine as its protection. Counts as silvered for any effect that cares.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "strengthRequirement": 15,
@@ -6807,7 +6822,7 @@ const canonicalItems = [
     "description": "+1 bonus to AC. Counts as silvered.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 1,
+      "baseAC": 2,
       "addsDexMod": false,
       "slot": "leggings",
       "additive": true
@@ -6851,11 +6866,17 @@ const canonicalItems = [
     "description": "+2 AC.",
     "armor": {
       "armorType": "shield",
-      "baseAC": 2,
+      "baseAC": 3,
       "addsDexMod": true,
       "slot": "shield",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "uncommon",
       "index": 171,
@@ -11438,7 +11459,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -11479,7 +11500,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -11572,9 +11593,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -11595,7 +11617,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 6,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -11636,9 +11658,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -11659,7 +11682,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -11743,7 +11766,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -11765,9 +11788,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -11810,9 +11834,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -11843,7 +11868,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -11884,9 +11909,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -11907,7 +11933,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -11948,9 +11974,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -12057,7 +12084,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -12097,9 +12124,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -12120,7 +12148,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 6,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -12205,9 +12233,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -12269,10 +12298,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -12304,7 +12332,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -12326,9 +12354,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -12465,10 +12494,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -12512,10 +12540,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -12536,10 +12563,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -12570,7 +12596,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -12592,9 +12618,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -12615,7 +12642,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -12661,7 +12688,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -12775,10 +12802,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -12880,7 +12906,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -12921,9 +12947,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -12972,9 +12999,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -13004,9 +13032,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -13117,7 +13146,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -15055,7 +15084,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -15108,7 +15137,7 @@ const canonicalItems = [
     "description": "AC 13 + Dex modifier (max 2). No Stealth disadvantage. You are considered proficient with this armor even if you lack proficiency in medium armor. Does not require attunement.",
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest",
@@ -15160,10 +15189,9 @@ const canonicalItems = [
     "description": "AC 12 + Dex modifier. As a bonus action: change the armor's appearance to any other outfit, costume, or suit of non-magical armor. Looks and feels completely real. Provides the same protection regardless of appearance. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -15416,7 +15444,7 @@ const canonicalItems = [
     "description": "AC 18. No Stealth disadvantage. Does not require a Strength score to wear without movement penalty. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 10,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": false
@@ -16172,7 +16200,7 @@ const canonicalItems = [
     "description": "+1 bonus to AC. No Stealth disadvantage. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 1,
+      "baseAC": 2,
       "addsDexMod": false,
       "slot": "leggings",
       "stealthDisadvantage": false,
@@ -16228,18 +16256,23 @@ const canonicalItems = [
     "description": "+2 AC. As light as a wooden buckler despite being full metal. Does not require attunement.",
     "armor": {
       "armorType": "shield",
-      "baseAC": 2,
+      "baseAC": 3,
       "addsDexMod": true,
       "slot": "shield",
       "additive": true,
       "stealthDisadvantage": false
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "rare",
       "index": 114,
       "name": "Mithral Plate Shield"
     },
-    "passive": [],
     "abilities": [],
     "appliedModifiers": [
       "material-mithral"
@@ -20474,7 +20507,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -20497,7 +20530,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -20549,7 +20582,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -20629,7 +20662,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -20728,10 +20761,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -20752,7 +20784,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -20775,7 +20807,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -20843,10 +20875,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -20891,7 +20922,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -20923,9 +20954,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -20955,10 +20987,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -21002,9 +21033,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21044,7 +21076,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 6,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -21138,7 +21170,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -21161,7 +21193,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -21217,7 +21249,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -21240,7 +21272,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -21263,7 +21295,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -21340,9 +21372,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest",
       "stealthDisadvantage": false
     },
@@ -21368,9 +21401,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21413,9 +21447,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -21483,9 +21518,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21529,7 +21565,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -21551,7 +21587,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -21615,9 +21651,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21638,7 +21675,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -21693,9 +21730,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21715,9 +21753,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -21747,10 +21786,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21811,7 +21849,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest",
@@ -21850,7 +21888,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -21871,9 +21909,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -21935,10 +21974,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -21987,9 +22025,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -22066,7 +22105,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -22118,7 +22157,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -22211,9 +22250,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -22234,7 +22274,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -22257,7 +22297,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -22279,9 +22319,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -22302,7 +22343,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest",
       "stealthDisadvantage": false
@@ -22630,9 +22671,10 @@ const canonicalItems = [
     "description": "AC 15 + Dex modifier. +5 spell save DC. +5 spell attack bonus. Advantage on saves against spells. Requires attunement (sorcerer, warlock, wizard).",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 15,
+      "armorType": "medium",
+      "baseAC": 7,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -22882,26 +22924,25 @@ const canonicalItems = [
     "wondrous": {}
   },
   {
-    "id": "armor-of-invulnerability",
-    "name": "Armor of Invulnerability",
+    "id": "plate-armor-of-invulnerability",
+    "name": "Plate Armor of Invulnerability",
     "itemType": "armor",
     "rarity": "superrare",
-    "weight": 27,
+    "weight": 18,
     "value": "80000 gp",
     "flavorText": "Full plate armor. Once per day: immune to all non-magical damage.",
     "description": "AC 18. Resistance to non-magical damage at all times. Action once per day: immunity to non-magical damage for 10 minutes. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 18,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 9,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "legacySource": {
       "tier": "superrare",
       "index": 14,
-      "name": "Armor of Invulnerability"
+      "name": "Plate Armor of Invulnerability"
     }
   },
   {
@@ -23372,7 +23413,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 21,
+      "baseAC": 12,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -24262,10 +24303,9 @@ const canonicalItems = [
     "description": "AC 18 while not wearing armor. If you wear armor, the tattoo provides no benefit. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 18,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 9,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "legacySource": {
@@ -24338,18 +24378,18 @@ const canonicalItems = [
     }
   },
   {
-    "id": "dragonhide-armor",
-    "name": "Dragonhide Armor",
+    "id": "dragonhide-plate-armor",
+    "name": "Dragonhide Plate Armor",
     "itemType": "armor",
     "rarity": "superrare",
-    "weight": 33,
+    "weight": 32,
     "value": "10000 gp",
     "flavorText": "Full suit of armor made from treated dragon hide, flexible yet incredibly durable.",
     "description": "AC 15 + Dex modifier (max 2). Resistance to the damage type of the dragon whose hide this was. Advantage on saving throws against Frightful Presence and breath weapons of that dragon type. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 15,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -24357,7 +24397,7 @@ const canonicalItems = [
     "legacySource": {
       "tier": "superrare",
       "index": 68,
-      "name": "Dragonhide Armor"
+      "name": "Dragonhide Plate Armor"
     }
   },
   {
@@ -24461,7 +24501,7 @@ const canonicalItems = [
     "description": "AC 19. Heavy armor. Requires 15 Strength or speed is reduced by 10 ft. Disadvantage on Stealth checks. No Strength requirement and no Stealth disadvantage — the living metal shifts its own weight distribution as you move.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 19,
+      "baseAC": 11,
       "addsDexMod": false,
       "slot": "chest",
       "strengthRequirement": 15,
@@ -24528,7 +24568,7 @@ const canonicalItems = [
     "description": "+2 bonus to AC. Does not require attunement.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 2,
+      "baseAC": 3,
       "addsDexMod": false,
       "slot": "leggings",
       "additive": true
@@ -24572,11 +24612,17 @@ const canonicalItems = [
     "description": "+3 AC. Exceeds the protection of a standard shield on its own merits. Does not require attunement.",
     "armor": {
       "armorType": "shield",
-      "baseAC": 3,
+      "baseAC": 4,
       "addsDexMod": true,
       "slot": "shield",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 3
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 77,
@@ -27415,7 +27461,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -27529,7 +27575,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -27585,11 +27631,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 158,
@@ -27608,7 +27660,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -27630,10 +27682,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -27654,7 +27705,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -27677,7 +27728,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -27699,7 +27750,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 6,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -27722,7 +27773,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -27743,9 +27794,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +2 bonus to saving throws against spells, and advantage on saves against being Petrified. The warding sigils flare painfully whenever a spell targets the bearer, dealing them 1 psychic damage even on a successful save. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -27765,10 +27817,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -27788,10 +27839,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -27822,7 +27872,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -27854,9 +27904,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -27905,9 +27956,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -27957,7 +28009,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 17,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -27989,9 +28041,10 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 12,
+      "armorType": "medium",
+      "baseAC": 6,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest",
       "critImmuneWhileWorn": true
     },
@@ -28063,9 +28116,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. +2 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -28085,9 +28139,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -28108,7 +28163,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -28148,10 +28203,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -28202,7 +28256,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -28225,7 +28279,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 13,
+      "baseAC": 6,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -28270,9 +28324,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -28303,7 +28358,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -28325,9 +28380,10 @@ const canonicalItems = [
     "description": "AC 15 + Dexterity modifier (max 2). Medium armor. +2 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 15,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -28358,7 +28414,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -28427,10 +28483,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "legacySource": {
@@ -28451,7 +28506,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 11,
+      "baseAC": 5,
       "addsDexMod": true,
       "slot": "chest"
     },
@@ -28473,11 +28528,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -28539,11 +28600,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 202,
@@ -28562,11 +28629,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "legacySource": {
       "tier": "superrare",
       "index": 203,
@@ -28812,25 +28885,24 @@ const canonicalItems = [
     }
   },
   {
-    "id": "demon-armor-cursed",
-    "name": "Demon Armor (Cursed)",
+    "id": "demon-plate-armor-cursed",
+    "name": "Demon Plate Armor (Cursed)",
     "itemType": "armor",
     "rarity": "superrare",
-    "weight": 14,
+    "weight": 15,
     "flavorText": "Blackened plate armor, its pauldrons shaped like leering, horned faces that seem to shift when unwatched.",
     "description": "AC 19. Heavy armor. Once attuned, the armor's curse takes hold: it can't be removed by any means short of Remove Curse or a Wish, and the wearer has disadvantage on saving throws against being frightened. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 19,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 10,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "legacySource": {
       "tier": "superrare",
       "index": 216,
-      "name": "Demon Armor (Cursed)"
+      "name": "Demon Plate Armor (Cursed)"
     }
   },
   {
@@ -28844,7 +28916,7 @@ const canonicalItems = [
     "description": "AC 18. Heavy armor. This armor's craftsmanship is so exceptional that your walking speed isn't reduced by its weight, and you have advantage on Strength (Athletics) checks made to push, pull, lift, or break something while wearing it.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest"
     },
@@ -28866,7 +28938,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 18,
+      "baseAC": 9,
       "addsDexMod": false,
       "slot": "chest"
     },
@@ -29445,10 +29517,9 @@ const canonicalItems = [
     "description": "AC 22. Once per long rest: if reduced to 0 HP, drop to 1 HP instead (armor rings audibly for 1 mile). Resistance to all damage while at 1–20 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 22,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 13,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "narrative": {
@@ -29529,9 +29600,9 @@ const canonicalItems = [
     "description": "AC 17. Resistance to piercing damage. Makes a low grunt when the wearer is startled or surprised. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 17,
-      "addsDexMod": true,
+      "armorType": "heavy",
+      "baseAC": 9,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "narrative": {
@@ -30187,11 +30258,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "facewear",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -30650,7 +30727,7 @@ const canonicalItems = [
     "description": "AC 19. Immunity to fire damage. While wearing: fire breath-like attacks you make deal +2d6 fire damage. As a bonus action: breathe fire in a 30-ft cone — 10d6 fire damage (DC 18 Dex for half). Once per day.",
     "armor": {
       "armorType": "heavy",
-      "baseAC": 19,
+      "baseAC": 10,
       "addsDexMod": false,
       "slot": "chest"
     },
@@ -30731,9 +30808,10 @@ const canonicalItems = [
     "description": "AC 14 + Dex modifier (max 2). Requires attunement by a druid or ranger. While wearing: cast Polymorph (self only, beast form) once per day without concentration — lasts 1 hour. Beast form: maximum challenge rating equal to your level. While transformed: advantage on Perception and Survival checks.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "light",
-      "baseAC": 14,
+      "armorType": "medium",
+      "baseAC": 8,
       "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -30933,7 +31011,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 20,
+      "baseAC": 11,
       "addsDexMod": false,
       "slot": "chest",
       "strengthRequirement": 15,
@@ -30963,7 +31041,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": false,
       "slot": "helmet",
       "additive": true,
@@ -30992,7 +31070,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": false,
       "slot": "handwear",
       "additive": true,
@@ -31050,7 +31128,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": false,
       "slot": "boots",
       "additive": true,
@@ -32500,7 +32578,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "medium",
-      "baseAC": 15,
+      "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
       "slot": "chest"
@@ -32537,10 +32615,9 @@ const canonicalItems = [
     "description": "AC 16. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d8 hit points instead. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 16,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 8,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -32577,7 +32654,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 14,
+      "baseAC": 7,
       "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
@@ -32614,10 +32691,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier. Light armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -32690,10 +32766,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -32843,11 +32918,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -33070,10 +33151,9 @@ const canonicalItems = [
     "description": "AC 12 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 2d8 fire damage at the attacker. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 12,
+      "armorType": "light",
+      "baseAC": 6,
       "addsDexMod": true,
-      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
@@ -33109,11 +33189,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 2,
+      "baseAC": 1,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 2
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -33466,10 +33552,9 @@ const canonicalItems = [
     "description": "AC 24. Immune to critical hits. A faint golden halo hovers above the wearer's head at all times, visible even in absolute darkness (cannot be suppressed). Resistance to all non-magical damage. Once per day as a bonus action: activate Eternal Ward — for 1 minute, the wearer has resistance to all damage types (including magical), immunity to the Frightened and Charmed conditions, and any creature that hits you with a melee attack takes 2d8 radiant damage. Requires attunement by a lawful creature.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 24,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 15,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "narrative": {
@@ -33636,11 +33721,17 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "light",
-      "baseAC": 3,
+      "baseAC": 2,
       "addsDexMod": true,
       "slot": "helmet",
       "additive": true
     },
+    "passive": [
+      {
+        "stat": "ac",
+        "value": 3
+      }
+    ],
     "narrative": {
       "unlocks": [
         {
@@ -33933,7 +34024,7 @@ const canonicalItems = [
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
-      "baseAC": 23,
+      "baseAC": 14,
       "addsDexMod": false,
       "slot": "chest"
     },
@@ -34527,10 +34618,9 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 14,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 7,
+      "addsDexMod": false,
       "slot": "chest"
     },
     "narrative": {
@@ -34565,10 +34655,9 @@ const canonicalItems = [
     "description": "AC 14. Heavy armor. Disadvantage on Stealth checks. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 14,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 7,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -34604,10 +34693,9 @@ const canonicalItems = [
     "description": "AC 18. Heavy armor. Disadvantage on Stealth checks. Once per long rest, reroll a failed saving throw and use either result. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "medium",
-      "baseAC": 18,
-      "addsDexMod": true,
-      "dexModCap": 2,
+      "armorType": "heavy",
+      "baseAC": 9,
+      "addsDexMod": false,
       "slot": "chest",
       "stealthDisadvantage": true
     },
@@ -34719,9 +34807,10 @@ const canonicalItems = [
     "description": "AC 14 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 3d8 hit points instead. Requires attunement by a creature willing to bear what comes with it.",
     "requiresAttunement": true,
     "armor": {
-      "armorType": "heavy",
-      "baseAC": 14,
-      "addsDexMod": false,
+      "armorType": "medium",
+      "baseAC": 7,
+      "addsDexMod": true,
+      "dexModCap": 2,
       "slot": "chest"
     },
     "narrative": {
