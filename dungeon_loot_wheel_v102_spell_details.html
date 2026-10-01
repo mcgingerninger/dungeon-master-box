@@ -7976,7 +7976,7 @@ function renderResults() {
     const saveBtnHtml = (ii) => `<span class="loot-item-actions">
       <button class="loot-save-btn" onclick="saveSpinItem(${result.enemy-1},${ii},this)">💾 Save</button>
       <button class="loot-save-btn" onclick="lootSpinItem(${result.enemy-1},${ii},this)">🎒 Loot</button>
-      <button class="loot-save-btn" onclick="markResultDiscarded(this)">🗑 Discard</button>
+      <button class="loot-save-btn" onclick="discardSpinItem(${result.enemy-1},${ii},this)">🗑 Discard</button>
     </span>`;
     return `
     <div class="enemy-result">
@@ -8734,7 +8734,7 @@ function renderChestResults() {
             <span class="loot-item-actions">
               <button class="loot-save-btn" onclick="saveChestItemToken(${chest.id-1},${ii},this)">💾 Save</button>
               <button class="loot-save-btn" onclick="lootChestItemToken(${chest.id-1},${ii},this)">🎒 Loot</button>
-              <button class="loot-save-btn" onclick="markResultDiscarded(this)">🗑 Discard</button>
+              <button class="loot-save-btn" onclick="discardChestItemToken(${chest.id-1},${ii},this)">🗑 Discard</button>
             </span>
           </div>
         </div>
@@ -8880,7 +8880,7 @@ function renderDeceasedResults() {
             <span class="loot-item-actions">
               <button class="loot-save-btn" onclick="saveDeceasedItemToken(${body.id - 1},${ii},this)">💾 Save</button>
               <button class="loot-save-btn" onclick="lootDeceasedItemToken(${body.id - 1},${ii},this)">🎒 Loot</button>
-              <button class="loot-save-btn" onclick="markResultDiscarded(this)">🗑 Discard</button>
+              <button class="loot-save-btn" onclick="discardDeceasedItemToken(${body.id - 1},${ii},this)">🗑 Discard</button>
             </span>
           </div>
         </div>
@@ -8889,10 +8889,26 @@ function renderDeceasedResults() {
   `).join('');
 }
 function saveDeceasedItemToken(idx, itemIdx, btn) {
-  saveLootResultItem(deceasedResults[idx]?.items[itemIdx], btn);
+  const body = deceasedResults[idx];
+  const item = body?.items[itemIdx];
+  if (!item) return;
+  saveLootResultItem(item, btn);
+  body.items.splice(itemIdx, 1);
+  renderDeceasedResults();
 }
 function lootDeceasedItemToken(idx, itemIdx, btn) {
-  lootItemDirectly(deceasedResults[idx]?.items[itemIdx], btn);
+  const body = deceasedResults[idx];
+  const item = body?.items[itemIdx];
+  if (!item) return;
+  lootItemDirectly(item, btn);
+  body.items.splice(itemIdx, 1);
+  renderDeceasedResults();
+}
+function discardDeceasedItemToken(idx, itemIdx, btn) {
+  const body = deceasedResults[idx];
+  if (!body || !body.items[itemIdx]) return;
+  body.items.splice(itemIdx, 1);
+  renderDeceasedResults();
 }
 function saveWholeDeceasedToCombat(idx) {
   const body = deceasedResults[idx];
@@ -11061,17 +11077,60 @@ function saveLootResultItem(item, btn) {
   if (typeof renderSavedItems === 'function') renderSavedItems();
   if (btn) { btn.textContent = '✓ Saved'; btn.disabled = true; btn.classList.add('saved'); }
 }
+// Save/Loot/Discard on an individual Roll Loot/Chest/Deceased Human item all need to actually
+// remove that item from the result's own `items` array, not just relabel the button — found via
+// a real user report: discarding (or even saving/looting) one item out of a rolled batch left it
+// sitting in the array untouched, so the card-level "⚔ Save to Combat" button (which dumps the
+// WHOLE array onto the Combat roster — see pushLootStashToCombat) still included it, and a
+// player could end up seeing an already-discarded (or already-saved-elsewhere, duplicated) item
+// show up as lootable in Combat. Splicing it out here and re-rendering the result list is what
+// makes an item an actual single object with continuity — once consumed by any of the three
+// actions, it's gone from the pool for good, the same way Combat-tab loot already worked via its
+// own claimedBy/claimedVia flags (see discardCombatItem above) — these three result lists just
+// never had an equivalent for their own local, DM-side staging state.
 function saveSpinItem(enemyIdx, itemIdx, btn) {
-  saveLootResultItem(spinResults[enemyIdx]?.items[itemIdx], btn);
+  const result = spinResults[enemyIdx];
+  const item = result?.items[itemIdx];
+  if (!item) return;
+  saveLootResultItem(item, btn);
+  result.items.splice(itemIdx, 1);
+  renderResults();
 }
 function lootSpinItem(enemyIdx, itemIdx, btn) {
-  lootItemDirectly(spinResults[enemyIdx]?.items[itemIdx], btn);
+  const result = spinResults[enemyIdx];
+  const item = result?.items[itemIdx];
+  if (!item) return;
+  lootItemDirectly(item, btn);
+  result.items.splice(itemIdx, 1);
+  renderResults();
+}
+function discardSpinItem(enemyIdx, itemIdx, btn) {
+  const result = spinResults[enemyIdx];
+  if (!result || !result.items[itemIdx]) return;
+  result.items.splice(itemIdx, 1);
+  renderResults();
 }
 function saveChestItemToken(chestIdx, itemIdx, btn) {
-  saveLootResultItem(chestResults[chestIdx]?.items[itemIdx], btn);
+  const chest = chestResults[chestIdx];
+  const item = chest?.items[itemIdx];
+  if (!item) return;
+  saveLootResultItem(item, btn);
+  chest.items.splice(itemIdx, 1);
+  renderChestResults();
 }
 function lootChestItemToken(chestIdx, itemIdx, btn) {
-  lootItemDirectly(chestResults[chestIdx]?.items[itemIdx], btn);
+  const chest = chestResults[chestIdx];
+  const item = chest?.items[itemIdx];
+  if (!item) return;
+  lootItemDirectly(item, btn);
+  chest.items.splice(itemIdx, 1);
+  renderChestResults();
+}
+function discardChestItemToken(chestIdx, itemIdx, btn) {
+  const chest = chestResults[chestIdx];
+  if (!chest || !chest.items[itemIdx]) return;
+  chest.items.splice(itemIdx, 1);
+  renderChestResults();
 }
 // ===================== RECENTLY LOOTED (36-slot staging grid) =====================
 // Every "Loot" action across the app — chests, wheel spins, killed monsters, the Monster
@@ -11279,11 +11338,12 @@ function saveCombatItem(uid, itemId, btn) {
     flashInvMessage('Someone already took that item.', true);
   });
 }
-// Unlike the plain markResultDiscarded below (a one-time chest/wheel-spin result that's never
-// looked at again once dismissed), a combat loot item lives on the battle roster entry
-// indefinitely and stays give/save/loot-able by anyone until something actually consumes it —
-// so "discarding" it here has to go through the same claim step as Save/Loot/Give, or a
-// "discarded" item would still be sitting right there for a player to self-loot a moment later.
+// Unlike discardSpinItem/discardChestItemToken/discardDeceasedItemToken above (which just splice
+// the item out of a result's own local array — nothing else could be racing a DM's own pre-roll
+// staging panel), a combat loot item lives on the battle roster entry indefinitely and stays
+// give/save/loot-able by anyone until something actually consumes it — so "discarding" it here
+// has to go through the same claim step as Save/Loot/Give, or a "discarded" item would still be
+// sitting right there for a player to self-loot a moment later.
 function discardCombatItem(uid, itemId, btn) {
   const entry = battleRoster.find(e => e.uid === uid);
   const item = entry && entry.loot && entry.loot.items.find(it => it.id === itemId);
@@ -11300,19 +11360,6 @@ function discardCombatItem(uid, itemId, btn) {
     flashInvMessage('Someone already took that item.', true);
   });
 }
-// Marks a result-card action row as discarded — used by chest/wheel-spin loot rows (ephemeral
-// display objects that were never saved anywhere and are never looked at again once dismissed),
-// so clicking Discard there is just a UI acknowledgment rather than needing to clean up any
-// backing data. Combat loot uses its own discardCombatItem instead (see above) since that data
-// lives on the battle roster indefinitely and stays give/save/loot-able until something
-// actually consumes it.
-function markResultDiscarded(btn) {
-  if (!btn) return;
-  btn.textContent = '🗑 Discarded';
-  btn.disabled = true;
-  btn.classList.add('saved');
-}
-
 function saveGenItem() {
   syncGeneratedItemEdits();
   if (!window._lastGenItem) return;
