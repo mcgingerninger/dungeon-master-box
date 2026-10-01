@@ -7709,8 +7709,11 @@ function resolveRoll(numEnemies, minItems, maxItems) {
     for(let i=0;i<count;i++){
       const rarity=pickRarity();
       const item=resolveScrollSpell(pickItem(rarity));
-      const descText = item.desc || '';
-      items.push({rarity,name:item.name,desc:descText,type:item.type,slotSize:item.slotSize,dmg:item.dmg,ac:item.ac,hp:item.hp,effect:item.effect,gp:item.gp,charges:item.charges,requirement:item.requirement});
+      // Spread the whole catalog item (like Treasure Chest/Deceased Human already do) rather than
+      // hand-picking a few fields — a whitelist silently dropped mods, abilities, unlocks,
+      // weight, subcategory, tags, properties and classification, so a rolled item showed (and
+      // saved/looted/sent to Combat) with less info than the very same item anywhere else.
+      items.push({ rarity, ...item, desc: item.desc || '' });
     }
     spinResults.push({enemy:spinResults.length+1,items});
   }
@@ -7879,6 +7882,17 @@ function inspectField(fieldKey, valueHtml, rarity, sourceKey, revealed) {
   </div>`;
 }
 
+// Hover tooltip for an item card in the Roll Loot / Treasure Chest / Deceased Human result
+// lists — the same shared tooltip (buildTooltipHtml) Combat loot, the Token Library and the
+// inventory already use, so a rolled item shows identical info everywhere it appears.
+function resultItemTooltipAttrs(kind, resultIdx, itemIdx) {
+  return `onmouseenter="showResultItemTooltip(event,'${kind}',${resultIdx},${itemIdx})" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()"`;
+}
+function showResultItemTooltip(evt, kind, resultIdx, itemIdx) {
+  const list = kind === 'roll' ? spinResults : kind === 'chest' ? chestResults : deceasedResults;
+  const it = list[resultIdx] && list[resultIdx].items[itemIdx];
+  if (it) showRawItemTooltip(evt, it, it.rarity);
+}
 // Build item display HTML, hiding/revealing fields based on inspection mode
 function renderItemWithInspection(it, inspectMode, sourceKey) {
   const fieldsToHide = inspectMode ? (INSPECT_HIDDEN_FIELDS[it.rarity] || []) : [];
@@ -7966,6 +7980,7 @@ function buildInspectMeta(it, fieldsToHide, revealed, sourceKey) {
 }
 
 function renderResults() {
+  if (typeof hideTokenTooltip === 'function') hideTokenTooltip();
   const list=document.getElementById('resultsList');
   const empty=document.getElementById('emptyMsg');
   if(!spinResults.length){ empty.style.display='flex'; list.innerHTML=''; return; }
@@ -7984,7 +7999,7 @@ function renderResults() {
         <button class="loot-save-btn" style="margin-left:0.6rem" onclick="saveWholeRollToCombat(${result.enemy - 1})">⚔ Save to Combat</button>
       </div>
       ${result.items.map((it,ii)=>`
-        <div class="loot-item ${it.rarity}">
+        <div class="loot-item ${it.rarity}" ${resultItemTooltipAttrs('roll', result.enemy-1, ii)}>
           <div class="rarity-dot"></div>
           <span class="rarity-label">[${rarityNames[it.rarity]}]</span>
           <div class="loot-item-text">
@@ -8705,6 +8720,7 @@ function resolveChest() {
 }
 
 function renderChestResults() {
+  if (typeof hideTokenTooltip === 'function') hideTokenTooltip();
   const list  = document.getElementById('chestResultsList');
   const empty = document.getElementById('chestEmptyMsg');
   if (!chestResults.length) {
@@ -8726,7 +8742,7 @@ function renderChestResults() {
         <strong>Gold:</strong> ${chest.gold}
       </div>
       ${chest.items.map((it,ii) => `
-        <div class="loot-item ${it.rarity}">
+        <div class="loot-item ${it.rarity}" ${resultItemTooltipAttrs('chest', chest.id-1, ii)}>
           <div class="rarity-dot"></div>
           <span class="rarity-label">[${rarityNames[it.rarity]}]</span>
           <div class="loot-item-text">
@@ -8852,6 +8868,7 @@ function generateDeceasedLoadout() {
   }, 50);
 }
 function renderDeceasedResults() {
+  if (typeof hideTokenTooltip === 'function') hideTokenTooltip();
   const list = document.getElementById('deceasedResultsList');
   const empty = document.getElementById('deceasedEmptyMsg');
   if (!deceasedResults.length) {
@@ -8872,7 +8889,7 @@ function renderDeceasedResults() {
         <strong>Gold:</strong> ${body.gold}
       </div>
       ${body.items.map((it, ii) => `
-        <div class="loot-item ${it.rarity}">
+        <div class="loot-item ${it.rarity}" ${resultItemTooltipAttrs('deceased', body.id - 1, ii)}>
           <div class="rarity-dot"></div>
           <span class="rarity-label">[${rarityNames[it.rarity]}]</span>
           <div class="loot-item-text">
