@@ -7978,7 +7978,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "225 gp",
-    "flavorText": "The edge of this battle staff never quite looks the same twice — always faintly touched by the void.",
+    "flavorText": "A battle staff topped with a crystal that holds a faint cold light, even in full sun.",
     "description": "+1 to attack and damage rolls. On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8015,7 +8015,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4,
     "value": "425 gp",
-    "flavorText": "The edge of this hand crossbow never quite looks the same twice — always faintly touched by the tempest.",
+    "flavorText": "A hand crossbow that crackles faintly in dry weather, enough to notice if you're holding it.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8055,7 +8055,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 17,
     "value": "550 gp",
-    "flavorText": "A battle-worn longbow said to have been carried through a war fought over the wild itself.",
+    "flavorText": "A longbow strung with something that was never quite gut or sinew — it still seems to be growing, very slowly, at the grip.",
     "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8089,7 +8089,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6.5,
     "value": "475 gp",
-    "flavorText": "A hand crossbow that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "flavorText": "A hand crossbow with a stock that stays cold to the touch even beside a fire.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8129,7 +8129,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 16,
     "value": "450 gp",
-    "flavorText": "This spear feels heavier than it should, as if the tide itself were bound somewhere inside it.",
+    "flavorText": "A spear with a haft that smells faintly of the sea no matter how far inland it travels.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8180,7 +8180,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6.5,
     "value": "725 gp",
-    "flavorText": "A battle-worn kukri said to have been carried through a war fought over the wild itself.",
+    "flavorText": "A kukri with a hilt wrapped in living vine that's never once needed replacing.",
     "description": "+1 to attack and damage rolls. Finesse. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8214,7 +8214,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 9,
     "value": "275 gp",
-    "flavorText": "The edge of this trident never quite looks the same twice — always faintly touched by the gale.",
+    "flavorText": "A trident light enough in the hand that it barely feels like it's there until it connects.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8255,7 +8255,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6,
     "value": "550 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this trident carries gravity in its very grain.",
+    "flavorText": "A trident that sits unnaturally still when set down, like it's heavier than its actual weight.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8296,7 +8296,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8.5,
     "value": "200 gp",
-    "flavorText": "A battle-worn longbow said to have been carried through a war fought over gravity itself.",
+    "flavorText": "A bronze-fitted longbow that feels like it's pulling gently downward, even just leaning against a wall.",
     "description": "+1 to attack and damage rolls. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8336,7 +8336,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "425 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this war pick carries the shadow in its very grain.",
+    "flavorText": "A bronze war pick that seems to blur at the edges the moment the light dims.",
     "description": "+1 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8373,7 +8373,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 12,
     "value": "725 gp",
-    "flavorText": "This trident feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "flavorText": "A trident pulled from a tomb that, by the looting party's own account, shouldn't have been empty.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8414,7 +8414,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8,
     "value": "400 gp",
-    "flavorText": "This shortsword feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "flavorText": "A shortsword with a warding sigil etched down the fuller in a hand that's clearly seen real practice.",
     "description": "+1 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8448,7 +8448,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4,
     "value": "525 gp",
-    "flavorText": "A kukri that hums faintly with the tide, its metal cool to the touch even in a forge.",
+    "flavorText": "A kukri with a blade that's never once developed a spot of rust, despite clearly having spent real time underwater.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8488,7 +8488,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7.5,
     "value": "500 gp",
-    "flavorText": "The edge of this heavy crossbow never quite looks the same twice — always faintly touched by the tempest.",
+    "flavorText": "A heavy crossbow strung during an actual thunderstorm, on purpose, by a fletcher who wanted it to remember.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8539,7 +8539,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 13,
     "value": "425 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this shortbow carries the blood in its very grain.",
+    "flavorText": "A shortbow with fletching dyed a red that was, the fletcher swore, never actually dyed at all.",
     "description": "+1 to attack and damage rolls. On a hit, drain 1d4 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8579,7 +8579,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 36,
     "value": "775 gp",
-    "flavorText": "The edge of this maul never quite looks the same twice — always faintly touched by the echo.",
+    "flavorText": "A maul that holds a faint ringing note after any real impact, long after the sound should have died out.",
     "description": "+1 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8619,7 +8619,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 15,
     "value": "550 gp",
-    "flavorText": "A battle-worn longbow said to have been carried through a war fought over the gale itself.",
+    "flavorText": "A longbow strung tight enough to sing faintly even with no wind in the room.",
     "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8659,7 +8659,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8,
     "value": "600 gp",
-    "flavorText": "This heavy crossbow feels heavier than it should, as if the void itself were bound somewhere inside it.",
+    "flavorText": "A heavy crossbow built around a stock of metal that, by the fletcher's own account, fell from somewhere above the clouds.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8710,7 +8710,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8,
     "value": "225 gp",
-    "flavorText": "This scimitar feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "flavorText": "A scimitar with a faint graveyard chill that never quite warms up, even carried close to the body.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8750,7 +8750,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "550 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this sickle carries the wild in its very grain.",
+    "flavorText": "A sickle cut from a single curved branch that was, against every rule of woodworking, never actually cured.",
     "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8791,7 +8791,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 16,
     "value": "200 gp",
-    "flavorText": "A battle-worn maul said to have been carried through a war fought over the dawn itself.",
+    "flavorText": "A steel maul that catches the first light of morning a shade brighter than it should.",
     "description": "+1 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 1d4 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8831,7 +8831,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 15,
     "value": "325 gp",
-    "flavorText": "A battle-worn heavy crossbow said to have been carried through a war fought over the gale itself.",
+    "flavorText": "A heavy crossbow noticeably lighter than its size should allow, like it was built to be carried at a run.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8872,7 +8872,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7.5,
     "value": "575 gp",
-    "flavorText": "The edge of this longsword never quite looks the same twice — always faintly touched by the deep frost.",
+    "flavorText": "A longsword that frosts over faintly whenever the temperature drops, whether or not its wielder feels the cold.",
     "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8922,7 +8922,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "750 gp",
-    "flavorText": "This shortbow feels heavier than it should, as if gravity itself were bound somewhere inside it.",
+    "flavorText": "A shortbow that seems to settle a little too firmly the moment it's set down.",
     "description": "+1 to attack and damage rolls. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -8962,7 +8962,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 43,
     "value": "400 gp",
-    "flavorText": "A battle-worn maul said to have been carried through a war fought over the gale itself.",
+    "flavorText": "A maul reinforced with oak that somehow swings lighter than its weight suggests.",
     "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9002,7 +9002,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "275 gp",
-    "flavorText": "This whip feels heavier than it should, as if the tide itself were bound somewhere inside it.",
+    "flavorText": "A whip braided from something that moves strangely when wet, almost like it's trying to swim on its own.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9048,7 +9048,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "500 gp",
-    "flavorText": "The edge of this kukri never quite looks the same twice — always faintly touched by the shadow.",
+    "flavorText": "A kukri finished, by every account, in a smithy that never once lit a proper fire.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9088,7 +9088,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "250 gp",
-    "flavorText": "This scimitar feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "flavorText": "A scimitar that rings a half-note longer than plain steel should, every time it connects.",
     "description": "+1 to attack and damage rolls. Finesse. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9128,7 +9128,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "375 gp",
-    "flavorText": "A dagger that hums faintly with the wild, its metal cool to the touch even in a forge.",
+    "flavorText": "A dagger with a crossguard shaped like coiled bramble, sharp enough to have drawn real blood on its own design.",
     "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9172,7 +9172,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 13,
     "value": "725 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this shortbow carries the warding in its very grain.",
+    "flavorText": "A shortbow with warding script worked into the grip, worn smooth from exactly the kind of use that script was meant for.",
     "description": "+1 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9206,7 +9206,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "275 gp",
-    "flavorText": "This dagger feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "flavorText": "A dagger with a blade that looks a little older with every passing year, though it's holding together just fine.",
     "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9246,7 +9246,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6,
     "value": "375 gp",
-    "flavorText": "A battleaxe that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "flavorText": "A battleaxe quenched in something considerably colder than the smithy's usual water barrel.",
     "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9296,7 +9296,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "600 gp",
-    "flavorText": "The edge of this dagger never quite looks the same twice — always faintly touched by the tide.",
+    "flavorText": "A bronze dagger with a faint brine smell that no amount of oiling has ever gotten out.",
     "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9346,7 +9346,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8,
     "value": "775 gp",
-    "flavorText": "A war pick that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "flavorText": "A war pick with a head that stays noticeably cold to the touch even fresh off a hot forge.",
     "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9393,7 +9393,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "625 gp",
-    "flavorText": "The edge of this trident never quite looks the same twice — always faintly touched by swiftness.",
+    "flavorText": "A trident noticeably lighter in the hand than its size would suggest.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9438,7 +9438,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 35,
     "value": "625 gp",
-    "flavorText": "The edge of this greataxe never quite looks the same twice — always faintly touched by the decay.",
+    "flavorText": "A greataxe with a head gone a pallor most smiths would have scrapped rather than sold.",
     "description": "+1 to attack and damage rolls. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9478,7 +9478,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3.5,
     "value": "150 gp",
-    "flavorText": "This mace feels heavier than it should, as if swiftness itself were bound somewhere inside it.",
+    "flavorText": "A mace carried by a courier clan famous for outrunning bad news to every town on their route.",
     "description": "+1 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9509,7 +9509,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4,
     "value": "150 gp",
-    "flavorText": "This mace feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "flavorText": "A mace whose head hums faintly at all times, like a bell that was cast and never quite stopped.",
     "description": "+1 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9556,7 +9556,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 18,
     "value": "225 gp",
-    "flavorText": "This trident feels heavier than it should, as if the tempest itself were bound somewhere inside it.",
+    "flavorText": "A trident reinforced with oak that smells faintly of ozone after a hard rain, every single time.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9597,7 +9597,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 12,
     "value": "550 gp",
-    "flavorText": "This glaive feels heavier than it should, as if the blood itself were bound somewhere inside it.",
+    "flavorText": "A glaive with a blade that darkens faintly after a solid hit, then fades back over the following day.",
     "description": "+1 to attack and damage rolls. On a hit, drain 1d4 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9637,7 +9637,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "325 gp",
-    "flavorText": "This shortsword feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "flavorText": "A shortsword that seems to catch a breeze of its own even in a sealed room.",
     "description": "+1 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9677,7 +9677,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 13,
     "value": "150 gp",
-    "flavorText": "A trident that hums faintly with the blood, its metal cool to the touch even in a forge.",
+    "flavorText": "A trident with branching lines etched down the shaft that look, from the wrong angle, uncomfortably vein-like.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, drain 1d4 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9728,7 +9728,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3.5,
     "value": "150 gp",
-    "flavorText": "This rapier feels heavier than it should, as if the whisper itself were bound somewhere inside it.",
+    "flavorText": "A rapier that seems to settle differently depending on who's holding it, as if it has opinions about company.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, a lance of psychic feedback adds an extra 1d4 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9768,7 +9768,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5,
     "value": "525 gp",
-    "flavorText": "This rapier feels heavier than it should, as if the deep frost itself were bound somewhere inside it.",
+    "flavorText": "A rapier whose blade holds a faint white rime that re-forms no matter how often it's wiped down.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9808,7 +9808,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 28,
     "value": "725 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this greataxe carries the warding in its very grain.",
+    "flavorText": "A greataxe etched edge to edge with warding glyphs, clearly the work of someone who took the commission seriously.",
     "description": "+1 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9842,7 +9842,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "350 gp",
-    "flavorText": "A battle-worn sickle said to have been carried through a war fought over the wild itself.",
+    "flavorText": "A sickle with a faint green tinge along the edge that polish has never once removed.",
     "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9873,7 +9873,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 26,
     "value": "375 gp",
-    "flavorText": "A warhammer that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "flavorText": "A warhammer that carries sound oddly — a tap on it somewhere else in the room is audible from across a hall.",
     "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9914,7 +9914,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4,
     "value": "500 gp",
-    "flavorText": "The edge of this wand blade never quite looks the same twice — always faintly touched by the wild.",
+    "flavorText": "A slender blade more root than metal at the hilt, and somehow none the weaker for it.",
     "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9945,7 +9945,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "300 gp",
-    "flavorText": "A battle-worn war pick said to have been carried through a war fought over the decay itself.",
+    "flavorText": "A bronze war pick with a faint rot smell worked permanently into the haft.",
     "description": "+1 to attack and damage rolls. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -9982,7 +9982,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 13,
     "value": "450 gp",
-    "flavorText": "A longbow that hums faintly with the deep frost, its metal cool to the touch even in a forge.",
+    "flavorText": "A longbow strung with something that frosts over at the grip in weather that shouldn't call for it.",
     "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10022,7 +10022,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "625 gp",
-    "flavorText": "A battle-worn mace said to have been carried through a war fought over the deep frost itself.",
+    "flavorText": "A mace with a head cold enough that gloves are recommended before swinging it bare-handed.",
     "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10059,7 +10059,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3.5,
     "value": "550 gp",
-    "flavorText": "A battle staff that hums faintly with swiftness, its metal cool to the touch even in a forge.",
+    "flavorText": "A battle staff worn smooth at the grip by someone who, by every account, never once walked anywhere.",
     "description": "+1 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10090,7 +10090,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8.5,
     "value": "425 gp",
-    "flavorText": "This pike feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "flavorText": "A pike with a haft that never quite stops humming faintly, like wind moving through a narrow gap.",
     "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10130,7 +10130,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 19,
     "value": "125 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this heavy crossbow carries the shadow in its very grain.",
+    "flavorText": "A heavy crossbow that's noticeably harder to spot the moment the sun starts going down.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10171,7 +10171,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "200 gp",
-    "flavorText": "A battle-worn kukri said to have been carried through a war fought over gravity itself.",
+    "flavorText": "A kukri heavier in the hand than its size has any right to be.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10221,7 +10221,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5,
     "value": "500 gp",
-    "flavorText": "A battle-worn hand crossbow said to have been carried through a war fought over the void itself.",
+    "flavorText": "A hand crossbow small enough to palm, with a trigger guard that glints a shade too bright in low light.",
     "description": "+1 to attack and damage rolls. Ammunition (range 80/320). On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10261,7 +10261,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3.5,
     "value": "225 gp",
-    "flavorText": "A whip that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "flavorText": "A whip that cracks with a sound that lingers noticeably longer than a plain whip-crack should.",
     "description": "+1 to attack and damage rolls. Finesse. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10301,7 +10301,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3.5,
     "value": "750 gp",
-    "flavorText": "This dagger feels heavier than it should, as if the whisper itself were bound somewhere inside it.",
+    "flavorText": "A dagger with a grip stitched in thread that catches light strangely, like it's reacting to something nobody else can sense.",
     "description": "+1 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, a lance of psychic feedback adds an extra 1d4 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10341,7 +10341,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "300 gp",
-    "flavorText": "The edge of this shortsword never quite looks the same twice — always faintly touched by the tempest.",
+    "flavorText": "A steel shortsword that hums very faintly when the air gets heavy before a storm.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d4 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10381,7 +10381,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "300 gp",
-    "flavorText": "A scimitar that hums faintly with the warding, its metal cool to the touch even in a forge.",
+    "flavorText": "A scimitar with a ward-circle worked into the crossguard that was, by the smith's own insistence, not merely decorative.",
     "description": "+1 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10425,7 +10425,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "550 gp",
-    "flavorText": "A mace that hums faintly with the shadow, its metal cool to the touch even in a forge.",
+    "flavorText": "A mace that reads a shade darker in twilight than it does at noon, for no reason anyone's identified.",
     "description": "+1 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10462,7 +10462,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5.5,
     "value": "775 gp",
-    "flavorText": "The edge of this quarterstaff never quite looks the same twice — always faintly touched by the dawn.",
+    "flavorText": "A quarterstaff capped in metal that seems to hold a little leftover sunlight, regardless of the actual weather.",
     "description": "+1 to attack and damage rolls. Versatile (1d8+1). On a hit against an undead or fiend, deal an extra 1d4 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10502,7 +10502,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 25,
     "value": "325 gp",
-    "flavorText": "The edge of this greataxe never quite looks the same twice — always faintly touched by the shadow.",
+    "flavorText": "A greataxe that seems to pull the dim a little dimmer around it, the longer it's held in a dark room.",
     "description": "+1 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10542,7 +10542,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "375 gp",
-    "flavorText": "A wand blade that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "flavorText": "A slender blade that rings unnervingly clearly when struck, like it's built around something hollow rather than solid.",
     "description": "+1 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d4 thunder damage to every creature within 10 ft. of the target (DC 12 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10579,7 +10579,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "625 gp",
-    "flavorText": "A handaxe that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "flavorText": "A handaxe that lands with a weight behind it its actual mass doesn't fully explain.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60). On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10626,7 +10626,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4,
     "value": "150 gp",
-    "flavorText": "The edge of this quarterstaff never quite looks the same twice — always faintly touched by the decay.",
+    "flavorText": "A quarterstaff with a faint graveyard smell that no amount of cleaning has ever removed.",
     "description": "+1 to attack and damage rolls. Versatile (1d8+1). On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10676,7 +10676,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 43,
     "value": "350 gp",
-    "flavorText": "The edge of this greatsword never quite looks the same twice — always faintly touched by the ember flame.",
+    "flavorText": "A greatsword warm to the touch at all times, as if it never fully cooled from whatever forge made it.",
     "description": "+1 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d4 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10716,7 +10716,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "800 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this quarterstaff carries swiftness in its very grain.",
+    "flavorText": "A quarterstaff cut thin and light, clearly made for someone who needed to move before they needed to block a hit.",
     "description": "+1 to attack and damage rolls. Versatile (1d8+1). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10750,7 +10750,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 14,
     "value": "275 gp",
-    "flavorText": "This trident feels heavier than it should, as if gravity itself were bound somewhere inside it.",
+    "flavorText": "A trident that feels bolted to the ground the instant it's planted.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10791,7 +10791,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6.5,
     "value": "250 gp",
-    "flavorText": "A battle-worn longsword said to have been carried through a war fought over the venom itself.",
+    "flavorText": "A longsword with two long grooves down the blade that look, from the right angle, like something struck it fang-first.",
     "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, inject venom for an extra 1d4 poison damage; the target must succeed on a DC 12 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10831,7 +10831,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 19,
     "value": "575 gp",
-    "flavorText": "A glaive that hums faintly with fortune, its metal cool to the touch even in a forge.",
+    "flavorText": "A glaive that's survived several owners' worth of fights it really shouldn't have.",
     "description": "+1 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10865,7 +10865,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5,
     "value": "300 gp",
-    "flavorText": "A longsword that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "flavorText": "A longsword that was, according to the smith who made it, quenched in flame instead of water.",
     "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, the wound cauterizes into flame for an extra 1d4 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10905,7 +10905,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5.5,
     "value": "625 gp",
-    "flavorText": "The edge of this handaxe never quite looks the same twice — always faintly touched by the venom.",
+    "flavorText": "A handaxe stitched with a grip that the maker swore was snakeskin, though nobody's ever identified the species.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60). On a hit, inject venom for an extra 1d4 poison damage; the target must succeed on a DC 12 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10942,7 +10942,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "100 gp",
-    "flavorText": "This battle staff feels heavier than it should, as if the wild itself were bound somewhere inside it.",
+    "flavorText": "A battle staff cut from a branch that kept budding for a full season after it was supposedly cut down.",
     "description": "+1 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 12 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -10973,7 +10973,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "150 gp",
-    "flavorText": "The edge of this glaive never quite looks the same twice — always faintly touched by the tide.",
+    "flavorText": "A glaive whose head stays faintly damp, regardless of how dry the room actually is.",
     "description": "+1 to attack and damage rolls. On a hit, a wave of pressure adds an extra 1d4 cold damage and the target must succeed on a DC 12 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11013,7 +11013,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5,
     "value": "575 gp",
-    "flavorText": "The edge of this shortsword never quite looks the same twice — always faintly touched by the void.",
+    "flavorText": "A shortsword with a blade that seems to hold a faint shimmer of stars, regardless of how much it's polished.",
     "description": "+1 to attack and damage rolls. Finesse. On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11053,7 +11053,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6,
     "value": "400 gp",
-    "flavorText": "This longbow feels heavier than it should, as if the whisper itself were bound somewhere inside it.",
+    "flavorText": "A longbow that seems to loose a half-beat before its wielder consciously decides to fire.",
     "description": "+1 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 1d4 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11093,7 +11093,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "775 gp",
-    "flavorText": "This rapier feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "flavorText": "A rapier with warding sigils etched along the blade in the same hand found on several other pieces from the same workshop.",
     "description": "+1 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11127,7 +11127,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "525 gp",
-    "flavorText": "This war pick feels heavier than it should, as if the deep frost itself were bound somewhere inside it.",
+    "flavorText": "A war pick carved, by all accounts, from a glacier that shouldn't have had a weapon inside it.",
     "description": "+1 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d4 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11164,7 +11164,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6.5,
     "value": "275 gp",
-    "flavorText": "A battle-worn sickle said to have been carried through a war fought over the decay itself.",
+    "flavorText": "A silvered sickle with an edge that's gone a faint grey no polish restores.",
     "description": "+1 to attack and damage rolls. On a hit, the wound withers for an extra 1d4 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11207,7 +11207,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "150 gp",
-    "flavorText": "The edge of this longsword never quite looks the same twice — always faintly touched by the void.",
+    "flavorText": "A longsword whose fuller catches a cold light that doesn't match any lamp in the room.",
     "description": "+1 to attack and damage rolls. Versatile (1d10+1). On a hit, unravel the target with starlight for an extra 1d4 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11247,7 +11247,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 5.5,
     "value": "525 gp",
-    "flavorText": "A war pick that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "flavorText": "A war pick stitched with leather that looks, by the look of it, like it came from something that used to fly.",
     "description": "+1 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d4 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11284,7 +11284,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3.5,
     "value": "200 gp",
-    "flavorText": "A battle staff that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "flavorText": "A battle staff that refuses to be knocked over once it's set upright, regardless of what hits it.",
     "description": "+1 to attack and damage rolls. On a hit, force crushes down for an extra 1d4 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11331,7 +11331,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 11,
     "value": "500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this spear carries the shadow in its very grain.",
+    "flavorText": "A steel spear that catches no shine at all once the light drops below dusk.",
     "description": "+1 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+1). On a hit while you are in dim light or darkness, deal an extra 1d4 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -11372,7 +11372,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 17,
     "value": "250 gp",
-    "flavorText": "This shortbow feels heavier than it should, as if the venom itself were bound somewhere inside it.",
+    "flavorText": "A shortbow with a sickly sheen along the limb that was never part of the original finish.",
     "description": "+1 to attack and damage rolls. On a hit, inject venom for an extra 1d4 poison damage; the target must succeed on a DC 12 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17038,7 +17038,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3,
     "value": "6000 gp",
-    "flavorText": "A handaxe that hums faintly with the echo, its metal cool to the touch even in a forge.",
+    "flavorText": "A handaxe that rings a beat longer than it should after any real hit lands.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60). On a critical hit, a thunderclap deals an extra 1d6 thunder damage to every creature within 10 ft. of the target (DC 14 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17075,7 +17075,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3,
     "value": "6500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this handaxe carries the decay in its very grain.",
+    "flavorText": "A handaxe that looks older every year, though by every real measure it's holding together just fine.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17112,7 +17112,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 10,
     "value": "5000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this trident carries the decay in its very grain.",
+    "flavorText": "A trident with a blade that never quite looks properly clean, no matter how recently it was sharpened.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17153,7 +17153,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1.5,
     "value": "6000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this hand crossbow carries the gale in its very grain.",
+    "flavorText": "A hand crossbow that fires with a faint rush of air no bowstring alone should produce.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17193,7 +17193,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 18,
     "value": "4000 gp",
-    "flavorText": "This heavy crossbow feels heavier than it should, as if fortune itself were bound somewhere inside it.",
+    "flavorText": "A heavy crossbow with gilt fittings that's bailed its wielder out of more than one bad shot.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17238,7 +17238,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 19,
     "value": "8500 gp",
-    "flavorText": "A glaive that hums faintly with the venom, its metal cool to the touch even in a forge.",
+    "flavorText": "A glaive etched with a coiled-serpent pattern that was clearly more than decoration.",
     "description": "+2 to attack and damage rolls. On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17278,7 +17278,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 17,
     "value": "2500 gp",
-    "flavorText": "This shortbow feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "flavorText": "A shortbow strung during an actual windstorm, on purpose, by a fletcher who wanted it to carry that memory.",
     "description": "+2 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17318,7 +17318,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "value": "5000 gp",
-    "flavorText": "A mace that hums faintly with fortune, its metal cool to the touch even in a forge.",
+    "flavorText": "A mace that's been dropped, pawned, and stolen more times than any weapon this functional has any right to be — and keeps turning up again.",
     "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17349,7 +17349,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 9,
     "value": "3500 gp",
-    "flavorText": "A glaive that hums faintly with the wild, its metal cool to the touch even in a forge.",
+    "flavorText": "A glaive with a haft wrapped in actual thorned bramble, somehow never once drawing its wielder's own blood.",
     "description": "+2 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 14 Strength to break free) until the end of its next turn. Roots and vines seem to reach for the bearer's feet — difficult terrain in natural environments costs them double movement, even terrain that wouldn't normally slow others. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17384,7 +17384,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "2500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this longsword carries the warding in its very grain.",
+    "flavorText": "A longsword with warding script down the fuller, the same mark a certain order uses to mark its graduates.",
     "description": "+2 to attack and damage rolls. Versatile (1d10+2). While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17428,7 +17428,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 12,
     "value": "3500 gp",
-    "flavorText": "A trident that hums faintly with swiftness, its metal cool to the touch even in a forge.",
+    "flavorText": "A trident that feels like it's already moving the instant it's picked up.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17463,7 +17463,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "7500 gp",
-    "flavorText": "A glaive that hums faintly with the whisper, its metal cool to the touch even in a forge.",
+    "flavorText": "A glaive etched with a cracked-open eye motif, clearly meant to suggest it's watching for something its wielder can't.",
     "description": "+2 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17503,7 +17503,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 14,
     "value": "3000 gp",
-    "flavorText": "A battle-worn longbow said to have been carried through a war fought over fortune itself.",
+    "flavorText": "A longbow strung during what its maker insisted was an unusually lucky week.",
     "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17537,7 +17537,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1.5,
     "value": "3500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this hand crossbow carries the deep frost in its very grain.",
+    "flavorText": "A mithral hand crossbow that stays unnervingly cold, even carried close to the body for hours.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, the target's blood slows to frost for an extra 1d6 cold damage and its speed is halved until the end of its next turn. The bearer's own hands run cold — disadvantage on checks requiring a delicate, warm touch (lockpicking, healer's kit, fine art). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17577,7 +17577,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7.5,
     "value": "4000 gp",
-    "flavorText": "A battle-worn rapier said to have been carried through a war fought over the tempest itself.",
+    "flavorText": "A rapier with a blade that holds a faint spark at the tip, like it's never quite finished discharging.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17617,7 +17617,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 4.5,
     "value": "7000 gp",
-    "flavorText": "A quarterstaff that hums faintly with the void, its metal cool to the touch even in a forge.",
+    "flavorText": "A quarterstaff capped in a metal that was, according to its maker, never actually mined.",
     "description": "+2 to attack and damage rolls. Versatile (1d8+2). On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17657,7 +17657,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 23,
     "value": "4500 gp",
-    "flavorText": "A battle-worn warhammer said to have been carried through a war fought over the warding itself.",
+    "flavorText": "A blacksteel warhammer that hums very faintly whenever a spell passes close by, the same way a few other pieces from this smith are known to.",
     "description": "+2 to attack and damage rolls. Versatile (1d10+2). While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17692,7 +17692,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "6500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this shortbow carries swiftness in its very grain.",
+    "flavorText": "A shortbow etched with a running-hare motif down the limb, clearly commissioned by someone who valued speed over subtlety.",
     "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17726,7 +17726,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "9000 gp",
-    "flavorText": "A morningstar that hums faintly with the dawn, its metal cool to the touch even in a forge.",
+    "flavorText": "A morningstar blessed, according to its maker, at the exact moment the sun cleared the horizon — and apparently it stuck.",
     "description": "+2 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 1d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17763,7 +17763,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7.5,
     "value": "4500 gp",
-    "flavorText": "A battle-worn wand blade said to have been carried through a war fought over fortune itself.",
+    "flavorText": "A slender blade from the same strange batch as a few other pieces with a reputation for showing up exactly when needed.",
     "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17794,7 +17794,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 18,
     "value": "8000 gp",
-    "flavorText": "A trident that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "flavorText": "A trident with prongs that stay faintly warm no matter the season.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17835,7 +17835,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 41,
     "value": "5000 gp",
-    "flavorText": "A battle-worn greataxe said to have been carried through a war fought over the blood itself.",
+    "flavorText": "A greataxe with an edge dyed deep red that was, according to the smith's own ledger, never actually dyed.",
     "description": "+2 to attack and damage rolls. On a hit, drain 1d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17885,7 +17885,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 11,
     "value": "8000 gp",
-    "flavorText": "A heavy crossbow that hums faintly with the whisper, its metal cool to the touch even in a forge.",
+    "flavorText": "A heavy crossbow etched with warding runes that seem to track a target before the sights do.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17936,7 +17936,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 29,
     "value": "4500 gp",
-    "flavorText": "A greataxe that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "flavorText": "A greataxe scorched black along one edge in a pattern that's never once faded or spread further.",
     "description": "+2 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -17976,7 +17976,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "value": "6500 gp",
-    "flavorText": "A hand crossbow that hums faintly with the whisper, its metal cool to the touch even in a forge.",
+    "flavorText": "A hand crossbow that sits a little too attentively in the hand, like it's listening for something.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18016,7 +18016,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "3000 gp",
-    "flavorText": "A morningstar that hums faintly with the blood, its metal cool to the touch even in a forge.",
+    "flavorText": "A morningstar whose spikes stay a shade too red to be plain iron, no matter how often it's cleaned.",
     "description": "+2 to attack and damage rolls. On a hit, drain 1d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18053,7 +18053,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "3000 gp",
-    "flavorText": "A scimitar that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "flavorText": "A blacksteel scimitar that cuts the air with a faint whistle sharper than its edge should produce.",
     "description": "+2 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18093,7 +18093,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 18,
     "value": "3500 gp",
-    "flavorText": "A battle-worn spear said to have been carried through a war fought over the ember flame itself.",
+    "flavorText": "A spear with a tip that stays warm to the touch long after it's left any actual fire behind.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18134,7 +18134,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 18,
     "value": "7500 gp",
-    "flavorText": "A battle-worn glaive said to have been carried through a war fought over the gale itself.",
+    "flavorText": "A glaive noticeably lighter in the hand than a blade its size should be.",
     "description": "+2 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18174,7 +18174,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 26,
     "value": "8500 gp",
-    "flavorText": "A maul that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "flavorText": "A maul forged, by the smith's own account, from an actual ship's anchor — and it still pulls like one.",
     "description": "+2 to attack and damage rolls. On a hit, force crushes down for an extra 1d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18214,7 +18214,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 20,
     "value": "7500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this glaive carries the wild in its very grain.",
+    "flavorText": "A glaive whose blade seems to catch on nothing and everything at once, the way bramble does.",
     "description": "+2 to attack and damage rolls. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 14 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18248,7 +18248,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "9000 gp",
-    "flavorText": "A rapier that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "flavorText": "A rapier quenched, against every normal method, in the exact moment lightning struck the forge.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18288,7 +18288,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "2500 gp",
-    "flavorText": "A longbow that hums faintly with the ember flame, its metal cool to the touch even in a forge.",
+    "flavorText": "A mithral longbow strung with something that smells faintly of ash no matter how it's stored.",
     "description": "+2 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18338,7 +18338,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "9000 gp",
-    "flavorText": "The edge of this kukri never quite looks the same twice — always faintly touched by the tempest.",
+    "flavorText": "A kukri with an edge that crackles faintly when drawn fast enough through dry air.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18378,7 +18378,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8.5,
     "value": "8500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this trident carries swiftness in its very grain.",
+    "flavorText": "A trident worn smooth at the grip by someone who apparently covered a lot of ground with it, fast.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18413,7 +18413,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "6500 gp",
-    "flavorText": "This whip feels heavier than it should, as if the shadow itself were bound somewhere inside it.",
+    "flavorText": "A whip that seems to vanish at the tip the moment the room goes dark.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit while you are in dim light or darkness, deal an extra 1d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18453,7 +18453,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 29,
     "value": "5500 gp",
-    "flavorText": "This greatsword feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "flavorText": "A silver-chased greatsword etched with warding sigils that hum faintly whenever a spell passes near it.",
     "description": "+2 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18497,7 +18497,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "4500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this flail carries the gale in its very grain.",
+    "flavorText": "A flail whose head seems to hang a half-second longer than gravity should allow before it falls.",
     "description": "+2 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18544,7 +18544,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 14,
     "value": "2500 gp",
-    "flavorText": "The edge of this shortbow never quite looks the same twice — always faintly touched by the venom.",
+    "flavorText": "A shortbow with a faint bitter smell at the grip that's never once washed out.",
     "description": "+2 to attack and damage rolls. On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18594,7 +18594,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 9.5,
     "value": "8000 gp",
-    "flavorText": "A battle-worn pike said to have been carried through a war fought over the decay itself.",
+    "flavorText": "A pike carved from timber pulled out of a bog that, by every normal rule, should have rotted solid.",
     "description": "+2 to attack and damage rolls. On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18644,7 +18644,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "4500 gp",
-    "flavorText": "The edge of this hand crossbow never quite looks the same twice — always faintly touched by the decay.",
+    "flavorText": "A hand crossbow with a stock gone a sickly grey-green that was never actually stained that color.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18684,7 +18684,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "value": "9000 gp",
-    "flavorText": "A battle-worn whip said to have been carried through a war fought over the dawn itself.",
+    "flavorText": "A whip that holds a faint warm glint long after the actual sunrise has passed.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit against an undead or fiend, deal an extra 1d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18724,7 +18724,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7.5,
     "value": "2500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this wand blade carries the blood in its very grain.",
+    "flavorText": "A blacksteel blade that runs warmer than it should, like it's still circulating something.",
     "description": "+2 to attack and damage rolls. On a hit, drain 1d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18771,7 +18771,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8.5,
     "value": "8000 gp",
-    "flavorText": "This halberd feels heavier than it should, as if the tempest itself were bound somewhere inside it.",
+    "flavorText": "A halberd etched with a jagged lightning-bolt motif down the haft, clearly more than decoration.",
     "description": "+2 to attack and damage rolls. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18811,7 +18811,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "9000 gp",
-    "flavorText": "The edge of this flail never quite looks the same twice — always faintly touched by the tempest.",
+    "flavorText": "A flail whose chain links spark faintly against each other with every swing.",
     "description": "+2 to attack and damage rolls. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18858,7 +18858,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5,
     "value": "7500 gp",
-    "flavorText": "A scimitar that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "flavorText": "A scimitar that moves with a faint rush of air, like it's cutting through more than it should.",
     "description": "+2 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18898,7 +18898,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "2500 gp",
-    "flavorText": "The edge of this halberd never quite looks the same twice — always faintly touched by the whisper.",
+    "flavorText": "A halberd etched with warding script down the haft, clearly meant to unsettle more than just the body.",
     "description": "+2 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 1d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18938,7 +18938,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "7000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this longsword carries the void in its very grain.",
+    "flavorText": "A longsword with constellations etched faintly along the blade, in a pattern no map quite matches.",
     "description": "+2 to attack and damage rolls. Versatile (1d10+2). On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -18988,7 +18988,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "4500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this longsword carries the void in its very grain.",
+    "flavorText": "Forged by a smith who swore the metal cooled wrong on purpose, into a blade that catches starlight even indoors.",
     "description": "+2 to attack and damage rolls. Versatile (1d10+2). On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19028,7 +19028,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6.5,
     "value": "6500 gp",
-    "flavorText": "The edge of this dagger never quite looks the same twice — always faintly touched by the venom.",
+    "flavorText": "A mithral dagger that stays faintly cool and slick to the touch, almost like it's still wet with something.",
     "description": "+2 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19068,7 +19068,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5,
     "value": "7500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this handaxe carries swiftness in its very grain.",
+    "flavorText": "A handaxe from the same courier tradition as its matching mace — built for someone who was always, somehow, already gone.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19099,7 +19099,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 19,
     "value": "8500 gp",
-    "flavorText": "This greatsword feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "flavorText": "A greatsword worn by a champion famous for a battle-cry that, by multiple accounts, the blade itself seemed to amplify.",
     "description": "+2 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 1d6 thunder damage to every creature within 10 ft. of the target (DC 14 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19139,7 +19139,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 26,
     "value": "2500 gp",
-    "flavorText": "A battle-worn maul said to have been carried through a war fought over the deep frost itself.",
+    "flavorText": "A maul whose head frosts over faintly the moment it's drawn, regardless of the actual weather.",
     "description": "+2 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 1d6 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19179,7 +19179,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3,
     "value": "6000 gp",
-    "flavorText": "A battle-worn hand crossbow said to have been carried through a war fought over the decay itself.",
+    "flavorText": "A hand crossbow that's aged visibly over the years without actually weakening.",
     "description": "+2 to attack and damage rolls. Ammunition (range 80/320). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19219,7 +19219,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 9.5,
     "value": "8000 gp",
-    "flavorText": "A battle-worn shortbow said to have been carried through a war fought over swiftness itself.",
+    "flavorText": "A shortbow that draws noticeably faster than its size should allow.",
     "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19253,7 +19253,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1.5,
     "value": "5500 gp",
-    "flavorText": "A battle-worn battle staff said to have been carried through a war fought over the tempest itself.",
+    "flavorText": "A battle staff that was, by the maker's own account, finished mid-storm on purpose.",
     "description": "+2 to attack and damage rolls. On a hit, arcs of lightning add an extra 1d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19290,7 +19290,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 16,
     "value": "4000 gp",
-    "flavorText": "This greataxe feels heavier than it should, as if swiftness itself were bound somewhere inside it.",
+    "flavorText": "A greataxe surprisingly quick to bring around for something its size, carried by the same courier line as its siblings.",
     "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19324,7 +19324,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 12,
     "value": "4000 gp",
-    "flavorText": "A spear that hums faintly with the venom, its metal cool to the touch even in a forge.",
+    "flavorText": "A spear with a tip gone a faint greenish tarnish that polish has never once removed.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, inject venom for an extra 1d6 poison damage; the target must succeed on a DC 14 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19365,7 +19365,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "5000 gp",
-    "flavorText": "This shortsword feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "flavorText": "A shortsword that carries its wielder's own voice back to them a half-second delayed, faint but unmistakable.",
     "description": "+2 to attack and damage rolls. Finesse. On a critical hit, a thunderclap deals an extra 1d6 thunder damage to every creature within 10 ft. of the target (DC 14 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19405,7 +19405,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3,
     "value": "2500 gp",
-    "flavorText": "This quarterstaff feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "flavorText": "A silver-capped quarterstaff with a faint rot smell that clings to it no matter how long it airs out.",
     "description": "+2 to attack and damage rolls. Versatile (1d8+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19445,7 +19445,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "8500 gp",
-    "flavorText": "The edge of this whip never quite looks the same twice — always faintly touched by the ember flame.",
+    "flavorText": "A whip that leaves a faint trail of ash in the air with a hard enough crack.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19485,7 +19485,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 4.5,
     "value": "7000 gp",
-    "flavorText": "The edge of this morningstar never quite looks the same twice — always faintly touched by the dawn.",
+    "flavorText": "A morningstar whose spikes gleam gold in direct sun, even when the rest of the metal has long since tarnished.",
     "description": "+2 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 1d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19522,7 +19522,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "7000 gp",
-    "flavorText": "The edge of this sickle never quite looks the same twice — always faintly touched by the void.",
+    "flavorText": "A sickle cast from fallen-star metal, curved a little too sharply to be purely practical.",
     "description": "+2 to attack and damage rolls. On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. The bearer's eyes reflect starlight even in total darkness, faintly visible from up to 30 ft. — impossible to fully hide their face. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19559,7 +19559,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "8000 gp",
-    "flavorText": "A handaxe that hums faintly with the warding, its metal cool to the touch even in a forge.",
+    "flavorText": "A handaxe stamped with a warding sigil down the haft, the same mark a certain order uses to mark its graduates.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60). While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19590,7 +19590,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "4500 gp",
-    "flavorText": "The edge of this kukri never quite looks the same twice — always faintly touched by the ember flame.",
+    "flavorText": "A kukri with a blade the color of banked coals, warm enough to notice even in winter.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19640,7 +19640,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 16,
     "value": "2000 gp",
-    "flavorText": "The edge of this spear never quite looks the same twice — always faintly touched by the tide.",
+    "flavorText": "A spear tipped with something pulled, by all accounts, from well below where light reaches.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19681,7 +19681,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "5000 gp",
-    "flavorText": "This wand blade feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "flavorText": "A slender blade etched edge to edge with warding glyphs, clearly the work of someone who took the commission seriously.",
     "description": "+2 to attack and damage rolls. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19712,7 +19712,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "value": "2500 gp",
-    "flavorText": "A mace that hums faintly with the decay, its metal cool to the touch even in a forge.",
+    "flavorText": "A mace with a head the color most smiths associate with metal left too long in a crypt.",
     "description": "+2 to attack and damage rolls. On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19759,7 +19759,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "5500 gp",
-    "flavorText": "A battle-worn scimitar said to have been carried through a war fought over the tide itself.",
+    "flavorText": "A scimitar with a curve that mirrors a breaking wave a little too precisely to be coincidence.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19799,7 +19799,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1.5,
     "value": "7500 gp",
-    "flavorText": "A battle-worn whip said to have been carried through a war fought over the wild itself.",
+    "flavorText": "A whip braided from something that was, by the braider's own insistence, alive when they started working it.",
     "description": "+2 to attack and damage rolls. Finesse. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 14 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19843,7 +19843,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7.5,
     "value": "6000 gp",
-    "flavorText": "This battleaxe feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "flavorText": "A battleaxe with an edge that's gone a sickly tint no sharpening stone restores.",
     "description": "+2 to attack and damage rolls. Versatile (1d10+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19883,7 +19883,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "8500 gp",
-    "flavorText": "This flail feels heavier than it should, as if the tide itself were bound somewhere inside it.",
+    "flavorText": "A flail whose chain moves oddly in water, almost like it's trying to swim on its own.",
     "description": "+2 to attack and damage rolls. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19920,7 +19920,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 10,
     "value": "8000 gp",
-    "flavorText": "A battle-worn shortbow said to have been carried through a war fought over the ember flame itself.",
+    "flavorText": "A shortbow with scorch marks along the limb that never seem to spread, no matter how much fire it's actually taken.",
     "description": "+2 to attack and damage rolls. On a hit, the wound cauterizes into flame for an extra 1d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19960,7 +19960,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 17,
     "value": "8500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this maul carries swiftness in its very grain.",
+    "flavorText": "A maul that swings faster than its weight has any business allowing.",
     "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -19994,7 +19994,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "7000 gp",
-    "flavorText": "This kukri feels heavier than it should, as if the warding itself were bound somewhere inside it.",
+    "flavorText": "A mithral kukri whose spine is etched with the same warding mark found on a handful of other pieces from the same order.",
     "description": "+2 to attack and damage rolls. Finesse. While holding this weapon, gain a +1 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20028,7 +20028,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "value": "6000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this rapier carries the tide in its very grain.",
+    "flavorText": "A rapier with a blade dyed a blue no dye in any known workshop actually produces.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20068,7 +20068,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 19,
     "value": "4500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this glaive carries swiftness in its very grain.",
+    "flavorText": "A glaive cut thin and light, clearly built for someone who valued speed over reach.",
     "description": "+2 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20112,7 +20112,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "7000 gp",
-    "flavorText": "A battle-worn halberd said to have been carried through a war fought over the void itself.",
+    "flavorText": "A halberd with a head that seems to hold a faint cold glow, visible only once every other light in the room is gone.",
     "description": "+2 to attack and damage rolls. On a hit, unravel the target with starlight for an extra 1d6 radiant damage, ignoring resistance to radiant damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20162,7 +20162,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3.5,
     "value": "3500 gp",
-    "flavorText": "The edge of this wand blade never quite looks the same twice — always faintly touched by gravity.",
+    "flavorText": "A slender blade that sits unnervingly still on a table, like it's heavier than it looks.",
     "description": "+2 to attack and damage rolls. On a hit, force crushes down for an extra 1d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20199,7 +20199,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "3000 gp",
-    "flavorText": "The edge of this quarterstaff never quite looks the same twice — always faintly touched by swiftness.",
+    "flavorText": "A quarterstaff etched with a running-hare motif, worn by someone who, by every account, never once walked anywhere.",
     "description": "+2 to attack and damage rolls. Versatile (1d8+2). Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20233,7 +20233,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "7000 gp",
-    "flavorText": "The edge of this spear never quite looks the same twice — always faintly touched by the decay.",
+    "flavorText": "A spear with a haft that looks far older than its actual age, without ever actually weakening.",
     "description": "+2 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+2). On a hit, the wound withers for an extra 1d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20274,7 +20274,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "6500 gp",
-    "flavorText": "The edge of this mace never quite looks the same twice — always faintly touched by gravity.",
+    "flavorText": "A mace with a head that drags at the wrist a little more than its size should.",
     "description": "+2 to attack and damage rolls. On a hit, force crushes down for an extra 1d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20321,7 +20321,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2,
     "value": "2500 gp",
-    "flavorText": "A battle-worn flail said to have been carried through a war fought over fortune itself.",
+    "flavorText": "A flail whose chain never seems to tangle at the worst possible moment, no matter how it's swung.",
     "description": "+2 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20352,7 +20352,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3,
     "value": "8500 gp",
-    "flavorText": "This whip feels heavier than it should, as if the gale itself were bound somewhere inside it.",
+    "flavorText": "A whip that cracks with a sound closer to a gust than a snap.",
     "description": "+2 to attack and damage rolls. Finesse. Once per turn on a hit, a gust adds an extra 1d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -20392,7 +20392,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "3500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this rapier carries the tide in its very grain.",
+    "flavorText": "A rapier that stays cold and faintly damp to the touch, regardless of the weather.",
     "description": "+2 to attack and damage rolls. Finesse. On a hit, a wave of pressure adds an extra 1d6 cold damage and the target must succeed on a DC 14 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25134,7 +25134,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 31,
     "value": "69500 gp",
-    "flavorText": "A battle-worn greataxe said to have been carried through a war fought over the tempest itself.",
+    "flavorText": "A voidsteel greataxe that crackles faintly under a dry glove, like the air around it is a little too charged.",
     "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25184,7 +25184,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6.5,
     "value": "78000 gp",
-    "flavorText": "A battle-worn morningstar said to have been carried through a war fought over the decay itself.",
+    "flavorText": "A starmetal morningstar with a faint graveyard chill that clings to the head no matter the weather.",
     "description": "+3 to attack and damage rolls. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25221,7 +25221,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 15,
     "value": "75000 gp",
-    "flavorText": "The edge of this glaive never quite looks the same twice — always faintly touched by the whisper.",
+    "flavorText": "A sun-forged glaive that reacts half a beat before its wielder does, every time something's about to go wrong.",
     "description": "+3 to attack and damage rolls. On a hit, a lance of psychic feedback adds an extra 2d6 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25261,7 +25261,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 1.5,
     "value": "62500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this battle staff carries the shadow in its very grain.",
+    "flavorText": "A battle staff that fades slightly at the ferrule whenever the room gets dim.",
     "description": "+3 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 2d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25298,7 +25298,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "44000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this rapier carries the dawn in its very grain.",
+    "flavorText": "A rapier that catches and holds morning light longer than physics has any business allowing.",
     "description": "+3 to attack and damage rolls. Finesse. On a hit against an undead or fiend, deal an extra 2d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25338,7 +25338,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 7,
     "value": "60000 gp",
-    "flavorText": "The edge of this battle staff never quite looks the same twice — always faintly touched by the venom.",
+    "flavorText": "A battle staff with a head carved to look, from the right angle, uncomfortably like a coiled snake.",
     "description": "+3 to attack and damage rolls. On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. The bearer's own blood thins with residual toxin — disadvantage on death saving throws. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25375,7 +25375,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "74000 gp",
-    "flavorText": "This kukri feels heavier than it should, as if the tempest itself were bound somewhere inside it.",
+    "flavorText": "A kukri with a blade that sparks faintly if struck against stone.",
     "description": "+3 to attack and damage rolls. Finesse. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25415,7 +25415,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 44,
     "value": "80500 gp",
-    "flavorText": "A warhammer that hums faintly with the decay, its metal cool to the touch even in a forge.",
+    "flavorText": "A warhammer whose head has aged visibly over the years without ever actually weakening.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25456,7 +25456,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 13,
     "value": "30500 gp",
-    "flavorText": "A battle-worn longbow said to have been carried through a war fought over swiftness itself.",
+    "flavorText": "A longbow that looses faster than a draw its length should allow.",
     "description": "+3 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25490,7 +25490,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 19,
     "value": "43500 gp",
-    "flavorText": "The edge of this glaive never quite looks the same twice — always faintly touched by fortune.",
+    "flavorText": "A sun-forged glaive that's turned more than one bad swing into a good one, for reasons nobody's pinned down.",
     "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25524,7 +25524,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 15,
     "value": "61000 gp",
-    "flavorText": "A battle-worn pike said to have been carried through a war fought over the gale itself.",
+    "flavorText": "A pike that was, by its maker's own account, finished outdoors specifically so the wind could have a say in it.",
     "description": "+3 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25564,7 +25564,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 11,
     "value": "59500 gp",
-    "flavorText": "A trident that hums faintly with the gale, its metal cool to the touch even in a forge.",
+    "flavorText": "A trident cut from dragonbone, lighter in the hand than bone that size has any right to be.",
     "description": "+3 to attack and damage rolls. Thrown (range 20/60), Versatile (1d8+3). Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25605,7 +25605,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 45,
     "value": "33000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this greatsword carries the gale in its very grain.",
+    "flavorText": "A greatsword that cuts the air with an audible rush, faster than its swing alone should produce.",
     "description": "+3 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25645,7 +25645,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 15,
     "value": "47000 gp",
-    "flavorText": "This shortbow feels heavier than it should, as if the dawn itself were bound somewhere inside it.",
+    "flavorText": "A starmetal shortbow inlaid with gold that seems to warm at sunrise, regardless of the actual weather.",
     "description": "+3 to attack and damage rolls. On a hit against an undead or fiend, deal an extra 2d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25685,7 +25685,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 26,
     "value": "96500 gp",
-    "flavorText": "A maul that hums faintly with the shadow, its metal cool to the touch even in a forge.",
+    "flavorText": "A dragonbone maul that reads darker than it should, the dimmer the room gets.",
     "description": "+3 to attack and damage rolls. On a hit while you are in dim light or darkness, deal an extra 2d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25725,7 +25725,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 39,
     "value": "29000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this greatsword carries fortune in its very grain.",
+    "flavorText": "A greatsword with a gilded fuller that's turned more than one failed swing into a solid hit — and, just as often, the reverse.",
     "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25759,7 +25759,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 4.5,
     "value": "98000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this scimitar carries the decay in its very grain.",
+    "flavorText": "A scimitar with a blade that's gone a shade paler than good steel should, and stayed that way.",
     "description": "+3 to attack and damage rolls. Finesse. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25809,7 +25809,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 19,
     "value": "95000 gp",
-    "flavorText": "The edge of this halberd never quite looks the same twice — always faintly touched by the tide.",
+    "flavorText": "A halberd with a head that's never once rusted, despite clearly having spent real time underwater.",
     "description": "+3 to attack and damage rolls. On a hit, a wave of pressure adds an extra 2d6 cold damage and the target must succeed on a DC 16 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25849,7 +25849,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 11,
     "value": "28500 gp",
-    "flavorText": "A battle-worn longbow said to have been carried through a war fought over gravity itself.",
+    "flavorText": "A longbow strung from something salvaged, by every account, off the bottom of a harbor.",
     "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25889,7 +25889,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "81500 gp",
-    "flavorText": "The edge of this battle staff never quite looks the same twice — always faintly touched by the tempest.",
+    "flavorText": "A voidsteel battle staff that rings with a sharper note than plain metal should, every time it's set down hard.",
     "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25926,7 +25926,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "86000 gp",
-    "flavorText": "This battleaxe feels heavier than it should, as if the decay itself were bound somewhere inside it.",
+    "flavorText": "A starmetal battleaxe with an edge that's gone a faint grey-green no polish has ever fixed.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -25976,7 +25976,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6,
     "value": "28500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this scimitar carries the shadow in its very grain.",
+    "flavorText": "A sun-forged scimitar that, oddly, seems to work better the less sun is actually in the room.",
     "description": "+3 to attack and damage rolls. Finesse. On a hit while you are in dim light or darkness, deal an extra 2d6 psychic damage. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26016,7 +26016,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2.5,
     "value": "53000 gp",
-    "flavorText": "This mace feels heavier than it should, as if the deep frost itself were bound somewhere inside it.",
+    "flavorText": "A voidsteel mace cold enough to sting bare skin on contact.",
     "description": "+3 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 2d6 cold damage and its speed is halved until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26063,7 +26063,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 33,
     "value": "69500 gp",
-    "flavorText": "A warhammer that hums faintly with the tide, its metal cool to the touch even in a forge.",
+    "flavorText": "A warhammer whose head seems to pull slightly downward, the way an undertow pulls at a swimmer's feet.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, a wave of pressure adds an extra 2d6 cold damage and the target must succeed on a DC 16 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26114,7 +26114,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "33000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this whip carries the warding in its very grain.",
+    "flavorText": "A whip with warding sigils worked into the braid, worn smooth from exactly the kind of use they were meant for.",
     "description": "+3 to attack and damage rolls. Finesse. While holding this weapon, gain a +2 bonus to saving throws against spells. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26148,7 +26148,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5,
     "value": "50500 gp",
-    "flavorText": "A battleaxe that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "flavorText": "A battleaxe with a head cast, the smith swore, from melted-down ship's chain.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26188,7 +26188,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6.5,
     "value": "64000 gp",
-    "flavorText": "A battle-worn quarterstaff said to have been carried through a war fought over gravity itself.",
+    "flavorText": "A quarterstaff that feels like it's pulling toward the ground even when held level.",
     "description": "+3 to attack and damage rolls. Versatile (1d8+3). On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26238,7 +26238,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "88500 gp",
-    "flavorText": "A battle-worn quarterstaff said to have been carried through a war fought over the decay itself.",
+    "flavorText": "An adamantine quarterstaff that smells, faintly and permanently, of a place most people avoid.",
     "description": "+3 to attack and damage rolls. Versatile (1d8+3). On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26283,7 +26283,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "59000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this morningstar carries gravity in its very grain.",
+    "flavorText": "A morningstar whose head swings with a weight that doesn't match how it feels to lift.",
     "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. The bearer feels perpetually heavier — their jump distance is halved and swimming costs double movement. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26320,7 +26320,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3.5,
     "value": "36500 gp",
-    "flavorText": "This battleaxe feels heavier than it should, as if the ember flame itself were bound somewhere inside it.",
+    "flavorText": "A battleaxe that was, by the smith's own account, quenched in flame instead of water.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound cauterizes into flame for an extra 2d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26360,7 +26360,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 8.5,
     "value": "30000 gp",
-    "flavorText": "A battle-worn shortbow said to have been carried through a war fought over swiftness itself.",
+    "flavorText": "A dragonbone shortbow noticeably lighter than bone that size has any right to be.",
     "description": "+3 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26394,7 +26394,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 1.5,
     "value": "51500 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this kukri carries the venom in its very grain.",
+    "flavorText": "A kukri with a single curved notch at the spine shaped unmistakably like a fang.",
     "description": "+3 to attack and damage rolls. Finesse. On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26434,7 +26434,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 10,
     "value": "45500 gp",
-    "flavorText": "A battle-worn glaive said to have been carried through a war fought over the echo itself.",
+    "flavorText": "A glaive that hums very faintly at all times, like a struck bell that never finished ringing.",
     "description": "+3 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 2d6 thunder damage to every creature within 10 ft. of the target (DC 16 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26474,7 +26474,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3.5,
     "value": "96500 gp",
-    "flavorText": "The edge of this dagger never quite looks the same twice — always faintly touched by the dawn.",
+    "flavorText": "A dagger with a blade that holds a faint glow well past sunrise, whether its wielder wants it to or not.",
     "description": "+3 to attack and damage rolls. Finesse, Thrown (range 20/60). On a hit against an undead or fiend, deal an extra 2d6 radiant damage. Sheds bright light 15 ft., dim light 15 ft. further. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26514,7 +26514,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6.5,
     "value": "69500 gp",
-    "flavorText": "This longsword feels heavier than it should, as if the ember flame itself were bound somewhere inside it.",
+    "flavorText": "A longsword with a faint orange glow along the fuller that only shows up in full darkness.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, the wound cauterizes into flame for an extra 2d6 fire damage. Sheds dim firelight 10 ft. while drawn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26554,7 +26554,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 38,
     "value": "99000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this greataxe carries fortune in its very grain.",
+    "flavorText": "A dragonbone greataxe that's outlasted several much better-made weapons, for reasons nobody's ever been able to pin down.",
     "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Once per long rest, the DM secretly forces you to reroll a SUCCESSFUL roll of their choice and take the new result — the item's luck runs both ways. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26588,7 +26588,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2.5,
     "value": "35000 gp",
-    "flavorText": "A battle staff that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "flavorText": "A battle staff that lands with far more force than a swing its length should produce.",
     "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26635,7 +26635,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5,
     "value": "99000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this morningstar carries the gale in its very grain.",
+    "flavorText": "A morningstar with a head that feels, against all sense, lighter than its chain.",
     "description": "+3 to attack and damage rolls. Once per turn on a hit, a gust adds an extra 2d6 thunder damage and pushes the target 10 ft. directly away from you. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26672,7 +26672,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2.5,
     "value": "78500 gp",
-    "flavorText": "The edge of this battleaxe never quite looks the same twice — always faintly touched by the tide.",
+    "flavorText": "A battleaxe with an edge that smells faintly of salt no amount of cleaning has gotten out.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, a wave of pressure adds an extra 2d6 cold damage and the target must succeed on a DC 16 Strength save or be knocked Prone. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26712,7 +26712,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6,
     "value": "52500 gp",
-    "flavorText": "A pike that hums faintly with gravity, its metal cool to the touch even in a forge.",
+    "flavorText": "A voidsteel pike that seems to resist being lifted, just slightly, every single time.",
     "description": "+3 to attack and damage rolls. On a hit, force crushes down for an extra 2d6 force damage, and the target's speed is reduced by 10 ft. until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26752,7 +26752,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 17,
     "value": "44000 gp",
-    "flavorText": "A longbow that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "flavorText": "A longbow strung with something that was never quite ordinary cord — it hums faintly whenever the weather turns.",
     "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26792,7 +26792,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3,
     "value": "81500 gp",
-    "flavorText": "A battle-worn hand crossbow said to have been carried through a war fought over the venom itself.",
+    "flavorText": "A hand crossbow with a bolt-rest that's gone a faint sickly green no amount of polishing restores.",
     "description": "+3 to attack and damage rolls. Ammunition (range 80/320). On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26832,7 +26832,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 49,
     "value": "68500 gp",
-    "flavorText": "A greataxe that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "flavorText": "A greataxe that rings a half-note sharper than plain steel should, when struck.",
     "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26882,7 +26882,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 25,
     "value": "32500 gp",
-    "flavorText": "A warhammer that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "flavorText": "A warhammer whose head sparks faintly on impact, more than plain metal striking stone should.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26933,7 +26933,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3.5,
     "value": "90000 gp",
-    "flavorText": "A battle-worn scimitar said to have been carried through a war fought over the wild itself.",
+    "flavorText": "A voidsteel scimitar with a curve that mirrors, a little too closely, the shape of a bramble vine.",
     "description": "+3 to attack and damage rolls. Finesse. On a critical hit, thorny vines erupt from the wound, Restraining the target (DC 16 Strength to break free) until the end of its next turn. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -26967,7 +26967,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3.5,
     "value": "68000 gp",
-    "flavorText": "The edge of this handaxe never quite looks the same twice — always faintly touched by the venom.",
+    "flavorText": "A handaxe with a long, thin scratch down the blade that looks uncomfortably like a fang mark.",
     "description": "+3 to attack and damage rolls. Thrown (range 20/60). On a hit, inject venom for an extra 2d6 poison damage; the target must succeed on a DC 16 Constitution save or be Poisoned for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27014,7 +27014,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3.5,
     "value": "39500 gp",
-    "flavorText": "A battle-worn wand blade said to have been carried through a war fought over the decay itself.",
+    "flavorText": "A slender blade pulled from a tomb that, by the looting party's own account, shouldn't have been empty.",
     "description": "+3 to attack and damage rolls. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27061,7 +27061,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 25,
     "value": "26500 gp",
-    "flavorText": "The edge of this maul never quite looks the same twice — always faintly touched by the blood.",
+    "flavorText": "A maul with a head quenched, by one account, in something other than water.",
     "description": "+3 to attack and damage rolls. On a hit, drain 2d6 necrotic damage from the target and heal the wielder for half that amount. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27101,7 +27101,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 4,
     "value": "58000 gp",
-    "flavorText": "A mace that hums faintly with the tempest, its metal cool to the touch even in a forge.",
+    "flavorText": "A mace that crackles faintly with static at all times, loud enough to notice in a quiet room.",
     "description": "+3 to attack and damage rolls. On a hit, arcs of lightning add an extra 2d6 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27148,7 +27148,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 39,
     "value": "57500 gp",
-    "flavorText": "A battle-worn greataxe said to have been carried through a war fought over the echo itself.",
+    "flavorText": "A greataxe that rings with an unnervingly clean note when struck, like a bell rather than a blade.",
     "description": "+3 to attack and damage rolls. On a critical hit, a thunderclap deals an extra 2d6 thunder damage to every creature within 10 ft. of the target (DC 16 Constitution save for half). The item resonates constantly at a low hum only the bearer can hear — disadvantage on Perception checks that rely on hearing. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27188,7 +27188,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5,
     "value": "61500 gp",
-    "flavorText": "The edge of this sickle never quite looks the same twice — always faintly touched by fortune.",
+    "flavorText": "An adamantine sickle that's turned more than one failed swing into a solid hit, and isn't always picky about whose favor it's in.",
     "description": "+3 to attack and damage rolls. Once per long rest, reroll an attack roll made with this weapon and use either result. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27224,7 +27224,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 34,
     "value": "57500 gp",
-    "flavorText": "This warhammer feels heavier than it should, as if the echo itself were bound somewhere inside it.",
+    "flavorText": "A dragonbone warhammer that carries sound strangely — a knock on it is audible well beyond where it should be.",
     "description": "+3 to attack and damage rolls. Versatile (1d10+3). On a critical hit, a thunderclap deals an extra 2d6 thunder damage to every creature within 10 ft. of the target (DC 16 Constitution save for half). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27265,7 +27265,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 21,
     "value": "74500 gp",
-    "flavorText": "A maul that hums faintly with swiftness, its metal cool to the touch even in a forge.",
+    "flavorText": "An adamantine maul that swings faster than its weight has any business allowing — which some who've wielded it find more unsettling than reassuring.",
     "description": "+3 to attack and damage rolls. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn. The bearer finds it almost impossible to stand still — disadvantage on Stealth checks that require remaining motionless, and on checks to maintain concentration while stationary. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27304,7 +27304,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 16,
     "value": "26000 gp",
-    "flavorText": "Forged by a smith who whispered to it as they worked, this greataxe carries the deep frost in its very grain.",
+    "flavorText": "A greataxe permanently fogged with a thin layer of frost, no matter where it's stored.",
     "description": "+3 to attack and damage rolls. On a hit, the target's blood slows to frost for an extra 2d6 cold damage and its speed is halved until the end of its next turn. The bearer's own hands run cold — disadvantage on checks requiring a delicate, warm touch (lockpicking, healer's kit, fine art). Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
@@ -27344,7 +27344,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 26,
     "value": "50000 gp",
-    "flavorText": "The edge of this greatsword never quite looks the same twice — always faintly touched by the decay.",
+    "flavorText": "A greatsword with a blade that drinks the shine off any polish within a day of applying it.",
     "description": "+3 to attack and damage rolls. On a hit, the wound withers for an extra 2d6 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "weapon": {
