@@ -11431,7 +11431,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 10,
     "value": "725 gp",
-    "flavorText": "A padded armor passed down through a lineage that had a complicated history with the blood.",
+    "flavorText": "Padded armor with a dark stain across the lining that's never fully washed out, no matter how many times it's been cleaned.",
     "description": "AC 5 + Dexterity modifier. Light armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11472,7 +11472,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 12,
     "value": "525 gp",
-    "flavorText": "A scale mail that shifts color faintly in the presence of the tide.",
+    "flavorText": "Scale mail with scales cut a little too fish-like to be purely decorative.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11514,7 +11514,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 10,
     "value": "225 gp",
-    "flavorText": "This buckler was clearly made for someone who expected trouble involving the tide.",
+    "flavorText": "A steel buckler that's never once developed a spot of rust, despite clearly having spent real time underwater.",
     "description": "+1 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11566,7 +11566,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 33,
     "value": "250 gp",
-    "flavorText": "A breastplate that shifts color faintly in the presence of the wild.",
+    "flavorText": "A breastplate with thorned vine worked permanently into the hinges, somehow without ever rusting them shut.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11589,7 +11589,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 17,
     "value": "425 gp",
-    "flavorText": "A chain shirt that shifts color faintly in the presence of the decay.",
+    "flavorText": "A chain shirt backed with wood that should have rotted through years ago and simply didn't.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11631,7 +11631,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 25,
     "value": "275 gp",
-    "flavorText": "This breastplate was clearly made for someone who expected trouble involving gravity.",
+    "flavorText": "A breastplate that sits unnaturally still on its stand, like it's heavier than its actual weight.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11654,7 +11654,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8.5,
     "value": "200 gp",
-    "flavorText": "A plate armor that shifts color faintly in the presence of the deep frost.",
+    "flavorText": "Oak-and-steel plate armor that stays cold enough to frost over on a warm day.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11715,7 +11715,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6,
     "value": "525 gp",
-    "flavorText": "This tower shield was clearly made for someone who expected trouble involving the ember flame.",
+    "flavorText": "An oak tower shield with scorch marks along the rim that never spread, no matter how much fire it's actually taken.",
     "description": "+3 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11738,7 +11738,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7.5,
     "value": "325 gp",
-    "flavorText": "Plate Armor that never seems to gather dust, dirt, or rust — as if the shadow kept it clean.",
+    "flavorText": "Plate armor that seems to drink the last light out of a room at dusk, darker there than it has any right to be.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11761,7 +11761,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 9.5,
     "value": "425 gp",
-    "flavorText": "A hide armor passed down through a lineage that had a complicated history with the venom.",
+    "flavorText": "Hide armor with a faint greenish sheen worked into the bronze fittings that was never actually part of the finish.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11784,7 +11784,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "500 gp",
-    "flavorText": "These gauntlets were clearly made for someone who expected trouble involving the shadow.",
+    "flavorText": "Gauntlets that seem to blur at the edges the moment the light dims, even to their own wearer.",
     "description": "+1 AC. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11807,7 +11807,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 20,
     "value": "150 gp",
-    "flavorText": "A breastplate that shifts color faintly in the presence of the ember flame.",
+    "flavorText": "A breastplate warm to the touch at all times, as if it never fully cooled from whatever forge made it.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11840,7 +11840,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 9.5,
     "value": "625 gp",
-    "flavorText": "Well-worn ring mail, clearly built by someone who understood the deep frost better than most.",
+    "flavorText": "Ring mail that's noticeably cold to the touch even fresh out of a hot forge.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11882,7 +11882,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 11,
     "value": "275 gp",
-    "flavorText": "This half plate armor was clearly made for someone who expected trouble involving the dawn.",
+    "flavorText": "Half-plate that catches the first light of morning a little too readily, and never seems to fully stop glowing afterward.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11905,7 +11905,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 37,
     "value": "325 gp",
-    "flavorText": "This ring mail was clearly made for someone who expected trouble involving the tide.",
+    "flavorText": "Ring mail with links that move strangely in water, almost like they're trying to swim on their own.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -11947,7 +11947,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 15,
     "value": "450 gp",
-    "flavorText": "A hide armor passed down through a lineage that had a complicated history with the gale.",
+    "flavorText": "Hide armor stitched, by the look of it, from something that used to fly.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12056,7 +12056,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 13,
     "value": "725 gp",
-    "flavorText": "A leather armor passed down through a lineage that had a complicated history with the warding.",
+    "flavorText": "Leather armor stamped with a warding sigil down the spine, the same mark a certain order uses to mark its graduates.",
     "description": "AC 5 + Dexterity modifier. Light armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12097,7 +12097,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 31,
     "value": "675 gp",
-    "flavorText": "A half plate armor that shifts color faintly in the presence of the ember flame.",
+    "flavorText": "Half-plate with a faint ash-grey finish that was, by the smith's own account, never actually painted on.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12120,7 +12120,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 30,
     "value": "550 gp",
-    "flavorText": "Chain Shirt that never seems to gather dust, dirt, or rust — as if the dawn kept it clean.",
+    "flavorText": "A chain shirt that holds a faint warm glint at the links long after the actual sunrise has passed.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12143,7 +12143,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "575 gp",
-    "flavorText": "Well-worn cape, clearly built by someone who understood the void better than most.",
+    "flavorText": "A cape with a lining that seems to hold a faint field of stars, regardless of how much light actually reaches it.",
     "description": "+1 AC. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12183,7 +12183,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 11,
     "value": "500 gp",
-    "flavorText": "Well-worn shield, clearly built by someone who understood the venom better than most.",
+    "flavorText": "A bronze shield with a faint bite-mark pattern pressed into the rim, like something tried it once and regretted it.",
     "description": "+2 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12206,7 +12206,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 28,
     "value": "175 gp",
-    "flavorText": "A breastplate that shifts color faintly in the presence of the warding.",
+    "flavorText": "A steel breastplate with a warding circle etched across the chest in a hand that's clearly seen real practice.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12229,7 +12229,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8,
     "value": "325 gp",
-    "flavorText": "A shield that shifts color faintly in the presence of the tide.",
+    "flavorText": "An iron shield with a faint brine smell that no amount of oiling has ever gotten out.",
     "description": "+2 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12271,7 +12271,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 19,
     "value": "225 gp",
-    "flavorText": "A chain mail that shifts color faintly in the presence of the blood.",
+    "flavorText": "Chain mail forged, by one account, with a few drops of its first wearer's blood mixed into the quench.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12304,7 +12304,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 39,
     "value": "300 gp",
-    "flavorText": "Ring Mail that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
+    "flavorText": "Ring mail that rings faintly with every step, like a storm that never quite breaks.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12327,7 +12327,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "300 gp",
-    "flavorText": "A half plate armor passed down through a lineage that had a complicated history with the blood.",
+    "flavorText": "Half-plate with a seam down the chest that was clearly repaired once, after something that should have been fatal.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d4 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12350,7 +12350,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2.5,
     "value": "300 gp",
-    "flavorText": "A cloak that shifts color faintly in the presence of the wild.",
+    "flavorText": "A cloak woven from bramble instead of cloth. Comfortable enough once you stop noticing the thorns — some wearers never do.",
     "description": "+1 AC. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Roots and vines seem to reach for the bearer's feet — difficult terrain in natural environments costs them double movement, even terrain that wouldn't normally slow others. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12373,7 +12373,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 12,
     "value": "725 gp",
-    "flavorText": "This buckler was clearly made for someone who expected trouble involving the whisper.",
+    "flavorText": "A small buckler that seems to turn a half-second before a blow actually lands, like it heard something coming first.",
     "description": "+1 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12415,7 +12415,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6.5,
     "value": "175 gp",
-    "flavorText": "This tower shield was clearly made for someone who expected trouble involving the decay.",
+    "flavorText": "A tower shield carved from timber pulled out of a bog that, by every normal rule, should have rotted solid.",
     "description": "+3 AC. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12467,7 +12467,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 26,
     "value": "275 gp",
-    "flavorText": "A chain mail that shifts color faintly in the presence of the dawn.",
+    "flavorText": "Chain mail blessed, according to its maker, at the exact moment the sun cleared the horizon — and apparently it stuck.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12490,7 +12490,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "625 gp",
-    "flavorText": "Gloves that shift color faintly in the presence of the tide.",
+    "flavorText": "Gloves with a faint salt crust worked into the seams that reappears no matter how often it's brushed off.",
     "description": "+1 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12513,7 +12513,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 34,
     "value": "600 gp",
-    "flavorText": "This chain mail was clearly made for someone who expected trouble involving the tempest.",
+    "flavorText": "Chain mail that crackles very faintly in dry weather, enough to notice if the room is quiet.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12536,7 +12536,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 16,
     "value": "800 gp",
-    "flavorText": "This studded leather armor was clearly made for someone who expected trouble involving the decay.",
+    "flavorText": "Studded leather with a faint graveyard smell worked permanently into the hide, no matter how it's cleaned.",
     "description": "AC 6 + Dexterity modifier. Light armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12568,7 +12568,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 28,
     "value": "250 gp",
-    "flavorText": "A ring mail that shifts color faintly in the presence of the echo.",
+    "flavorText": "Ring mail that rings a half-note longer than plain steel should, every time it's struck.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 12 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12591,7 +12591,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7.5,
     "value": "450 gp",
-    "flavorText": "A breastplate passed down through a lineage that had a complicated history with the tempest.",
+    "flavorText": "A breastplate that was, according to its maker, finished during an actual thunderstorm on purpose.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12614,7 +12614,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 16,
     "value": "625 gp",
-    "flavorText": "A splint armor that shifts color faintly in the presence of the echo.",
+    "flavorText": "Splint armor that holds a faint ringing note after any real impact, long after the sound should have died out.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 12 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12637,7 +12637,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 12,
     "value": "550 gp",
-    "flavorText": "This shield was clearly made for someone who expected trouble involving swiftness.",
+    "flavorText": "A steel shield noticeably lighter in the hand than its size would suggest, like it was built for someone who didn't plan to stand still with it.",
     "description": "+2 AC. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12660,7 +12660,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 18,
     "value": "475 gp",
-    "flavorText": "Splint Armor that never seems to gather dust, dirt, or rust — as if the void kept it clean.",
+    "flavorText": "Splint armor with a faint shimmer across every plate, like it's reflecting a sky that isn't currently out.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. The bearer's eyes reflect starlight even in total darkness, faintly visible from up to 30 ft. — impossible to fully hide their face. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12683,7 +12683,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 0.7,
     "value": "675 gp",
-    "flavorText": "A belt passed down through a lineage that had a complicated history with the deep frost.",
+    "flavorText": "A belt with a faint rime of frost along the buckle that never fully melts.",
     "description": "+1 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12706,7 +12706,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4.5,
     "value": "650 gp",
-    "flavorText": "Tower Shield that never seems to gather dust, dirt, or rust — as if the ember flame kept it clean.",
+    "flavorText": "A tower shield with a faint orange glow along the rivets that only shows up in full darkness.",
     "description": "+3 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12775,7 +12775,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 36,
     "value": "700 gp",
-    "flavorText": "A chain mail that shifts color faintly in the presence of the venom.",
+    "flavorText": "Chain mail that stays faintly cool and slick to the touch, almost like it's still wet with something.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12817,7 +12817,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "275 gp",
-    "flavorText": "A girdle that shifts color faintly in the presence of the decay.",
+    "flavorText": "A girdle gone a sickly grey-green that was never actually dyed that color.",
     "description": "+1 AC. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12878,7 +12878,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 10,
     "value": "275 gp",
-    "flavorText": "This scale mail was clearly made for someone who expected trouble involving the venom.",
+    "flavorText": "Scale mail with a sickly sheen along every plate that was never part of the original finish.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12920,7 +12920,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 31,
     "value": "400 gp",
-    "flavorText": "Half Plate Armor that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
+    "flavorText": "Half-plate reinforced with oak that smells faintly of ozone after a hard rain, every single time.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -12972,7 +12972,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 14,
     "value": "450 gp",
-    "flavorText": "Breastplate that never seems to gather dust, dirt, or rust — as if the void kept it clean.",
+    "flavorText": "A breastplate etched with constellations that don't quite match any sky its wearer has ever actually stood under.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -13005,7 +13005,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 16,
     "value": "350 gp",
-    "flavorText": "A hide armor that shifts color faintly in the presence of the venom.",
+    "flavorText": "Hide armor stitched with what the tanner swore was snakeskin, though nobody's ever identified the species.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -13055,7 +13055,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "225 gp",
-    "flavorText": "Well-worn gloves, clearly built by someone who understood the warding better than most.",
+    "flavorText": "Gloves with warding script stitched into the palms, worn smooth from exactly the kind of use that script was meant for.",
     "description": "+1 AC. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -13078,7 +13078,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 10,
     "value": "575 gp",
-    "flavorText": "This buckler was clearly made for someone who expected trouble involving the wild.",
+    "flavorText": "A wooden buckler with a root system still faintly visible under the grain, like it was grown rather than carved.",
     "description": "+1 AC. Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -13118,7 +13118,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 14,
     "value": "750 gp",
-    "flavorText": "A leather armor that shifts color faintly in the presence of the venom.",
+    "flavorText": "Leather armor with a faint bitter smell that's never once washed out.",
     "description": "AC 5 + Dexterity modifier. Light armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20451,7 +20451,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 12,
     "value": "5500 gp",
-    "flavorText": "A tower shield that shifts color faintly in the presence of the ember flame.",
+    "flavorText": "A tower shield scorched black along one edge in a pattern that's never once faded or spread further.",
     "description": "+3 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20474,7 +20474,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 25,
     "value": "8000 gp",
-    "flavorText": "Well-worn plate armor, clearly built by someone who understood the ember flame better than most.",
+    "flavorText": "Blacksteel plate that stays warm long after its wearer leaves any actual fire behind.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20497,7 +20497,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 26,
     "value": "3000 gp",
-    "flavorText": "Well-worn scale mail, clearly built by someone who understood the ember flame better than most.",
+    "flavorText": "Scale mail with plates the color of banked coals, warm enough to notice even in winter.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20549,7 +20549,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 34,
     "value": "4500 gp",
-    "flavorText": "This leather armor was clearly made for someone who expected trouble involving the decay.",
+    "flavorText": "Leather armor that looks a little older with every year, though by every measure it's holding together just fine.",
     "description": "AC 5 + Dexterity modifier. Light armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20600,7 +20600,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 4.25,
     "value": "7000 gp",
-    "flavorText": "A buckler that shifts color faintly in the presence of the venom.",
+    "flavorText": "A mithral buckler etched with a coiled-serpent pattern that was clearly more than decoration.",
     "description": "+1 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20629,7 +20629,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 11,
     "value": "8500 gp",
-    "flavorText": "Plate Armor that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "flavorText": "Plate armor woven through with thread that doesn't quite match any known material, with a reputation for showing up exactly when needed.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20729,7 +20729,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 25,
     "value": "3500 gp",
-    "flavorText": "Studded Leather Armor that never seems to gather dust, dirt, or rust — as if swiftness kept it clean.",
+    "flavorText": "Studded leather worn thin at the joints by someone who, by every account, never once walked anywhere.",
     "description": "AC 6 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20751,7 +20751,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 36,
     "value": "6500 gp",
-    "flavorText": "A splint armor that shifts color faintly in the presence of the blood.",
+    "flavorText": "Splint armor dyed a deep red that was, according to the smith's own ledger, never actually dyed at all.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20774,7 +20774,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 37,
     "value": "4000 gp",
-    "flavorText": "A splint armor that shifts color faintly in the presence of the shadow.",
+    "flavorText": "Splint armor finished, by every account, in a smithy that never once lit a proper fire.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20797,7 +20797,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "8500 gp",
-    "flavorText": "A shield that shifts color faintly in the presence of the venom.",
+    "flavorText": "A shield with a long, thin scratch down the face that looks uncomfortably like a fang mark.",
     "description": "+2 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20820,7 +20820,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5,
     "value": "4000 gp",
-    "flavorText": "A tower shield passed down through a lineage that had a complicated history with the tempest.",
+    "flavorText": "A tower shield with a jagged crack-pattern etched across the face, clearly meant to look like lightning and clearly more than decoration.",
     "description": "+3 AC. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20843,7 +20843,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 23,
     "value": "4000 gp",
-    "flavorText": "A chain mail passed down through a lineage that had a complicated history with the deep frost.",
+    "flavorText": "Chain mail with links that click a little too sharply, like ice rather than iron.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20866,7 +20866,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5,
     "value": "8000 gp",
-    "flavorText": "Buckler that never seems to gather dust, dirt, or rust — as if the tempest kept it clean.",
+    "flavorText": "A small buckler that hums faintly during a storm, loud enough to notice if you're holding it.",
     "description": "+1 AC. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20889,7 +20889,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 29,
     "value": "7500 gp",
-    "flavorText": "A plate armor that shifts color faintly in the presence of the venom.",
+    "flavorText": "Plate armor with a faint greenish tarnish along every seam that polish has never once removed.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20922,7 +20922,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 20,
     "value": "5000 gp",
-    "flavorText": "A half plate armor that shifts color faintly in the presence of fortune.",
+    "flavorText": "Half-plate from the same strange weave as its full-plate sibling — just as unreliable about whose luck it actually bends.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20955,7 +20955,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 18,
     "value": "7000 gp",
-    "flavorText": "A chain mail passed down through a lineage that had a complicated history with swiftness.",
+    "flavorText": "Chain mail etched with a running-hare motif down the sleeves, clearly commissioned by someone who valued speed over subtlety.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -20978,7 +20978,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1.5,
     "value": "3000 gp",
-    "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if the venom kept it clean.",
+    "flavorText": "A belt with a buckle that's gone a faint sickly green no amount of polishing restores.",
     "description": "+1 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21001,7 +21001,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 20,
     "value": "5500 gp",
-    "flavorText": "This hide armor was clearly made for someone who expected trouble involving the dawn.",
+    "flavorText": "Hide armor that seems to catch morning light a shade brighter than it should.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21043,7 +21043,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 36,
     "value": "2500 gp",
-    "flavorText": "Well-worn chain shirt, clearly built by someone who understood fortune better than most.",
+    "flavorText": "A chain shirt that's survived three owners' worth of situations it really shouldn't have.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21114,7 +21114,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "7000 gp",
-    "flavorText": "A shield passed down through a lineage that had a complicated history with the deep frost.",
+    "flavorText": "A shield quenched, against every normal method, in something far colder than water.",
     "description": "+2 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21137,7 +21137,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "4000 gp",
-    "flavorText": "A plate armor passed down through a lineage that had a complicated history with the ember flame.",
+    "flavorText": "Plate armor that was, according to the smith who made it, quenched in flame instead of water.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21160,7 +21160,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 16,
     "value": "6500 gp",
-    "flavorText": "A splint armor passed down through a lineage that had a complicated history with the venom.",
+    "flavorText": "Splint armor with a single curved plate at the collar shaped unmistakably like a fang.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21183,7 +21183,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "4000 gp",
-    "flavorText": "A tower shield that shifts color faintly in the presence of the warding.",
+    "flavorText": "A tower shield etched edge to edge with warding glyphs, clearly the work of someone who took the commission seriously.",
     "description": "+3 AC. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21216,7 +21216,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 22,
     "value": "6000 gp",
-    "flavorText": "A ring mail passed down through a lineage that had a complicated history with the gale.",
+    "flavorText": "Ring mail that somehow weighs noticeably less than a piece its size has any right to.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21239,7 +21239,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 14,
     "value": "7000 gp",
-    "flavorText": "This scale mail was clearly made for someone who expected trouble involving the decay.",
+    "flavorText": "Scale mail with a pallor to the metal that most smiths would have scrapped rather than sold.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21262,7 +21262,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 10,
     "value": "3500 gp",
-    "flavorText": "A padded armor that shifts color faintly in the presence of the tempest.",
+    "flavorText": "Padded armor etched with storm-warding runes down the collar, worn by someone who clearly expected weather trouble.",
     "description": "AC 5 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21294,7 +21294,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 11,
     "value": "2500 gp",
-    "flavorText": "A tower shield passed down through a lineage that had a complicated history with the decay.",
+    "flavorText": "A tower shield cut from the same bog-timber as its sibling piece — equally rotted-looking, equally unwilling to actually rot.",
     "description": "+3 AC. Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21317,7 +21317,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "5000 gp",
-    "flavorText": "A pair of greaves passed down through a lineage that had a complicated history with swiftness.",
+    "flavorText": "Greaves worn smooth at the shin by someone who apparently covered a lot of ground in them, fast.",
     "description": "+1 AC. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21340,7 +21340,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 12.5,
     "value": "8000 gp",
-    "flavorText": "Breastplate that never seems to gather dust, dirt, or rust — as if the gale kept it clean.",
+    "flavorText": "A mithral breastplate that catches passing wind in a way plate generally shouldn't, and never seems to slow its wearer down for it.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21369,7 +21369,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 16,
     "value": "4500 gp",
-    "flavorText": "This breastplate was clearly made for someone who expected trouble involving the warding.",
+    "flavorText": "Blacksteel armor with a ward-circle worked into the chest plate that was, by the smith's own insistence, not merely decorative.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. +1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21392,7 +21392,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3.5,
     "value": "8500 gp",
-    "flavorText": "Well-worn crown, clearly built by someone who understood the deep frost better than most.",
+    "flavorText": "A silver crown that stays cold enough to numb fingers on contact, even carried in a warm pocket.",
     "description": "+1 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21415,7 +21415,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 24,
     "value": "8000 gp",
-    "flavorText": "A half plate armor that shifts color faintly in the presence of gravity.",
+    "flavorText": "Half-plate that seems to settle a little too firmly into the ground the moment its wearer stops moving.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21486,7 +21486,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 14,
     "value": "4500 gp",
-    "flavorText": "A half plate armor that shifts color faintly in the presence of the deep frost.",
+    "flavorText": "Half-plate with a faint white rime that re-forms across the surface no matter how often it's wiped down.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21509,7 +21509,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "5000 gp",
-    "flavorText": "Well-worn buckler, clearly built by someone who understood the whisper better than most.",
+    "flavorText": "A buckler etched with a cracked-open eye motif, clearly meant to suggest it's watching for something its wearer can't.",
     "description": "+1 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21532,7 +21532,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 31,
     "value": "4500 gp",
-    "flavorText": "A leather armor that shifts color faintly in the presence of swiftness.",
+    "flavorText": "Leather armor cut close and light, clearly made for someone who needed to move before they needed to block a hit.",
     "description": "AC 5 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21554,7 +21554,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 9.5,
     "value": "7500 gp",
-    "flavorText": "Plate Armor that never seems to gather dust, dirt, or rust — as if the echo kept it clean.",
+    "flavorText": "Plate armor that hums faintly at all times, like a bell that was cast and never quite stopped.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21577,7 +21577,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 9,
     "value": "4000 gp",
-    "flavorText": "This tower shield was clearly made for someone who expected trouble involving the deep frost.",
+    "flavorText": "A tower shield permanently fogged with a thin layer of frost, regardless of the room it's kept in.",
     "description": "+3 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21619,7 +21619,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 34,
     "value": "8500 gp",
-    "flavorText": "This hide armor was clearly made for someone who expected trouble involving the wild.",
+    "flavorText": "Hide armor etched with druidic warding marks down the spine, clearly made by someone who kept close company with growing things.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21642,7 +21642,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 39,
     "value": "8500 gp",
-    "flavorText": "Scale Mail that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "flavorText": "Scale mail with vine worked between the plates that, left too long, keeps growing whether its wearer wants it to or not.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Roots and vines seem to reach for the bearer's feet — difficult terrain in natural environments costs them double movement, even terrain that wouldn't normally slow others. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21665,7 +21665,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 10,
     "value": "7000 gp",
-    "flavorText": "A buckler that shifts color faintly in the presence of the ember flame.",
+    "flavorText": "A small buckler with a scorch-pattern etching that was never actually burned into the metal.",
     "description": "+1 AC. Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21698,7 +21698,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 23,
     "value": "9000 gp",
-    "flavorText": "A breastplate passed down through a lineage that had a complicated history with the venom.",
+    "flavorText": "A breastplate with two long grooves down the chest that look, from the right angle, like something struck it fang-first.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21721,7 +21721,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 20,
     "value": "8000 gp",
-    "flavorText": "Hide Armor that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "flavorText": "Hide armor that's stayed a faint green at the seams since the day it was tanned, with no sign of fading.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21754,7 +21754,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "4500 gp",
-    "flavorText": "This studded leather armor was clearly made for someone who expected trouble involving the tempest.",
+    "flavorText": "Studded leather with rivets that spark faintly if struck just right — more than plain metal should.",
     "description": "AC 6 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21776,7 +21776,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 1.5,
     "value": "4000 gp",
-    "flavorText": "This great helm was clearly made for someone who expected trouble involving fortune.",
+    "flavorText": "A great helm worn by a duelist who, by his own account, never once lost a fight he should have lost.",
     "description": "+1 AC. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21814,9 +21814,9 @@ const canonicalItems = [
     "name": "Mithral Scale Mail of the Tempest",
     "itemType": "armor",
     "rarity": "rare",
-    "weight": 15.5,
+    "weight": 0.75,
     "value": "8000 gp",
-    "flavorText": "This scale mail was clearly made for someone who expected trouble involving the tempest.",
+    "flavorText": "Mithral scale mail that crackles faintly under a dry glove, like the air around it is a little too charged.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21824,7 +21824,8 @@ const canonicalItems = [
       "baseAC": 7,
       "addsDexMod": true,
       "dexModCap": 2,
-      "slot": "chest",
+      "slot": "handwear",
+      "additive": true,
       "stealthDisadvantage": false
     },
     "narrative": {
@@ -21855,7 +21856,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7.5,
     "value": "6000 gp",
-    "flavorText": "Well-worn padded armor, clearly built by someone who understood the tide better than most.",
+    "flavorText": "Padded armor that stays dry on the outside even after a real soaking, which its owner has never been able to explain.",
     "description": "AC 5 + Dexterity modifier. Light armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21877,7 +21878,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 10,
     "value": "7000 gp",
-    "flavorText": "Well-worn half plate armor, clearly built by someone who understood the echo better than most.",
+    "flavorText": "Half-plate that carries sound oddly — a knock on it somewhere else in the room is audible from across a hall.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21919,7 +21920,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 0.65,
     "value": "4000 gp",
-    "flavorText": "Gloves that shift color faintly in the presence of the shadow.",
+    "flavorText": "Gloves that seem to fade slightly at the fingertips whenever the room gets dim.",
     "description": "+1 AC. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21942,7 +21943,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 18,
     "value": "9000 gp",
-    "flavorText": "This studded leather armor was clearly made for someone who expected trouble involving fortune.",
+    "flavorText": "Studded leather that's been dropped, pawned, and stolen more times than any piece this functional has any right to be — and keeps turning up again.",
     "description": "AC 6 + Dexterity modifier. Light armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -21993,7 +21994,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 35,
     "value": "8000 gp",
-    "flavorText": "A half plate armor passed down through a lineage that had a complicated history with the echo.",
+    "flavorText": "Half-plate that rings a beat longer than it should after any real hit lands.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22016,7 +22017,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 8,
     "value": "4000 gp",
-    "flavorText": "A shield passed down through a lineage that had a complicated history with the void.",
+    "flavorText": "A shield hammered, by all accounts, from metal that fell rather than metal that was mined.",
     "description": "+2 AC. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22049,7 +22050,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5.5,
     "value": "2000 gp",
-    "flavorText": "Shield that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "flavorText": "A shield rimmed in actual thorned bramble, somehow never once drawing its bearer's own blood.",
     "description": "+2 AC. Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22072,7 +22073,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 35,
     "value": "6500 gp",
-    "flavorText": "This splint armor was clearly made for someone who expected trouble involving the tempest.",
+    "flavorText": "Splint armor etched with a jagged lightning-bolt motif down every plate, clearly more than just decoration.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22095,7 +22096,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 4,
     "value": "7000 gp",
-    "flavorText": "This tower shield was clearly made for someone who expected trouble involving the tide.",
+    "flavorText": "A mithral tower shield heavy enough that most assume it would sink — its owners have reported otherwise.",
     "description": "+3 AC. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22124,7 +22125,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 28,
     "value": "5500 gp",
-    "flavorText": "A splint armor passed down through a lineage that had a complicated history with the echo.",
+    "flavorText": "Splint armor worn by a champion famous for a battle-cry that, by multiple accounts, the armor itself seemed to amplify.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22176,7 +22177,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 7,
     "value": "3500 gp",
-    "flavorText": "A tower shield that shifts color faintly in the presence of the venom.",
+    "flavorText": "A tower shield with a coiled-serpent crest that was clearly commissioned, not improvised.",
     "description": "+3 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22218,7 +22219,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 34,
     "value": "3500 gp",
-    "flavorText": "Half Plate Armor that never seems to gather dust, dirt, or rust — as if the dawn kept it clean.",
+    "flavorText": "Silver-chased half-plate that holds a faint glow well past sunrise, whether its wearer wants it to or not.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22241,7 +22242,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 32,
     "value": "5500 gp",
-    "flavorText": "This padded armor was clearly made for someone who expected trouble involving swiftness.",
+    "flavorText": "Padded armor that practically vibrates with pent-up motion — comfortable in a sprint, considerably harder to wear while standing still.",
     "description": "AC 5 + Dexterity modifier. Light armor. +1 bonus to initiative rolls, and difficult terrain costs you no extra movement. The bearer finds it almost impossible to stand still — disadvantage on Stealth checks that require remaining motionless, and on checks to maintain concentration while stationary. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22264,7 +22265,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 31,
     "value": "5500 gp",
-    "flavorText": "A ring mail passed down through a lineage that had a complicated history with the deep frost.",
+    "flavorText": "Ring mail quenched in something considerably colder than the smithy's usual water barrel.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22287,7 +22288,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 24,
     "value": "6500 gp",
-    "flavorText": "This breastplate was clearly made for someone who expected trouble involving the tempest.",
+    "flavorText": "A breastplate that rings a half-note sharper than plain steel should, when struck.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -22310,7 +22311,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3.5,
     "value": "7500 gp",
-    "flavorText": "A padded armor that shifts color faintly in the presence of gravity.",
+    "flavorText": "Mithral-threaded padding that should be feather-light and somehow refuses to be moved once it's planted.",
     "description": "AC 5 + Dexterity modifier. Light armor. Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27383,7 +27384,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2,
     "value": "84500 gp",
-    "flavorText": "This cloak was clearly made for someone who expected trouble involving the blood.",
+    "flavorText": "An adamantine-threaded cloak that runs warmer than it should, like it's still circulating something.",
     "description": "+2 AC. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27422,7 +27423,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 7.5,
     "value": "61500 gp",
-    "flavorText": "A ring mail passed down through a lineage that had a complicated history with the venom.",
+    "flavorText": "Ring mail with links that have taken on a faint greenish cast no cleaning has reversed.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27503,7 +27504,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "52000 gp",
-    "flavorText": "This tower shield was clearly made for someone who expected trouble involving the echo.",
+    "flavorText": "A voidsteel tower shield that rings with an unnervingly clean note when struck, like a bell rather than a shield.",
     "description": "+4 AC. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 16 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27536,7 +27537,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 14,
     "value": "95500 gp",
-    "flavorText": "Well-worn ring mail, clearly built by someone who understood the dawn better than most.",
+    "flavorText": "Ring mail with links that gleam gold in direct sun, even when the rest of the metal has long since tarnished.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27559,7 +27560,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 7.5,
     "value": "54500 gp",
-    "flavorText": "Buckler that never seems to gather dust, dirt, or rust — as if the shadow kept it clean.",
+    "flavorText": "A small buckler that's noticeably harder to spot the moment the sun starts going down.",
     "description": "+2 AC. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27592,7 +27593,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 4,
     "value": "35500 gp",
-    "flavorText": "A circlet passed down through a lineage that had a complicated history with the whisper.",
+    "flavorText": "A sun-forged circlet that sits a little too attentively, like it's listening for something even when its wearer isn't.",
     "description": "+1 AC. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27615,7 +27616,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 11,
     "value": "85000 gp",
-    "flavorText": "Scale Mail that never seems to gather dust, dirt, or rust — as if the blood kept it clean.",
+    "flavorText": "Scale mail cut from dragonbone that darkens almost imperceptibly after a hard hit, then fades back over the following day.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27638,7 +27639,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 13,
     "value": "67000 gp",
-    "flavorText": "Well-worn studded leather armor, clearly built by someone who understood the gale better than most.",
+    "flavorText": "Studded leather that moves a half-beat ahead of its wearer, like it's already decided which way they're about to turn.",
     "description": "AC 6 + Dexterity modifier. Light armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27660,7 +27661,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 9.5,
     "value": "60500 gp",
-    "flavorText": "A ring mail passed down through a lineage that had a complicated history with the shadow.",
+    "flavorText": "Ring mail that reads a shade darker in twilight than it does at noon, for no reason anyone's identified.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27683,7 +27684,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 38,
     "value": "39500 gp",
-    "flavorText": "Well-worn leather armor, clearly built by someone who understood the whisper better than most.",
+    "flavorText": "Leather armor stitched with thread that catches light strangely, like it's reacting to something nobody else in the room can sense.",
     "description": "AC 5 + Dexterity modifier. Light armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27705,7 +27706,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 8,
     "value": "65500 gp",
-    "flavorText": "This chain shirt was clearly made for someone who expected trouble involving the whisper.",
+    "flavorText": "A chain shirt that seems to settle differently depending on who's nearby, as if it has opinions about company.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27728,7 +27729,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 32,
     "value": "60500 gp",
-    "flavorText": "A padded armor passed down through a lineage that had a complicated history with the tempest.",
+    "flavorText": "Padded armor that crackles faintly with static at all times — useful in a fight, considerably less useful for staying unnoticed.",
     "description": "AC 5 + Dexterity modifier. Light armor. Resistance to lightning damage. Once per long rest, when struck in melee, discharge 2d6 lightning damage to the attacker. Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27750,7 +27751,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 32,
     "value": "83000 gp",
-    "flavorText": "A breastplate that shifts color faintly in the presence of the warding.",
+    "flavorText": "A breastplate marked with the same warding sigil as several of its siblings, etched just a little deeper than the rest.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. +2 bonus to saving throws against spells, and advantage on saves against being Petrified. The warding sigils flare painfully whenever a spell targets the bearer, dealing them 1 psychic damage even on a successful save. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27773,7 +27774,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 36,
     "value": "76500 gp",
-    "flavorText": "A studded leather armor passed down through a lineage that had a complicated history with the gale.",
+    "flavorText": "Studded leather with a hem that never quite settles, even indoors with the windows shut.",
     "description": "AC 6 + Dexterity modifier. Light armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27795,7 +27796,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 18,
     "value": "46000 gp",
-    "flavorText": "A studded leather armor passed down through a lineage that had a complicated history with the shadow.",
+    "flavorText": "Studded leather dyed a black that seems to deepen, rather than fade, the dimmer the room gets.",
     "description": "AC 6 + Dexterity modifier. Light armor. While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27827,7 +27828,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 31,
     "value": "38500 gp",
-    "flavorText": "A plate armor that shifts color faintly in the presence of the whisper.",
+    "flavorText": "Sun-forged plate armor that reacts half a beat before its wearer does, every time something's about to go wrong.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27860,7 +27861,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 16,
     "value": "75500 gp",
-    "flavorText": "Well-worn hide armor, clearly built by someone who understood the gale better than most.",
+    "flavorText": "Hide armor that seems to shed momentum rather than resist it — a fall just never quite lands the way it should.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27912,7 +27913,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 32,
     "value": "39500 gp",
-    "flavorText": "Well-worn hide armor, clearly built by someone who understood fortune better than most.",
+    "flavorText": "Hide armor that's outlasted several much better-made pieces, for reasons nobody's ever pinned down.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27964,7 +27965,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 17,
     "value": "53000 gp",
-    "flavorText": "Splint Armor that never seems to gather dust, dirt, or rust — as if the gale kept it clean.",
+    "flavorText": "Splint armor forged from fallen-star metal that, against all sense, moves lighter than it looks.",
     "description": "AC 9. Heavy armor. Disadvantage on Stealth checks. Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -27997,7 +27998,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 9.5,
     "value": "68500 gp",
-    "flavorText": "A hide armor that shifts color faintly in the presence of the void.",
+    "flavorText": "Hide armor with a faint shimmer along the seams that only shows up once the room goes properly dark.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28072,7 +28073,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 30,
     "value": "56000 gp",
-    "flavorText": "Well-worn breastplate, clearly built by someone who understood swiftness better than most.",
+    "flavorText": "A breastplate built noticeably narrower at the waist than most, clearly for someone who valued speed over bulk.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. +2 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28095,7 +28096,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 33,
     "value": "41500 gp",
-    "flavorText": "Breastplate that never seems to gather dust, dirt, or rust — as if the void kept it clean.",
+    "flavorText": "A breastplate that never seems to gather dust — as if the void it was forged near kept it clean on its own.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28118,7 +28119,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 36,
     "value": "42000 gp",
-    "flavorText": "A leather armor that shifts color faintly in the presence of the venom.",
+    "flavorText": "Leather armor tanned with something that's left a permanent bitter edge to its smell.",
     "description": "AC 5 + Dexterity modifier. Light armor. Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28159,7 +28160,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 23,
     "value": "47500 gp",
-    "flavorText": "Well-worn chain mail, clearly built by someone who understood the whisper better than most.",
+    "flavorText": "Chain mail that seems to tighten slightly the moment danger gets close, well before its wearer consciously notices it.",
     "description": "AC 8. Heavy armor. Disadvantage on Stealth checks. Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28211,7 +28212,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 7.5,
     "value": "82500 gp",
-    "flavorText": "A ring mail that shifts color faintly in the presence of the deep frost.",
+    "flavorText": "Ring mail that frosts over faintly whenever the temperature drops, whether or not its wearer actually feels the cold.",
     "description": "AC 7. Heavy armor. Disadvantage on Stealth checks. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28234,7 +28235,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 39,
     "value": "93000 gp",
-    "flavorText": "This chain shirt was clearly made for someone who expected trouble involving the void.",
+    "flavorText": "A chain shirt with links that catch a faint cold light, visible only once every other light source is gone.",
     "description": "AC 6 + Dexterity modifier (max 2). Medium armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28257,7 +28258,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 9,
     "value": "47000 gp",
-    "flavorText": "This shield was clearly made for someone who expected trouble involving the dawn.",
+    "flavorText": "A shield that catches and holds morning light longer than physics has any business allowing.",
     "description": "+3 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28280,7 +28281,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 39,
     "value": "75500 gp",
-    "flavorText": "Well-worn half plate armor, clearly built by someone who understood the tide better than most.",
+    "flavorText": "Half-plate cut from dragonbone that smells faintly of the ocean no matter how far inland it travels.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28313,7 +28314,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 35,
     "value": "56000 gp",
-    "flavorText": "A scale mail passed down through a lineage that had a complicated history with the blood.",
+    "flavorText": "Starmetal scale mail that was quenched, the smith insisted, in something other than water.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28336,7 +28337,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 17,
     "value": "98000 gp",
-    "flavorText": "This half plate armor was clearly made for someone who expected trouble involving swiftness.",
+    "flavorText": "Half-plate from the same courier tradition as its matching helm — built for someone who was always, somehow, already gone.",
     "description": "AC 7 + Dexterity modifier (max 2). Medium armor. +2 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28369,7 +28370,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 38,
     "value": "85000 gp",
-    "flavorText": "A leather armor passed down through a lineage that had a complicated history with the void.",
+    "flavorText": "Leather armor with a strange starlit sheen that makes no sense for something tanned entirely on solid ground.",
     "description": "AC 5 + Dexterity modifier. Light armor. You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28439,7 +28440,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 29,
     "value": "94000 gp",
-    "flavorText": "Well-worn studded leather armor, clearly built by someone who understood the blood better than most.",
+    "flavorText": "Studded leather with rivets that sit a shade too red to be plain iron.",
     "description": "AC 6 + Dexterity modifier. Light armor. Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 2d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28461,7 +28462,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 40,
     "value": "38500 gp",
-    "flavorText": "A leather armor passed down through a lineage that had a complicated history with the echo.",
+    "flavorText": "Leather armor worn by the same champion as a matching splint-armor piece — lighter, but no less loud when it needed to be.",
     "description": "AC 5 + Dexterity modifier. Light armor. Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 16 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28483,7 +28484,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 2.5,
     "value": "31500 gp",
-    "flavorText": "Circlet that never seems to gather dust, dirt, or rust — as if the dawn kept it clean.",
+    "flavorText": "A dragonbone circlet inlaid with gold that seems to warm at sunrise, regardless of the actual weather.",
     "description": "+1 AC. Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28516,7 +28517,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5,
     "value": "63500 gp",
-    "flavorText": "This buckler was clearly made for someone who expected trouble involving the wild.",
+    "flavorText": "A small buckler braided from living bramble rather than metal, and still, somehow, holding a line.",
     "description": "+2 AC. Once per short rest, as a bonus action, regrow 2d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28549,7 +28550,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 3,
     "value": "82500 gp",
-    "flavorText": "Circlet that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "flavorText": "A gilded circlet that's turned more than one failed roll into a success — and, just as often, the reverse.",
     "description": "+1 AC. Once per long rest, reroll a failed saving throw and use either result. Once per long rest, the DM secretly forces you to reroll a SUCCESSFUL roll of their choice and take the new result — the item's luck runs both ways. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28572,7 +28573,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 1.5,
     "value": "55500 gp",
-    "flavorText": "A helm that shifts color faintly in the presence of the venom.",
+    "flavorText": "A sun-forged helm with a faint greenish tarnish spreading slowly across the browplate, no matter how often it's polished away.",
     "description": "+1 AC. Resistance to poison damage and advantage on saving throws against being Poisoned. The bearer's own blood thins with residual toxin — disadvantage on death saving throws. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
@@ -28595,7 +28596,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 11,
     "value": "52000 gp",
-    "flavorText": "Well-worn tower shield, clearly built by someone who understood the deep frost better than most.",
+    "flavorText": "An adamantine tower shield cold enough that gloves are recommended before carrying it bare-handed.",
     "description": "+4 AC. Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
