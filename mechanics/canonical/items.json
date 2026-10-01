@@ -11409,7 +11409,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "200 gp",
-    "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the gale.",
+    "flavorText": "Gloves with knuckles worn smooth from constant motion — their last owner apparently never stood still.",
     "description": "Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11450,7 +11450,7 @@
     "rarity": "uncommon",
     "weight": 0.8,
     "value": "500 gp",
-    "flavorText": "Well-worn bracers, clearly built by someone who understood the deep frost better than most.",
+    "flavorText": "Bracers carved from something that never quite stopped being cold, even off the mountain it came from.",
     "description": "Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11492,7 +11492,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "175 gp",
-    "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the void kept them clean.",
+    "flavorText": "Gloves stitched with thread that catches starlight even indoors, where there isn't any to catch.",
     "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11544,7 +11544,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "400 gp",
-    "flavorText": "This cape was clearly made for someone who expected trouble involving gravity.",
+    "flavorText": "A cape with a hem that always hangs straight down, no matter which way its wearer is actually falling.",
     "description": "Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11609,7 +11609,7 @@
     "rarity": "uncommon",
     "weight": 2,
     "value": "750 gp",
-    "flavorText": "Boots that shift color faintly in the presence of the void.",
+    "flavorText": "Boots with silvered soles that never quite go dark, even standing in a room with no light at all.",
     "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11674,7 +11674,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "400 gp",
-    "flavorText": "Gloves that shift color faintly in the presence of the tempest.",
+    "flavorText": "Gloves that spark faintly at the fingertips. Useful in a fight, and impossible to sneak anywhere in.",
     "description": "Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Metal objects within 5 ft. of the bearer crackle with static — Stealth checks are made at disadvantage while worn. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11693,7 +11693,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "750 gp",
-    "flavorText": "A girdle that shifts color faintly in the presence of the wild.",
+    "flavorText": "A girdle woven through with living vine that never seems to finish growing.",
     "description": "Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11860,7 +11860,7 @@
     "rarity": "uncommon",
     "weight": 0.45,
     "value": "350 gp",
-    "flavorText": "Well-worn bracers, clearly built by someone who understood the decay better than most.",
+    "flavorText": "Bracers that leave a faint ring of dead grass wherever their wearer stands too long.",
     "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Plants wilt within 10 ft. of the bearer, and they can never benefit from natural healing during a short rest — only spells or magical means restore their HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11925,7 +11925,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "400 gp",
-    "flavorText": "Boots that shift color faintly in the presence of gravity.",
+    "flavorText": "Boots that feel bolted to the floor, even when they aren't.",
     "description": "Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11967,7 +11967,7 @@
     "rarity": "uncommon",
     "weight": 0.9,
     "value": "650 gp",
-    "flavorText": "These gauntlets were clearly made for someone who expected trouble involving the void.",
+    "flavorText": "Gauntlets hammered from metal that fell from somewhere above the clouds. They never stopped reacting to the dark the way they did the night they landed.",
     "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -11986,7 +11986,7 @@
     "rarity": "uncommon",
     "weight": 0.3,
     "value": "375 gp",
-    "flavorText": "Well-worn boots, clearly built by someone who understood the tempest better than most.",
+    "flavorText": "Boots that crackle faintly with every step, like a storm that never quite arrives.",
     "description": "Resistance to lightning damage. Once per long rest, when struck in melee, discharge 1d4 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -12015,7 +12015,7 @@
     "rarity": "uncommon",
     "weight": 0.15,
     "value": "475 gp",
-    "flavorText": "Well-worn bracers, clearly built by someone who understood the venom better than most.",
+    "flavorText": "Bracers stained a faint green that never washes out, like whatever made them was poisonous from the start.",
     "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12034,7 +12034,7 @@
     "rarity": "uncommon",
     "weight": 0.85,
     "value": "575 gp",
-    "flavorText": "Well-worn gloves, clearly built by someone who understood the void better than most.",
+    "flavorText": "Gloves set with tiny flecks of fallen-star metal that glint faintly in total darkness.",
     "description": "You have advantage on saving throws against being Blinded, Deafened, or Stunned, and can see through magical darkness as if it were dim light. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12075,7 +12075,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "600 gp",
-    "flavorText": "A girdle that shifts color faintly in the presence of the gale.",
+    "flavorText": "A girdle that feels lighter than it should, like it's still half-convinced it's supposed to be flying.",
     "description": "Your walking speed increases by 10 feet, and you take no falling damage from a fall of 30 feet or less. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12163,7 +12163,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "800 gp",
-    "flavorText": "Well-worn greaves, clearly built by someone who understood the wild better than most.",
+    "flavorText": "Greaves with roots growing faintly into the seams — somehow this hasn't ruined them yet.",
     "description": "Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12249,7 +12249,7 @@
     "rarity": "uncommon",
     "weight": 0.2,
     "value": "400 gp",
-    "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the decay.",
+    "flavorText": "Gloves made from wood that should have rotted away years ago and simply didn't.",
     "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12393,7 +12393,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "225 gp",
-    "flavorText": "This cape was clearly made for someone who expected trouble involving the whisper.",
+    "flavorText": "A cape that settles oddly on the shoulders, like it's always half-turned toward whatever's about to happen.",
     "description": "Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12435,7 +12435,7 @@
     "rarity": "uncommon",
     "weight": 0.65,
     "value": "775 gp",
-    "flavorText": "This belt was clearly made for someone who expected trouble involving the deep frost.",
+    "flavorText": "A bronze belt that stays cold to the touch even worn against bare skin in summer.",
     "description": "Resistance to cold damage. You and your gear are unaffected by extreme cold and never need to check for frostbite. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -12726,7 +12726,7 @@
     "rarity": "uncommon",
     "weight": 0.8,
     "value": "325 gp",
-    "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if swiftness kept it clean.",
+    "flavorText": "A belt worn thin at the buckle by someone who was, by every account, always the first one moving.",
     "description": "+1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -12755,7 +12755,7 @@
     "rarity": "uncommon",
     "weight": 1,
     "value": "700 gp",
-    "flavorText": "These greaves were clearly made for someone who expected trouble involving the tide.",
+    "flavorText": "Greaves with a faint barnacle crust along the ankles that never fully scrapes off.",
     "description": "You can breathe underwater and have a swimming speed equal to your walking speed. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12795,7 +12795,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "250 gp",
-    "flavorText": "Well-worn belt, clearly built by someone who understood the ember flame better than most.",
+    "flavorText": "A belt with a buckle that stays warm long after the fire that should have cooled it.",
     "description": "Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d4 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12837,7 +12837,7 @@
     "rarity": "uncommon",
     "weight": 0.3,
     "value": "400 gp",
-    "flavorText": "Well-worn bracers, clearly built by someone who understood the venom better than most.",
+    "flavorText": "Bracers wrapped in something that was once a snake and, in a sense, still kind of is.",
     "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12856,7 +12856,7 @@
     "rarity": "uncommon",
     "weight": 0.25,
     "value": "775 gp",
-    "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the dawn kept them clean.",
+    "flavorText": "Gloves that catch the light a little too well, like they're reflecting a sun that isn't currently out.",
     "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12898,7 +12898,7 @@
     "rarity": "uncommon",
     "weight": 1.5,
     "value": "600 gp",
-    "flavorText": "A belt passed down through a lineage that had a complicated history with the warding.",
+    "flavorText": "A belt with a warding-sigil buckle worn by a guard captain who swore it once stopped an actual curse. Maybe it did.",
     "description": "+1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -12940,7 +12940,7 @@
     "rarity": "uncommon",
     "weight": 0.25,
     "value": "725 gp",
-    "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the wild kept them clean.",
+    "flavorText": "Bronze gloves with vines worked permanently into the knuckle-plates, somehow still flexible.",
     "description": "Once per short rest, as a bonus action, regrow 1d4 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -13025,7 +13025,7 @@
     "rarity": "uncommon",
     "weight": 2,
     "value": "175 gp",
-    "flavorText": "Greaves that shift color faintly in the presence of the dawn.",
+    "flavorText": "Greaves that throw a faint warm light across the ground whenever undead pass close by.",
     "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -13098,7 +13098,7 @@
     "rarity": "uncommon",
     "weight": 2,
     "value": "300 gp",
-    "flavorText": "These greaves were clearly made for someone who expected trouble involving gravity.",
+    "flavorText": "Oak-reinforced greaves heavy enough that their wearer has genuinely never been pushed over.",
     "description": "Advantage on checks and saves made to avoid being moved, knocked Prone, or forced to teleport against your will. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -20429,7 +20429,7 @@
     "rarity": "rare",
     "weight": 0.65,
     "value": "8000 gp",
-    "flavorText": "Gloves that shift color faintly in the presence of the echo.",
+    "flavorText": "Gloves that ring faintly when struck, like the hands inside them once belonged to someone who rang a lot of bells.",
     "description": "Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -20517,7 +20517,7 @@
     "rarity": "rare",
     "weight": 0.55,
     "value": "6500 gp",
-    "flavorText": "A belt passed down through a lineage that had a complicated history with swiftness.",
+    "flavorText": "A belt handed down a family line known for arriving everywhere slightly before they were expected.",
     "description": "+1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -20568,7 +20568,7 @@
     "rarity": "rare",
     "weight": 0.6,
     "value": "6500 gp",
-    "flavorText": "Well-worn girdle, clearly built by someone who understood the dawn better than most.",
+    "flavorText": "A girdle blessed at a shrine so long ago nobody currently serving there remembers the ceremony.",
     "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -20659,7 +20659,7 @@
     "rarity": "rare",
     "weight": 1.5,
     "value": "3000 gp",
-    "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if the wild kept it clean.",
+    "flavorText": "A belt woven from thorned vine that somehow never once drew blood from its wearer.",
     "description": "Once per short rest, as a bonus action, regrow 1d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -20678,7 +20678,7 @@
     "rarity": "rare",
     "weight": 1.5,
     "value": "3000 gp",
-    "flavorText": "A belt that shifts color faintly in the presence of the venom.",
+    "flavorText": "A belt with a faint sickly-green sheen that never fully polishes away.",
     "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -20707,7 +20707,7 @@
     "rarity": "rare",
     "weight": 1.5,
     "value": "2000 gp",
-    "flavorText": "Well-worn gloves, clearly built by someone who understood the warding better than most.",
+    "flavorText": "Silver-threaded gloves stitched by the same order that trains battle-priests in warding work.",
     "description": "+1 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21021,7 +21021,7 @@
     "rarity": "rare",
     "weight": 0.1,
     "value": "3500 gp",
-    "flavorText": "This cape was clearly made for someone who expected trouble involving swiftness.",
+    "flavorText": "A cape that snaps in a breeze even on days with no wind to speak of.",
     "description": "+1 bonus to initiative rolls, and difficult terrain costs you no extra movement. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21063,7 +21063,7 @@
     "rarity": "rare",
     "weight": 1.5,
     "value": "6000 gp",
-    "flavorText": "Belt that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "flavorText": "A belt braided from thread that doesn't quite match any known material. It's been wrong about outcomes before — just never in its wearer's favor.",
     "description": "Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21082,7 +21082,7 @@
     "rarity": "rare",
     "weight": 0.15,
     "value": "6500 gp",
-    "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the ember flame.",
+    "flavorText": "Gloves quenched in fire instead of water during their forging, against every normal method.",
     "description": "Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -21445,7 +21445,7 @@
     "rarity": "rare",
     "weight": 1.5,
     "value": "7500 gp",
-    "flavorText": "A cape passed down through a lineage that had a complicated history with the shadow.",
+    "flavorText": "A cape that seems to drink light rather than reflect it, more noticeably the dimmer the room gets.",
     "description": "While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21464,7 +21464,7 @@
     "rarity": "rare",
     "weight": 0.8,
     "value": "4500 gp",
-    "flavorText": "A cape passed down through a lineage that had a complicated history with the echo.",
+    "flavorText": "A cape that hums very faintly at all times, like a struck bell that never finished ringing.",
     "description": "Once per short rest, as a reaction to being hit, unleash a thunderous crack: the attacker must succeed on a DC 14 Constitution save or be Deafened for 1 minute. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21597,7 +21597,7 @@
     "rarity": "rare",
     "weight": 2,
     "value": "9000 gp",
-    "flavorText": "Gloves that shift color faintly in the presence of the blood.",
+    "flavorText": "Gloves with a dark stain across the knuckles that's never once come out, no matter how they're cleaned.",
     "description": "Once per long rest, when you take damage that would reduce you below half your hit point maximum, regain 1d6 hit points instead. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21796,7 +21796,7 @@
     "rarity": "rare",
     "weight": 0.7,
     "value": "4000 gp",
-    "flavorText": "Greaves that shift color faintly in the presence of the venom.",
+    "flavorText": "Greaves etched with warding runes clearly meant for something venomous. Whatever it was, they still work.",
     "description": "Resistance to poison damage and advantage on saving throws against being Poisoned. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21897,7 +21897,7 @@
     "rarity": "rare",
     "weight": 1,
     "value": "3000 gp",
-    "flavorText": "These gloves were clearly made for someone who expected trouble involving the ember flame.",
+    "flavorText": "Gloves that stay warm to the touch no matter the season, like they're still holding on to whatever forged them.",
     "description": "Resistance to fire damage. Once per short rest, when you take fire damage, flare back 1d6 fire damage at the attacker. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -21971,7 +21971,7 @@
     "rarity": "rare",
     "weight": 1,
     "value": "9000 gp",
-    "flavorText": "This girdle was clearly made for someone who expected trouble involving the dawn.",
+    "flavorText": "A girdle that glows faintly at all times — useful against the undead, considerably less useful for anyone trying not to be seen.",
     "description": "Resistance to radiant damage. Undead within 10 ft. of you have disadvantage on attack rolls against you. The bearer glows faintly at all times (even in darkness) and can never benefit from being Invisible or from Darkness-based concealment. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -22154,7 +22154,7 @@
     "rarity": "rare",
     "weight": 0.25,
     "value": "3500 gp",
-    "flavorText": "A pair of boots passed down through a lineage that had a complicated history with the whisper.",
+    "flavorText": "Boots that always seem to land a half-step ahead of trouble, like their wearer already knew it was coming.",
     "description": "Advantage on saving throws against being Charmed or Frightened, and you can't be surprised while wearing it. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -22196,7 +22196,7 @@
     "rarity": "rare",
     "weight": 0.55,
     "value": "3500 gp",
-    "flavorText": "Well-worn cloak, clearly built by someone who understood the shadow better than most.",
+    "flavorText": "A cloak that seems to pull the dim a little dimmer around its wearer's shoulders.",
     "description": "While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -27442,7 +27442,7 @@
     "rarity": "superrare",
     "weight": 0.8,
     "value": "30000 gp",
-    "flavorText": "This belt was clearly made for someone who expected trouble involving the decay.",
+    "flavorText": "A belt taken from a tomb that, by the looting party's own account, shouldn't have been empty.",
     "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -27471,7 +27471,7 @@
     "rarity": "superrare",
     "weight": 1,
     "value": "52500 gp",
-    "flavorText": "Well-worn gloves, clearly built by someone who understood the wild better than most.",
+    "flavorText": "Gloves grown rather than stitched, from the same thornwood a certain druidic order refuses to explain.",
     "description": "Once per short rest, as a bonus action, regrow 2d6 hit points from living plant matter within reach. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -27880,7 +27880,7 @@
     "rarity": "superrare",
     "weight": 2,
     "value": "75500 gp",
-    "flavorText": "Cape that never seems to gather dust, dirt, or rust — as if the warding kept it clean.",
+    "flavorText": "A cape with warding script sewn into the lining, in a hand nobody currently alive can read.",
     "description": "+2 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -27942,7 +27942,7 @@
     "rarity": "superrare",
     "weight": 0.85,
     "value": "54000 gp",
-    "flavorText": "Girdle that never seems to gather dust, dirt, or rust — as if fortune kept it clean.",
+    "flavorText": "A girdle braided from the same strange, not-quite-natural thread as its sibling belt — equally unreliable about whose luck it bends.",
     "description": "Once per long rest, reroll a failed saving throw and use either result. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -28033,7 +28033,7 @@
     "rarity": "superrare",
     "weight": 0.5,
     "value": "94000 gp",
-    "flavorText": "Well-worn girdle, clearly built by someone who understood fortune better than most.",
+    "flavorText": "An adamantine girdle that's absolutely saved lives — and, by at least one account, cost one too. It doesn't seem to care which.",
     "description": "Once per long rest, reroll a failed saving throw and use either result. Once per long rest, the DM secretly forces you to reroll a SUCCESSFUL roll of their choice and take the new result — the item's luck runs both ways. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -28052,7 +28052,7 @@
     "rarity": "superrare",
     "weight": 1.5,
     "value": "58500 gp",
-    "flavorText": "Well-worn greaves, clearly built by someone who understood the decay better than most.",
+    "flavorText": "Greaves forged from sun-bright metal that somehow still carries a faint graveyard chill underneath.",
     "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -28137,7 +28137,7 @@
     "rarity": "superrare",
     "weight": 1,
     "value": "84000 gp",
-    "flavorText": "A pair of gloves passed down through a lineage that had a complicated history with the decay.",
+    "flavorText": "Gloves that feel a little too cold for the weather, every single time they're put on.",
     "description": "Resistance to necrotic damage. Once per long rest, when reduced to 0 HP, instead drop to 1 HP. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -28179,7 +28179,7 @@
     "rarity": "superrare",
     "weight": 0.5,
     "value": "52500 gp",
-    "flavorText": "Gloves that never seem to gather dust, dirt, or rust — as if the warding kept them clean.",
+    "flavorText": "Gloves stamped with a ward-glyph clearly copied from somewhere official. The copy still works.",
     "description": "+2 bonus to saving throws against spells, and advantage on saves against being Petrified. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
@@ -28388,7 +28388,7 @@
     "rarity": "superrare",
     "weight": 2.5,
     "value": "67500 gp",
-    "flavorText": "Well-worn bracers, clearly built by someone who understood the shadow better than most.",
+    "flavorText": "Bracers forged in a smithy that, by the smith's own account, never once saw proper daylight.",
     "description": "While in dim light or darkness, you are heavily obscured to creatures more than 10 ft. away. Advantage on Stealth checks in shadow. Requires attunement.",
     "requiresAttunement": true,
     "legacySource": {
@@ -28407,7 +28407,7 @@
     "rarity": "superrare",
     "weight": 0.35,
     "value": "86000 gp",
-    "flavorText": "Boots that never seem to gather dust, dirt, or rust — as if the tempest kept them clean.",
+    "flavorText": "Boots with soles that spark faintly against stone, like they're still carrying a little of the storm that forged them.",
     "description": "Resistance to lightning damage. Once per long rest, when struck in melee, discharge 2d6 lightning damage to the attacker. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
