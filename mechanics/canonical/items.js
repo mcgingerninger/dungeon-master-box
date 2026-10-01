@@ -2420,7 +2420,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 4.5,
     "value": "8 gp",
-    "flavorText": "A iron a short, balanced blade suited to quick strikes.",
+    "flavorText": "An iron short, balanced blade suited to quick strikes.",
     "description": "Finesse, light.",
     "weapon": {
       "damageDice": "1d6",
@@ -2443,7 +2443,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 3.5,
     "value": "8 gp",
-    "flavorText": "A iron a straight double-edged blade about a yard long.",
+    "flavorText": "An iron straight double-edged blade about a yard long.",
     "description": "Versatile (1d10).",
     "weapon": {
       "damageDice": "1d8",
@@ -2466,7 +2466,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 2,
     "value": "8 gp",
-    "flavorText": "A iron a short double-edged blade with a simple crossguard.",
+    "flavorText": "An iron short double-edged blade with a simple crossguard.",
     "description": "Finesse, light, thrown (range 20/60).",
     "weapon": {
       "damageDice": "1d4",
@@ -2489,7 +2489,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 1,
     "value": "8 gp",
-    "flavorText": "A iron a flanged metal head on a sturdy haft.",
+    "flavorText": "An iron flanged metal head on a sturdy haft.",
     "description": "Bludgeoning.",
     "weapon": {
       "damageDice": "1d6",
@@ -2509,7 +2509,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 4.5,
     "value": "8 gp",
-    "flavorText": "A iron a broad single-bladed axe head on a long haft.",
+    "flavorText": "An iron broad single-bladed axe head on a long haft.",
     "description": "Versatile (1d10).",
     "weapon": {
       "damageDice": "1d8",
@@ -2532,7 +2532,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 19,
     "value": "8 gp",
-    "flavorText": "A iron a heavy square hammerhead built for crushing blows.",
+    "flavorText": "An iron heavy square hammerhead built for crushing blows.",
     "description": "Versatile (1d10).",
     "weapon": {
       "damageDice": "1d8",
@@ -2556,7 +2556,7 @@ const canonicalItems = [
     "rarity": "common",
     "weight": 16,
     "value": "8 gp",
-    "flavorText": "A iron a long haft tipped with a leaf-shaped point.",
+    "flavorText": "An iron long haft tipped with a leaf-shaped point.",
     "description": "Thrown (range 20/60), versatile (1d8).",
     "weapon": {
       "damageDice": "1d6",
@@ -6867,7 +6867,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 1,
     "value": "60 gp",
-    "flavorText": "A steel a short, balanced blade suited to quick strikes.",
+    "flavorText": "A steel short, balanced blade suited to quick strikes.",
     "description": "Finesse, light. +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d6",
@@ -6900,7 +6900,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 2,
     "value": "60 gp",
-    "flavorText": "A steel a straight double-edged blade about a yard long.",
+    "flavorText": "A steel straight double-edged blade about a yard long.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d8",
@@ -6933,7 +6933,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7,
     "value": "60 gp",
-    "flavorText": "A steel a short double-edged blade with a simple crossguard.",
+    "flavorText": "A steel short double-edged blade with a simple crossguard.",
     "description": "Finesse, light, thrown (range 20/60). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d4",
@@ -6966,7 +6966,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 6,
     "value": "60 gp",
-    "flavorText": "A steel a flanged metal head on a sturdy haft.",
+    "flavorText": "A steel flanged metal head on a sturdy haft.",
     "description": "Bludgeoning. +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d6",
@@ -6996,7 +6996,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 8,
     "value": "60 gp",
-    "flavorText": "A steel a broad single-bladed axe head on a long haft.",
+    "flavorText": "A steel broad single-bladed axe head on a long haft.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d8",
@@ -7029,7 +7029,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 40,
     "value": "60 gp",
-    "flavorText": "A steel a heavy square hammerhead built for crushing blows.",
+    "flavorText": "A steel heavy square hammerhead built for crushing blows.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d8",
@@ -7063,7 +7063,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 10,
     "value": "60 gp",
-    "flavorText": "A steel a long haft tipped with a leaf-shaped point.",
+    "flavorText": "A steel long haft tipped with a leaf-shaped point.",
     "description": "Thrown (range 20/60), versatile (1d8). +1 to attack and damage rolls. Superior steel holds an edge far longer than iron.",
     "weapon": {
       "damageDice": "1d6",
@@ -7097,7 +7097,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 4,
     "value": "90 gp",
-    "flavorText": "A silver a short, balanced blade suited to quick strikes.",
+    "flavorText": "A silver short, balanced blade suited to quick strikes.",
     "description": "Finesse, light. +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d6",
@@ -7136,7 +7136,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 7.5,
     "value": "90 gp",
-    "flavorText": "A silver a flanged metal head on a sturdy haft.",
+    "flavorText": "A silver flanged metal head on a sturdy haft.",
     "description": "Bludgeoning. +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d6",
@@ -7172,7 +7172,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 3,
     "value": "90 gp",
-    "flavorText": "A silver a broad single-bladed axe head on a long haft.",
+    "flavorText": "A silver broad single-bladed axe head on a long haft.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d8",
@@ -7211,7 +7211,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 36,
     "value": "90 gp",
-    "flavorText": "A silver a heavy square hammerhead built for crushing blows.",
+    "flavorText": "A silver heavy square hammerhead built for crushing blows.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d8",
@@ -7251,7 +7251,7 @@ const canonicalItems = [
     "rarity": "uncommon",
     "weight": 16,
     "value": "90 gp",
-    "flavorText": "A silver a long haft tipped with a leaf-shaped point.",
+    "flavorText": "A silver long haft tipped with a leaf-shaped point.",
     "description": "Thrown (range 20/60), versatile (1d8). +1 to attack and damage rolls. Counts as silvered — effective against lycanthropes and certain undead. Not fully magical.",
     "weapon": {
       "damageDice": "1d6",
@@ -16257,7 +16257,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 4,
     "value": "1200 gp",
-    "flavorText": "A mithral a short, balanced blade suited to quick strikes.",
+    "flavorText": "A mithral short, balanced blade suited to quick strikes.",
     "description": "Finesse, light. +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d6",
@@ -16290,7 +16290,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 3.5,
     "value": "1200 gp",
-    "flavorText": "A mithral a straight double-edged blade about a yard long.",
+    "flavorText": "A mithral straight double-edged blade about a yard long.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d8",
@@ -16323,7 +16323,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 6,
     "value": "1200 gp",
-    "flavorText": "A mithral a short double-edged blade with a simple crossguard.",
+    "flavorText": "A mithral short double-edged blade with a simple crossguard.",
     "description": "Finesse, light, thrown (range 20/60). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d4",
@@ -16356,7 +16356,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 5,
     "value": "1200 gp",
-    "flavorText": "A mithral a flanged metal head on a sturdy haft.",
+    "flavorText": "A mithral flanged metal head on a sturdy haft.",
     "description": "Bludgeoning. +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d6",
@@ -16386,7 +16386,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 2.5,
     "value": "1200 gp",
-    "flavorText": "A mithral a broad single-bladed axe head on a long haft.",
+    "flavorText": "A mithral broad single-bladed axe head on a long haft.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d8",
@@ -16419,7 +16419,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 32,
     "value": "1200 gp",
-    "flavorText": "A mithral a heavy square hammerhead built for crushing blows.",
+    "flavorText": "A mithral heavy square hammerhead built for crushing blows.",
     "description": "Versatile (1d10). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d8",
@@ -16453,7 +16453,7 @@ const canonicalItems = [
     "rarity": "rare",
     "weight": 19,
     "value": "1200 gp",
-    "flavorText": "A mithral a long haft tipped with a leaf-shaped point.",
+    "flavorText": "A mithral long haft tipped with a leaf-shaped point.",
     "description": "Thrown (range 20/60), versatile (1d8). +1 to attack and damage rolls. Half the normal weight of a comparable weapon, without sacrificing durability.",
     "weapon": {
       "damageDice": "1d6",
@@ -24603,7 +24603,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a short, balanced blade suited to quick strikes.",
+    "flavorText": "An orichalcum short, balanced blade suited to quick strikes.",
     "description": "Finesse, light. +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d6",
@@ -24636,7 +24636,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a straight double-edged blade about a yard long.",
+    "flavorText": "An orichalcum straight double-edged blade about a yard long.",
     "description": "Versatile (1d10). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d8",
@@ -24669,7 +24669,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 6,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a short double-edged blade with a simple crossguard.",
+    "flavorText": "An orichalcum short double-edged blade with a simple crossguard.",
     "description": "Finesse, light, thrown (range 20/60). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d4",
@@ -24702,7 +24702,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 5.5,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a flanged metal head on a sturdy haft.",
+    "flavorText": "An orichalcum flanged metal head on a sturdy haft.",
     "description": "Bludgeoning. +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d6",
@@ -24732,7 +24732,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 4.5,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a broad single-bladed axe head on a long haft.",
+    "flavorText": "An orichalcum broad single-bladed axe head on a long haft.",
     "description": "Versatile (1d10). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d8",
@@ -24765,7 +24765,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 21,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a heavy square hammerhead built for crushing blows.",
+    "flavorText": "An orichalcum heavy square hammerhead built for crushing blows.",
     "description": "Versatile (1d10). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d8",
@@ -24799,7 +24799,7 @@ const canonicalItems = [
     "rarity": "superrare",
     "weight": 15,
     "value": "12000 gp",
-    "flavorText": "A orichalcum a long haft tipped with a leaf-shaped point.",
+    "flavorText": "An orichalcum long haft tipped with a leaf-shaped point.",
     "description": "Thrown (range 20/60), versatile (1d8). +2 to attack and damage rolls. The metal seems to hum faintly when swung in earnest.",
     "weapon": {
       "damageDice": "1d6",
@@ -31118,7 +31118,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 4.5,
     "value": "25000 gp",
-    "flavorText": "A adamantine a short, balanced blade suited to quick strikes.",
+    "flavorText": "An adamantine short, balanced blade suited to quick strikes.",
     "description": "Finesse, light. +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d6",
@@ -31156,7 +31156,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 5.5,
     "value": "25000 gp",
-    "flavorText": "A adamantine a straight double-edged blade about a yard long.",
+    "flavorText": "An adamantine straight double-edged blade about a yard long.",
     "description": "Versatile (1d10). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d8",
@@ -31194,7 +31194,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 6,
     "value": "25000 gp",
-    "flavorText": "A adamantine a short double-edged blade with a simple crossguard.",
+    "flavorText": "An adamantine short double-edged blade with a simple crossguard.",
     "description": "Finesse, light, thrown (range 20/60). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d4",
@@ -31232,7 +31232,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 2.5,
     "value": "25000 gp",
-    "flavorText": "A adamantine a flanged metal head on a sturdy haft.",
+    "flavorText": "An adamantine flanged metal head on a sturdy haft.",
     "description": "Bludgeoning. +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d6",
@@ -31267,7 +31267,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 4,
     "value": "25000 gp",
-    "flavorText": "A adamantine a broad single-bladed axe head on a long haft.",
+    "flavorText": "An adamantine broad single-bladed axe head on a long haft.",
     "description": "Versatile (1d10). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d8",
@@ -31305,7 +31305,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 23,
     "value": "25000 gp",
-    "flavorText": "A adamantine a heavy square hammerhead built for crushing blows.",
+    "flavorText": "An adamantine heavy square hammerhead built for crushing blows.",
     "description": "Versatile (1d10). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d8",
@@ -31344,7 +31344,7 @@ const canonicalItems = [
     "rarity": "legendary",
     "weight": 8,
     "value": "25000 gp",
-    "flavorText": "A adamantine a long haft tipped with a leaf-shaped point.",
+    "flavorText": "An adamantine long haft tipped with a leaf-shaped point.",
     "description": "Thrown (range 20/60), versatile (1d8). +2 to attack and damage rolls. Attacks made with this weapon that hit an object automatically score a critical hit against it.",
     "weapon": {
       "damageDice": "1d6",
