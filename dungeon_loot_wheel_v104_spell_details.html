@@ -2223,6 +2223,14 @@
   .tt-header.legendary { color:var(--legendary); }
   .tt-header.celestial { color:var(--celestial); }
   .tt-rarity { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+  /* Spell / summon quick-reference links (see linkRefs) */
+  .ref-link { border-bottom:1px dotted var(--gold); cursor:help; }
+  .ref-link:hover { color:var(--gold-bright); }
+  .tt-refs { margin-top:0.5rem; border-top:1px solid var(--border); padding-top:0.4rem; }
+  .tt-ref { margin-bottom:0.45rem; }
+  .tt-ref-head { color:var(--gold); }
+  .tt-ref-head span { color:var(--text-dim); font-size:0.78rem; }
+  .tt-ref-text { font-size:0.8rem; color:var(--text-dim); line-height:1.35; margin-top:0.15rem; }
   .tt-stats { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem; }
   .tt-stats span { background:var(--surface); border:1px solid var(--border); padding:0.1rem 0.4rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--gold); }
   .tt-desc { font-style:italic; color:var(--text-dim); margin-bottom:0.4rem; white-space:pre-line; }
@@ -7942,7 +7950,7 @@ function renderItemWithInspection(it, inspectMode, sourceKey) {
     if (fieldsToHide.includes('desc')) {
       descHtml = inspectField('desc', it.desc, it.rarity, sourceKey, revealed.has('desc'));
     } else {
-      descHtml = `<div class="item-desc">${it.desc}</div>`;
+      descHtml = `<div class="item-desc">${linkRefs(it.desc)}</div>`;
     }
   }
 
@@ -7955,7 +7963,7 @@ function renderItemWithInspection(it, inspectMode, sourceKey) {
     if (fieldsToHide.includes('effect')) {
       effectHtml = inspectField('effect', `<em>${it.effect}</em>`, it.rarity, sourceKey, revealed.has('effect'));
     } else {
-      effectHtml = `<div class="item-effect">Effect: ${it.effect}</div>`;
+      effectHtml = `<div class="item-effect">Effect: ${linkRefs(it.effect)}</div>`;
     }
   }
 
@@ -9086,7 +9094,7 @@ function itemEffectBlockHtml(item) {
   if (item.mods && item.mods.length) {
     return `<div class="item-effect">${item.mods.map(m => colorizeModifierText(m.text, m.type) + summonedMonsterStatHtml(m)).join(' ')}</div>`;
   }
-  if (item.effect) return `<div class="item-effect">Effect: ${item.effect}</div>`;
+  if (item.effect) return `<div class="item-effect">Effect: ${linkRefs(item.effect)}</div>`;
   return '';
 }
 
@@ -14880,6 +14888,208 @@ const EXTRA_FLAVOR = [];
 
 // ===================== ITEM TOKENS & PLAYER EQUIPMENT =====================
 
+// ===================== SPELL / SUMMON QUICK-REFERENCE POPUPS =====================
+// Item text names spells ("cast Silvery Barbs once per short rest") and summoned creatures
+// ("summon a Water Elemental") that a player shouldn't have to leave the item to look up. Two
+// surfaces share one finder (findRefSpans):
+//  - linkRefs(): wraps those names in a dotted-underline <span class="ref-link"> wherever item
+//    text is shown persistently (loot result cards, Edit Items, Generate/Fleshmancer previews);
+//    hovering one opens the shared #itemTooltip with the spell's / creature's reference card.
+//  - buildItemRefSection(): the same info as a compact "Quick reference" block inside an item's
+//    own hover tooltip, since a tooltip can't itself be hovered.
+// Spells come from the Spell Compendium database and creatures from the Monster Compendium
+// database (both load from 5etools at startup), so a name only links once that data has loaded.
+const REF_SUMMON_VERB = /\b(?:summon(?:s|ed|ing)?|conjure[sd]?|call(?:s)? forth|manifest(?:s)?|animates?|becomes? an?|obeys? (?:you|your)|follows? your commands?|serves you)\b/i;
+let _refIndex = null, _refIndexKey = '';
+function refEscRe(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/'|’/g, "(?:'|’|&#39;|&apos;)").replace(/ /g, '\\s+');
+}
+function refNormName(s) { return String(s || '').toLowerCase().replace(/’/g, "'").replace(/&#39;|&apos;/g, "'").replace(/\s+/g, ' ').trim(); }
+function getRefIndex() {
+  const spells = (typeof spellDatabase !== 'undefined' && Array.isArray(spellDatabase)) ? spellDatabase : [];
+  const mons = (typeof monsterDatabase !== 'undefined' && Array.isArray(monsterDatabase)) ? monsterDatabase : [];
+  const key = spells.length + ':' + mons.length;
+  if (_refIndex && key === _refIndexKey) return _refIndex;
+  const spellMap = new Map(), monsterMap = new Map();
+  spells.forEach(s => { const k = refNormName(s.name); if (k && !spellMap.has(k)) spellMap.set(k, s); });
+  mons.forEach(m => {
+    const k = refNormName(m.name);
+    // Named NPC stat blocks ("Guard", "Mage", "Priest") would otherwise light up in any sentence
+    // that merely mentions commanding someone — only real creatures count as summons.
+    if (k.length >= 3 && !/^humanoid/i.test(m.type || '') && !monsterMap.has(k)) monsterMap.set(k, m);
+  });
+  const byLen = (a, b) => b.length - a.length;
+  const spellNames = [...spellMap.values()].map(s => s.name);
+  const multi = spellNames.filter(n => /[ -]/.test(n)).sort(byLen);
+  const single = [...new Set(spellNames.filter(n => !/[ -]/.test(n)))].sort(byLen);
+  const idx = { spellMap, monsterMap, key };
+  const alt = a => a.map(refEscRe).join('|');
+  if (multi.length) idx.multiRe = new RegExp(`(?<![\\w-])(?:${alt(multi)})(?![\\w-])`, 'gi');
+  if (single.length) {
+    // A one-word spell name ("Light", "Shield", "Fly") is also an ordinary English word, so it
+    // only counts with spell context: "cast Light", "Expend 1: Fly", "Light (Xanathar)", "the
+    // Shield spell". "...Light or Daylight" continues a list after one such hit.
+    idx.singleCtxRe = new RegExp(`(?:\\b(?:casts?|casting|spell|cantrip|scroll of|learns?|knows?)\\s+(?:the\\s+)?(?:spell\\s+)?|Expend\\s+\\d+(?:\\s+charges?)?:\\s*|charges?:\\s*)(${alt(single)})(?![\\w-])`, 'g');
+    idx.singleSufRe = new RegExp(`(?<![\\w-])(${alt(single)})(?=\\s+(?:spell|cantrip)\\b|\\s*\\([A-Z][\\w' ]*\\)|\\s*\\(\\d+\\)|\\s+\\d+(?:st|nd|rd|th)\\b)`, 'g');
+    idx.listNameRe = new RegExp(`\\s*(?:,\\s*)?(?:or|and)\\s+(${alt([...multi, ...single])})(?![\\w-])`, 'iy');
+  }
+  const monNames = [...monsterMap.values()].map(m => m.name).sort(byLen);
+  if (monNames.length) idx.monsterRe = new RegExp(`(?<![\\w-])(${alt(monNames)})(?:e?s)?(?![\\w-])`, 'gi');
+  _refIndex = idx; _refIndexKey = key;
+  return idx;
+}
+// -> [{ start, end, kind:'spell'|'monster', name }] over plain/HTML-safe text, non-overlapping.
+function findRefSpans(text, summonContext) {
+  const idx = getRefIndex();
+  const spans = [];
+  const add = (start, end, kind, name) => spans.push({ start, end, kind, name });
+  if (idx.multiRe) { idx.multiRe.lastIndex = 0; for (const m of text.matchAll(idx.multiRe)) { const s = idx.spellMap.get(refNormName(m[0])); if (s) add(m.index, m.index + m[0].length, 'spell', s.name); } }
+  const singleHit = (m) => {
+    const name = m[1], start = m.index + m[0].lastIndexOf(name);
+    const s = idx.spellMap.get(refNormName(name)); if (!s) return;
+    add(start, start + name.length, 'spell', s.name);
+    let at = start + name.length;
+    for (;;) { // "cast Light or Daylight": keep consuming list continuations
+      idx.listNameRe.lastIndex = at; const n = idx.listNameRe.exec(text); if (!n) break;
+      const ns = idx.spellMap.get(refNormName(n[1])); if (!ns) break;
+      const ns0 = n.index + n[0].lastIndexOf(n[1]); add(ns0, ns0 + n[1].length, 'spell', ns.name); at = ns0 + n[1].length;
+    }
+  };
+  if (idx.singleCtxRe) { idx.singleCtxRe.lastIndex = 0; for (const m of text.matchAll(idx.singleCtxRe)) singleHit(m); }
+  if (idx.singleSufRe) { idx.singleSufRe.lastIndex = 0; for (const m of text.matchAll(idx.singleSufRe)) singleHit(m); }
+  if (summonContext && idx.monsterRe) {
+    idx.monsterRe.lastIndex = 0;
+    for (const m of text.matchAll(idx.monsterRe)) { const mo = idx.monsterMap.get(refNormName(m[1])); if (mo) add(m.index, m.index + m[0].length, 'monster', mo.name); }
+  }
+  spans.sort((a, b) => a.start - b.start || b.end - a.end);
+  const out = [];
+  spans.forEach(sp => { if (!out.length || sp.start >= out[out.length - 1].end) out.push(sp); });
+  return out;
+}
+// Wraps spell/creature names inside an HTML string (tag markup and attributes are left alone).
+function linkRefs(html) {
+  if (!html) return html;
+  const s = String(html);
+  const idx = getRefIndex();
+  if (!idx.spellMap.size && !idx.monsterMap.size) return s;
+  const summonContext = REF_SUMMON_VERB.test(s.replace(/<[^>]+>/g, ' '));
+  return s.replace(/(<[^>]*>)|([^<]+)/g, (m, tag, text) => {
+    if (tag) return tag;
+    const spans = findRefSpans(text, summonContext);
+    if (!spans.length) return text;
+    let out = '', at = 0;
+    spans.forEach(sp => {
+      out += text.slice(at, sp.start) + `<span class="ref-link ref-${sp.kind}" data-ref-kind="${sp.kind}" data-ref-name="${escapeHtml(sp.name)}" onmouseenter="showRefTooltip(event,this)" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${text.slice(sp.start, sp.end)}</span>`;
+      at = sp.end;
+    });
+    return out + text.slice(at);
+  });
+}
+function refPlainText(item) {
+  const bits = [item.desc, item.effect, ...(item.mods || []).map(m => m.text)];
+  return bits.filter(Boolean).join(' ').replace(/<[^>]+>/g, ' ');
+}
+// Unique refs an item's own text mentions, in reading order, plus any creature a Summon/
+// Transform modifier rolled with a stat snapshot attached.
+function collectItemRefs(item) {
+  if (!item) return [];
+  const text = refPlainText(item);
+  const found = [], seen = new Set();
+  const push = (kind, name) => { const k = kind + ':' + name.toLowerCase(); if (!seen.has(k)) { seen.add(k); found.push({ kind, name }); } };
+  (item.mods || []).forEach(m => { if (m.summonedMonster && m.summonedMonster.name) push('monster', m.summonedMonster.name); });
+  findRefSpans(text, REF_SUMMON_VERB.test(text)).forEach(sp => push(sp.kind, sp.name));
+  return found;
+}
+function refTrim(text, max) {
+  const t = String(text || '').replace(/[ \t]+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const stop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('.\n'));
+  return (stop > max * 0.5 ? cut.slice(0, stop + 1) : cut.replace(/\s+\S*$/, '')) + ' …';
+}
+function spellRefShortCasting(s) { return String(s.casting || '—').replace(/\s*\(.*$/, ''); }
+function spellRefLevelLabel(s) {
+  const lv = Number(s.level);
+  return (lv === 0 ? 'Cantrip' : spellLevelLabel(lv) + '-level') + ' ' + (s.schoolName || '');
+}
+function spellRefFacts(s) {
+  const facts = [['⏱', spellRefShortCasting(s)], ['📏', s.rangeLabel], ['⌛', s.durationLabel], ['✋', s.componentsLabel]];
+  if (s.hitDice && s.hitDice !== '—') facts.push(['🎲', s.hitDice]);
+  return facts.filter(([, v]) => v && v !== '—');
+}
+function buildSpellRefHtml(name, compact) {
+  const idx = getRefIndex();
+  const s = idx.spellMap.get(refNormName(name));
+  if (!s) return `<div class="tt-header"><span>${escapeHtml(name)}</span></div><div class="tt-desc">${spellDatabaseLoaded ? 'No reference entry found for this spell.' : 'Spell reference is still loading — hover again in a moment.'}</div>`;
+  const facts = `<div class="tt-stats">${spellRefFacts(s).map(([i, v]) => `<span>${i} ${escapeHtml(v)}</span>`).join('')}</div>`;
+  const tags = [s.concentration ? 'Concentration' : '', s.ritual ? 'Ritual' : ''].filter(Boolean).join(' · ');
+  if (compact) {
+    return `<div class="tt-ref"><div class="tt-ref-head"><b>🔮 ${escapeHtml(s.name)}</b> <span>${escapeHtml(spellRefLevelLabel(s))}${tags ? ' · ' + tags : ''}</span></div>${facts}<div class="tt-ref-text">${escapeHtml(refTrim(s.description, 240))}</div></div>`;
+  }
+  const rows = [['Save', s.save], ['Attack', s.attack], ['Damage', s.damage], ['Conditions', s.conditions]].filter(([, v]) => v && v !== '—');
+  const material = s.materialLabel && s.materialLabel !== '—' ? `<div class="tt-classification">Material: ${escapeHtml(refTrim(s.materialLabel, 140))}</div>` : '';
+  return `<div class="tt-header"><span>🔮 ${escapeHtml(s.name)}</span></div>
+    <div class="tt-rarity">${escapeHtml(spellRefLevelLabel(s))}${tags ? ' · ' + tags : ''} · ${escapeHtml(s.sourceLabel || s.source || '')}</div>
+    ${facts}
+    ${rows.length ? `<div class="tt-classification">${rows.map(([k, v]) => `${k}: ${escapeHtml(v)}`).join(' · ')}</div>` : ''}
+    ${material}
+    <div class="tt-effect" style="white-space:pre-line">${escapeHtml(refTrim(s.description, 900))}</div>`;
+}
+const _refMonsterSnaps = new Map();
+function monsterRefData(name, snapshot) {
+  const m = getRefIndex().monsterMap.get(refNormName(name));
+  if (m) return m;
+  snapshot = snapshot || _refMonsterSnaps.get(refNormName(name));
+  return snapshot ? { name: snapshot.name || name, ac: snapshot.ac, hp: snapshot.hp, size: snapshot.size, type: snapshot.type, cr: snapshot.cr, speed: snapshot.speed, traits: [], actions: [] } : null;
+}
+function monsterRefAbilityLine(m) {
+  const parts = [['STR', m.str], ['DEX', m.dex], ['CON', m.con], ['INT', m.int], ['WIS', m.wis], ['CHA', m.cha]].filter(([, v]) => v != null);
+  return parts.map(([k, v]) => `${k} ${v} (${v >= 10 ? '+' : ''}${Math.floor((v - 10) / 2)})`).join(' · ');
+}
+function buildMonsterRefHtml(name, compact, snapshot) {
+  const m = monsterRefData(name, snapshot);
+  if (!m) return `<div class="tt-header"><span>${escapeHtml(name)}</span></div><div class="tt-desc">${monsterDatabaseLoaded ? 'No reference entry found for this creature.' : 'Creature reference is still loading — hover again in a moment.'}</div>`;
+  const stats = [m.ac != null && m.ac !== '' ? `🛡 AC ${m.ac}` : '', m.hp ? `❤ HP ${m.hp}` : '', m.speed ? `🏃 ${m.speed}` : '', m.cr != null && m.cr !== '' ? `⚔ CR ${m.cr}` : ''].filter(Boolean);
+  const statsHtml = `<div class="tt-stats">${stats.map(s => `<span>${escapeHtml(s)}</span>`).join('')}</div>`;
+  const typeLine = [m.size, m.type, m.alignment].filter(Boolean).join(' · ');
+  const attacks = (list, max, len) => (list || []).slice(0, max).map(a => `<div class="tt-ref-text"><b>${escapeHtml(a.name)}${a.recharge ? ' (Recharge ' + escapeHtml(a.recharge) + ')' : ''}.</b> ${escapeHtml(refTrim(a.text, len))}</div>`).join('');
+  if (compact) {
+    return `<div class="tt-ref"><div class="tt-ref-head"><b>🐾 ${escapeHtml(m.name)}</b> <span>${escapeHtml(typeLine)}</span></div>${statsHtml}${attacks(m.actions, 2, 130)}</div>`;
+  }
+  const abil = m.str != null ? `<div class="tt-classification">${escapeHtml(monsterRefAbilityLine(m))}</div>` : '';
+  const damage = [['Resist', m.resist], ['Immune', m.immune], ['Vulnerable', m.vulnerable], ['Condition Immune', m.conditionImmune]].filter(([, v]) => v && v !== '—');
+  return `<div class="tt-header"><span>🐾 ${escapeHtml(m.name)}</span></div>
+    <div class="tt-rarity">${escapeHtml(typeLine)}${m.sourceLabel ? ' · ' + escapeHtml(m.sourceLabel) : ''}</div>
+    ${statsHtml}${abil}
+    ${m.senses && m.senses !== '—' ? `<div class="tt-classification">Senses ${escapeHtml(m.senses)}${m.languages && m.languages !== '—' ? ' · Languages ' + escapeHtml(m.languages) : ''}</div>` : ''}
+    ${damage.length ? `<div class="tt-classification">${damage.map(([k, v]) => `${k}: ${escapeHtml(v)}`).join(' · ')}</div>` : ''}
+    ${(m.traits && m.traits.length) ? `<div class="tt-unlocks-title">Traits</div>${attacks(m.traits, 4, 160)}` : ''}
+    ${(m.actions && m.actions.length) ? `<div class="tt-unlocks-title">Actions</div>${attacks(m.actions, 5, 200)}` : ''}`;
+}
+function showRefTooltip(evt, el) {
+  const tt = document.getElementById('itemTooltip');
+  if (!tt || !el) return;
+  const kind = el.getAttribute('data-ref-kind'), name = el.getAttribute('data-ref-name');
+  if (kind === 'spell' && !spellDatabaseLoaded && typeof loadSpellDatabase === 'function') loadSpellDatabase(false);
+  if (kind === 'monster' && !monsterDatabaseLoaded && typeof loadMonsterDatabase === 'function') loadMonsterDatabase(false);
+  tt.innerHTML = kind === 'spell' ? buildSpellRefHtml(name, false) : buildMonsterRefHtml(name, false);
+  tt.style.display = 'block';
+  moveTokenTooltip(evt);
+}
+// Compact reference block appended to an item's own tooltip (capped so a ring that mentions five
+// spells doesn't produce a screen-tall popup — hover the underlined names on a card for the full
+// version).
+function buildItemRefSection(item) {
+  const refs = collectItemRefs(item);
+  if (!refs.length) return '';
+  const MAX = 3;
+  const snaps = new Map();
+  (item.mods || []).forEach(m => { if (m.summonedMonster && m.summonedMonster.name) snaps.set(m.summonedMonster.name.toLowerCase(), m.summonedMonster); });
+  const blocks = refs.slice(0, MAX).map(r => r.kind === 'spell' ? buildSpellRefHtml(r.name, true) : buildMonsterRefHtml(r.name, true, snaps.get(r.name.toLowerCase())));
+  const more = refs.length > MAX ? `<div class="tt-ref-text">+${refs.length - MAX} more — hover the underlined names on the item card.</div>` : '';
+  return `<div class="tt-refs"><div class="tt-unlocks-title">Quick reference</div>${blocks.join('')}${more}</div>`;
+}
+
 function escapeHtml(str) {
   if (str === undefined || str === null) return '';
   return String(str)
@@ -14920,7 +15130,9 @@ function summonedMonsterStatHtml(mod) {
     s.cr != null ? `CR ${s.cr}` : null,
     s.speed ? `Speed ${s.speed}` : null,
   ].filter(Boolean).join(' · ');
-  return `<div class="mod-monster-stats">🐾 <strong>${escapeHtml(s.name)}</strong> — ${escapeHtml(parts)}</div>`;
+  _refMonsterSnaps.set(refNormName(s.name), s);
+  const nameHtml = `<strong class="ref-link ref-monster" data-ref-kind="monster" data-ref-name="${escapeHtml(s.name)}" onmouseenter="showRefTooltip(event,this)" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${escapeHtml(s.name)}</strong>`;
+  return `<div class="mod-monster-stats">🐾 ${nameHtml} — ${escapeHtml(parts)}</div>`;
 }
 // used — "the bearer suffers" (self-inflicted curse, red) vs "Inflicts ... on one target"
 // (aimed at an enemy, green). Named Traits mix exactly one of each in a single line
@@ -14928,7 +15140,7 @@ function summonedMonsterStatHtml(mod) {
 // Everything else (Power, Transform, Summon, Terrain, Skill, Monster Skill) is left
 // uncolored — this is scoped to buffs/debuffs specifically. Only ever call this on text
 // about to be inserted as HTML, never on text headed for a plain-text export/copy.
-function colorizeModifierText(text, type) {
+function colorizeModifierTextRaw(text, type) {
   if (type === 'Buff') return `<span style="color:var(--uncommon)">${text}</span>`;
   if (type === 'Debuff') {
     const isSelfInflicted = /the bearer suffers/i.test(text);
@@ -14940,6 +15152,12 @@ function colorizeModifierText(text, type) {
     );
   }
   return text;
+}
+// Spell and summoned-creature names in modifier text link to quick-reference popups (see
+// linkRefs); pass plain=true where the result lands inside a tooltip, which can't be hovered.
+function colorizeModifierText(text, type, plain) {
+  const html = colorizeModifierTextRaw(text, type);
+  return plain ? html : linkRefs(html);
 }
 
 const SLOT_TYPES = [
@@ -17222,7 +17440,7 @@ function buildTooltipHtml(entry) {
   }
   let modsHtml = '';
   if (item.mods && item.mods.length) {
-    modsHtml = `<div class="tt-mods">${item.mods.map(m => `<div class="tt-mod"><b>${escapeHtml(m.type)}:</b> ${colorizeModifierText(m.text, m.type)}</div>${summonedMonsterStatHtml(m)}`).join('')}</div>`;
+    modsHtml = `<div class="tt-mods">${item.mods.map(m => `<div class="tt-mod"><b>${escapeHtml(m.type)}:</b> ${colorizeModifierText(m.text, m.type, true)}</div>${summonedMonsterStatHtml(m)}`).join('')}</div>`;
   }
   // Classification breadcrumb + properties/tags chips — see classifyItemFull(). Falls back
   // to computing on the spot for anything shown before it's been saved/loaded through the
@@ -17250,6 +17468,7 @@ function buildTooltipHtml(entry) {
     ${item.desc ? `<div class="tt-desc">${escapeHtml(item.desc)}</div>` : ''}
     ${(item.abilities && item.abilities.length) ? '' : effectBulletsHtml(effect)}
     ${modsHtml}
+    ${buildItemRefSection(item)}
     ${tagsHtml}
     ${interactionsHtml}
     ${unlocksHtml}
