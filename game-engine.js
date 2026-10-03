@@ -1537,3 +1537,145 @@ export function computeSpellFocusBonus(focus, mods) {
   if (focus.buff === 'attack') return { damage: 0, attack: focus.attackBonus };
   return { damage: Math.round(scaled / 2), attack: Math.ceil(focus.attackBonus / 2) };
 }
+
+
+// ===================== WEAPON PROFICIENCY =====================
+// A weapon attack only adds the proficiency bonus if the character is PROFICIENT with that weapon.
+// Proficiency comes from four places: the class (5e class tables, matched from the free-text Class
+// field), what the player ticks on the Character Sheet, equipped gear/feats whose text grants it
+// ("Proficiency with longbows and shortbows"), or the weapon itself. A character with no
+// recognizable class and nothing ticked is treated as proficient with everything, so a sheet nobody
+// has filled in yet behaves as it did before this system existed.
+const SIMPLE = 'simple', MARTIAL = 'martial';
+// [name regex (lowercase), id, label, category] — first match wins, so specific names come before
+// generic ones ("greatclub" before "club", "battleaxe" before "axe").
+export const WEAPON_PROFICIENCY_TABLE = [
+  [/great.?club/, 'greatclub', 'Greatclub', SIMPLE],
+  [/light hammer/, 'light hammer', 'Light hammer', SIMPLE],
+  [/war.?hammer|great.?hammer|\bmaul\b/, 'warhammer', 'Warhammer', MARTIAL],
+  [/hand crossbow/, 'hand crossbow', 'Hand crossbow', MARTIAL],
+  [/heavy crossbow/, 'heavy crossbow', 'Heavy crossbow', MARTIAL],
+  [/crossbow/, 'light crossbow', 'Light crossbow', SIMPLE],
+  [/long.?bow|great.?bow/, 'longbow', 'Longbow', MARTIAL],
+  [/short.?bow/, 'shortbow', 'Shortbow', SIMPLE],
+  [/\bsling\b/, 'sling', 'Sling', SIMPLE],
+  [/\bdarts?\b/, 'dart', 'Dart', SIMPLE],
+  [/javelin/, 'javelin', 'Javelin', SIMPLE],
+  [/dagger|\bknife\b|dirk|stiletto|kukri|\bshiv\b/, 'dagger', 'Dagger', SIMPLE],
+  [/hand.?axe|hatchet|tomahawk/, 'handaxe', 'Handaxe', SIMPLE],
+  [/great.?axe/, 'greataxe', 'Greataxe', MARTIAL],
+  [/battle.?axe|\baxe\b/, 'battleaxe', 'Battleaxe', MARTIAL],
+  [/morningstar/, 'morningstar', 'Morningstar', MARTIAL],
+  [/\bflail\b/, 'flail', 'Flail', MARTIAL],
+  [/\bmace\b/, 'mace', 'Mace', SIMPLE],
+  [/\bclub\b|cudgel|truncheon/, 'club', 'Club', SIMPLE],
+  [/quarterstaff|battle staff|\bstaff\b/, 'quarterstaff', 'Quarterstaff', SIMPLE],
+  [/\bsickle\b/, 'sickle', 'Sickle', SIMPLE],
+  [/\bspear\b|\bspears\b/, 'spear', 'Spear', SIMPLE],
+  [/trident/, 'trident', 'Trident', MARTIAL],
+  [/halberd/, 'halberd', 'Halberd', MARTIAL],
+  [/glaive/, 'glaive', 'Glaive', MARTIAL],
+  [/\bpike\b/, 'pike', 'Pike', MARTIAL],
+  [/\blance\b|dragonlance/, 'lance', 'Lance', MARTIAL],
+  [/\bwhip\b/, 'whip', 'Whip', MARTIAL],
+  [/blowgun/, 'blowgun', 'Blowgun', MARTIAL],
+  [/\bnet\b/, 'net', 'Net', MARTIAL],
+  [/\bpick\b/, 'war pick', 'War pick', MARTIAL],
+  [/rapier/, 'rapier', 'Rapier', MARTIAL],
+  [/scimitar/, 'scimitar', 'Scimitar', MARTIAL],
+  [/short.?sword|wand blade/, 'shortsword', 'Shortsword', MARTIAL],
+  [/great.?sword|zweihander/, 'greatsword', 'Greatsword', MARTIAL],
+  [/long.?sword|sword|blade\b/, 'longsword', 'Longsword', MARTIAL],
+  [/\b(wand|rod|scepter|sceptre|orb)\b/, 'wand', 'Wand / rod', SIMPLE],
+];
+export const WEAPON_PROFICIENCY_IDS = WEAPON_PROFICIENCY_TABLE.map(([, id, label, category]) => ({ id, label, category }))
+  .filter((w, i, a) => a.findIndex(x => x.id === w.id) === i);
+
+function matchWeaponProficiencyName(name) {
+  const n = String(name || '').toLowerCase();
+  for (const [re, id, label, category] of WEAPON_PROFICIENCY_TABLE) if (re.test(n)) return { id, label, category };
+  return null;
+}
+// -> { id, label, category:'simple'|'martial'|'natural' } for any weapon item. Natural weapons
+// (claws, fangs, grafted limbs) are always proficient; an authored item.weaponCategory wins;
+// anything else unrecognizable is treated as martial (a custom weapon is not a "simple" one).
+export function weaponProficiencyInfo(item) {
+  const authored = item && String(item.weaponCategory || '').toLowerCase();
+  const found = matchWeaponProficiencyName(item && item.name) || { id: 'other', label: 'Other weapon', category: MARTIAL };
+  if (authored === SIMPLE || authored === MARTIAL || authored === 'natural') return { ...found, category: authored };
+  if (!matchWeaponProficiencyName(item && item.name) && /\b(claw|fang|bite|talon|horn|tail|sting|slam|maw)s?\b/i.test((item && item.name) || '')) return { id: 'natural', label: 'Natural weapon', category: 'natural' };
+  return found;
+}
+
+const BOTH = [SIMPLE, MARTIAL];
+export const CLASS_WEAPON_PROFICIENCY = {
+  artificer: { categories: [SIMPLE] },
+  barbarian: { categories: BOTH },
+  bard:      { categories: [SIMPLE], weapons: ['hand crossbow', 'longsword', 'rapier', 'shortsword'] },
+  cleric:    { categories: [SIMPLE] },
+  druid:     { weapons: ['club', 'dagger', 'dart', 'javelin', 'mace', 'quarterstaff', 'scimitar', 'sickle', 'sling', 'spear'] },
+  fighter:   { categories: BOTH },
+  monk:      { categories: [SIMPLE], weapons: ['shortsword'] },
+  paladin:   { categories: BOTH },
+  ranger:    { categories: BOTH },
+  rogue:     { categories: [SIMPLE], weapons: ['hand crossbow', 'longsword', 'rapier', 'shortsword'] },
+  sorcerer:  { weapons: ['dagger', 'dart', 'sling', 'quarterstaff', 'light crossbow'] },
+  warlock:   { categories: [SIMPLE] },
+  wizard:    { weapons: ['dagger', 'dart', 'sling', 'quarterstaff', 'light crossbow'] },
+};
+// "Fighter", "Rogue / Wizard", "Battle Smith Artificer" -> union of every class name found in it.
+export function classWeaponProficiencies(classText) {
+  const text = String(classText || '').toLowerCase();
+  const out = { categories: new Set(), weapons: new Set(), classes: [] };
+  Object.entries(CLASS_WEAPON_PROFICIENCY).forEach(([cls, p]) => {
+    if (!new RegExp('\\b' + cls + 's?\\b').test(text)) return;
+    out.classes.push(cls);
+    (p.categories || []).forEach(c => out.categories.add(c));
+    (p.weapons || []).forEach(w => out.weapons.add(w));
+  });
+  return out;
+}
+
+// Reads weapon-proficiency grants out of free text (gear effect text, feat descriptions):
+// "Proficiency with longbows and shortbows", "You gain proficiency with martial weapons",
+// "proficient with all weapons". -> { all, categories:[], weapons:[] }
+export function parseWeaponProficiencyGrants(text) {
+  const out = { all: false, categories: [], weapons: [] };
+  const t = String(text || '').replace(/<[^>]+>/g, ' ');
+  const re = /proficien(?:cy|t)\s+(?:with|in)\s+([^.;()]*)/gi;
+  let m;
+  while ((m = re.exec(t)) !== null) {
+    const seg = m[1].toLowerCase();
+    if (/\b(all|every|any)\s+(?:kinds? of\s+)?weapons?\b/.test(seg)) out.all = true;
+    if (/\bsimple\b/.test(seg)) out.categories.push(SIMPLE);
+    if (/\bmartial\b/.test(seg)) out.categories.push(MARTIAL);
+    seg.split(/,|\band\b|\bor\b/).forEach(part => {
+      const p = part.trim().replace(/^(?:the|a|an)\s+/, '').replace(/(?<=[a-z])s$/, '');
+      if (!p || /\b(simple|martial)\b/.test(p) || /\bweapons?$/.test(p)) return;
+      const hit = matchWeaponProficiencyName(p);
+      if (hit && p.length > 2) out.weapons.push(hit.id);
+    });
+  }
+  return out;
+}
+// ctx: { classText, manual:{ categories:[], weapons:[] }, grants:[{ source, all, categories, weapons }] }
+// -> { proficient, via, detail, info, classes }
+export function weaponProficiencyCheck(item, ctx = {}) {
+  const info = weaponProficiencyInfo(item);
+  const cls = classWeaponProficiencies(ctx.classText);
+  const manual = ctx.manual || {};
+  const grants = ctx.grants || [];
+  const base = { info, classes: cls.classes };
+  if (info.category === 'natural') return { ...base, proficient: true, via: 'natural', detail: 'Natural weapons need no training.' };
+  if (cls.categories.has(info.category) || cls.weapons.has(info.id)) {
+    return { ...base, proficient: true, via: 'class', detail: `${cls.classes.map(c => c[0].toUpperCase() + c.slice(1)).join('/')} ${cls.categories.has(info.category) ? 'is proficient with ' + info.category + ' weapons' : 'is proficient with ' + info.label.toLowerCase() + 's'}.` };
+  }
+  if ((manual.categories || []).includes(info.category) || (manual.weapons || []).includes(info.id)) {
+    return { ...base, proficient: true, via: 'manual', detail: `You marked ${(manual.weapons || []).includes(info.id) ? info.label.toLowerCase() + 's' : info.category + ' weapons'} as proficient on the Character Sheet.` };
+  }
+  const g = grants.find(x => x.all || (x.categories || []).includes(info.category) || (x.weapons || []).includes(info.id));
+  if (g) return { ...base, proficient: true, via: 'gear', source: g.source, detail: `${g.source} grants proficiency with ${g.all ? 'all weapons' : (g.categories || []).includes(info.category) ? info.category + ' weapons' : info.label.toLowerCase() + 's'}.` };
+  const unconfigured = !cls.classes.length && !(manual.categories || []).length && !(manual.weapons || []).length;
+  if (unconfigured) return { ...base, proficient: true, via: 'unconfigured', detail: 'No class or weapon proficiencies are set on the Character Sheet yet, so every weapon is assumed proficient.' };
+  return { ...base, proficient: false, via: 'none', detail: `Not proficient with ${info.label.toLowerCase()}s (${info.category}).` };
+}

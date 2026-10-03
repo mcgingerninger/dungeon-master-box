@@ -1796,6 +1796,8 @@
   .spellbook-search-row, .spellbook-known-row { display:flex; align-items:center; gap:0.6rem; background:var(--surface); border:1px solid var(--border); padding:0.4rem 0.6rem; }
   .spellbook-search-name { font-weight:600; color:var(--gold-bright); flex:1; font-size:0.88rem; }
   .spellbook-search-level { color:var(--text-dim); font-size:0.78rem; white-space:nowrap; }
+  .sheet-prof-badge { font-size:0.68rem; color:var(--gold); border:1px solid var(--border); padding:0 0.3rem; margin-left:0.2rem; }
+  .sheet-prof-group { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-dim); margin-bottom:0.2rem; }
   .sheet-feat-row { display:flex; align-items:center; gap:0.4rem; font-size:0.84rem; padding:0.15rem 0; cursor:help; }
   .sheet-line-row label { display:flex; align-items:center; gap:0.4rem; cursor:pointer; }
   .sheet-line-val { color:var(--gold); font-family:'Share Tech Mono',monospace; }
@@ -4278,6 +4280,9 @@
 
     <h3 class="sheet-section-title">Feats</h3>
     <div id="sheetFeatsList" class="sheet-feats-list"></div>
+    <h3 class="sheet-section-title">Weapon Proficiencies</h3>
+    <div id="sheetWeaponProf"></div>
+    <p class="sheet-note">The proficiency bonus is only added to a weapon attack when you're proficient with that weapon. Proficiencies come from your Class (the 5e class tables), anything you tick here, equipped gear whose text grants it (e.g. "Proficiency with longbows and shortbows"), and feats. Greyed-out boxes are granted automatically.</p>
     <p class="sheet-note">A feat's numeric bonus (e.g. "+1 Constitution") is picked up automatically the same way an item's effect text is — see the Compendium's Reference tab for the full list and what each one does.</p>
   </div>
 
@@ -16569,6 +16574,9 @@ let characterSpeedEffective = 30;
 // selected feat's effect text feeds into the same stat-breakdown pass equipped gear/active
 // effects already go through.
 let feats = [];
+// Weapon proficiencies the player ticked by hand on the Character Sheet (on top of whatever the
+// class, equipped gear and feats grant — see weaponProficiencyCheck in game-engine.js).
+let weaponProf = { categories: [], weapons: [] };
 // Which hidden-power unlock tiers this character has actually achieved, DM-confirmed --
 // {itemKey, tierIndex} pairs. Keyed by item key rather than a per-instance id (matching how
 // activeTimedEffects already keys off item key too) so an achieved tier survives the item being
@@ -16746,11 +16754,14 @@ function abilitySourceLines(stat, sheet) {
   });
   return lines;
 }
-function proficiencySourceLines(sheet) {
-  return [
-    `Automatic from your character level: you are level <b>${characterLevel || 1}</b>, which gives ${fmtMod(sheet.profBonus)} (+2 at levels 1–4, +3 at 5, +4 at 9, +5 at 13, +6 at 17).`,
-    `<i>This app adds it to every weapon attack — it doesn't track which weapons you're proficient with.</i>`,
-  ];
+function proficiencySourceLines(sheet, check) {
+  const amount = `Your level-${characterLevel || 1} proficiency bonus is ${fmtMod(sheet.profBonus)} (+2 at levels 1–4, +3 at 5, +4 at 9, +5 at 13, +6 at 17).`;
+  if (!check) return [amount, 'Unarmed strikes are always proficient.'];
+  if (check.proficient) {
+    const how = { class: 'From your class', manual: 'You ticked it on the Character Sheet', gear: 'From equipped gear', natural: 'Natural weapon', unconfigured: 'Assumed (nothing set up yet)' }[check.via] || '';
+    return [`<b>Applied.</b> ${escapeHtml(check.detail)}`, amount, how ? `<i>${how}.</i>` : ''];
+  }
+  return [`<b>Not applied (+0).</b> ${escapeHtml(check.detail)}`, amount + ' You only get it with weapons you are proficient with.', '<i>To gain it: pick a class that has this weapon, tick it under Weapon Proficiencies on the Character Sheet, equip gear that grants it, or take a feat that does.</i>'];
 }
 function scalingOriginText(item, rarity) {
   if (Object.keys(normalizeScaling(item.scaling)).length) return 'These grades are set on the item itself.';
@@ -16763,7 +16774,7 @@ function buildAttackSources(item, rarity, sheet, d) {
   const src = {};
   const name = escapeHtml(item.name);
   src.toHit = attackTipBlock(`${d.abilityLabel} modifier ${fmtMod(d.abilityMod)} (to hit)`, [...abilitySourceLines(d.toHitStat, sheet), `Used to hit because ${name} grades ${d.abilityLabel} ${d.scaling[d.toHitStat]} — the best Strength/Dexterity stat it grades C or better.`]);
-  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(sheet.profBonus)}`, proficiencySourceLines(sheet));
+  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(d.prof.proficient ? sheet.profBonus : 0)}`, proficiencySourceLines(sheet, d.prof));
   const atkClauses = attackEffectClauses(item, /\+\d+[^.;]*(?:attack|hit)/i);
   src.atk = attackTipBlock(`Weapon attack bonus ${fmtMod(d.atkBonus)}`, [`From <b>${name}</b>:`, ...atkClauses.map(c => '“' + escapeHtml(c) + '”'), atkClauses.length ? '' : 'Part of the weapon’s own stats.']);
   src.dmgDice = attackTipBlock(`Damage dice ${d.dmgRaw}`, [`${name}’s own weapon die${item.dmg && String(item.dmg).replace(/\s+/g, '') !== d.dmgRaw ? ` (the item lists ${escapeHtml(item.dmg)}; any flat bonus is counted under “Weapon damage bonus”)` : ''}.`, 'Doubled on a critical hit.']);
@@ -16820,13 +16831,15 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   const d20 = rn(1, 20);
   const isCrit = d20 === 20;
   const isFumble = d20 === 1;
-  const toHitTotal = d20 + abilityMod + sheet.profBonus + atkBonus;
+  const prof = weaponProficiencyFor(item);
+  const profApplied = prof.proficient ? sheet.profBonus : 0;
+  const toHitTotal = d20 + abilityMod + profApplied + atkBonus;
   const dmgResult = dmgMatch ? battleRollDamage(dmgMatch[0].replace(/\s+/g, ''), isCrit) : null;
   const bonusRolls = bonusDiceClauses.map(c => ({ ...c, roll: battleRollDamage(c.dice, isCrit) })).filter(c => c.roll);
   const bonusDiceTotal = bonusRolls.reduce((sum, c) => sum + c.roll.total, 0);
   const dmgTotal = dmgResult ? dmgResult.total + scaled.total + dmgBonus + bonusDiceTotal : null;
-  const sources = buildAttackSources(item, rarity, sheet, { abilityLabel, abilityMod, toHitStat: toHit.stat, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
-  return { dmgRaw, abilityMod, abilityLabel, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
+  const sources = buildAttackSources(item, rarity, sheet, { prof, abilityLabel, abilityMod, toHitStat: toHit.stat, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
+  return { dmgRaw, abilityMod, abilityLabel, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: profApplied, profProficient: prof.proficient, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
 }
 function weaponAttackRollHtml(roll) {
   _attackRollSources = roll.sources || {};
@@ -16834,7 +16847,7 @@ function weaponAttackRollHtml(roll) {
   return `
     <div class="weapon-attack-line"><span>d20 roll</span><span class="${roll.isCrit ? 'weapon-attack-crit' : roll.isFumble ? 'weapon-attack-fumble' : ''}">${roll.d20}${roll.isCrit ? ' (CRIT!)' : roll.isFumble ? ' (FUMBLE!)' : ''}</span></div>
     <div class="weapon-attack-line"><span>${S('toHit', roll.abilityLabel + ' modifier (to hit)')}</span><span>${fmtMod(roll.abilityMod)}</span></div>
-    <div class="weapon-attack-line"><span>${S('prof', 'Proficiency bonus')}</span><span>${fmtMod(roll.profBonus)}</span></div>
+    <div class="weapon-attack-line"><span>${S('prof', roll.profProficient === false ? 'Proficiency bonus (not proficient)' : 'Proficiency bonus')}</span><span>${fmtMod(roll.profBonus)}</span></div>
     ${roll.atkBonus ? `<div class="weapon-attack-line"><span>${S('atk', 'Weapon attack bonus')}</span><span>${fmtMod(roll.atkBonus)}</span></div>` : ''}
     <div class="weapon-attack-total">To Hit: ${roll.toHitTotal}</div>
     ${roll.dmgResult ? `
@@ -16904,7 +16917,7 @@ function computeUnarmedAttackRoll(sheet) {
   const toHitTotal = d20 + strMod + sheet.profBonus + atkBonus;
   const dmgResult = battleRollDamage(dice, isCrit);
   const dmgTotal = dmgResult ? dmgResult.total + strMod + dmgBonus : null;
-  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { toHit: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (to hit and damage)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { toHit: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (to hit and damage)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet, null)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
 }
 // The ability bar's always-present "Unarmed" icon — unlike rollEquippedWeaponAttack this never
 // needs an equipped weapon (that's the whole point), so it has no "nothing equipped there" guard.
@@ -17209,6 +17222,57 @@ function statValueHtml(value, stat) {
   const title = stat.tooltip ? ` title="${escapeHtml(stat.tooltip)}"` : '';
   return `<span class="sheet-line-val${cls}"${title}>${value}</span>`;
 }
+// ---------- Weapon proficiency (rules in game-engine.js, "WEAPON PROFICIENCY") ----------
+function collectWeaponProficiencyGrants() {
+  buildTokenIndex();
+  const grants = [];
+  const add = (source, text) => {
+    const g = parseWeaponProficiencyGrants(text);
+    if (g.all || g.categories.length || g.weapons.length) grants.push({ source, ...g });
+  };
+  Object.keys(SLOT_CATEGORY).forEach(slotId => {
+    const key = playerSlots[slotId];
+    const entry = key && TOKEN_INDEX[key];
+    if (!entry) return;
+    const it = entry.item;
+    add(it.name, [it.effect, ...(it.mods || []).map(m => m.text)].filter(Boolean).join(' '));
+  });
+  (feats || []).forEach(name => {
+    const def = (typeof FEAT_LIBRARY !== 'undefined' ? FEAT_LIBRARY : []).find(f => f.name === name);
+    if (def) add(def.name + ' (feat)', def.description);
+  });
+  return grants;
+}
+function weaponProficiencyFor(item) {
+  return weaponProficiencyCheck(item, { classText: characterClass, manual: weaponProf, grants: collectWeaponProficiencyGrants() });
+}
+function toggleWeaponProf(kind, id) {
+  const list = weaponProf[kind];
+  const i = list.indexOf(id);
+  if (i === -1) list.push(id); else list.splice(i, 1);
+  renderCharacterSheet();
+  if (typeof scheduleSave === 'function') scheduleSave();
+}
+function renderWeaponProficiencies() {
+  const el = document.getElementById('sheetWeaponProf');
+  if (!el) return;
+  const cls = classWeaponProficiencies(characterClass);
+  const grants = collectWeaponProficiencyGrants();
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const classLabel = cls.classes.map(cap).join('/');
+  const row = (kind, id, label, viaClass, viaGear) => {
+    const manual = weaponProf[kind].includes(id);
+    const locked = viaClass || !!viaGear;
+    const badge = viaClass ? classLabel : viaGear ? viaGear.source : '';
+    return `<label class="sheet-feat-row" style="cursor:default"><input type="checkbox" ${(locked || manual) ? 'checked' : ''} ${locked ? 'disabled' : ''} onchange="toggleWeaponProf('${kind}','${id.replace(/'/g, "\\'")}')"> ${escapeHtml(label)}${badge ? ` <span class="sheet-prof-badge">${escapeHtml(badge)}</span>` : ''}</label>`;
+  };
+  const cats = ['simple', 'martial'].map(c => row('categories', c, cap(c) + ' weapons', cls.categories.has(c), grants.find(g => g.all || g.categories.includes(c)))).join('');
+  const specific = ['simple', 'martial'].map(c => `<div><div class="sheet-prof-group">${cap(c)}</div>${WEAPON_PROFICIENCY_IDS.filter(w => w.category === c).map(w => row('weapons', w.id, w.label, cls.weapons.has(w.id) || cls.categories.has(c), grants.find(g => g.all || g.weapons.includes(w.id) || g.categories.includes(c)))).join('')}</div>`).join('');
+  const unconfigured = !cls.classes.length && !weaponProf.categories.length && !weaponProf.weapons.length;
+  el.innerHTML = `${unconfigured ? '<p class="sheet-note">No class or weapon proficiencies set yet — every weapon currently counts as proficient. Enter a Class above or tick a box to turn the rules on.</p>' : ''}
+    <div class="sheet-feats-list">${cats}</div>
+    <details style="margin-top:0.4rem"><summary style="cursor:pointer;color:var(--text-dim)">Specific weapons</summary><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;margin-top:0.4rem">${specific}</div></details>`;
+}
 function renderCharacterSheet() {
   const raceEl = document.getElementById('sheetRace');
   const classEl = document.getElementById('sheetClass');
@@ -17335,6 +17399,7 @@ function renderCharacterSheet() {
       return `<label class="sheet-feat-row" title="${escapeHtml(f.description)}"><input type="checkbox" ${selected ? 'checked' : ''} onchange="toggleFeat('${f.name.replace(/'/g, "\\'")}')"> ${escapeHtml(f.name)}</label>`;
     }).join('');
   }
+  renderWeaponProficiencies();
 }
 
 const SLOT_EMPTY_ICON = {
@@ -24658,7 +24723,7 @@ function saveAppState() {
       activeBounties, bountyCounter,
       manglerFinishedWork, manglerPartKey, manglerItemKey, manglerFocus,
       combatLootSettings, chestLootSettings, corpseLootSettings, modWeights, fleshModWeights, npcEdits,
-      characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats,
+      characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, feats, weaponProf,
       characterSpellSlots, characterSpellSlotsUsed, characterKnownSpells,
       characterCurrentHp, characterMaxHp, characterMaxHpEffective, characterHitDice, characterAc, characterClass,
       characterRace, characterAffinity, characterInitiative, characterSpeed, characterSpeedEffective, deckOfManyThingsLog, geomorphTiles, achievedUnlocks,
@@ -24755,6 +24820,7 @@ function applyStateBlob(data) {
   if (data.skillProficiencies) skillProficiencies = data.skillProficiencies;
   if (data.saveProficiencies) saveProficiencies = data.saveProficiencies;
   if (data.feats) feats = data.feats;
+  if (data.weaponProf) weaponProf = { categories: data.weaponProf.categories || [], weapons: data.weaponProf.weapons || [] };
   if (data.achievedUnlocks) achievedUnlocks = data.achievedUnlocks;
   if (data.deckOfManyThingsLog) deckOfManyThingsLog = data.deckOfManyThingsLog;
   if (data.geomorphTiles) geomorphTiles = data.geomorphTiles;
@@ -24851,6 +24917,7 @@ window.resetMainAppStateToBlank = function () {
   skillProficiencies = [];
   saveProficiencies = [];
   feats = [];
+  weaponProf = { categories: [], weapons: [] };
   achievedUnlocks = [];
   deckOfManyThingsLog = [];
   geomorphTiles = [];

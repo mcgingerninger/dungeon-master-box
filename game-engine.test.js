@@ -757,3 +757,59 @@ describe('weapon stat scaling', () => {
     assert.ok(n > 300);
   });
 });
+
+describe('weapon proficiency', () => {
+  const w = name => ({ name, type: 'weapon' });
+  test('weapon names map to a base weapon and its simple/martial category', () => {
+    assert.deepEqual(GE.weaponProficiencyInfo(w('Iron Battleaxe of the Deep Frost')), { id: 'battleaxe', label: 'Battleaxe', category: 'martial' });
+    assert.equal(GE.weaponProficiencyInfo(w('Oaken Handaxe')).category, 'simple');
+    assert.equal(GE.weaponProficiencyInfo(w('Mithral Dagger')).id, 'dagger');
+    assert.equal(GE.weaponProficiencyInfo(w('Steel Quarterstaff')).category, 'simple');
+    assert.equal(GE.weaponProficiencyInfo(w('Thornmaul')).category, 'martial');
+    assert.equal(GE.weaponProficiencyInfo(w('Frosthowl')).category, 'martial');      // unknown custom weapon = martial
+    assert.equal(GE.weaponProficiencyInfo(w('Wyvern Claw')).category, 'natural');
+    assert.equal(GE.weaponProficiencyInfo({ name: 'Frosthowl', weaponCategory: 'simple' }).category, 'simple');
+  });
+
+  test('class tables: Artificer is simple-only; Fighter both; Wizard a short list; multiclass unions', () => {
+    const art = GE.classWeaponProficiencies('Artificer');
+    assert.deepEqual([...art.categories], ['simple']);
+    assert.deepEqual([...GE.classWeaponProficiencies('fighter').categories].sort(), ['martial', 'simple']);
+    assert.ok(GE.classWeaponProficiencies('Wizard').weapons.has('light crossbow'));
+    const multi = GE.classWeaponProficiencies('Rogue / Wizard');
+    assert.deepEqual(multi.classes, ['rogue', 'wizard']);
+    assert.ok(multi.categories.has('simple') && multi.weapons.has('rapier') && multi.weapons.has('sling'));
+    assert.equal(GE.classWeaponProficiencies('Gunslinger').classes.length, 0);
+  });
+
+  test('gear/feat text grants: categories, all weapons, and named weapon types', () => {
+    assert.deepEqual(GE.parseWeaponProficiencyGrants('Proficiency with longbows and shortbows. +2 to ranged attack rolls.'), { all: false, categories: [], weapons: ['longbow', 'shortbow'] });
+    assert.deepEqual(GE.parseWeaponProficiencyGrants('You gain proficiency with martial weapons.'), { all: false, categories: ['martial'], weapons: [] });
+    assert.equal(GE.parseWeaponProficiencyGrants('Proficient with all weapons while worn.').all, true);
+    assert.deepEqual(GE.parseWeaponProficiencyGrants('Proficiency with a cartographer\'s tools lets you map.'), { all: false, categories: [], weapons: [] });
+    assert.deepEqual(GE.parseWeaponProficiencyGrants('+1 to AC. Requires attunement by a creature proficient with shields.'), { all: false, categories: [], weapons: [] });
+  });
+
+  test('the check: class first, then manual, then gear; unproficient otherwise', () => {
+    const axe = { name: 'Iron Battleaxe of the Deep Frost', type: 'weapon' };
+    const dag = { name: 'Dagger', type: 'weapon' };
+    const art = GE.weaponProficiencyCheck(axe, { classText: 'Artificer' });
+    assert.equal(art.proficient, false);
+    assert.equal(art.via, 'none');
+    assert.equal(GE.weaponProficiencyCheck(dag, { classText: 'Artificer' }).via, 'class');
+    assert.equal(GE.weaponProficiencyCheck(axe, { classText: 'Artificer', manual: { weapons: ['battleaxe'] } }).via, 'manual');
+    assert.equal(GE.weaponProficiencyCheck(axe, { classText: 'Artificer', manual: { categories: ['martial'] } }).proficient, true);
+    const withGear = GE.weaponProficiencyCheck(axe, { classText: 'Artificer', grants: [{ source: 'Gauntlets of Might', categories: ['martial'] }] });
+    assert.deepEqual([withGear.proficient, withGear.via, withGear.source], [true, 'gear', 'Gauntlets of Might']);
+    const bow = GE.weaponProficiencyCheck({ name: 'Longbow', type: 'weapon' }, { classText: 'Artificer', grants: [{ source: 'Bracers of Archery', weapons: ['longbow', 'shortbow'] }] });
+    assert.equal(bow.proficient, true);
+  });
+
+  test('a sheet nobody has configured keeps the old behavior (proficient with everything)', () => {
+    const r = GE.weaponProficiencyCheck({ name: 'Greataxe', type: 'weapon' }, { classText: '' });
+    assert.deepEqual([r.proficient, r.via], [true, 'unconfigured']);
+    // ...but ticking anything (or having a class) turns the rules on
+    assert.equal(GE.weaponProficiencyCheck({ name: 'Greataxe', type: 'weapon' }, { classText: '', manual: { weapons: ['dagger'] } }).proficient, false);
+    assert.equal(GE.weaponProficiencyCheck({ name: 'Wyvern Claw', type: 'weapon' }, { classText: 'Wizard' }).via, 'natural');
+  });
+});
