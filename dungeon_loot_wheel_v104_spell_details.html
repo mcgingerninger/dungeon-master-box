@@ -17797,15 +17797,30 @@ function spellNormalize(raw, ruleset){
     description, hitDice:spellHitDiceLabel(description, raw)
   };
 }
-async function fetchSpellSet(ruleset){
-  const root=SPELL_SOURCE_ROOTS[ruleset];
+// Spell records ship with the app (data/spells/<ruleset>/, copied from the 5etools mirrors by
+// scripts/update-spell-data.js) so the Compendium, Spellbook and every item's spell quick-reference
+// popup work offline and load instantly. If those files can't be read (e.g. the page was opened
+// without the data folder next to it), it falls back to fetching the same files from GitHub.
+const SPELL_LOCAL_ROOTS = { 2014: 'data/spells/2014/', 2024: 'data/spells/2024/' };
+async function fetchSpellSetFrom(root, ruleset, strict){
   const idx=await fetch(root+'index.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Could not load spell index');return r.json();});
   const entries=Object.entries(idx).filter(([code])=>code!=='XPHB' || ruleset==='2024');
   const results=await Promise.all(entries.map(async ([code,file])=>{
-    try{const j=await fetch(root+file,{cache:'no-store'}).then(r=>r.json()); return (j.spell||[]).map(x=>spellNormalize(x,ruleset));}
-    catch(e){console.warn('Spell source failed',code,e);return[];}
+    try{
+      const r=await fetch(root+file,{cache:'no-store'});
+      if(!r.ok) throw new Error('HTTP '+r.status+' for '+file);
+      const j=await r.json(); return (j.spell||[]).map(x=>spellNormalize(x,ruleset));
+    }
+    catch(e){ if(strict) throw e; console.warn('Spell source failed',code,e);return[];}
   }));
   return results.flat();
+}
+async function fetchSpellSet(ruleset){
+  try { return await fetchSpellSetFrom(SPELL_LOCAL_ROOTS[ruleset], ruleset, true); }
+  catch(e){
+    console.warn('Bundled spell data unavailable — falling back to the online 5etools copy.', e);
+    return fetchSpellSetFrom(SPELL_SOURCE_ROOTS[ruleset], ruleset, false);
+  }
 }
 // `wrap`/`spellCount` are the Compendium Spells sub-tab's own loading-state elements -- this
 // function is also the Spellbook panel's (Part B) load trigger now, and that panel has no
@@ -17831,10 +17846,10 @@ async function loadSpellDatabase(force=false){
     if (wrap) { populateSpellSourceFilter(); renderSpellTable(); }
     if (typeof renderSpellbookSearchResults === 'function') renderSpellbookSearchResults();
   }catch(err){
-    if (wrap) wrap.innerHTML='<div class="spell-loading">Unable to load the spell database. This tab needs an internet connection to retrieve the structured source records. Try Refresh Spell Data.</div>';
+    if (wrap) wrap.innerHTML='<div class="spell-loading">Unable to load the spell database (neither the bundled data/spells files nor the online copy could be read). Try Refresh Spell Data.</div>';
     const countEl = document.getElementById('spellCount'); if (countEl) countEl.textContent='Spell database unavailable';
     const sbResults = document.getElementById('spellbookSearchResults');
-    if (sbResults) sbResults.innerHTML = '<div class="empty-results">Unable to load the spell database — needs an internet connection.</div>';
+    if (sbResults) sbResults.innerHTML = '<div class="empty-results">Unable to load the spell database.</div>';
     console.error(err);
   }
 }
