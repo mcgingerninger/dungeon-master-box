@@ -2211,7 +2211,7 @@
 
   /* Shared hover tooltip for tokens (tokens tab + equipped slots) */
   .item-tooltip {
-    display:none; position:fixed; z-index:500; max-width:320px;
+    display:none; position:fixed; z-index:1200; max-width:320px;
     background:var(--surface2); border:1px solid var(--gold); box-shadow:0 6px 24px rgba(0,0,0,0.6);
     padding:0.8rem 0.9rem; pointer-events:none; font-size:0.85rem; line-height:1.5;
   }
@@ -2223,6 +2223,8 @@
   .tt-header.legendary { color:var(--legendary); }
   .tt-header.celestial { color:var(--celestial); }
   .tt-rarity { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+  /* Hoverable source lines in the attack popup */
+  .attack-src { border-bottom:1px dotted var(--gold); cursor:help; }
   /* Weapon scaling chips (tooltip + loot cards) */
   .tt-scaling { display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; margin-bottom:0.4rem; }
   .tt-scale-label { font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; }
@@ -16720,6 +16722,81 @@ function parseWeaponEffectBonuses(effect, dmgField) {
 // attack and damage rolls" effect-text phrase used to sum independently here, double-counting the
 // same authored bonus (see docs/V2_MECHANICS_MIGRATION.md) — the migration reconciled that into a
 // single passive damageRoll entry, so bridged.damageDice never has a modifier left to double.
+// ---------- Where each number in an attack popup comes from ----------
+// Every line of the attack popup can be hovered for its source (ability score + the gear adding to
+// it, the level-based proficiency bonus, which item clause gives a weapon bonus, how a stat's
+// scaling grade was worked out). The text is built once per roll and kept in _attackRollSources.
+let _attackRollSources = {};
+function attackTipBlock(title, lines) {
+  return `<div class="tt-header"><span>${escapeHtml(title)}</span></div>` + lines.filter(Boolean).map(l => `<div class="tt-ref-text">${l}</div>`).join('');
+}
+function attackEffectClauses(item, re) {
+  const text = String(getItemEffectText(item) || '').replace(/<[^>]+>/g, '');
+  return text.split(/(?<=[.;])\s+/).map(c => c.trim()).filter(c => c && re.test(c));
+}
+function abilitySourceLines(stat, sheet) {
+  const a = sheet.abilities && sheet.abilities[stat];
+  if (!a) return [];
+  const label = SCALING_STAT_LABEL[stat];
+  const lines = [a.bonus
+    ? `${label} score <b>${a.total}</b> = base ${a.base} ${fmtMod(a.bonus)} from gear and active effects, so the modifier is ${fmtMod(a.mod)}.`
+    : `${label} score <b>${a.total}</b> (your base score — no gear or effects change it), so the modifier is ${fmtMod(a.mod)}.`];
+  (a.sources || []).forEach(src => {
+    lines.push('• ' + escapeHtml(src.itemName) + ': ' + (src.isBaseOverride ? `sets the score to ${src.amount + 10}` : fmtMod(src.amount) + (src.viaAbility ? ' via ' + escapeHtml(src.viaAbility) : '')));
+  });
+  return lines;
+}
+function proficiencySourceLines(sheet) {
+  return [
+    `Automatic from your character level: you are level <b>${characterLevel || 1}</b>, which gives ${fmtMod(sheet.profBonus)} (+2 at levels 1–4, +3 at 5, +4 at 9, +5 at 13, +6 at 17).`,
+    `<i>This app adds it to every weapon attack — it doesn't track which weapons you're proficient with.</i>`,
+  ];
+}
+function scalingOriginText(item, rarity) {
+  if (Object.keys(normalizeScaling(item.scaling)).length) return 'These grades are set on the item itself.';
+  const r = rarity || item.rarity || 'common';
+  const boost = r === 'superrare' ? ', raised one grade on the main stat for Super Rare' : (r === 'legendary' || r === 'celestial') ? ', raised one grade on the best two stats for ' + (rarityNames[r] || r) + ' rarity' : '';
+  const kind = weaponScalingKind(item);
+  return `Default grades for ${/^[aeiou]/i.test(kind) ? 'an' : 'a'} ${kind} weapon${boost}.`;
+}
+function buildAttackSources(item, rarity, sheet, d) {
+  const src = {};
+  const name = escapeHtml(item.name);
+  src.toHit = attackTipBlock(`${d.abilityLabel} modifier ${fmtMod(d.abilityMod)} (to hit)`, [...abilitySourceLines(d.toHitStat, sheet), `Used to hit because ${name} grades ${d.abilityLabel} ${d.scaling[d.toHitStat]} — the best Strength/Dexterity stat it grades C or better.`]);
+  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(sheet.profBonus)}`, proficiencySourceLines(sheet));
+  const atkClauses = attackEffectClauses(item, /\+\d+[^.;]*(?:attack|hit)/i);
+  src.atk = attackTipBlock(`Weapon attack bonus ${fmtMod(d.atkBonus)}`, [`From <b>${name}</b>:`, ...atkClauses.map(c => '“' + escapeHtml(c) + '”'), atkClauses.length ? '' : 'Part of the weapon’s own stats.']);
+  src.dmgDice = attackTipBlock(`Damage dice ${d.dmgRaw}`, [`${name}’s own weapon die${item.dmg && String(item.dmg).replace(/\s+/g, '') !== d.dmgRaw ? ` (the item lists ${escapeHtml(item.dmg)}; any flat bonus is counted under “Weapon damage bonus”)` : ''}.`, 'Doubled on a critical hit.']);
+  d.scalingParts.forEach(pt => {
+    const L = SCALING_STAT_LABEL[pt.stat];
+    src['scale_' + pt.stat] = attackTipBlock(`${L} scaling ${pt.grade}`, [
+      `${name} scales with ${L} at grade <b>${pt.grade}</b> (×${pt.mult}).`,
+      `Your ${L} modifier is ${fmtMod(pt.mod)}, so ${pt.mult} × ${pt.mod} = ${Math.round(pt.value * 100) / 100}${!pt.primary && pt.mult * pt.mod < 0 ? ' (a secondary stat never subtracts)' : ''}.`,
+      ...abilitySourceLines(pt.stat, sheet).slice(0, 1),
+      scalingOriginText(item, rarity),
+    ]);
+  });
+  src.scaleTotal = attackTipBlock(`Scaling bonus ${fmtMod(d.scalingTotal)}`, ['The scaling lines above added together, rounded to a whole number. Scaling affects damage only — not the to-hit roll.']);
+  const dmgClauses = attackEffectClauses(item, /\+\d+[^.;]*damage/i);
+  src.dmg = attackTipBlock(`Weapon damage bonus ${fmtMod(d.dmgBonus)}`, [`From <b>${name}</b>:`, ...dmgClauses.map(c => '“' + escapeHtml(c) + '”')]);
+  d.bonusRolls.forEach((c, i) => {
+    const clauses = attackEffectClauses(item, new RegExp(c.dice.replace(/[+]/g, '\\+')));
+    src['bonus' + i] = attackTipBlock(`Bonus ${c.type ? c.type + ' ' : ''}damage ${c.dice}`, [`From <b>${name}</b>:`, ...clauses.map(x => '“' + escapeHtml(x) + '”')]);
+  });
+  return src;
+}
+function attackSrc(roll, key, label) {
+  if (!roll.sources || !roll.sources[key]) return label;
+  return `<span class="attack-src" onmouseenter="showAttackSourceTip(event,'${key}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${label}</span>`;
+}
+function showAttackSourceTip(evt, key) {
+  const html = _attackRollSources[key];
+  const tt = document.getElementById('itemTooltip');
+  if (!html || !tt) return;
+  tt.innerHTML = html;
+  tt.style.display = 'block';
+  moveTokenTooltip(evt);
+}
 function currentAbilityMods(sheet) {
   const sh = sheet || computeCharacterSheet();
   const out = {};
@@ -16748,22 +16825,25 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   const bonusRolls = bonusDiceClauses.map(c => ({ ...c, roll: battleRollDamage(c.dice, isCrit) })).filter(c => c.roll);
   const bonusDiceTotal = bonusRolls.reduce((sum, c) => sum + c.roll.total, 0);
   const dmgTotal = dmgResult ? dmgResult.total + scaled.total + dmgBonus + bonusDiceTotal : null;
-  return { dmgRaw, abilityMod, abilityLabel, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+  const sources = buildAttackSources(item, rarity, sheet, { abilityLabel, abilityMod, toHitStat: toHit.stat, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
+  return { dmgRaw, abilityMod, abilityLabel, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
 }
 function weaponAttackRollHtml(roll) {
+  _attackRollSources = roll.sources || {};
+  const S = (key, label) => attackSrc(roll, key, label);
   return `
     <div class="weapon-attack-line"><span>d20 roll</span><span class="${roll.isCrit ? 'weapon-attack-crit' : roll.isFumble ? 'weapon-attack-fumble' : ''}">${roll.d20}${roll.isCrit ? ' (CRIT!)' : roll.isFumble ? ' (FUMBLE!)' : ''}</span></div>
-    <div class="weapon-attack-line"><span>${roll.abilityLabel} modifier (to hit)</span><span>${fmtMod(roll.abilityMod)}</span></div>
-    <div class="weapon-attack-line"><span>Proficiency bonus</span><span>${fmtMod(roll.profBonus)}</span></div>
-    ${roll.atkBonus ? `<div class="weapon-attack-line"><span>Weapon attack bonus</span><span>${fmtMod(roll.atkBonus)}</span></div>` : ''}
+    <div class="weapon-attack-line"><span>${S('toHit', roll.abilityLabel + ' modifier (to hit)')}</span><span>${fmtMod(roll.abilityMod)}</span></div>
+    <div class="weapon-attack-line"><span>${S('prof', 'Proficiency bonus')}</span><span>${fmtMod(roll.profBonus)}</span></div>
+    ${roll.atkBonus ? `<div class="weapon-attack-line"><span>${S('atk', 'Weapon attack bonus')}</span><span>${fmtMod(roll.atkBonus)}</span></div>` : ''}
     <div class="weapon-attack-total">To Hit: ${roll.toHitTotal}</div>
     ${roll.dmgResult ? `
-      <div class="weapon-attack-line"><span>Damage dice (${escapeHtml(roll.dmgRaw)}${roll.isCrit ? ', doubled' : ''})</span><span>${roll.dmgResult.rolls.join(' + ')}${roll.dmgResult.mod ? ' ' + fmtMod(roll.dmgResult.mod) : ''}</span></div>
+      <div class="weapon-attack-line"><span>${S('dmgDice', `Damage dice (${escapeHtml(roll.dmgRaw)}${roll.isCrit ? ', doubled' : ''})`)}</span><span>${roll.dmgResult.rolls.join(' + ')}${roll.dmgResult.mod ? ' ' + fmtMod(roll.dmgResult.mod) : ''}</span></div>
       ${roll.scalingParts
-        ? roll.scalingParts.map(p => `<div class="weapon-attack-line"><span>${SCALING_STAT_LABEL[p.stat]} scaling ${p.grade} (×${p.mult}, ${fmtMod(p.mod)})</span><span>${fmtMod(Math.round(p.value * 100) / 100)}</span></div>`).join('') + `<div class="weapon-attack-line"><span>Scaling bonus (rounded)</span><span>${fmtMod(roll.scalingTotal)}</span></div>`
-        : `<div class="weapon-attack-line"><span>${roll.abilityLabel} modifier</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
-      ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>Weapon damage bonus</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
-      ${roll.bonusRolls.map(c => `<div class="weapon-attack-line"><span>Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
+        ? roll.scalingParts.map(p => `<div class="weapon-attack-line"><span>${S('scale_' + p.stat, `${SCALING_STAT_LABEL[p.stat]} scaling ${p.grade} (×${p.mult}, ${fmtMod(p.mod)})`)}</span><span>${fmtMod(Math.round(p.value * 100) / 100)}</span></div>`).join('') + `<div class="weapon-attack-line"><span>${S('scaleTotal', 'Scaling bonus (rounded)')}</span><span>${fmtMod(roll.scalingTotal)}</span></div>`
+        : `<div class="weapon-attack-line"><span>${S('toHit', roll.abilityLabel + ' modifier')}</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
+      ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>${S('dmg', 'Weapon damage bonus')}</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
+      ${roll.bonusRolls.map((c, i) => `<div class="weapon-attack-line"><span>${S('bonus' + i, `Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})`)}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
       <div class="weapon-attack-total">Damage: ${roll.dmgTotal}</div>
     ` : `<p class="sheet-chip-empty">This weapon's damage dice aren't set on the item (edit it to add one, e.g. "1d8") — showing the attack roll only.</p>`}
   `;
@@ -16824,7 +16904,7 @@ function computeUnarmedAttackRoll(sheet) {
   const toHitTotal = d20 + strMod + sheet.profBonus + atkBonus;
   const dmgResult = battleRollDamage(dice, isCrit);
   const dmgTotal = dmgResult ? dmgResult.total + strMod + dmgBonus : null;
-  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { toHit: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (to hit and damage)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
 }
 // The ability bar's always-present "Unarmed" icon — unlike rollEquippedWeaponAttack this never
 // needs an equipped weapon (that's the whole point), so it has no "nothing equipped there" guard.
