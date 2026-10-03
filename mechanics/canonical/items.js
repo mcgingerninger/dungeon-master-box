@@ -2616,8 +2616,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Storm-Tested",
-          "condition": "Have the pigeon successfully deliver a message across genuinely hazardous territory (a storm, a warzone, hostile terrain) and return safely.",
-          "reward": "Range extends to 10 miles, the pigeon can find you anywhere within that range even if you've since moved, and it always returns the same day."
+          "condition": "Have the pigeon deliver 3 messages to 3 different recipients, each at least 2 miles away, with at least one flight made through rain or snow.",
+          "reward": "Once per day, the pigeon can carry a message to any person you have met before who is within 10 miles — it finds them by the scent of your seal — and return with a one-line reply."
         }
       ]
     },
@@ -2672,8 +2672,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Braver Than It Looks",
-          "condition": "Use the mouse to retrieve or scout something in a situation where being caught would have been genuinely dangerous.",
-          "reward": "The mouse can now carry a small key, note, or trinket along with it, and can be directed toward a general location rather than only a specific object you can already see."
+          "condition": "Send the mouse into a guarded space (a locked room, a trapped chest, or an occupied guard post) to retrieve or scout something, and get it out safely, on 3 separate occasions.",
+          "reward": "The mouse can carry a key, note, or trinket (up to 1 lb), and once per day can gnaw through a rope, strap, or leather bond in 1 minute to free a restrained creature or slacken a trap's tension."
         }
       ]
     },
@@ -2700,8 +2700,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Weather-Wise",
-          "condition": "Correctly heed the toad's warning to avoid a serious problem — a storm, a flash flood, or similar.",
-          "reward": "Forecasting range extends to 24 hours, and it can now also sense standing magical weather effects (a fog cloud, a controlled climate) within a mile."
+          "condition": "Correctly forecast 5 separate weather changes over at least 5 days of travel, and act on each one (find shelter, change route, or delay a march).",
+          "reward": "Once per long rest, as an action, the toad's croak summons light rain or burns off fog in a 100-ft radius for 1 hour, dousing nonmagical fires and clearing nonmagical smoke and gas."
         }
       ]
     },
@@ -2728,8 +2728,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Quick Fingers, Quick Paws",
-          "condition": "Use the weasel's distraction to pull off a genuinely difficult theft or escape.",
-          "reward": "+1 Dexterity. The weasel can now also retrieve a small unattended item during its distraction, on top of just creating the opening."
+          "condition": "Use the weasel's distraction to pick 3 different pockets, locks, or stashes during a single heist or break-in, with the weasel returning safely each time.",
+          "reward": "Once per long rest, the weasel can slip into a lock or container within 30 ft and work it open from the inside, automatically opening any lock of DC 15 or lower."
         }
       ]
     },
@@ -2756,8 +2756,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — A Long Memory",
-          "condition": "The crow correctly warns you about someone it recognized as dangerous from a past encounter.",
-          "reward": "Memory extends to roughly 30 individuals, and it can now mimic a short phrase (a few words) convincingly enough to fool someone who isn't listening closely."
+          "condition": "Keep the crow for 30 days, and have it identify 3 different people (friend or foe) by memory whom you had not told it about.",
+          "reward": "Once per day, the crow can recall a conversation or scene it witnessed within the past week and recite it back to you word for word, in the speakers' own voices, for up to 1 minute."
         }
       ]
     },
@@ -2812,8 +2812,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Indiscriminate Eaters",
-          "condition": "Resist or recover from a serious disease while the swarm was present.",
-          "reward": "The advantage on disease saves extends to poison saves as well — the flies, it turns out, aren't picky about what they clean up."
+          "condition": "Survive 3 separate exposures to disease, poison, or rot (spoiled food, a plague victim, a poisoned meal, swamp fever) with the swarm in your pack.",
+          "reward": "Once per long rest, the swarm can consume all poison or disease in one meal, drink, or wound within your reach, removing it as if by Lesser Restoration."
         }
       ]
     },
@@ -2840,8 +2840,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Knows Every Gap",
-          "condition": "The ferret retrieves something genuinely important from a spot no one else could have reached.",
-          "reward": "The ferret can now navigate and retrieve from spaces up to 60 ft. away without direct supervision, working purely off your description of where to look."
+          "condition": "Send the ferret to retrieve something from 3 different hidden or guarded places (a burrow, a vault grate, a sealed crate), each at least 20 ft out of your sight.",
+          "reward": "Once per day, the ferret can scout a tunnel, vent, or crawlspace up to 100 ft long, and you see through its eyes for up to 10 minutes while it does."
         }
       ]
     },
@@ -2868,8 +2868,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Devoted Watch",
-          "condition": "The duckling's alert saves the party from a genuine ambush during a rest.",
-          "reward": "+1 Wisdom. Alert range extends to 60 feet, and it now reacts distinctly to a creature it has been alerted to before, so you know when it's the same threat returning."
+          "condition": "Be woken by the duckling's alarm on 3 separate nights when an intruder or predator approached the camp, and drive each one off.",
+          "reward": "Once per day, the duckling imprints on up to 3 allies: you always know the direction and rough distance to each of them, and it quacks loudly whenever one of them drops below half their hit points."
         }
       ]
     },
@@ -2896,8 +2896,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Reliable Hen",
-          "condition": "Use the chicken's egg to solve a problem in a moment that actually mattered.",
-          "reward": "The hen now lays two eggs some days instead of one, and can be prompted to lay on demand once per day instead of waiting for morning."
+          "condition": "Use the hen's eggs to solve problems in 3 separate situations (bait, barter, a meal for a starving NPC, a puzzle component), and keep her fed and safe for 30 days.",
+          "reward": "Once per week, the hen lays a golden egg: eating it grants advantage on one attack roll, saving throw, or ability check of your choice within the next 24 hours."
         }
       ]
     },
@@ -2924,8 +2924,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Unnerving Regardless",
-          "condition": "Use the cat's presence to successfully intimidate a genuinely superstitious foe or crowd.",
-          "reward": "+1 Charisma. The Intimidation advantage now applies against any creature, superstitious or not — something about this particular cat is just unsettling."
+          "condition": "Unnerve, startle, or stare down 3 separate foes or crowds with the cat's help (a guard, a noble, a mob), each of which then backs down or flees.",
+          "reward": "Once per day, as a bonus action, the cat fixes its gaze on a creature within 30 ft that can see it: that creature must succeed on a DC 13 Wisdom save or have disadvantage on its next attack roll or ability check against you."
         }
       ]
     },
@@ -2952,8 +2952,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Seen It All Before",
-          "condition": "Keep your nerve in a moment of real danger specifically because of the tortoise's calming presence.",
-          "reward": "The calm extends to a 15-ft radius rather than just within reach, and the advantage against fear now covers the whole party in that radius."
+          "condition": "Rest the party through 3 separate nights in dangerous locations (a monster's territory, a haunted building, a battlefield) with the tortoise at the fire, without anyone abandoning the watch.",
+          "reward": "Once per long rest, as a reaction when a creature within 5 ft is hit, the tortoise draws that creature into its shell's shadow: it has resistance to bludgeoning, piercing, and slashing damage until the start of your next turn."
         }
       ]
     },
@@ -2980,8 +2980,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — A Song Worth Hearing",
-          "condition": "Use the songbird's song to turn around a camp that had genuinely lost hope.",
-          "reward": "The song can be called on twice between rests instead of once, and grants advantage on the next TWO morale-raising Charisma checks instead of one."
+          "condition": "Have the songbird sing at 3 separate gatherings of at least 5 people (a tavern, a camp after a defeat, a funeral), with at least one audience that was visibly despondent beforehand.",
+          "reward": "Once per day, the songbird sings a calming refrain for 10 minutes: creatures within 30 ft that can hear it have advantage on saves against being frightened or charmed, and natural sleepers are not woken by noise."
         }
       ]
     },
@@ -3008,8 +3008,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Knows the Underneath",
-          "condition": "Use the rat to scout a path that saved the party from a serious trap or ambush.",
-          "reward": "Reports become more detailed — it can now indicate rough distances and simple hazards (water, fire, a locked door) with its trained gestures, not just point out a safe path."
+          "condition": "Use the rat to scout 3 separate sewers, tunnels, or dungeon corridors at least 100 ft long before the party enters, and avoid at least one trap or ambush it found.",
+          "reward": "Once per long rest, the rat can lead the party along its own route: for 1 hour you can always find a path to a destination within 1 mile that you name, and nonmagical traps along that path never trigger."
         }
       ]
     },
@@ -3038,8 +3038,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Steady Under Pressure",
-          "condition": "Ride the pony through a genuinely dangerous situation and keep it calm.",
-          "reward": "Speed increases to 50 ft., and the pony no longer needs a check to remain steady near loud or frightening stimuli."
+          "condition": "Ride the pony through 3 separate frightening events (a burning building, a cavalry charge, a roaring monster) without losing control or dismounting.",
+          "reward": "Once per short rest, as a bonus action, the pony bolts: it moves up to double its speed this turn without provoking opportunity attacks, and its rider cannot be thrown."
         }
       ]
     },
@@ -3068,8 +3068,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Never Complains",
-          "condition": "The mule hauls a genuinely overloaded burden through difficult terrain without faltering.",
-          "reward": "Carrying capacity increases to 600 lbs. without penalty, and the sure-footed advantage now also applies to the rider's own checks to stay mounted on rough ground."
+          "condition": "Haul a load of at least 400 lbs for 3 consecutive days of travel over rough terrain (mountains, mud, or forest) without unloading it once.",
+          "reward": "Once per long rest, as a bonus action, the mule digs in: it and any creature touching it cannot be moved or knocked prone until the start of your next turn, and it can shoulder through a flimsy door, gate, or barricade."
         }
       ]
     },
@@ -3098,8 +3098,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Rides Through Anything",
-          "condition": "Ride the horse hard across real distance in a genuine emergency, and take care of it properly afterward.",
-          "reward": "Speed increases to 70 ft., and the horse gains enough stamina that a long, hard ride on it no longer wears it — or its rider — down as quickly."
+          "condition": "Ride the horse at least 60 miles in a single day (with proper rests and water on the way), then spend the night caring for it: feed, water, and rubdown.",
+          "reward": "Once per long rest, as a bonus action, the horse gallops: for 1 minute it can take the Dash action as a bonus action, and its rider has advantage on saving throws against being thrown or knocked prone."
         }
       ]
     },
@@ -3129,8 +3129,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Impossible Footing",
-          "condition": "Cross terrain on the goat that should have been impassable, and survive it.",
-          "reward": "Climb speed increases to 40 ft., and the advantage against falling or being knocked prone extends to the rider even when not directly on the goat, so long as they're within 5 ft. of it."
+          "condition": "Climb a cliff, scree slope, or sheer ledge at least 100 ft high on the goat, carrying a rider or load, without ropes, magic, or falling.",
+          "reward": "Once per short rest, the goat can leap up to 20 ft vertically, carrying its rider, and lands without taking fall damage."
         }
       ]
     },
@@ -7340,8 +7340,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Sharp-Eyed Scout",
-          "condition": "Use the hawk's scouting to avoid a genuine ambush.",
-          "reward": "+2 Survival. The scouted advantage now applies to two checks of your choice instead of just one, and lasts until you next make camp."
+          "condition": "Scout ahead with the hawk on 5 separate days of overland travel, and use its report to avoid or prepare for at least 2 distinct threats (a patrol, a monster lair, a washed-out bridge).",
+          "reward": "Once per day, as an action, you see through the hawk's eyes for up to 10 minutes while it flies up to 1 mile away, with advantage on Perception checks made through its senses."
         }
       ]
     },
@@ -7368,8 +7368,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Never Blinks",
-          "condition": "The owl's night vision saves you from a real threat you wouldn't have spotted otherwise.",
-          "reward": "+2 Perception. The advantage now applies at all times, not just at night or in dim light."
+          "condition": "Keep watch with the owl perched beside you on 5 separate nights, spotting at least 2 intruders or hazards before anyone else did.",
+          "reward": "Once per long rest, the owl can fly ahead silently and describe a place within 300 ft, including hidden creatures, traps, and ambushers; it can also see invisible creatures within 30 ft of itself and mark them for you."
         }
       ]
     },
@@ -7396,8 +7396,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Never Quite Tame",
-          "condition": "Use the fox's stealth guidance to slip past something that should have caught you.",
-          "reward": "+2 Stealth. The advantage now extends to urban and indoor terrain as well, not just natural surroundings."
+          "condition": "Sneak the party into or past 3 separate guarded places (a camp, a town gate, a noble's estate) following the fox's lead, without being detected.",
+          "reward": "Once per long rest, as an action, the fox leads you and up to 3 allies for 1 hour: you leave no tracks and have advantage on Stealth checks while following it."
         }
       ]
     },
@@ -7424,8 +7424,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Stronger Than It Looks",
-          "condition": "The frog's strength saves the day moving something genuinely too heavy for the party alone.",
-          "reward": "+2 Strength. Its assistance advantage now applies to Athletics checks generally, not just moving heavy objects."
+          "condition": "Haul, drag, or lift 3 separate obstacles that the party could not move alone (a fallen tree, a stuck wagon, a portcullis, a boulder) with the frog's help.",
+          "reward": "Once per short rest, the frog can leap 30 ft carrying a Medium creature, or hurl a Small creature or object up to 30 ft; for 1 minute it can also cling to walls and ceilings."
         }
       ]
     },
@@ -7452,8 +7452,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Distracting Presence",
-          "condition": "Use the snake's presence to talk your way out of a situation that should have gone badly.",
-          "reward": "The Intimidation advantage now also applies to Deception checks made in the same breath — people distracted by the snake don't scrutinize your words as closely."
+          "condition": "Win 3 separate negotiations, bluffs, or interrogations while the snake is coiled openly on you or on the table.",
+          "reward": "Once per long rest, the snake can coil around a Medium or smaller creature within 5 ft (DC 13 Strength save to avoid): it is restrained (escape DC 13) and takes 1d6 bludgeoning damage at the start of each of your turns."
         }
       ]
     },
@@ -7480,8 +7480,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Digs First",
-          "condition": "The badger digs an escape or shortcut that saves the party in a real emergency.",
-          "reward": "Digging time drops to 1 minute for the same 5-ft cube, and it can now dig through packed earth or loose stone, not just soft ground."
+          "condition": "Dig 3 separate escape tunnels, foxholes, or shortcuts of at least 10 ft each for the party while under time pressure (pursuit, siege, or flood).",
+          "reward": "Once per long rest, the badger can dig a 30-ft tunnel through earth or soft stone in 1 minute; its walls are braced so the tunnel cannot collapse."
         }
       ]
     },
@@ -7536,8 +7536,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Brighter Glands",
-          "condition": "The beetle's light saves the party from a real danger in the dark.",
-          "reward": "Light radius increases to 20 ft. bright / 20 ft. dim, and the glands can flare to 40 ft. bright for 1 minute, once per short rest, on command."
+          "condition": "Light the way for the party through 3 separate lightless dungeons, caverns, or night marches of at least 1 hour each, using no other light source.",
+          "reward": "Once per long rest, the beetle flashes its glands: creatures within 15 ft that can see it must succeed on a DC 13 Constitution save or be blinded until the end of their next turn."
         }
       ]
     },
@@ -7564,8 +7564,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Never Sleeps on Watch",
-          "condition": "The mastiff's watch prevents a real ambush during a rest.",
-          "reward": "+2 Constitution. The mastiff now also gives a free warning bark, waking the party a full round before danger arrives instead of just improving the roll."
+          "condition": "Have the mastiff raise the alarm against 3 separate nighttime intruders, raiders, or beasts, and hold each at bay until the party is armed.",
+          "reward": "Once per short rest, as a reaction when a creature within 5 ft of the mastiff attacks one of your party, the mastiff bites it for 2d6 piercing damage, and it is knocked prone (DC 13 Strength save negates)."
         }
       ]
     },
@@ -7592,8 +7592,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Steady Under Load",
-          "condition": "The crab hauls something critical across water in a genuine emergency.",
-          "reward": "Carrying capacity increases to 600 lbs., and it can now also carry a willing rider (Small or smaller) at the same time."
+          "condition": "Ferry cargo of at least 200 lbs across 3 separate crossings of rivers, tidal flats, or shallows without losing any of it.",
+          "reward": "Once per long rest, the crab spreads its shell as a raft for 1 hour: it carries up to 4 Medium creatures across water at its speed, and its claws can pinch a creature within 5 ft (1d8 bludgeoning, grappled, escape DC 13)."
         }
       ]
     },
@@ -7620,8 +7620,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Knows Death's Shape",
-          "condition": "The vulture's carrion-sense leads you to a body or clue that mattered.",
-          "reward": "Detection range increases to 3 miles, and it can now roughly distinguish how recently the death occurred."
+          "condition": "Use the vulture to find 3 separate corpses or sites of recent death, and uncover a clue from each (cause, time, or the killer's trail) that advances an investigation.",
+          "reward": "Once per long rest, the vulture can read a death within 1 mile: you learn how, when, and with what weapon it happened, and if the corpse has been dead less than 24 hours it can answer 2 yes-or-no questions as with Speak with Dead."
         }
       ]
     },
@@ -7649,8 +7649,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — More Useful Than It Looks",
-          "condition": "The otter retrieves something genuinely important from underwater.",
-          "reward": "Swim speed increases to 50 ft., and it can now hold its retrieval in a cheek-pouch to carry more than one small item at a time."
+          "condition": "Recover 3 separate items from underwater (lost keys, weapons, evidence, or treasure) at a depth of at least 20 ft, on your command.",
+          "reward": "Once per long rest, the otter can tow a Medium or smaller creature through water at 30 ft speed, keeping everything it carries dry, and can open one underwater lock or latch."
         }
       ]
     },
@@ -7677,8 +7677,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Clears Its Own Path",
-          "condition": "The centipede clears a path through rubble or a narrow space that mattered.",
-          "reward": "+2 to your own checks to squeeze through narrow gaps while it travels with you (not just after it burrows first), and it can now widen a passage enough for a Medium creature to follow more easily."
+          "condition": "Clear or squeeze the party through 3 separate collapsed tunnels, rubble blockages, or crawlspaces, each requiring at least 10 minutes of work.",
+          "reward": "Once per long rest, the centipede's bite injects venom: a creature it bites must succeed on a DC 13 Constitution save or be poisoned for 1 minute (it repeats the save at the end of each of its turns)."
         }
       ]
     },
@@ -7713,8 +7713,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Battle-Proven",
-          "condition": "Fight a real battle from horseback and win.",
-          "reward": "The attack bonus while mounted increases to +2, and the horse gains advantage on saves against being frightened by combat itself."
+          "condition": "Win 3 separate battles while mounted on the horse, with the horse neither fleeing nor falling in any of them.",
+          "reward": "Once per long rest, as a reaction when its rider is hit by a melee attack, the warhorse rears: the attacker must succeed on a DC 14 Strength save or be knocked prone and pushed 10 ft, and the rider has advantage on their next attack against it."
         }
       ]
     },
@@ -7743,8 +7743,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Bred for the Waste",
-          "condition": "Cross a genuinely brutal stretch of desert on the camel and survive it.",
-          "reward": "Water endurance increases to 8 days, and the heat-save advantage now extends to the mount itself as well as the rider."
+          "condition": "Cross at least 50 miles of waterless desert on the camel in a single journey, with every member of the party surviving.",
+          "reward": "Once per day, the camel can regurgitate stored water: enough to give up to 4 creatures a full day of water; creatures riding it also ignore difficult terrain from loose sand."
         }
       ]
     },
@@ -7773,8 +7773,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Knows the Wild Roads",
-          "condition": "Use the elk to navigate genuinely hostile wilderness and get the party through safely.",
-          "reward": "+2 Survival while mounted (stacking with the existing advantage), and speed increases to 70 ft."
+          "condition": "Lead the party at least 100 miles through untracked forest, tundra, or mountains on the elk, arriving at a destination you declared before you set out.",
+          "reward": "Once per long rest, as an action, the elk finds the safest path: for 8 hours of overland travel the party cannot become lost and ignores difficult terrain from nonmagical plants and snow."
         }
       ]
     },
@@ -7804,8 +7804,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Bred for the Impossible Climb",
-          "condition": "Climb something on the goat that should have been impossible.",
-          "reward": "Climb speed increases to 50 ft., and the goat can now carry a second Small passenger or equivalent extra load without losing its climb speed."
+          "condition": "Climb a sheer cliff, tower, or ravine wall of at least 200 ft on the goat with a rider and gear, at normal speed, without ropes or magic.",
+          "reward": "Once per short rest, the goat butts a creature within 10 ft: 2d8 bludgeoning damage and knocked prone (DC 14 Strength save negates); if the goat charged at least 20 ft in a line first, the save has disadvantage."
         }
       ]
     },
@@ -8198,9 +8198,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Undertow",
+          "condition": "Dive at least 60 ft underwater with the weapon and defeat a creature that lives there.",
+          "reward": "Once per short rest, as a bonus action, summon a 10-ft-radius surge of icy water on a point within 30 ft. For 1 minute the area is difficult terrain, creatures inside have disadvantage on Dexterity saving throws and cannot take reactions, and you and your allies inside have resistance to fire damage."
         }
       ]
     },
@@ -8557,9 +8557,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Conductor",
+          "condition": "Chain the weapon's lightning to 3 or more creatures at once, on 3 separate occasions.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 1d4 lightning damage."
         }
       ]
     },
@@ -8728,9 +8728,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Guiding Light",
+          "condition": "Strike down 3 undead or fiends with this weapon's radiant damage.",
+          "reward": "Once per short rest, as a bonus action, the weapon flares for 1 minute: invisible creatures and shapechangers in their true form within 30 ft are outlined in light, and attacks against them do not suffer disadvantage from being unseen."
         }
       ]
     },
@@ -8809,9 +8809,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Briar Snare",
+          "condition": "Plant a living sapling with the weapon at its roots in a sacred grove or ancient forest, and guard it through one full night against whatever comes.",
+          "reward": "Once per short rest, as an action, cause briars to sprout in a 15-ft radius around a point within 30 ft: the area is difficult terrain for 1 minute, and a creature that enters or starts its turn there takes 1d4 piercing damage."
         }
       ]
     },
@@ -8940,9 +8940,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Hoarfrost Skin",
+          "condition": "Slow 3 different creatures with this weapon's frost and defeat each one while it is still slowed.",
+          "reward": "Once per short rest, as a bonus action, gain 5 temporary hit points and a coat of rime for 1 minute: a creature that hits you with a melee attack has its speed reduced by 10 ft until the end of its next turn."
         }
       ]
     },
@@ -9190,9 +9190,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Briar Snare",
+          "condition": "Fight 2 encounters back to back without a short or long rest, and never drop below half your hit points in any of them.",
+          "reward": "Once per short rest, as an action, cause briars to sprout in a 15-ft radius around a point within 30 ft: the area is difficult terrain for 1 minute, and a creature that enters or starts its turn there takes 1d4 piercing damage."
         }
       ]
     },
@@ -9314,9 +9314,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Hoarfrost Skin",
+          "condition": "Spend three nights in freezing wilderness with the weapon but no fire to warm you.",
+          "reward": "Once per short rest, as a bonus action, gain 5 temporary hit points and a coat of rime for 1 minute: a creature that hits you with a melee attack has its speed reduced by 10 ft until the end of its next turn."
         }
       ]
     },
@@ -9364,9 +9364,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Undertow",
+          "condition": "Knock 3 different creatures prone with this weapon within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, summon a 10-ft-radius surge of icy water on a point within 30 ft. For 1 minute the area is difficult terrain, creatures inside have disadvantage on Dexterity saving throws and cannot take reactions, and you and your allies inside have resistance to fire damage."
         }
       ]
     },
@@ -9411,9 +9411,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Hoarfrost Skin",
+          "condition": "Spend three nights in freezing wilderness with the weapon but no fire to warm you.",
+          "reward": "Once per short rest, as a bonus action, gain 5 temporary hit points and a coat of rime for 1 minute: a creature that hits you with a melee attack has its speed reduced by 10 ft until the end of its next turn."
         }
       ]
     },
@@ -9456,9 +9456,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its signature effect triggers one additional time per rest."
+          "tierLabel": "Hidden Power — Quickstep",
+          "condition": "Outrun a mounted rider or a pursuing pack on foot over at least a mile with the weapon drawn, ending the chase with them still behind you.",
+          "reward": "Once per short rest, as a bonus action, take the Dash or Disengage action. While you hold the weapon, opportunity attacks made against you have disadvantage."
         }
       ]
     },
@@ -9574,9 +9574,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Resounding Blow",
+          "condition": "Hit with this weapon's thunderclap on a critical hit, catching 3 or more creatures, on 2 separate occasions.",
+          "reward": "Once per short rest, as a bonus action, strike the ground or a wall to release a 15-ft cone of thunder: 1d4 thunder damage and deafened until your next turn (DC 12 Constitution save negates the deafness and halves the damage). The crack can be heard for 300 ft."
         }
       ]
     },
@@ -9746,9 +9746,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Bloodtithe",
+          "condition": "Spend a full night tending the dying: keep at least 3 critically wounded creatures alive until dawn using only hit points this weapon drains.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, drain it again: it takes 1d4 necrotic damage and you regain the same number of hit points or gain them as temporary hit points that last 1 hour."
         }
       ]
     },
@@ -10239,9 +10239,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Heavy Hand",
+          "condition": "Carry the weapon up a cliff face, tower, or mountain of at least 200 ft by hand — no flight, levitation, or climbing magic.",
+          "reward": "Once per short rest, as a bonus action, crush gravity in a 10-ft radius around a point within 30 ft for 1 minute: creatures there have their speed halved, and flying creatures there descend 30 ft at the start of each of their turns."
         }
       ]
     },
@@ -10443,9 +10443,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its signature effect triggers one additional time per rest."
+          "tierLabel": "Hidden Power — Spellbreaker",
+          "condition": "Defeat a single creature of CR 2 or higher with this weapon while no other creature deals damage to it.",
+          "reward": "Once per long rest, as a reaction when a creature within 60 ft casts a spell of 1st level or lower, counter it."
         }
       ]
     },
@@ -10644,9 +10644,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Heavy Hand",
+          "condition": "Slow 3 different creatures with the weapon's gravity strike and defeat each one while it is still slowed.",
+          "reward": "Once per short rest, as a bonus action, crush gravity in a 10-ft radius around a point within 30 ft for 1 minute: creatures there have their speed halved, and flying creatures there descend 30 ft at the start of each of their turns."
         }
       ]
     },
@@ -10694,9 +10694,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Festering Wound",
+          "condition": "Land the killing blow with this weapon on 3 different creatures of CR 1 or higher (summons and minions do not count).",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         }
       ]
     },
@@ -11349,9 +11349,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +2, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Heavy Hand",
+          "condition": "Win 2 encounters in a row using only this weapon — no spells, no other weapons, and no other magic items' abilities.",
+          "reward": "Once per short rest, as a bonus action, crush gravity in a 10-ft radius around a point within 30 ft for 1 minute: creatures there have their speed halved, and flying creatures there descend 30 ft at the start of each of their turns."
         }
       ]
     },
@@ -11565,9 +11565,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Riptide Guard",
+          "condition": "Dive to the bed of a sea or lake at least 100 ft deep wearing it, and bring something up from the bottom.",
+          "reward": "While you are submerged or standing in water you have resistance to bludgeoning and piercing damage and cannot be moved against your will. Once per short rest, as a reaction when a creature hits you, a wave breaks over the attacker and pushes it 10 ft away."
         }
       ]
     },
@@ -11858,9 +11858,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Cinder Guard",
+          "condition": "Walk through a burning building, field, or smoldering ruin to rescue a person or object, wearing it the entire way.",
+          "reward": "Once per short rest, as a bonus action, ignite for 1 minute: you shed bright light in a 20-ft radius, you are immune to fire damage and the burning condition, and creatures that start their turn within 5 ft of you take 1d4 fire damage."
         }
       ]
     },
@@ -12032,9 +12032,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Survive 5 separate killing blows while wearing this piece (reduced to 0 HP and stabilized or healed counts).",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Static Charge",
+          "condition": "Discharge the armor into 3 different attackers, tallied across encounters.",
+          "reward": "Once per short rest, as a reaction when you are hit by a melee attack, discharge: the attacker takes 1d4 lightning damage and cannot take reactions until the start of its next turn."
         }
       ]
     },
@@ -12322,9 +12322,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Second Wind",
+          "condition": "Drop below a quarter of your maximum hit points and still win the fight, on 2 separate occasions, while wearing it.",
+          "reward": "Once per short rest, as a bonus action, spend a Hit Die: regain hit points equal to the roll plus your Constitution modifier, and gain advantage on death saving throws until the end of your next turn."
         }
       ]
     },
@@ -12481,9 +12481,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Frostbound Mantle",
+          "condition": "Cross a glacier, frozen sea, or snow-choked pass of at least 20 miles on foot wearing it.",
+          "reward": "Once per short rest, as a reaction when you take damage, rime flashes over you: reduce the damage by 5, and the attacker's speed becomes 0 until the end of its next turn."
         }
       ]
     },
@@ -12586,9 +12586,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Survive 5 separate killing blows while wearing this piece (reduced to 0 HP and stabilized or healed counts).",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Death's Doorstep",
+          "condition": "Walk away from a fight in which every other member of your party fell to 0 HP at some point.",
+          "reward": "While you are at or below half your hit point maximum, you are immune to necrotic damage and have advantage on death saving throws."
         }
       ]
     },
@@ -12772,9 +12772,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Fleet Reflexes",
+          "condition": "Act first in initiative in 3 separate encounters while wearing it.",
+          "reward": "Once per short rest, as a reaction when you are hit by an attack, move up to half your speed without provoking opportunity attacks; the attack still hits."
         }
       ]
     },
@@ -12986,9 +12986,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Green Mending",
+          "condition": "Heal 3 different creatures using natural means (herbs, rest, the armor's own regrowth) while wearing it.",
+          "reward": "Once per short rest, as an action, plant roots into the ground: for 1 minute you regain 1d4 hit points at the start of each of your turns while you stand still, and enemies must succeed on a DC 12 Strength save to move you."
         }
       ]
     },
@@ -13023,9 +13023,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Clear Sight",
+          "condition": "Navigate a magically dark dungeon of at least three rooms without carrying a light of any kind, wearing it.",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is Blinded, Deafened, or Stunned, end that condition on the target immediately."
         }
       ]
     },
@@ -13071,9 +13071,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Stirring",
-          "condition": "Survive 5 separate killing blows while wearing this piece (reduced to 0 HP and stabilized or healed counts).",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Dawn Ward",
+          "condition": "Defeat 3 undead or fiends while wearing it.",
+          "reward": "Once per short rest, as a bonus action, you glow with dawn light for 1 minute: shed bright light in a 20-ft radius, and undead and fiends that start their turn there take 1d4 radiant damage."
         }
       ]
     },
@@ -16063,8 +16063,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Awakened",
-          "condition": "Push 5 different creatures into hazardous terrain, off a ledge, or into each other using the cannon's force.",
-          "reward": "Damage increases to 4d8, and reloading no longer requires a full action — it can be folded into the same action as firing."
+          "condition": "Push 5 different creatures off a ledge, into a hazard, or into each other using the cannon's force, and fire it at 10 separate targets in total.",
+          "reward": "Once per long rest, the cannon can fire a Siege Shot: a 30-ft line of force that deals 6d8 force damage (DC 16 Dexterity save for half) and shatters nonmagical cover or walls up to 5 ft thick in its path."
         }
       ]
     },
@@ -16621,8 +16621,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Approval Earned",
-          "condition": "The owl delivers a message that changes the outcome of something important.",
-          "reward": "+2 Perception (its judgment is rubbing off on you). It can now carry a small object along with its message, and its opinion of people has become reliable enough to ask directly and trust."
+          "condition": "Have the owl correctly flag 3 separate liars, impostors, or disguised creatures, each confirmed by you independently afterward.",
+          "reward": "Once per long rest, the owl can speak to a creature for you in perfect mimicry of your voice. It also warns you whenever a creature within 30 ft knowingly tells it or you a lie, giving you advantage on Insight checks against that creature."
         }
       ]
     },
@@ -16649,8 +16649,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Mostly Obedient",
-          "condition": "Use the quasit's shapeshifting to pull off a real infiltration.",
-          "reward": "Invisibility duration increases to 2 hours per day combined, and it can now also polymorph its owner (touch range) into the same forms it can take, once per long rest."
+          "condition": "Use the quasit's invisibility or shapechanging to infiltrate 3 separate guarded places (a castle, a cult gathering, an enemy camp) and bring back useful information each time.",
+          "reward": "Once per long rest, as an action, the quasit whispers a lesser curse at a creature within 30 ft: that creature must succeed on a DC 14 Wisdom save or have disadvantage on attack rolls and ability checks for 1 minute (it repeats the save at the end of each of its turns)."
         }
       ]
     },
@@ -16677,8 +16677,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Better Craftsmanship",
-          "condition": "The homunculus delivers a spell through its link that turns a real fight around.",
-          "reward": "It can now deliver a touch-range spell of up to 4th level, twice per short rest instead of once, and shares its owner's senses at any range on the same plane, not just when perched."
+          "condition": "Spend 3 days and 250 gp of materials refining the homunculus's body at a workshop, then have it deliver a spell through its link during a real fight.",
+          "reward": "Once per long rest, the homunculus can store a spell of 3rd level or lower that you cast on it, holding it for up to 8 hours, and release it as a reaction whenever you choose."
         }
       ]
     },
@@ -16705,8 +16705,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Gentle Giant, Longer Reach",
-          "condition": "The toad's grapple or retrieval saves someone from real danger.",
-          "reward": "+2 Strength. Its tongue's range increases to 25 ft., and the grapple save DC increases to 15."
+          "condition": "Use the toad's tongue to pull 5 separate creatures or objects out of danger or into a fight (a weapon over a pit, an enemy off a ledge, an ally from a fire).",
+          "reward": "Once per short rest, the toad can swallow a Small or smaller creature or object it has grappled: the creature is restrained and blinded inside and takes 1d6 acid damage at the start of each of its turns (escape DC 14)."
         }
       ]
     },
@@ -16733,8 +16733,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Growing Into It",
-          "condition": "The pup's frost breath turns a genuinely dangerous fight.",
-          "reward": "Cold resistance extends to a 20-ft radius, and the breath weapon can be used twice per short rest, dealing 6d6 cold damage instead of 4d6."
+          "condition": "Fight 3 separate battles in snow, ice, or freezing weather alongside the pup, using its frost breath at least once in each.",
+          "reward": "Once per long rest, as an action, the pup freezes the ground in a 15-ft radius for 1 minute: it becomes difficult terrain, and enemies that start their turn there take 1d6 cold damage."
         }
       ]
     },
@@ -16761,8 +16761,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Finally Entertained",
-          "condition": "The dragon's breath weapon or invisibility saves the party from a fight that should have gone badly.",
-          "reward": "Owner-shared invisibility increases to three times per long rest, and the breath weapon's save DC increases to 15."
+          "condition": "Pull off 3 separate pranks on arrogant or powerful targets (a guard captain, a noble, a wizard) alongside the dragon without anyone being hurt.",
+          "reward": "Once per long rest, as an action, the dragon weaves an illusion as with Major Image (no sound) lasting 10 minutes, centered within 120 ft."
         }
       ]
     },
@@ -16790,8 +16790,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Faster, Quieter",
-          "condition": "Use the weasel's stealth and tracking together to pull off a genuine infiltration.",
-          "reward": "+2 Dexterity. Speed increases to 60 ft., and its tracking advantage now also applies to Stealth checks made while actively tracking, not just while traveling."
+          "condition": "Track down 3 separate creatures or hidden places using the weasel's nose (a missing person, a bandit camp, a secret door).",
+          "reward": "Once per long rest, the weasel can slip through any gap 6 inches wide or more, scouting a place and returning with a count and description of every creature it saw there."
         }
       ]
     },
@@ -16826,8 +16826,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Mutual Respect, Proven",
-          "condition": "Fight and win a real battle from the wolf's back.",
-          "reward": "The attack bonus while mounted increases to +3, and the wolf's bite-and-prone ability can be used twice per short rest."
+          "condition": "Win 3 separate battles from the wolf's back, with its bite knocking at least one enemy prone in each.",
+          "reward": "Once per long rest, as a reaction when an enemy moves away from the wolf, it lunges: the wolf makes a free bite attack (2d6+3 piercing) and the target's speed becomes 0 until the start of your next turn."
         }
       ]
     },
@@ -16863,8 +16863,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Unshakeable Grip",
-          "condition": "Use the lizard's climbing to reach somewhere that should have been unreachable, under real pressure.",
-          "reward": "Climb speed increases to 50 ft., and the attack bonus while mounted increases to +2."
+          "condition": "Climb a cliff, tower, or ceiling at least 60 ft high on the lizard with a rider and gear, and fight for at least one round while it clings to a wall or ceiling.",
+          "reward": "Once per long rest, the lizard can drop from a wall or ceiling onto a creature: 3d6 bludgeoning damage and the target is grappled (escape DC 14), and the rider has advantage on the attack that follows."
         }
       ]
     },
@@ -16893,8 +16893,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Deep Current",
-          "condition": "Complete a genuinely dangerous underwater journey on the seahorse.",
-          "reward": "Swim speed increases to 80 ft., and the rider's cold resistance while mounted becomes immunity."
+          "condition": "Complete an underwater journey of at least 5 miles on the seahorse, descending to a depth of at least 60 ft and returning safely.",
+          "reward": "Once per long rest, the seahorse surrounds you and up to 3 allies within 10 ft with a bubble of air for 1 hour: all can breathe and speak underwater and move at the seahorse's speed in water."
         }
       ]
     },
@@ -17256,9 +17256,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its signature effect triggers one additional time per rest."
+          "tierLabel": "Hidden Power — Lucky Streak",
+          "condition": "Cheat death: win an encounter after rolling a natural 1 on an attack roll, then rolling a natural 20 on the very next one.",
+          "reward": "Once per short rest, when you or an ally within 30 ft fails an attack roll, ability check, or saving throw, force a reroll and use the new result."
         }
       ]
     },
@@ -17446,9 +17446,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its signature effect triggers one additional time per rest."
+          "tierLabel": "Hidden Power — Spellbreaker",
+          "condition": "Succeed on 4 saving throws against hostile spells while holding this weapon, tallied across encounters.",
+          "reward": "Once per long rest, as a reaction when a creature within 60 ft casts a spell of 2nd level or lower, counter it."
         }
       ]
     },
@@ -17903,9 +17903,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Bloodtithe",
+          "condition": "Heal at least 50 hit points in total using this weapon's drain (the DM keeps the tally).",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, drain it again: it takes 1d6 necrotic damage and you regain the same number of hit points or gain them as temporary hit points that last 1 hour."
         }
       ]
     },
@@ -17954,9 +17954,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Mind-Read",
+          "condition": "Defeat a mind flayer, aboleth, or other mind-controlling creature without ever being charmed or dominated by it.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, read its surface thoughts for 1 minute while it is within 60 ft: you learn what it intends to do on its next turn, and the first attack it makes against you before then has disadvantage."
         }
       ]
     },
@@ -18356,9 +18356,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Kindled",
+          "condition": "Defeat a single creature of CR 4 or higher with this weapon while no other creature deals damage to it.",
+          "reward": "Once per short rest, as a bonus action, the weapon blazes for 1 minute: bright light in a 30-ft radius, and each creature you hit while it blazes catches fire, taking 1d6 fire damage at the start of each of its turns until it uses an action to douse itself."
         }
       ]
     },
@@ -18515,9 +18515,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its signature effect triggers one additional time per rest."
+          "tierLabel": "Hidden Power — Spellbreaker",
+          "condition": "Defeat a hostile spellcaster able to cast 5th-level spells in single combat while holding this weapon.",
+          "reward": "Once per long rest, as a reaction when a creature within 60 ft casts a spell of 2nd level or lower, counter it."
         }
       ]
     },
@@ -18562,9 +18562,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Slipstream",
+          "condition": "Use the weapon's gust to shove 4 different creatures off a ledge, out of a window, or into a hazard (a fall of 10+ ft or damaging terrain counts).",
+          "reward": "Once per short rest, as a reaction when a ranged attack targets you or an ally within 30 ft, the weapon howls and that attack is made with disadvantage. In addition, when you take the Dash action while holding it, every creature you move past must succeed on a DC 14 Strength save or be shoved 10 ft."
         }
       ]
     },
@@ -18612,9 +18612,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Antivenin",
+          "condition": "Poison 4 different creatures with this weapon's venom and defeat each of them.",
+          "reward": "While you hold the weapon you have advantage on saving throws against poison and the poisoned condition. Once per long rest, as an action, draw a dose of antivenin from the blade to end the poisoned condition on a creature you touch (including yourself)."
         }
       ]
     },
@@ -18662,9 +18662,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Festering Wound",
+          "condition": "Lay the weapon on a grave or battlefield at least a century old for a full night, leaving a gift of at least 250 gp worth of flowers, wine, or coin with it.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         }
       ]
     },
@@ -18789,9 +18789,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Bloodtithe",
+          "condition": "Spend a full night tending the dying: keep at least 3 critically wounded creatures alive until dawn using only hit points this weapon drains.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, drain it again: it takes 1d6 necrotic damage and you regain the same number of hit points or gain them as temporary hit points that last 1 hour."
         }
       ]
     },
@@ -18876,9 +18876,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Conductor",
+          "condition": "Chain the weapon's lightning to 3 or more creatures at once, on 3 separate occasions.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 1d6 lightning damage."
         }
       ]
     },
@@ -19006,9 +19006,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Guiding Light",
+          "condition": "Land the killing blow with this weapon on 4 different creatures of CR 2 or higher (summons and minions do not count).",
+          "reward": "Once per short rest, as a bonus action, the weapon flares for 1 minute: invisible creatures and shapechangers in their true form within 30 ft are outlined in light, and attacks against them do not suffer disadvantage from being unseen."
         }
       ]
     },
@@ -19658,9 +19658,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Kindled",
+          "condition": "Set 4 different creatures ablaze with this weapon's flame within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, the weapon blazes for 1 minute: bright light in a 30-ft radius, and each creature you hit while it blazes catches fire, taking 1d6 fire damage at the start of each of its turns until it uses an action to douse itself."
         }
       ]
     },
@@ -19777,9 +19777,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Festering Wound",
+          "condition": "Reduce 4 different creatures' hit point maximums with this weapon, tallied across encounters.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         }
       ]
     },
@@ -19861,9 +19861,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Briar Snare",
+          "condition": "Defeat a single creature of CR 4 or higher with this weapon while no other creature deals damage to it.",
+          "reward": "Once per short rest, as an action, cause briars to sprout in a 15-ft radius around a point within 30 ft: the area is difficult terrain for 1 minute, and a creature that enters or starts its turn there takes 1d6 piercing damage."
         }
       ]
     },
@@ -20130,9 +20130,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its signature effect triggers one additional time per rest."
+          "tierLabel": "Hidden Power — Quickstep",
+          "condition": "Slay a named monster that has been terrorizing a settlement, then return and present its remains to the people it preyed on.",
+          "reward": "Once per short rest, as a bonus action, take the Dash or Disengage action. While you hold the weapon, opportunity attacks made against you have disadvantage."
         }
       ]
     },
@@ -20180,9 +20180,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Guiding Light",
+          "condition": "Keep a vigil under open sky at the highest point you can reach, from dusk to dawn, with the weapon unsheathed and pointed at the stars.",
+          "reward": "Once per short rest, as a bonus action, the weapon flares for 1 minute: invisible creatures and shapechangers in their true form within 30 ft are outlined in light, and attacks against them do not suffer disadvantage from being unseen."
         }
       ]
     },
@@ -20339,9 +20339,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +3, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Heavy Hand",
+          "condition": "Slow 4 different creatures with the weapon's gravity strike and defeat each one while it is still slowed.",
+          "reward": "Once per short rest, as a bonus action, crush gravity in a 10-ft radius around a point within 30 ft for 1 minute: creatures there have their speed halved, and flying creatures there descend 30 ft at the start of each of their turns."
         }
       ]
     },
@@ -20563,9 +20563,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Wear this piece continuously through 5 full days without ever removing it.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Fleet Reflexes",
+          "condition": "Act first in initiative in 4 separate encounters while wearing it.",
+          "reward": "Once per short rest, as a reaction when you are hit by an attack, move up to half your speed without provoking opportunity attacks; the attack still hits."
         }
       ]
     },
@@ -20614,9 +20614,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Dawn Ward",
+          "condition": "Spend a night within a haunted or desecrated site wearing it and see dawn without leaving.",
+          "reward": "Once per short rest, as a bonus action, you glow with dawn light for 1 minute: shed bright light in a 20-ft radius, and undead and fiends that start their turn there take 1d6 radiant damage."
         }
       ]
     },
@@ -20680,9 +20680,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Survive 5 separate killing blows while wearing this piece (reduced to 0 HP and stabilized or healed counts).",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Second Chance",
+          "condition": "Succeed on a saving throw that would have killed you outright, 2 separate times.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft fails a saving throw, they reroll it and use the new result."
         }
       ]
     },
@@ -20724,9 +20724,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Antitoxin Skin",
+          "condition": "Survive 4 poisonings or applications of the poisoned condition while wearing it.",
+          "reward": "Once per short rest, as a reaction when a creature within 5 ft of you is poisoned or takes poison damage, you siphon the toxin: the creature takes no damage from it and you gain 8 temporary hit points."
         }
       ]
     },
@@ -20940,9 +20940,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Antitoxin Skin",
+          "condition": "Take 150 combined damage while wearing this armor (the DM keeps a running tally).",
+          "reward": "Once per short rest, as a reaction when a creature within 5 ft of you is poisoned or takes poison damage, you siphon the toxin: the creature takes no damage from it and you gain 8 temporary hit points."
         }
       ]
     },
@@ -20973,9 +20973,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Second Chance",
+          "condition": "Succeed on a saving throw that would have killed you outright, 2 separate times.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft fails a saving throw, they reroll it and use the new result."
         }
       ]
     },
@@ -21128,9 +21128,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Wear this piece continuously through 5 full days without ever removing it.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Cinder Guard",
+          "condition": "Be hit by 2 critical hits across your adventures while wearing this armor, and remain standing after each one.",
+          "reward": "Once per short rest, as a bonus action, ignite for 1 minute: you shed bright light in a 20-ft radius, you are immune to fire damage and the burning condition, and creatures that start their turn within 5 ft of you take 1d6 fire damage."
         }
       ]
     },
@@ -21234,9 +21234,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Spellguard",
+          "condition": "Succeed on 4 saving throws against hostile spells while wearing it, tallied across encounters.",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is targeted by a spell, grant the target resistance to the spell's damage and advantage on the saving throw against it."
         }
       ]
     },
@@ -21312,9 +21312,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Static Charge",
+          "condition": "Stand on an exposed summit or open plain during a thunderstorm wearing it until lightning strikes you.",
+          "reward": "Once per short rest, as a reaction when you are hit by a melee attack, discharge: the attacker takes 1d6 lightning damage and cannot take reactions until the start of its next turn."
         }
       ]
     },
@@ -21466,9 +21466,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Immovable",
+          "condition": "Take 150 combined damage while wearing this armor (the DM keeps a running tally).",
+          "reward": "Once per short rest, as a reaction when a creature hits you with a melee attack, plant your feet: the attack deals half damage and the attacker must succeed on a DC 14 Strength save or be knocked prone."
         }
       ]
     },
@@ -21716,9 +21716,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Cinder Guard",
+          "condition": "Walk away from a fight in which every other member of your party fell to 0 HP at some point.",
+          "reward": "Once per short rest, as a bonus action, ignite for 1 minute: you shed bright light in a 20-ft radius, you are immune to fire damage and the burning condition, and creatures that start their turn within 5 ft of you take 1d6 fire damage."
         }
       ]
     },
@@ -21772,9 +21772,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Green Mending",
+          "condition": "Spend three nights outdoors wearing it, sleeping on bare earth, and keep a living plant alive on the road throughout.",
+          "reward": "Once per short rest, as an action, plant roots into the ground: for 1 minute you regain 1d6 hit points at the start of each of your turns while you stand still, and enemies must succeed on a DC 14 Strength save to move you."
         }
       ]
     },
@@ -21869,9 +21869,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Static Charge",
+          "condition": "Stand on an exposed summit or open plain during a thunderstorm wearing it until lightning strikes you.",
+          "reward": "Once per short rest, as a reaction when you are hit by a melee attack, discharge: the attacker takes 1d6 lightning damage and cannot take reactions until the start of its next turn."
         }
       ]
     },
@@ -21993,9 +21993,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Second Chance",
+          "condition": "Survive 2 separate encounters against creatures of CR 4 or higher while wearing this armor, with each of those creatures having hit you at least once.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft fails a saving throw, they reroll it and use the new result."
         }
       ]
     },
@@ -22068,9 +22068,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Clear Sight",
+          "condition": "Shake off 4 separate blinding, deafening, or stunning effects while wearing it.",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is Blinded, Deafened, or Stunned, end that condition on the target immediately."
         }
       ]
     },
@@ -22176,9 +22176,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Awakened",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Thunderous Rebuke",
+          "condition": "Raise an alarm that matters: sound a warning that saves a settlement or camp from an attack, using only the armor's own sound.",
+          "reward": "Once per long rest, as a bonus action, release a thunderclap in a 15-ft radius: 1d6 thunder damage (DC 14 Constitution save for half), and creatures that fail are pushed 10 ft."
         }
       ]
     },
@@ -23105,7 +23105,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Use the eye's Disintegrate or Dominate Monster to end a serious threat, 3 times.",
+          "condition": "Use the Eye's Disintegrate or Dominate Monster to defeat 3 separate creatures of CR 10 or higher.",
           "reward": "Both abilities become available twice per day instead of once."
         }
       ]
@@ -23619,7 +23619,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Use the rod to save a group from a genuine catastrophe, not merely as a rest stop.",
+          "condition": "Shelter at least 10 creatures inside the rod's paradise during a lethal event (a dragon's attack, a collapsing building, a flood) and bring them all out alive.",
           "reward": "The paradise becomes reachable every 5 days instead of every 10, and it can now hold up to 300 creatures."
         }
       ]
@@ -23924,7 +23924,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Use the reactive immunity 10 times to survive damage that would otherwise have been serious.",
+          "condition": "Trigger the tattoo's reactive immunity 10 times, each time against an attack or effect that would have dealt at least 20 damage.",
           "reward": "The immunity duration extends to 10 minutes, and it can now be triggered preemptively the instant you see an incoming attack, rather than only after taking the damage."
         }
       ]
@@ -24887,8 +24887,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Fully Grown",
-          "condition": "Fight alongside the fully-grown griffon and win a real battle together.",
-          "reward": "Its claw attack can now be used twice per short rest, and it gains a bite attack (1d10+3 piercing) usable alongside the claw."
+          "condition": "Raise the griffon to full maturity (about a year of ownership), then win 3 separate battles with it fighting alongside you.",
+          "reward": "Once per long rest, as an action, the griffon carries you and one other Medium creature aloft for up to 10 minutes at a fly speed of 60 ft; the first attack you make each turn from its back after it dives at least 20 ft has advantage."
         }
       ]
     },
@@ -24915,8 +24915,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Sworn in Earnest",
-          "condition": "The sprite's magic or archery saves your life in a real fight.",
-          "reward": "+2 Charisma. Heart Sight can now be cast twice per short rest, and its longbow's poison save DC increases to 15."
+          "condition": "Win 3 separate fights in which the sprite's poisoned arrow struck at least one enemy and you used Heart Sight beforehand to learn an enemy's intent.",
+          "reward": "Once per long rest, the sprite casts Faerie Fire on a 20-ft cube centered on a point within 60 ft; you and your allies have advantage on attack rolls against creatures outlined by it."
         }
       ]
     },
@@ -24971,8 +24971,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Fur Fully Set",
-          "condition": "Survive a fight that should have killed you, specifically because of the cub's displacement.",
-          "reward": "Displacement duration increases to 10 minutes, usable twice per short rest, and its tentacle attacks increase to 3d6+3 each."
+          "condition": "Avoid at least 5 attacks in a single fight thanks to the cub's displacement, or survive a fight that left you below 10 hit points while it was active.",
+          "reward": "Once per long rest, as a bonus action, the cub conjures 2 illusory duplicates of you, as with Mirror Image, for 1 minute."
         }
       ]
     },
@@ -25027,8 +25027,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Deeper Into Shadow",
-          "condition": "Use the pup's shadow-teleport to pull off an escape or ambush that mattered.",
-          "reward": "It can now carry up to two willing creatures within 5 ft. along when it teleports, and its bark's frighten DC increases to 15."
+          "condition": "Use the pup's shadow-teleport to escape capture or a surprise attack on 3 separate occasions.",
+          "reward": "Once per long rest, as a bonus action, the pup floods a 20-ft radius with magical darkness for 1 minute (it moves with the pup); creatures that start their turn inside must succeed on a DC 14 Wisdom save or be frightened of the pup."
         }
       ]
     },
@@ -25129,8 +25129,8 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Feywild Deepens",
-          "condition": "Use the elk's Misty Step to save the party from something that should have caught you.",
-          "reward": "Misty Step increases to three times per day, and the attack bonus while mounted increases to +2."
+          "condition": "Use the elk's Misty Step to escape a deadly situation (a grapple, a pit trap, or being surrounded) on 3 separate occasions.",
+          "reward": "Once per long rest, as an action, the elk casts Pass Without Trace for 1 hour, affecting itself, its rider, and up to 3 allies within 10 ft."
         }
       ]
     },
@@ -25208,9 +25208,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Conductor",
+          "condition": "Hold the weapon aloft on an exposed summit or open plain during a thunderstorm until lightning strikes it.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 2d6 lightning damage."
         }
       ]
     },
@@ -25833,9 +25833,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Festering Wound",
+          "condition": "Reduce 5 different creatures' hit point maximums with this weapon, tallied across encounters.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         }
       ]
     },
@@ -26000,9 +26000,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Festering Wound",
+          "condition": "Lay the weapon on a grave or battlefield at least a century old for a full night, leaving a gift of at least 500 gp worth of flowers, wine, or coin with it.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         }
       ]
     },
@@ -26087,9 +26087,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Hoarfrost Skin",
+          "condition": "Slow 5 different creatures with this weapon's frost and defeat each one while it is still slowed.",
+          "reward": "Once per short rest, as a bonus action, gain 12 temporary hit points and a coat of rime for 1 minute: a creature that hits you with a melee attack has its speed reduced by 10 ft until the end of its next turn."
         }
       ]
     },
@@ -26138,9 +26138,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Undertow",
+          "condition": "Knock 5 different creatures prone with this weapon within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, summon a 10-ft-radius surge of icy water on a point within 30 ft. For 1 minute the area is difficult terrain, creatures inside have disadvantage on Dexterity saving throws and cannot take reactions, and you and your allies inside have resistance to fire damage."
         }
       ]
     },
@@ -26262,9 +26262,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Defeat a creature at least twice your character level using only this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Heavy Hand",
+          "condition": "Slow 5 different creatures with the weapon's gravity strike and defeat each one while it is still slowed.",
+          "reward": "Once per short rest, as a bonus action, crush gravity in a 10-ft radius around a point within 30 ft for 1 minute: creatures there have their speed halved, and flying creatures there descend 30 ft at the start of each of their turns."
         }
       ]
     },
@@ -26659,9 +26659,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Heavy Hand",
+          "condition": "Slow 5 different creatures with the weapon's gravity strike and defeat each one while it is still slowed.",
+          "reward": "Once per short rest, as a bonus action, crush gravity in a 10-ft radius around a point within 30 ft for 1 minute: creatures there have their speed halved, and flying creatures there descend 30 ft at the start of each of their turns."
         }
       ]
     },
@@ -26906,9 +26906,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Conductor",
+          "condition": "Hold the weapon aloft on an exposed summit or open plain during a thunderstorm until lightning strikes it.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 2d6 lightning damage."
         }
       ]
     },
@@ -26957,9 +26957,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Land a killing blow against 10 different creatures using this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Conductor",
+          "condition": "Chain the weapon's lightning to 3 or more creatures at once, on 3 separate occasions.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 2d6 lightning damage."
         }
       ]
     },
@@ -27038,9 +27038,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Carry this weapon through 5 full combat encounters without ever setting it down.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Antivenin",
+          "condition": "Collect a vial of venom from a spider, snake, or other venomous creature you personally killed, and soak the blade in it overnight.",
+          "reward": "While you hold the weapon you have advantage on saving throws against poison and the poisoned condition. Once per long rest, as an action, draw a dose of antivenin from the blade to end the poisoned condition on a creature you touch (including yourself)."
         }
       ]
     },
@@ -27085,9 +27085,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Score 3 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Festering Wound",
+          "condition": "Reduce 5 different creatures' hit point maximums with this weapon, tallied across encounters.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         }
       ]
     },
@@ -27172,9 +27172,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Deal a combined 200 points of damage with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +4, and its elemental damage die increases by one size."
+          "tierLabel": "Hidden Power — Conductor",
+          "condition": "Defeat a single creature of CR 7 or higher with this weapon while no other creature deals damage to it.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 2d6 lightning damage."
         }
       ]
     },
@@ -27442,9 +27442,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Wear this piece continuously through 5 full days without ever removing it.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Second Wind",
+          "condition": "Be the one to keep the party alive: stabilize or heal 5 different downed allies yourself while wearing it.",
+          "reward": "Once per short rest, as a bonus action, spend a Hit Die: regain hit points equal to the roll plus your Constitution modifier, and gain advantage on death saving throws until the end of your next turn."
         }
       ]
     },
@@ -27495,9 +27495,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Wear this piece continuously through 5 full days without ever removing it.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Death's Doorstep",
+          "condition": "Be reduced to 0 hit points and stabilized or revived 5 separate times while wearing it.",
+          "reward": "While you are at or below half your hit point maximum, you are immune to necrotic damage and have advantage on death saving throws."
         }
       ]
     },
@@ -27524,9 +27524,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Green Mending",
+          "condition": "Spend three nights outdoors wearing it, sleeping on bare earth, and keep a living plant alive on the road throughout.",
+          "reward": "Once per short rest, as an action, plant roots into the ground: for 1 minute you regain 2d6 hit points at the start of each of your turns while you stand still, and enemies must succeed on a DC 16 Strength save to move you."
         }
       ]
     },
@@ -27561,9 +27561,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Thunderous Rebuke",
+          "condition": "Deafen 5 separate attackers with the armor's thunderous crack, tallied across encounters.",
+          "reward": "Once per long rest, as a bonus action, release a thunderclap in a 15-ft radius: 2d6 thunder damage (DC 16 Constitution save for half), and creatures that fail are pushed 10 ft."
         }
       ]
     },
@@ -27617,9 +27617,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Veil of Dusk",
+          "condition": "Hide from a hunting party for a full night while they search for you within 100 ft, wearing it.",
+          "reward": "Once per short rest, as a reaction when a creature targets you with an attack or spell while you are in dim light or darkness, you step sideways into shadow: the attack misses and you teleport to an unoccupied space within 15 ft."
         }
       ]
     },
@@ -27852,9 +27852,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Wear this piece continuously through 5 full days without ever removing it.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Veil of Dusk",
+          "condition": "Hide from a hunting party for a full night while they search for you within 100 ft, wearing it.",
+          "reward": "Once per short rest, as a reaction when a creature targets you with an attack or spell while you are in dim light or darkness, you step sideways into shadow: the attack misses and you teleport to an unoccupied space within 15 ft."
         }
       ]
     },
@@ -27885,9 +27885,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Unflinching",
+          "condition": "Stand a full night watch alone at a gate, bridge, or camp, and let no one pass unseen.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft is targeted by a charm or fear effect, you shout a warning: the ally has advantage on the save, and you can end the frightened condition on them."
         }
       ]
     },
@@ -27933,9 +27933,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Spellguard",
+          "condition": "Walk through a mage's trapped corridor or a warded vault wearing it, and survive every ward.",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is targeted by a spell, grant the target resistance to the spell's damage and advantage on the saving throw against it."
         }
       ]
     },
@@ -27970,9 +27970,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Wear this piece continuously through 5 full days without ever removing it.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Second Chance",
+          "condition": "Win 5 separate wagers or games of chance worth at least 500 gp each while wearing it.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft fails a saving throw, they reroll it and use the new result."
         }
       ]
     },
@@ -28022,9 +28022,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Featherfall",
+          "condition": "Survive a fall of at least 60 ft while wearing it, unharmed or at least still standing.",
+          "reward": "Once per short rest, as a reaction when you fall or are knocked prone, catch the wind: you take no damage and land on your feet, and each creature within 5 ft is pushed back 5 ft."
         }
       ]
     },
@@ -28056,9 +28056,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Clear Sight",
+          "condition": "Shake off 5 separate blinding, deafening, or stunning effects while wearing it.",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is Blinded, Deafened, or Stunned, end that condition on the target immediately."
         }
       ]
     },
@@ -28232,9 +28232,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Survive 5 separate killing blows while wearing this piece (reduced to 0 HP and stabilized or healed counts).",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Spellguard",
+          "condition": "Succeed on 5 saving throws against hostile spells while wearing it, tallied across encounters.",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is targeted by a spell, grant the target resistance to the spell's damage and advantage on the saving throw against it."
         }
       ]
     },
@@ -28338,9 +28338,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Riptide Guard",
+          "condition": "Dive to the bed of a sea or lake at least 100 ft deep wearing it, and bring something up from the bottom.",
+          "reward": "While you are submerged or standing in water you have resistance to bludgeoning and piercing damage and cannot be moved against your will. Once per short rest, as a reaction when a creature hits you, a wave breaks over the attacker and pushes it 10 ft away."
         }
       ]
     },
@@ -28394,9 +28394,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Fleet Reflexes",
+          "condition": "Outrun a mounted rider or pursuing pack over at least 5 miles on foot wearing it.",
+          "reward": "Once per short rest, as a reaction when you are hit by an attack, move up to half your speed without provoking opportunity attacks; the attack still hits."
         }
       ]
     },
@@ -28460,9 +28460,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Successfully protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Static Charge",
+          "condition": "Stand on an exposed summit or open plain during a thunderstorm wearing it until lightning strikes you.",
+          "reward": "Once per short rest, as a reaction when you are hit by a melee attack, discharge: the attacker takes 2d6 lightning damage and cannot take reactions until the start of its next turn."
         }
       ]
     },
@@ -28541,9 +28541,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Take a combined 150 points of damage while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Dawn Ward",
+          "condition": "Be hit by 3 critical hits across your adventures while wearing this armor, and remain standing after each one.",
+          "reward": "Once per short rest, as a bonus action, you glow with dawn light for 1 minute: shed bright light in a 20-ft radius, and undead and fiends that start their turn there take 2d6 radiant damage."
         }
       ]
     },
@@ -28574,9 +28574,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Survive 5 separate killing blows while wearing this piece (reduced to 0 HP and stabilized or healed counts).",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Green Mending",
+          "condition": "Spend three nights outdoors wearing it, sleeping on bare earth, and keep a living plant alive on the road throughout.",
+          "reward": "Once per short rest, as an action, plant roots into the ground: for 1 minute you regain 2d6 hit points at the start of each of your turns while you stand still, and enemies must succeed on a DC 16 Strength save to move you."
         }
       ]
     },
@@ -28654,9 +28654,9 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Ascendant",
-          "condition": "Be the last person standing in 3 separate combat encounters while wearing this piece.",
-          "reward": "The armor's protective bonus sharpens: advantage on one additional category of saving throw of your choice, and its signature effect can be used one additional time before requiring a rest."
+          "tierLabel": "Hidden Power — Frostbound Mantle",
+          "condition": "Spend three nights in freezing weather wearing it, without a fire for warmth.",
+          "reward": "Once per short rest, as a reaction when you take damage, rime flashes over you: reduce the damage by 12, and the attacker's speed becomes 0 until the end of its next turn."
         }
       ]
     },
@@ -29208,7 +29208,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier II — The Grudge List",
-          "condition": "Engrave 5 or more names of genuine enemies into the haft using the axe's blade.",
+          "condition": "Engrave 5 or more names of enemies you have personally defeated or sworn to defeat into the haft using the axe's blade.",
           "reward": "Against any named creature: +2d10 damage per hit. Reducing a named target to 0 HP restores 10 HP to you. The axe pulses when any named creature is within 30 ft."
         },
         {
@@ -30109,7 +30109,7 @@ const canonicalItems = [
         {
           "type": "cursed",
           "tierLabel": "Tier III — Owed (Curse)",
-          "condition": "Lose a bet on something genuinely important — wagered something you could not afford to lose and lost it, without using magic to change the outcome.",
+          "condition": "Lose a bet in which you staked at least half of your total wealth or a prized possession, without using magic to change the outcome.",
           "reward": "Once per week: an unknown benefactor provides one service or clears one debt (GM determines form). However: once per month the coin calls in its own favor — GM chooses what you must do. Refusing costs you 3 automatic reroll failures."
         }
       ]
@@ -30190,7 +30190,7 @@ const canonicalItems = [
         {
           "type": "dormant",
           "tierLabel": "Dormant — The Lie Told True",
-          "condition": "Convince someone of something completely false — a lie that genuinely changes their long-term behavior — using the hourglass's temporal aura to make the lie feel like memory.",
+          "condition": "Convince someone of a complete falsehood using the hourglass's temporal aura to make the lie feel like memory, so that they reverse a major decision (the DM confirms).",
           "reward": "The hourglass stops lying. Once per day: see exactly 6 seconds into the future with certainty — not a guess, but true knowledge of what will happen next round in initiative order, including all enemy actions and targets."
         }
       ]
@@ -30370,7 +30370,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — A Song for Foundations",
-          "condition": "Use the lyre to protect a structure that is later actually attacked while the protection is active.",
+          "condition": "Play the lyre's protection over a structure while it is attacked by at least 6 hostile creatures or a siege engine, and hold it until the attack ends.",
           "reward": "The protective radius increases to 500 ft., and structures within it also can't be damaged by natural disasters (fire, flood, earthquake) while you play."
         },
         {
@@ -30880,13 +30880,13 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — The Sword Recognizes You",
-          "condition": "Reach the sword's Exalted state (through its normal awakening process) and win a significant battle while wielding it.",
+          "condition": "Reach the sword's Exalted state through its normal awakening process, and win a battle against a creature of CR 10 or higher while wielding it.",
           "reward": "Once Exalted, the radiant damage increases to 3d6, and the sword's bonus to attack and damage persists even if you are momentarily disarmed and immediately reclaim it (within 1 minute)."
         },
         {
           "type": "locked",
           "tierLabel": "Tier II — A Voice That Answers Back",
-          "condition": "Carry the sword, Exalted, through 3 more significant battles.",
+          "condition": "Carry the sword, Exalted, through 3 more battles against creatures of CR 10 or higher.",
           "reward": "The sword can now speak a short warning to you (as a free action on its part) when you are about to be surprised or ambushed, once per long rest."
         }
       ]
@@ -30909,7 +30909,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — A Home That Follows",
-          "condition": "Successfully use the tower for shelter during a genuine emergency (storm, ambush, pursuit).",
+          "condition": "Shelter at least 4 allies inside the tower while it is pursued, stormed, or attacked by at least 6 hostile creatures, and hold until the threat leaves.",
           "reward": "The tower gains a 5th floor with a small kitchen and washroom, and can now be summoned as a bonus action instead of an action."
         },
         {
@@ -31437,7 +31437,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — Proven Worth Protecting",
-          "condition": "Use the wyrmling's breath weapon to turn a battle that should have been a loss.",
+          "condition": "Use the wyrmling's breath weapon to hit at least 3 enemies at once in each of 3 separate battles.",
           "reward": "Breath weapon damage increases to 10d8, usable three times per short rest."
         },
         {
@@ -31505,7 +31505,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — Light Against the Dark",
-          "condition": "Use the archon's light or Guiding Bolt to turn a fight against real darkness — undead, fiends, or literal shadow — in your favor.",
+          "condition": "Defeat 3 separate encounters against undead or fiends in which the archon's light or Guiding Bolt struck the first blow.",
           "reward": "Guiding Bolt can now be cast twice per short rest, dealing 6d6 radiant, and Daylight no longer requires a rest to recast once its previous casting has ended."
         },
         {
@@ -31548,13 +31548,13 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — Noble Bearing, Proven",
-          "condition": "Win a real aerial battle astride the pegasus.",
+          "condition": "Win a battle fought entirely at least 30 ft above the ground, with the pegasus carrying you.",
           "reward": "The attack bonus while mounted and airborne increases to +4, and the dive-kick can be used twice per short rest."
         },
         {
           "type": "locked",
           "tierLabel": "Tier II — Good at Heart",
-          "condition": "Prove yourself good at heart in a moment that cost you something real, with the pegasus as the only witness.",
+          "condition": "Give up something worth at least 500 gp (or a prized possession) to help a stranger in need, with no witness but the pegasus.",
           "reward": "Fly speed increases to 120 ft., and the frightened-immunity while mounted extends to a 30-ft radius around the pegasus, protecting nearby allies too."
         }
       ]
@@ -31591,7 +31591,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — Chose Well",
-          "condition": "Fight a real battle together with the griffon, each of you covering the other, and win.",
+          "condition": "Win 3 separate battles in which you and the griffon each protected the other at least once (blocked a blow, drew attacks, or pulled the other out of danger).",
           "reward": "The attack bonus while mounted increases to +4, and the griffon's claw and beak damage increase to 2d6+6 and 2d10+6."
         },
         {
@@ -31645,15 +31645,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Once per turn on a hit, a gust adds an extra 2d8 thunder damage and pushes the target 10 ft. directly away from you."
+          "tierLabel": "Tier I — Slipstream",
+          "condition": "Use the weapon's gust to shove 6 different creatures off a ledge, out of a window, or into a hazard (a fall of 10+ ft or damaging terrain counts).",
+          "reward": "Once per short rest, as a reaction when a ranged attack targets you or an ally within 30 ft, the weapon howls and that attack is made with disadvantage. In addition, when you take the Dash action while holding it, every creature you move past must succeed on a DC 18 Strength save or be shoved 10 ft."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Stormcaller's Toll (Curse)",
+          "condition": "Use this weapon to sunder another magic weapon or magic item, destroying it completely.",
+          "reward": "Once per long rest, as an action, unleash a 30-ft cone of thunder: 6d6 thunder damage (DC 18 Constitution save for half), and each creature that fails is pushed 15 ft and deafened until the end of its next turn. The price: the wind never stops tugging at you — you automatically fail Stealth checks against anything within 60 ft, and torches and candles within 10 ft gutter out."
         }
       ]
     },
@@ -31696,15 +31696,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Land the killing blow on 10 different creatures with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, while you are in dim light or darkness, deal an extra 2d8 psychic damage."
+          "tierLabel": "Tier I — Shadowstep",
+          "condition": "Defeat a single creature of CR 11 or higher with this weapon while no other creature deals damage to it.",
+          "reward": "Once per short rest, as a bonus action while you are in dim light or darkness, teleport up to 30 ft to an unoccupied space you can see that is also in dim light or darkness."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Umbral Lance",
+          "condition": "Defeat a shadow, a nightwalker, or another creature of living darkness of CR 11 or higher while holding it, dealing the killing blow yourself.",
+          "reward": "Once per long rest, as an action, plunge a 30-ft radius around you into magical darkness for 10 minutes (it moves with you). You can see through it, and you have advantage on attack rolls against creatures that cannot."
         }
       ]
     },
@@ -31744,15 +31744,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn."
+          "tierLabel": "Tier I — Quickstep",
+          "condition": "Deliver a sealed message at least 50 miles overland in under 24 hours, on foot, carrying this weapon.",
+          "reward": "Once per short rest, as a bonus action, take the Dash or Disengage action. While you hold the weapon, opportunity attacks made against you have disadvantage."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — The Courier's Burden (Curse)",
+          "condition": "Swear a binding oath before a priest or witnesses, then break it while wielding this weapon.",
+          "reward": "Once per long rest, as a bonus action, take one additional action on your turn (Attack, Dash, Disengage, Dodge, Help, or Hide). The price: every use costs you a level of exhaustion, and you cannot remove exhaustion gained this way except by sleeping a full night in a proper bed."
         }
       ]
     },
@@ -31798,15 +31798,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, the wound cauterizes into flame for an extra 2d8 fire damage. Sheds dim firelight 10 ft. while drawn."
+          "tierLabel": "Tier I — Kindled",
+          "condition": "Set 6 different creatures ablaze with this weapon's flame within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, the weapon blazes for 1 minute: bright light in a 30-ft radius, and each creature you hit while it blazes catches fire, taking 2d8 fire damage at the start of each of its turns until it uses an action to douse itself."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Wildfire Heart (Curse)",
+          "condition": "Use this weapon to kill a surrendered or bound prisoner while witnesses watch (the DM judges that the surrender was genuine).",
+          "reward": "Once per long rest, as an action, erupt in a 15-ft-radius burst of flame centered on you: 6d6 fire damage to creatures of your choice (DC 18 Dexterity save for half). The price: you are never quite cool again — you have vulnerability to cold damage."
         }
       ]
     },
@@ -31852,15 +31852,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, a wave of pressure adds an extra 2d8 cold damage and the target must succeed on a DC 18 Strength save or be knocked Prone."
+          "tierLabel": "Tier I — Undertow",
+          "condition": "Knock 6 different creatures prone with this weapon within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, summon a 10-ft-radius surge of icy water on a point within 30 ft. For 1 minute the area is difficult terrain, creatures inside have disadvantage on Dexterity saving throws and cannot take reactions, and you and your allies inside have resistance to fire damage."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Drowned Man's Debt (Curse)",
+          "condition": "Grant a mercy killing with this weapon to a mortally wounded ally or creature who begged you for it.",
+          "reward": "Once per long rest, as an action, flood a 30-ft radius around you ankle-deep for 1 minute: enemies inside have disadvantage on attack rolls and their speed is halved. The price: the sea keeps its claim on you — you must fully immerse yourself in water for a minute each dawn or gain a level of exhaustion."
         }
       ]
     },
@@ -31903,15 +31903,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Once per turn on a hit, a gust adds an extra 2d8 thunder damage and pushes the target 10 ft. directly away from you."
+          "tierLabel": "Tier I — Slipstream",
+          "condition": "Carry the weapon to a mountain summit or tower top above the cloud line, and hold it aloft through one full storm there.",
+          "reward": "Once per short rest, as a reaction when a ranged attack targets you or an ally within 30 ft, the weapon howls and that attack is made with disadvantage. In addition, when you take the Dash action while holding it, every creature you move past must succeed on a DC 18 Strength save or be shoved 10 ft."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Stormcaller's Toll (Curse)",
+          "condition": "Use this weapon to sunder another magic weapon or magic item, destroying it completely.",
+          "reward": "Once per long rest, as an action, unleash a 30-ft cone of thunder: 6d6 thunder damage (DC 18 Constitution save for half), and each creature that fails is pushed 15 ft and deafened until the end of its next turn. The price: the wind never stops tugging at you — you automatically fail Stealth checks against anything within 60 ft, and torches and candles within 10 ft gutter out."
         }
       ]
     },
@@ -31948,15 +31948,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Land the killing blow on 10 different creatures with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn."
+          "tierLabel": "Tier I — Quickstep",
+          "condition": "Deliver a sealed message at least 50 miles overland in under 24 hours, on foot, carrying this weapon.",
+          "reward": "Once per short rest, as a bonus action, take the Dash or Disengage action. While you hold the weapon, opportunity attacks made against you have disadvantage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Wind at Your Back",
+          "condition": "Pay a sage, priest, or master smith at least 1000 gp to read this item's history, then travel to the place that reading names and spend a full night there with it.",
+          "reward": "Once per long rest, as an action, you and up to 4 willing allies within 30 ft each immediately move up to their full speed without provoking opportunity attacks."
         }
       ]
     },
@@ -32002,15 +32002,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, unravel the target with starlight for an extra 2d8 radiant damage, ignoring resistance to radiant damage."
+          "tierLabel": "Tier I — Guiding Light",
+          "condition": "Strike down 6 undead or fiends with this weapon's radiant damage.",
+          "reward": "Once per short rest, as a bonus action, the weapon flares for 1 minute: invisible creatures and shapechangers in their true form within 30 ft are outlined in light, and attacks against them do not suffer disadvantage from being unseen."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Dawn's Verdict",
+          "condition": "Keep a seven-night vigil with the item at a shrine to a god of sun or light, or the ruins of one, never sleeping more than 4 hours a night and never leaving its side.",
+          "reward": "Once per long rest, as an action, name a creature you can see: it must succeed on a DC 18 Charisma save or be wreathed in light for 1 minute, unable to turn invisible or hide, and your attacks against it deal an extra 2d8 radiant damage."
         }
       ]
     },
@@ -32054,15 +32054,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Land the killing blow on 10 different creatures with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, while you are in dim light or darkness, deal an extra 2d8 psychic damage."
+          "tierLabel": "Tier I — Shadowstep",
+          "condition": "Land the killing blow with this weapon's psychic damage on 6 different creatures while you stand in dim light or darkness.",
+          "reward": "Once per short rest, as a bonus action while you are in dim light or darkness, teleport up to 30 ft to an unoccupied space you can see that is also in dim light or darkness."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Hollow Mind (Curse)",
+          "condition": "Seal a keepsake worth at least 1000 gp in a place that has never known light, and never return for it.",
+          "reward": "Once per long rest, when you hit a creature, it must succeed on a DC 18 Wisdom save or be frightened and unable to speak for 1 minute (it repeats the save at the end of each of its turns). The price: the weapon fills your sleep with whispers — you can no longer finish a long rest in dim light or darkness; resting anywhere but bright light grants you no benefit from it."
         }
       ]
     },
@@ -32108,15 +32108,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, arcs of lightning add an extra 2d8 lightning damage and jump to one other creature within 10 ft. of the target (same damage, no save)."
+          "tierLabel": "Tier I — Conductor",
+          "condition": "Chain the weapon's lightning to 3 or more creatures at once, on 3 separate occasions.",
+          "reward": "Once per short rest, as a bonus action, charge the weapon for 1 minute: you gain resistance to lightning damage, and the first creature to hit you with a melee attack each turn takes 2d8 lightning damage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Storm's Eye",
+          "condition": "Win a duel against the bearer of a similar relic (to the death or to a formal surrender), or defeat a storm giant, a roc, or another creature that commands lightning in single combat while holding it using no other magic item.",
+          "reward": "Once per long rest, as an action, raise a storm in a 60-ft radius for 1 minute; on each of your turns, as a bonus action, choose a creature in the area to take 2d8 lightning damage (no save, doubled against creatures wearing metal armor)."
         }
       ]
     },
@@ -32161,15 +32161,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Proven",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, a lance of psychic feedback adds an extra 2d8 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn."
+          "tierLabel": "Tier I — Mind-Read",
+          "condition": "Defeat a mind flayer, aboleth, or other mind-controlling creature without ever being charmed or dominated by it.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, read its surface thoughts for 1 minute while it is within 60 ft: you learn what it intends to do on its next turn, and the first attack it makes against you before then has disadvantage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Bring this item to the place it was first made, or as close as living memory can place that location, and spend a full night there.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Thought-Forged",
+          "condition": "Keep a seven-night vigil with the item at a place where minds have been broken: an asylum, a dream-shrine, or a mind flayer's lair, never sleeping more than 4 hours a night and never leaving its side.",
+          "reward": "Once per long rest, as an action, link minds: you and up to 4 willing creatures within 60 ft share thoughts telepathically for 8 hours and cannot be surprised."
         }
       ]
     },
@@ -32220,15 +32220,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Land the killing blow on 10 different creatures with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. On a critical hit, a thunderclap deals an extra 2d8 thunder damage to every creature within 10 ft. of the target (DC 18 Constitution save for half)."
+          "tierLabel": "Tier I — Resounding Blow",
+          "condition": "Hit with this weapon's thunderclap on a critical hit, catching 3 or more creatures, on 3 separate occasions.",
+          "reward": "Once per short rest, as a bonus action, strike the ground or a wall to release a 15-ft cone of thunder: 2d8 thunder damage and deafened until your next turn (DC 18 Constitution save negates the deafness and halves the damage). The crack can be heard for 300 ft."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Siege-Breaker (Curse)",
+          "condition": "At an exposed summit or lightning-struck plain, destroy 1000 gp worth of treasure (melted down, burned, or sunk) as an offering to the weapon, during a single night-long ritual.",
+          "reward": "Once per long rest, as an action, shatter a nonmagical wall, door, or gate up to a 10-ft cube, and creatures within 10 ft of it take 6d6 thunder damage (DC 18 Constitution save for half). The price: the ringing never fades — you have disadvantage on hearing-based Perception checks and cannot hear whispers."
         }
       ]
     },
@@ -32269,15 +32269,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. While holding this weapon, gain a +3 bonus to saving throws against spells."
+          "tierLabel": "Tier I — Spellbreaker",
+          "condition": "Defeat a hostile spellcaster able to cast 5th-level spells in single combat while holding this weapon.",
+          "reward": "Once per long rest, as a reaction when a creature within 60 ft casts a spell of 4th level or lower, counter it."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Hungry for Magic (Curse)",
+          "condition": "Betray a patron or employer who trusted you — deliver them to their enemies or take their treasure — while carrying this weapon.",
+          "reward": "Once per long rest, as a reaction when you succeed on a saving throw against a spell, absorb it: the spell has no effect on you and you regain 6d6 hit points. The price: magic recoils from you — beneficial spells cast on you by others (healing, buffs) fail."
         }
       ]
     },
@@ -32323,15 +32323,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Proven",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, the wound withers for an extra 2d8 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest."
+          "tierLabel": "Tier I — Festering Wound",
+          "condition": "Lay the weapon on a grave or battlefield at least a century old for a full night, leaving a gift of at least 1000 gp worth of flowers, wine, or coin with it.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Time Remembers",
+          "condition": "Gather three rare reagents (each from a different dangerous creature or location, with one taken from a wight, a wraith, or another creature that drains life) and use them to attune the item to you in a ritual at a graveyard, battlefield, or catacomb at least a century old.",
+          "reward": "Once per long rest, as a reaction when a creature hits you with an attack, age the blow: the attack deals half damage, and if the attacker's weapon is nonmagical it crumbles after its next hit."
         }
       ]
     },
@@ -32374,15 +32374,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. On a critical hit, a thunderclap deals an extra 2d8 thunder damage to every creature within 10 ft. of the target (DC 18 Constitution save for half)."
+          "tierLabel": "Tier I — Resounding Blow",
+          "condition": "Use the weapon to breach a locked gate, barricade, or fortress wall that blocks the party's way.",
+          "reward": "Once per short rest, as a bonus action, strike the ground or a wall to release a 15-ft cone of thunder: 2d8 thunder damage and deafened until your next turn (DC 18 Constitution save negates the deafness and halves the damage). The crack can be heard for 300 ft."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Siege-Breaker (Curse)",
+          "condition": "At an exposed summit or lightning-struck plain, destroy 1000 gp worth of treasure (melted down, burned, or sunk) as an offering to the weapon, during a single night-long ritual.",
+          "reward": "Once per long rest, as an action, shatter a nonmagical wall, door, or gate up to a 10-ft cube, and creatures within 10 ft of it take 6d6 thunder damage (DC 18 Constitution save for half). The price: the ringing never fades — you have disadvantage on hearing-based Perception checks and cannot hear whispers."
         }
       ]
     },
@@ -32425,15 +32425,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, the wound cauterizes into flame for an extra 2d8 fire damage. Sheds dim firelight 10 ft. while drawn."
+          "tierLabel": "Tier I — Kindled",
+          "condition": "Set 6 different creatures ablaze with this weapon's flame within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, the weapon blazes for 1 minute: bright light in a 30-ft radius, and each creature you hit while it blazes catches fire, taking 2d8 fire damage at the start of each of its turns until it uses an action to douse itself."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Forge-Memory",
+          "condition": "Win a duel against the bearer of a similar relic (to the death or to a formal surrender), or defeat a fire elemental, a hell hound, or another creature of living flame in single combat while holding it using no other magic item.",
+          "reward": "Once per long rest, as an action, plunge the weapon into fire to temper it: for 1 hour its fire damage ignores resistance and immunity to fire, and any structure it strikes catches alight."
         }
       ]
     },
@@ -32479,15 +32479,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, while you are in dim light or darkness, deal an extra 2d8 psychic damage."
+          "tierLabel": "Tier I — Shadowstep",
+          "condition": "Spend three consecutive nights in a lightless place (a deep cave, crypt, or sealed cellar) without lighting any flame, with the weapon drawn across your lap.",
+          "reward": "Once per short rest, as a bonus action while you are in dim light or darkness, teleport up to 30 ft to an unoccupied space you can see that is also in dim light or darkness."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "+6 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Hollow Mind (Curse)",
+          "condition": "Swear a binding oath before a priest or witnesses, then break it while wielding this weapon.",
+          "reward": "Once per long rest, when you hit a creature, it must succeed on a DC 18 Wisdom save or be frightened and unable to speak for 1 minute (it repeats the save at the end of each of its turns). The price: the weapon fills your sleep with whispers — you can no longer finish a long rest in dim light or darkness; resting anywhere but bright light grants you no benefit from it."
         }
       ]
     },
@@ -32530,15 +32530,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +5. Now, on every hit, a wave of pressure adds an extra 2d8 cold damage and the target must succeed on a DC 18 Strength save or be knocked Prone."
+          "tierLabel": "Tier I — Undertow",
+          "condition": "Knock 6 different creatures prone with this weapon within a single encounter.",
+          "reward": "Once per short rest, as a bonus action, summon a 10-ft-radius surge of icy water on a point within 30 ft. For 1 minute the area is difficult terrain, creatures inside have disadvantage on Dexterity saving throws and cannot take reactions, and you and your allies inside have resistance to fire damage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — The Deep Current",
+          "condition": "Pay a sage, priest, or master smith at least 1000 gp to read this item's history, then travel to the place that reading names and spend a full night there with it.",
+          "reward": "Once per long rest, as an action, you and up to 4 allies within 30 ft gain a swim speed equal to your walking speed and can breathe water for 8 hours."
         }
       ]
     },
@@ -32568,15 +32568,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Unflinching",
+          "condition": "Be reduced to 0 HP while wearing this armor and be back on your feet within the same encounter.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft is targeted by a charm or fear effect, you shout a warning: the ally has advantage on the save, and you can end the frightened condition on them."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Warden-Bound (Curse)",
+          "condition": "Destroy a spellbook, scroll collection, or library worth at least 1000 gp that someone depends on.",
+          "reward": "Once per long rest, as a bonus action, take the Dodge action and force each enemy within 10 ft to make a DC 18 Wisdom save or be compelled to attack only you until the end of your next turn. The price: you can no longer sleep soundly — you gain no benefit from a long rest unless you pass a DC 18 Wisdom save."
         }
       ]
     },
@@ -32606,15 +32606,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Second Wind",
+          "condition": "Be the one to keep the party alive: stabilize or heal 6 different downed allies yourself while wearing it.",
+          "reward": "Once per short rest, as a bonus action, spend a Hit Die: regain hit points equal to the roll plus your Constitution modifier, and gain advantage on death saving throws until the end of your next turn."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Bloodprice (Curse)",
+          "condition": "Wear this armor and abandon an ally or companion who is begging you not to leave them, and leave them to their fate.",
+          "reward": "Once per long rest, as a bonus action, give an ally within 30 ft hit points equal to 3 times your level, taken from your own (you can drop to 1 hit point this way). The price: your hit point maximum is permanently reduced by 18."
         }
       ]
     },
@@ -32644,15 +32644,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Unflinching",
+          "condition": "Stand a full night watch alone at a gate, bridge, or camp, and let no one pass unseen.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft is targeted by a charm or fear effect, you shout a warning: the ally has advantage on the save, and you can end the frightened condition on them."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — The Long Watch",
+          "condition": "Defeat a mage, a lich, or another master of spells of CR 11 or higher while wearing it, dealing the killing blow yourself.",
+          "reward": "Once per long rest, as an action, your allies within 30 ft are warded for 1 hour: they cannot be surprised, and they have advantage on saves against being charmed or frightened."
         }
       ]
     },
@@ -32681,15 +32681,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Unflinching",
+          "condition": "Stand a full night watch alone at a gate, bridge, or camp, and let no one pass unseen.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft is targeted by a charm or fear effect, you shout a warning: the ally has advantage on the save, and you can end the frightened condition on them."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Bring this item to the place it was first made, or as close as living memory can place that location, and spend a full night there.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — The Long Watch",
+          "condition": "Keep a seven-night vigil with the item at a mage's tower, a ward-circle, or a library vault, never sleeping more than 4 hours a night and never leaving its side.",
+          "reward": "Once per long rest, as an action, your allies within 30 ft are warded for 1 hour: they cannot be surprised, and they have advantage on saves against being charmed or frightened."
         }
       ]
     },
@@ -32719,15 +32719,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Cinder Guard",
+          "condition": "Take fire damage on 6 separate occasions while wearing it and keep fighting each time.",
+          "reward": "Once per short rest, as a bonus action, ignite for 1 minute: you shed bright light in a 20-ft radius, you are immune to fire damage and the burning condition, and creatures that start their turn within 5 ft of you take 2d8 fire damage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Ashes Rising",
+          "condition": "Return the item to where it was made (or the nearest place to it) and re-temper it: spend 24 hours and 1000 gp of materials at an active forge, volcano, or burnt-out ruin.",
+          "reward": "If you are killed while wearing it, your body bursts into flame, and at the next dawn you rise from the ashes with half your hit points. This can happen only once every 30 days."
         }
       ]
     },
@@ -32756,15 +32756,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Frostbound Mantle",
+          "condition": "Survive 3 separate encounters against creatures of CR 11 or higher while wearing this armor, with each of those creatures having hit you at least once.",
+          "reward": "Once per short rest, as a reaction when you take damage, rime flashes over you: reduce the damage by 18, and the attacker's speed becomes 0 until the end of its next turn."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Absolute Winter (Curse)",
+          "condition": "Wear this armor while taking a bribe to look the other way as harm is done to someone under your protection.",
+          "reward": "Once per long rest, as an action, a 20-ft aura of killing cold surrounds you for 1 minute: enemies that start their turn inside take 2d8 cold damage and have their speed halved. The price: warmth abandons you — you have vulnerability to fire damage."
         }
       ]
     },
@@ -32794,15 +32794,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Featherfall",
+          "condition": "Cross a rope bridge, narrow ledge, or high wire at least 100 ft above the ground in a storm, wearing it.",
+          "reward": "Once per short rest, as a reaction when you fall or are knocked prone, catch the wind: you take no damage and land on your feet, and each creature within 5 ft is pushed back 5 ft."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Bring this item to the place it was first made, or as close as living memory can place that location, and spend a full night there.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — The High Road",
+          "condition": "Keep a seven-night vigil with the item at a mountain pass above the cloud line, never sleeping more than 4 hours a night and never leaving its side.",
+          "reward": "Once per long rest, as an action, you and up to 4 allies within 30 ft float on the wind: for 1 hour you ignore falling damage and difficult terrain and gain a +10 ft bonus to your jump distance."
         }
       ]
     },
@@ -32832,15 +32832,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Static Charge",
+          "condition": "Stand on an exposed summit or open plain during a thunderstorm wearing it until lightning strikes you.",
+          "reward": "Once per short rest, as a reaction when you are hit by a melee attack, discharge: the attacker takes 2d8 lightning damage and cannot take reactions until the start of its next turn."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Grounded",
+          "condition": "Pay a sage, priest, or master smith at least 1000 gp to read this item's history, then travel to the place that reading names and spend a full night there with it.",
+          "reward": "Once per long rest, as an action, link yourself to up to 4 allies within 30 ft for 1 minute: when any of you take lightning damage, all of you share it equally, and you can attack with lightning arcing between you."
         }
       ]
     },
@@ -32870,15 +32870,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Second Wind",
+          "condition": "Be reduced to 0 HP while wearing this armor and be back on your feet within the same encounter.",
+          "reward": "Once per short rest, as a bonus action, spend a Hit Die: regain hit points equal to the roll plus your Constitution modifier, and gain advantage on death saving throws until the end of your next turn."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Bloodprice (Curse)",
+          "condition": "Swear a binding oath before a priest or witnesses, then break it while wearing this armor.",
+          "reward": "Once per long rest, as a bonus action, give an ally within 30 ft hit points equal to 3 times your level, taken from your own (you can drop to 1 hit point this way). The price: your hit point maximum is permanently reduced by 18."
         }
       ]
     },
@@ -32908,15 +32908,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Proven",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Antitoxin Skin",
+          "condition": "Survive a bite or sting from a dangerous venomous creature (giant spider, wyvern, or similar) while wearing it.",
+          "reward": "Once per short rest, as a reaction when a creature within 5 ft of you is poisoned or takes poison damage, you siphon the toxin: the creature takes no damage from it and you gain 18 temporary hit points."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Serpent Scales (Curse)",
+          "condition": "Wear this armor while taking a bribe to look the other way as harm is done to someone under your protection.",
+          "reward": "Once per long rest, as a bonus action, exhale a 15-ft cone of venom: 6d6 poison damage (DC 18 Constitution save for half), and a creature that fails is poisoned for 1 minute. The price: you are always faintly poisoned — you have disadvantage on Charisma checks against creatures that can smell you."
         }
       ]
     },
@@ -32946,15 +32946,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Frostbound Mantle",
+          "condition": "Cross a glacier, frozen sea, or snow-choked pass of at least 20 miles on foot wearing it.",
+          "reward": "Once per short rest, as a reaction when you take damage, rime flashes over you: reduce the damage by 18, and the attacker's speed becomes 0 until the end of its next turn."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — The Long Thaw",
+          "condition": "Win a duel against the bearer of a similar relic (to the death or to a formal surrender), or defeat a winter wolf, a frost giant, or another creature of ice in single combat while wearing it using no other magic item.",
+          "reward": "Once per long rest, as an action, raise a wall of ice up to 30 ft long and 10 ft high within 60 ft of you; it lasts 1 hour or until destroyed."
         }
       ]
     },
@@ -32984,15 +32984,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Dawn Ward",
+          "condition": "Survive 3 separate encounters against creatures of CR 11 or higher while wearing this armor, with each of those creatures having hit you at least once.",
+          "reward": "Once per short rest, as a bonus action, you glow with dawn light for 1 minute: shed bright light in a 20-ft radius, and undead and fiends that start their turn there take 2d8 radiant damage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Sunrise Vigil",
+          "condition": "Win a duel against the bearer of a similar relic (to the death or to a formal surrender), or defeat a fiend, a revenant, or another creature that hates the light in single combat while wearing it using no other magic item.",
+          "reward": "Once per long rest, as an action, call a sunrise: a 30-ft radius around you becomes bright sunlight for 10 minutes, and you and your allies inside regain 18 hit points at the start of each of your turns."
         }
       ]
     },
@@ -33022,15 +33022,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Dawn Ward",
+          "condition": "Defeat 6 undead or fiends while wearing it.",
+          "reward": "Once per short rest, as a bonus action, you glow with dawn light for 1 minute: shed bright light in a 20-ft radius, and undead and fiends that start their turn there take 2d8 radiant damage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Bring this item to the place it was first made, or as close as living memory can place that location, and spend a full night there.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Sunrise Vigil",
+          "condition": "Return the item to where it was made (or the nearest place to it) and re-temper it: spend 24 hours and 1000 gp of materials at a shrine to a god of sun or light, or the ruins of one.",
+          "reward": "Once per long rest, as an action, call a sunrise: a 30-ft radius around you becomes bright sunlight for 10 minutes, and you and your allies inside regain 18 hit points at the start of each of your turns."
         }
       ]
     },
@@ -33060,15 +33060,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Proven",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Static Charge",
+          "condition": "Stand on an exposed summit or open plain during a thunderstorm wearing it until lightning strikes you.",
+          "reward": "Once per short rest, as a reaction when you are hit by a melee attack, discharge: the attacker takes 2d8 lightning damage and cannot take reactions until the start of its next turn."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Lightning Rod (Curse)",
+          "condition": "Wear this armor through three consecutive days without removing it or sleeping anywhere but a place you have never slept before.",
+          "reward": "Once per long rest, as an action, become a lightning rod for 1 minute: lightning damage heals you instead of harming you, and every turn you can discharge 2d8 lightning damage at a creature you can see within 60 ft. The price: you take double damage from thunder."
         }
       ]
     },
@@ -33098,15 +33098,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Unflinching",
+          "condition": "Shake off 6 separate charm or fear effects while wearing it.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft is targeted by a charm or fear effect, you shout a warning: the ally has advantage on the save, and you can end the frightened condition on them."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — The Long Watch",
+          "condition": "Defeat a mage, a lich, or another master of spells of CR 11 or higher while wearing it, dealing the killing blow yourself.",
+          "reward": "Once per long rest, as an action, your allies within 30 ft are warded for 1 hour: they cannot be surprised, and they have advantage on saves against being charmed or frightened."
         }
       ]
     },
@@ -33135,15 +33135,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Cinder Guard",
+          "condition": "Walk through a burning building, field, or smoldering ruin to rescue a person or object, wearing it the entire way.",
+          "reward": "Once per short rest, as a bonus action, ignite for 1 minute: you shed bright light in a 20-ft radius, you are immune to fire damage and the burning condition, and creatures that start their turn within 5 ft of you take 2d8 fire damage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Bring this item to the place it was first made, or as close as living memory can place that location, and spend a full night there.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Ashes Rising",
+          "condition": "Win a duel against the bearer of a similar relic (to the death or to a formal surrender), or defeat a fire elemental, a hell hound, or another creature of living flame in single combat while wearing it using no other magic item.",
+          "reward": "If you are killed while wearing it, your body bursts into flame, and at the next dawn you rise from the ashes with half your hit points. This can happen only once every 30 days."
         }
       ]
     },
@@ -33173,15 +33173,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Protect an ally from a killing blow while wearing this piece, 3 separate times.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Unflinching",
+          "condition": "Stand a full night watch alone at a gate, bridge, or camp, and let no one pass unseen.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft is targeted by a charm or fear effect, you shout a warning: the ally has advantage on the save, and you can end the frightened condition on them."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Warden-Bound (Curse)",
+          "condition": "At a mage's tower, a ward-circle, or a library vault, destroy 1000 gp worth of treasure (melted down, burned, or sunk) as an offering to the armor, during a single night-long ritual.",
+          "reward": "Once per long rest, as a bonus action, take the Dodge action and force each enemy within 10 ft to make a DC 18 Wisdom save or be compelled to attack only you until the end of your next turn. The price: you can no longer sleep soundly — you gain no benefit from a long rest unless you pass a DC 18 Wisdom save."
         }
       ]
     },
@@ -33582,7 +33582,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — Constellation Claimed",
-          "condition": "Navigate successfully by starlight alone through dangerous wilderness — at least 10 miles — and arrive exactly where intended.",
+          "condition": "Navigate by starlight alone (no map, compass, or landmarks) at least 10 miles through unmarked wilderness at night, and arrive within a quarter mile of the destination you declared.",
           "reward": "Darkvision 120 ft. and see through magical darkness. Once per day: your star answers a yes/no question — the GM answers honestly."
         },
         {
@@ -33619,7 +33619,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — The Pattern Shifts",
-          "condition": "Successfully use the Predestined Outcome ability 5 times, each genuinely changing the course of an encounter.",
+          "condition": "Use Predestined Outcome 5 times, each time turning a failed roll into a success that changes the outcome of the encounter (the DM confirms).",
           "reward": "Predestined Outcome upgrades to twice per long rest. Once per day: a spell you cast deals maximum damage (all dice at highest value) — the Fates wrote it this way."
         },
         {
@@ -33706,7 +33706,7 @@ const canonicalItems = [
         {
           "type": "dormant",
           "tierLabel": "Tier II — The Second Crowning",
-          "condition": "Be formally crowned as ruler of a settlement, city, or nation while wearing this crown — a genuine ceremony witnessed by at least 100 people.",
+          "condition": "Be formally crowned ruler of a settlement, city, or nation while wearing this crown, in a ceremony witnessed by at least 100 people.",
           "reward": "Sunbeam upgrades to Sunburst (12d6 radiant, DC 20 Con, 60-ft radius) once per day. This Sunburst's light persists 24 hours. Undead destroyed by it cannot be resurrected. Undead aura expands to 60 ft. and deals 6d6 instead of 4d6."
         }
       ]
@@ -33738,7 +33738,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — The Harmony Heard",
-          "condition": "Sing genuinely — not magically — in front of an audience of at least 50 people.",
+          "condition": "Sing without magic in front of an audience of at least 50 people.",
           "reward": "Choir's Lament range increases to 120 ft. and DC to 20. While flying 20+ ft. above ground, all spell save DCs increase by 2."
         },
         {
@@ -34098,7 +34098,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — A Selfless Wish",
-          "condition": "Use the fragment's Wish-like power for something genuinely selfless, for someone else's benefit rather than your own.",
+          "condition": "Use the fragment's Wish-like power to grant something to another creature that costs you at least 500 gp or a prized possession and gains you nothing in return.",
           "reward": "The protective flare can now be used three times per day instead of twice, each lasting 12 hours, and the guardian's HP increases to 90."
         },
         {
@@ -34140,7 +34140,7 @@ const canonicalItems = [
         {
           "type": "locked",
           "tierLabel": "Tier I — Worthy a Second Time",
-          "condition": "Ride the steed through a genuine crisis and prove worthy of the ride a second time.",
+          "condition": "Ride the steed through a battle against 5 or more enemies or a creature of CR 10 or higher while protecting at least one ally, and win.",
           "reward": "The Plane Shift-like leap can now be used twice per day, and the attack bonus while mounted increases to +5."
         },
         {
@@ -34193,15 +34193,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Proven",
-          "condition": "Carry this weapon through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Now, on every hit, a lance of psychic feedback adds an extra 3d8 psychic damage, and the target has disadvantage on the next saving throw it makes before the end of your next turn."
+          "tierLabel": "Tier I — Mind-Read",
+          "condition": "Make 8 different creatures fail the saving throw against this weapon's psychic feedback and defeat each of them.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, read its surface thoughts for 1 minute while it is within 60 ft: you learn what it intends to do on its next turn, and the first attack it makes against you before then has disadvantage."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "+7 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Fractured Mind (Curse)",
+          "condition": "Swear a binding oath before a priest or witnesses, then break it while wielding this weapon.",
+          "reward": "Once per long rest, as an action, shatter the minds around you: creatures of your choice within 30 ft take 8d6 psychic damage (DC 20 Intelligence save for half) and a creature that fails is stunned until the end of its next turn. The price: the weapon speaks in your head — you have disadvantage on saving throws against being charmed or frightened."
         }
       ]
     },
@@ -34248,15 +34248,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Land the killing blow on 10 different creatures with this weapon.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Now, on every hit, inject venom for an extra 3d8 poison damage; the target must succeed on a DC 20 Constitution save or be Poisoned for 1 minute."
+          "tierLabel": "Tier I — Antivenin",
+          "condition": "Poison 8 different creatures with this weapon's venom and defeat each of them.",
+          "reward": "While you hold the weapon you have advantage on saving throws against poison and the poisoned condition. Once per long rest, as an action, draw a dose of antivenin from the blade to end the poisoned condition on a creature you touch (including yourself)."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "+7 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Viper's Kiss (Curse)",
+          "condition": "Sell this weapon (take real payment for it), then take it back within 7 days — by theft, or by force from whoever bought it.",
+          "reward": "Once per long rest, as a bonus action, a creature currently poisoned by this weapon takes 8d6 poison damage (no save) and cannot regain hit points for 1 minute. The price: the venom reaches you too — you lose all resistance and immunity to poison damage from every source."
         }
       ]
     },
@@ -34294,15 +34294,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. While holding this weapon, gain a +4 bonus to saving throws against spells."
+          "tierLabel": "Tier I — Spellbreaker",
+          "condition": "Succeed on 8 saving throws against hostile spells while holding this weapon, tallied across encounters.",
+          "reward": "Once per long rest, as a reaction when a creature within 60 ft casts a spell of 5th level or lower, counter it."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "+7 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Hungry for Magic (Curse)",
+          "condition": "Destroy a spellbook, scroll collection, or library worth at least 2500 gp that someone depends on.",
+          "reward": "Once per long rest, as a reaction when you succeed on a saving throw against a spell, absorb it: the spell has no effect on you and you regain 8d6 hit points. The price: magic recoils from you — beneficial spells cast on you by others (healing, buffs) fail."
         }
       ]
     },
@@ -34345,15 +34345,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Now, on every hit, a wave of pressure adds an extra 3d8 cold damage and the target must succeed on a DC 20 Strength save or be knocked Prone."
+          "tierLabel": "Tier I — Undertow",
+          "condition": "Fight 4 encounters back to back without a short or long rest, and never drop below half your hit points in any of them.",
+          "reward": "Once per short rest, as a bonus action, summon a 10-ft-radius surge of icy water on a point within 30 ft. For 1 minute the area is difficult terrain, creatures inside have disadvantage on Dexterity saving throws and cannot take reactions, and you and your allies inside have resistance to fire damage."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "+7 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Drowned Man's Debt (Curse)",
+          "condition": "Use this weapon to sunder another magic weapon or magic item, destroying it completely.",
+          "reward": "Once per long rest, as an action, flood a 30-ft radius around you ankle-deep for 1 minute: enemies inside have disadvantage on attack rolls and their speed is halved. The price: the sea keeps its claim on you — you must fully immerse yourself in water for a minute each dawn or gain a level of exhaustion."
         }
       ]
     },
@@ -34401,15 +34401,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Now, on every hit, the target's blood slows to frost for an extra 3d8 cold damage and its speed is halved until the end of its next turn."
+          "tierLabel": "Tier I — Hoarfrost Skin",
+          "condition": "Spend three nights in freezing wilderness with the weapon but no fire to warm you.",
+          "reward": "Once per short rest, as a bonus action, gain 25 temporary hit points and a coat of rime for 1 minute: a creature that hits you with a melee attack has its speed reduced by 10 ft until the end of its next turn."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Bring this item to the place it was first made, or as close as living memory can place that location, and spend a full night there.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — The Long Winter",
+          "condition": "Gather three rare reagents (each from a different dangerous creature or location, with one taken from a winter wolf, a frost giant, or another creature of ice) and use them to attune the item to you in a ritual at a glacier, frozen lake, or snowbound pass.",
+          "reward": "Once per long rest, as an action, freeze all water and wet ground in a 60-ft radius into slick ice for 10 minutes: enemies treat it as difficult terrain and must succeed on a DC 20 Dexterity save each turn they move or fall prone; you and your allies move across it freely."
         }
       ]
     },
@@ -34452,15 +34452,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Now, on every hit, the wound cauterizes into flame for an extra 3d8 fire damage. Sheds dim firelight 10 ft. while drawn."
+          "tierLabel": "Tier I — Kindled",
+          "condition": "Temper the weapon in a real fire: leave it in an active forge, bonfire, or lava flow for one full hour without removing it.",
+          "reward": "Once per short rest, as a bonus action, the weapon blazes for 1 minute: bright light in a 30-ft radius, and each creature you hit while it blazes catches fire, taking 3d8 fire damage at the start of each of its turns until it uses an action to douse itself."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Win by a method that technically honors the rules and completely betrays their spirit.",
-          "reward": "+7 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "tierLabel": "Tier II — Wildfire Heart (Curse)",
+          "condition": "At an active forge, volcano, or burnt-out ruin, destroy 2500 gp worth of treasure (melted down, burned, or sunk) as an offering to the weapon, during a single night-long ritual.",
+          "reward": "Once per long rest, as an action, erupt in a 15-ft-radius burst of flame centered on you: 8d6 fire damage to creatures of your choice (DC 20 Dexterity save for half). The price: you are never quite cool again — you have vulnerability to cold damage."
         }
       ]
     },
@@ -34497,15 +34497,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Once per turn when you hit with this weapon, your walking speed increases by 10 ft. until the start of your next turn."
+          "tierLabel": "Tier I — Quickstep",
+          "condition": "Outrun a mounted rider or a pursuing pack on foot over at least a mile with the weapon drawn, ending the chase with them still behind you.",
+          "reward": "Once per short rest, as a bonus action, take the Dash or Disengage action. While you hold the weapon, opportunity attacks made against you have disadvantage."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature effect no longer requires a hit to trigger once per turn — it happens automatically at the start of each of your turns in combat, no action required."
+          "tierLabel": "Tier II — Wind at Your Back",
+          "condition": "Gather three rare reagents (each from a different dangerous creature or location, with one taken from a creature that moves at least twice as fast as you) and use them to attune the item to you in a ritual at a crossroads at the edge of three realms.",
+          "reward": "Once per long rest, as an action, you and up to 4 willing allies within 30 ft each immediately move up to their full speed without provoking opportunity attacks."
         }
       ]
     },
@@ -34553,15 +34553,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Proven",
-          "condition": "Score 5 critical hits with this weapon across any number of encounters.",
-          "reward": "The bonus to attack and damage rolls permanently increases to +6. Now, on every hit, the wound withers for an extra 3d8 necrotic damage, and the target's hit point maximum is reduced by an equal amount until it finishes a long rest."
+          "tierLabel": "Tier I — Festering Wound",
+          "condition": "Reduce 8 different creatures' hit point maximums with this weapon, tallied across encounters.",
+          "reward": "Once per short rest, as a bonus action after you hit a creature, the wound festers: its speed is halved and it cannot regain hit points until the start of your next turn."
         },
         {
           "type": "cursed",
           "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "+7 to attack and damage rolls permanently. In exchange, it can no longer be willingly set down or given away while you live — removing it requires a Wish or its equivalent."
+          "condition": "Rob a fresh grave, or the corpse of a hero, of their most treasured possession.",
+          "reward": "Once per long rest, as an action, wither everything in a 20-ft radius around you: nonmagical plants die, and creatures of your choice take 8d6 necrotic damage (DC 20 Constitution save for half). The price: nothing mends you easily — all healing you receive from spells and potions is halved (rounded down)."
         }
       ]
     },
@@ -34590,15 +34590,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Frostbound Mantle",
+          "condition": "Spend three nights in freezing weather wearing it, without a fire for warmth.",
+          "reward": "Once per short rest, as a reaction when you take damage, rime flashes over you: reduce the damage by 25, and the attacker's speed becomes 0 until the end of its next turn."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — The Long Thaw",
+          "condition": "Keep a seven-night vigil with the item at a glacier, frozen lake, or snowbound pass, never sleeping more than 4 hours a night and never leaving its side.",
+          "reward": "Once per long rest, as an action, raise a wall of ice up to 30 ft long and 10 ft high within 60 ft of you; it lasts 1 hour or until destroyed."
         }
       ]
     },
@@ -34628,15 +34628,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Clear Sight",
+          "condition": "Take 500 combined damage while wearing this armor (the DM keeps a running tally).",
+          "reward": "Once per short rest, as a reaction when you or an ally within 30 ft is Blinded, Deafened, or Stunned, end that condition on the target immediately."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Use this item to accomplish something its very first owner explicitly failed to do.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Starlit Road",
+          "condition": "Defeat a fiend, a revenant, or another creature that hates the light of CR 15 or higher while wearing it, dealing the killing blow yourself.",
+          "reward": "Once per long rest, as an action, you and up to 5 allies within 30 ft can see in magical and nonmagical darkness out to 120 ft for 8 hours."
         }
       ]
     },
@@ -34666,15 +34666,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — Recognition",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Second Chance",
+          "condition": "Succeed on a saving throw that would have killed you outright, 4 separate times.",
+          "reward": "Once per short rest, as a reaction when an ally within 30 ft fails a saving throw, they reroll it and use the new result."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Borrowed Time (Curse)",
+          "condition": "Swear a binding oath before a priest or witnesses, then break it while wearing this armor.",
+          "reward": "Once per long rest, as a reaction when you would take damage, take none: the damage lands on the nearest creature within 30 ft instead (the DM picks). The price: every use costs you a point of luck — you have disadvantage on the next death saving throw you make."
         }
       ]
     },
@@ -34704,15 +34704,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Second Wind",
+          "condition": "Wear this armor continuously for 7 days of travel, including sleeping in it, without removing it once.",
+          "reward": "Once per short rest, as a bonus action, spend a Hit Die: regain hit points equal to the roll plus your Constitution modifier, and gain advantage on death saving throws until the end of your next turn."
         },
         {
           "type": "dormant",
-          "tierLabel": "Tier II — The Deeper Truth",
-          "condition": "Learn this item's true origin from a source that has no reason to lie to you, and accept what that means.",
-          "reward": "Its signature ability no longer requires a rest to recharge — it can be used again immediately, though never twice in the same round."
+          "tierLabel": "Tier II — Crimson Vow",
+          "condition": "Gather three rare reagents (each from a different dangerous creature or location, with one taken from a vampire, a hag, or another creature that feeds on blood) and use them to attune the item to you in a ritual at a battlefield, an abattoir, or a place of ritual sacrifice.",
+          "reward": "Once per long rest, as a reaction when an ally within 30 ft drops to 0 hit points, they instead drop to 1 hit point, and the armor takes the rest from you as necrotic damage that cannot be reduced."
         }
       ]
     },
@@ -34742,15 +34742,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Dawn Ward",
+          "condition": "Defeat 8 undead or fiends while wearing it.",
+          "reward": "Once per short rest, as a bonus action, you glow with dawn light for 1 minute: shed bright light in a 20-ft radius, and undead and fiends that start their turn there take 3d8 radiant damage."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Keep this item after being given a genuine, fair chance to be rid of it.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Scorching Dawn (Curse)",
+          "condition": "Sell this armor (take real payment for it), then take it back within 7 days — by theft, or by force from whoever bought it.",
+          "reward": "Once per long rest, as a reaction when a creature within 10 ft hits you, it takes 8d6 radiant damage (DC 20 Constitution save for half) and is blinded until the end of its next turn. The price: you cannot hide from the dark — you have disadvantage on Stealth checks and shed dim light in a 5-ft radius."
         }
       ]
     },
@@ -34780,15 +34780,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The Turning Point",
-          "condition": "Survive being reduced to 0 HP while wearing this piece, then stabilize or recover without removing it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Second Wind",
+          "condition": "Be the one to keep the party alive: stabilize or heal 8 different downed allies yourself while wearing it.",
+          "reward": "Once per short rest, as a bonus action, spend a Hit Die: regain hit points equal to the roll plus your Constitution modifier, and gain advantage on death saving throws until the end of your next turn."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Bloodprice (Curse)",
+          "condition": "Sell this armor (take real payment for it), then take it back within 7 days — by theft, or by force from whoever bought it.",
+          "reward": "Once per long rest, as a bonus action, give an ally within 30 ft hit points equal to 3 times your level, taken from your own (you can drop to 1 hit point this way). The price: your hit point maximum is permanently reduced by 25."
         }
       ]
     },
@@ -34818,15 +34818,15 @@ const canonicalItems = [
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Tier I — The First Test",
-          "condition": "Wear this piece through a battle you had no reasonable expectation of surviving, and survive it.",
-          "reward": "A second use of its signature ability becomes available before requiring a rest, and advantage extends to one additional category of saving throw of your choice."
+          "tierLabel": "Tier I — Frostbound Mantle",
+          "condition": "Cross a glacier, frozen sea, or snow-choked pass of at least 20 miles on foot wearing it.",
+          "reward": "Once per short rest, as a reaction when you take damage, rime flashes over you: reduce the damage by 25, and the attacker's speed becomes 0 until the end of its next turn."
         },
         {
           "type": "cursed",
-          "tierLabel": "Tier II — The Price Paid (Curse)",
-          "condition": "Use this item to do something its maker would clearly not have approved of.",
-          "reward": "Its protective bonus increases further, but it can no longer be willingly removed while you live — only a Wish or its equivalent ends the attunement."
+          "tierLabel": "Tier II — Absolute Winter (Curse)",
+          "condition": "Wear this armor and abandon an ally or companion who is begging you not to leave them, and leave them to their fate.",
+          "reward": "Once per long rest, as an action, a 20-ft aura of killing cold surrounds you for 1 minute: enemies that start their turn inside take 3d8 cold damage and have their speed halved. The price: warmth abandons you — you have vulnerability to fire damage."
         }
       ]
     },

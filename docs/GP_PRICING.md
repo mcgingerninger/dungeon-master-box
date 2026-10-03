@@ -20,7 +20,7 @@ worth more than **100,000 gp**, and no **Rare** item more than **1,000 gp**.
   prices (clamped to the tier ceiling).
 - `scripts/rebalance-gp.test.js` — fails the suite if any item breaks the caps or a non-numeric
   price is anything other than `Unknown`.
-- `dungeon_loot_wheel_v102_spell_details.html` — `COMMERCE_SCALE`/`commercePrice` (Store wares),
+- `dungeon_loot_wheel_v104_spell_details.html` — `COMMERCE_SCALE`/`commercePrice` (Store wares),
   `FLESH_ATTACH_SCALE` (limb grafts) and `GEN.scale` (Generate Item) use the same bands.
   Monster parts keep their own, lower `MONSTER_PART_GP_RANGE`.
 
