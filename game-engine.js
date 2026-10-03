@@ -1330,3 +1330,210 @@ export function applyPokerAction(table, action, rand = Math.random) {
     delete table.hands[uid];
   }
 }
+
+
+// ===================== WEAPON STAT SCALING =====================
+// Souls-style weapon scaling: instead of every weapon adding "your Strength modifier" to damage,
+// each weapon carries a letter grade per stat ({ str:'B', dex:'D' }) and adds
+// grade-multiplier × that stat's modifier. Scaling affects DAMAGE only — the to-hit roll stays a
+// plain 5e ability check (see weaponToHitStat), so AC math is untouched.
+//
+// A weapon's grades come from, in order: an authored `item.scaling` object (always wins), else the
+// default for its weapon kind (weaponScalingKind -> WEAPON_SCALING_BY_KIND), nudged up by rarity.
+// Spell-focus staves/wands additionally carry a spell focus (inferSpellFocus) that buffs spell
+// damage and/or spell attack rolls, separate from their melee scaling.
+export const SCALING_GRADE_ORDER = ['E', 'D', 'C', 'B', 'A', 'S'];
+export const SCALING_GRADE_MULT = { S: 1.25, A: 1, B: 0.75, C: 0.5, D: 0.25, E: 0.1 };
+export const SCALING_STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+export const SCALING_STAT_LABEL = { str: 'STR', dex: 'DEX', con: 'CON', int: 'INT', wis: 'WIS', cha: 'CHA' };
+const PHYSICAL_STATS = ['str', 'dex'];
+
+export const WEAPON_SCALING_BY_KIND = {
+  dagger:      { dex: 'B', str: 'D' },
+  rapier:      { dex: 'A', str: 'D' },
+  lightblade:  { dex: 'B', str: 'C' },   // shortsword, scimitar, sabre, wand blade
+  sword:       { str: 'B', dex: 'D' },
+  axe:         { str: 'B', dex: 'D' },
+  mace:        { str: 'B', dex: 'E' },
+  hammer:      { str: 'B', dex: 'E' },
+  flail:       { str: 'B', dex: 'D' },
+  club:        { str: 'C', dex: 'D' },
+  pick:        { str: 'B', dex: 'D' },
+  sickle:      { dex: 'C', str: 'C' },
+  spear:       { str: 'C', dex: 'C' },
+  quarterstaff:{ str: 'C', dex: 'D' },
+  polearm:     { str: 'B', dex: 'C' },
+  greatweapon: { str: 'A', dex: 'E' },   // greatsword, greataxe, maul, greatclub
+  whip:        { dex: 'A', str: 'E' },
+  bow:         { dex: 'A', str: 'E' },
+  crossbow:    { dex: 'B', str: 'D' },
+  sling:       { dex: 'B', str: 'D' },
+  blowgun:     { dex: 'A' },
+  dart:        { dex: 'A', str: 'E' },
+  thrown:      { dex: 'B', str: 'C' },   // throwing knives/axes, shuriken, javelins
+  net:         { str: 'C' },
+  natural:     { str: 'B', dex: 'D' },
+  onehanded:   { str: 'B', dex: 'D' },   // fallbacks when the name says nothing
+  twohanded:   { str: 'A', dex: 'E' },
+};
+
+// Name keywords -> kind, first match wins. Deliberately independent of classifyItemHierarchy's
+// breadcrumb, which misses plenty of real weapons (handaxe, battleaxe, quarterstaff, kukri...).
+const WEAPON_KIND_RULES = [
+  [/great.?sword|zweihander|great.?axe|great.?club|great.?hammer|\bmaul\b/, 'greatweapon'],
+  [/halberd|glaive|\bpike\b|\blance\b|dragonlance|polearm|bardiche|\bscythe\b/, 'polearm'],
+  [/crossbow/, 'crossbow'],
+  [/bow\b|\barrows?\b|\bquiver\b/, 'bow'],
+  [/\bsling\b|bullet/, 'sling'],
+  [/blowgun/, 'blowgun'],
+  [/\bdarts?\b/, 'dart'],
+  [/throwing|shuriken|javelin|chakram/, 'thrown'],
+  [/\bnet\b/, 'net'],
+  [/\bwhip\b|\bchain\b(?!\s*mail)|kusarigama|\blash\b/, 'whip'],
+  [/rapier|\bestoc\b/, 'rapier'],
+  [/dagger|\bknife\b|dirk|stiletto|kukri|\bkris\b|\bshiv\b|\bkatar\b|\bsai\b/, 'dagger'],
+  [/wand blade|short.?sword|scimitar|\bsabre\b|\bsaber\b|cutlass|\bkatana\b|shamshir/, 'lightblade'],
+  [/quarterstaff|battle staff|\bstaff\b|\bcane\b|\bbo\b/, 'quarterstaff'],
+  [/morningstar|\bflail\b/, 'flail'],
+  [/battle.?axe|hand.?axe|\baxe\b|hatchet|tomahawk|\bcleaver\b/, 'axe'],
+  [/\bmace\b|hammer|\bmallet\b|\bcensor\b/, 'hammer'],
+  [/\bclub\b|cudgel|truncheon|\bbaton\b/, 'club'],
+  [/\bpick\b|\bpickaxe\b/, 'pick'],
+  [/\bsickle\b/, 'sickle'],
+  [/spear|trident|\bfork\b/, 'spear'],
+  [/sword|blade\b|falchion|claymore|broadsword|\bedge\b/, 'sword'],
+  [/\bclaw|\bfang|\bbite\b|\btalon|\bhorn\b|\btail\b|\bsting/, 'natural'],
+];
+export function weaponScalingKind(item) {
+  const n = String((item && item.name) || '').toLowerCase();
+  for (const [re, kind] of WEAPON_KIND_RULES) if (re.test(n)) return kind;
+  // Named uniques ("Frosthowl", "The Last Word") say nothing in their name — their description
+  // usually does ("a greataxe forged from..."): take whichever weapon word appears first.
+  const desc = String((item && item.desc) || '').toLowerCase();
+  let best = null;
+  for (const [re, kind] of WEAPON_KIND_RULES) {
+    const m = re.exec(desc);
+    if (m && (!best || m.index < best.index)) best = { index: m.index, kind };
+  }
+  if (best) return best.kind;
+  return ((item && item.slotSize) >= 2 || (item && item.subcategory) === 'twohanded') ? 'twohanded' : 'onehanded';
+}
+function gradeIdx(g) { return SCALING_GRADE_ORDER.indexOf(g); }
+function boostGrade(g, steps) { return SCALING_GRADE_ORDER[Math.min(SCALING_GRADE_ORDER.length - 1, Math.max(0, gradeIdx(g) + steps))]; }
+// Keeps only valid stat -> grade pairs (so a typo in authored data can never break an attack roll).
+export function normalizeScaling(raw) {
+  const out = {};
+  if (raw && typeof raw === 'object') {
+    SCALING_STATS.forEach(s => { const g = String(raw[s] || '').toUpperCase(); if (SCALING_GRADE_MULT[g] != null) out[s] = g; });
+  }
+  return out;
+}
+// Highest-multiplier stat first (ties keep SCALING_STATS order).
+function scalingStatsByStrength(scaling) {
+  return SCALING_STATS.filter(s => scaling[s]).sort((a, b) => SCALING_GRADE_MULT[scaling[b]] - SCALING_GRADE_MULT[scaling[a]]);
+}
+export function inferWeaponScaling(item, rarity) {
+  const authored = normalizeScaling(item && item.scaling);
+  if (Object.keys(authored).length) return authored;
+  const r = rarity || (item && item.rarity) || 'common';
+  const scaling = { ...WEAPON_SCALING_BY_KIND[weaponScalingKind(item)] };
+  // A finesse weapon is at least decent with Dexterity whatever its kind says.
+  if (/finesse/i.test((item && item.effect) || '') && (!scaling.dex || gradeIdx(scaling.dex) < gradeIdx('B'))) scaling.dex = 'B';
+  // Better weapons scale better: Super Rare lifts the main stat a grade, Legendary/Celestial lift
+  // the two best.
+  const order = scalingStatsByStrength(scaling);
+  const steps = r === 'superrare' ? 1 : (r === 'legendary' || r === 'celestial') ? 1 : 0;
+  if (steps) order.slice(0, (r === 'superrare') ? 1 : 2).forEach(s => { scaling[s] = boostGrade(scaling[s], steps); });
+  return scaling;
+}
+// scaling + { str:+3, dex:+1, ... } (ability MODIFIERS) -> the damage bonus and a per-stat breakdown.
+// The primary (best-graded) stat counts at its signed value, so a weak primary stat still hurts;
+// every other stat can only ever add.
+export function computeScalingDamage(scaling, mods) {
+  const order = scalingStatsByStrength(scaling);
+  const parts = order.map((stat, i) => {
+    const mult = SCALING_GRADE_MULT[scaling[stat]];
+    const mod = (mods && mods[stat]) || 0;
+    const raw = mult * mod;
+    return { stat, grade: scaling[stat], mult, mod, value: i === 0 ? raw : Math.max(0, raw), primary: i === 0 };
+  });
+  return { total: Math.round(parts.reduce((s, p) => s + p.value, 0)), parts };
+}
+// Which physical ability the to-hit roll uses: the best modifier among Str/Dex stats the weapon
+// grades C or better (so a spear, graded evenly, uses whichever is higher); if neither is graded
+// C+, the better-graded one.
+export function weaponToHitStat(scaling, mods) {
+  const phys = PHYSICAL_STATS.filter(s => scaling[s]);
+  if (!phys.length) return { stat: 'str', mod: (mods && mods.str) || 0 };
+  const good = phys.filter(s => SCALING_GRADE_MULT[scaling[s]] >= SCALING_GRADE_MULT.C);
+  const pool = good.length ? good : [phys.sort((a, b) => SCALING_GRADE_MULT[scaling[b]] - SCALING_GRADE_MULT[scaling[a]])[0]];
+  const best = pool.reduce((b, s) => (((mods && mods[s]) || 0) > ((mods && mods[b]) || 0) ? s : b), pool[0]);
+  return { stat: best, mod: (mods && mods[best]) || 0 };
+}
+// [{ stat:'str', label:'STR', grade:'B' }, ...] strongest first — what tooltips render as chips.
+export function scalingEntries(scaling) {
+  return scalingStatsByStrength(scaling).map(stat => ({ stat, label: SCALING_STAT_LABEL[stat], grade: scaling[stat] }));
+}
+export function formatScaling(scaling) {
+  return scalingStatsByStrength(scaling).map(s => `${SCALING_STAT_LABEL[s]} ${scaling[s]}`).join(' · ');
+}
+
+// ---- Spell-focus staves, wands and rods ----
+const FOCUS_NAME = /\b(staff|wand|rod|scepter|sceptre|orb|codex|grimoire)\b/i;
+const NOT_A_FOCUS = /battle staff|quarterstaff|wand blade|\bcane\b/i;
+export function isSpellFocusWeapon(item) {
+  if (!item || item.type !== 'weapon') return false;
+  if (item.spellFocus && typeof item.spellFocus === 'object') return true;
+  const n = item.name || '';
+  return FOCUS_NAME.test(n) && !NOT_A_FOCUS.test(n) && /charges?|spells?\b|cast|cantrip|spell attack/i.test(item.effect || '');
+}
+const CLASS_STAT = { wizard: 'int', artificer: 'int', cleric: 'wis', druid: 'wis', ranger: 'wis', paladin: 'wis', monk: 'wis', bard: 'cha', sorcerer: 'cha', warlock: 'cha' };
+const FOCUS_GRADE_BY_RARITY = { common: 'C', uncommon: 'C', rare: 'B', superrare: 'A', legendary: 'S', celestial: 'S' };
+const FOCUS_ATTACK_BY_RARITY = { common: 1, uncommon: 1, rare: 2, superrare: 2, legendary: 3, celestial: 3 };
+function nameHash(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+function inferFocusStat(item) {
+  const text = ((item.name || '') + ' ' + (item.effect || '') + ' ' + (item.desc || '')).toLowerCase();
+  const m = text.match(/attunement[^()]*\(([^)]*)\)/) || text.match(/attunement by an? ([^.]*)/);
+  if (m) {
+    const votes = {};
+    Object.keys(CLASS_STAT).forEach(c => { if (m[1].includes(c)) votes[CLASS_STAT[c]] = (votes[CLASS_STAT[c]] || 0) + 1; });
+    const ranked = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    if (ranked.length) return ranked[0][0];
+  }
+  if (/holy|radiant|divine|sacred|woodland|verdant|nature|heal|restor|cleric|druid/.test(text)) return 'wis';
+  if (/charm|warlock|pact|eldritch|infernal|bard|sorcer|fey|soul|blood/.test(text)) return 'cha';
+  return 'int';
+}
+// -> { stat, grade, buff:'damage'|'attack'|'both', attackBonus } or null for a non-focus weapon.
+// `buff` varies staff to staff: authored (item.spellFocus.buff), else read from the effect text
+// ("+3 to spell attack rolls"), else a stable pick by name so the same staff is always the same.
+export function inferSpellFocus(item, rarity) {
+  if (!isSpellFocusWeapon(item)) return null;
+  const r = rarity || item.rarity || 'common';
+  const authored = (item.spellFocus && typeof item.spellFocus === 'object') ? item.spellFocus : {};
+  const text = item.effect || '';
+  const stat = SCALING_STATS.includes(authored.stat) ? authored.stat : inferFocusStat(item);
+  const grade = SCALING_GRADE_MULT[authored.grade] != null ? authored.grade : (FOCUS_GRADE_BY_RARITY[r] || 'C');
+  const textAttack = text.match(/\+(\d+)\s+to\s+spell\s+attack/i);
+  let buff = ['damage', 'attack', 'both'].includes(authored.buff) ? authored.buff : null;
+  if (!buff) {
+    if (textAttack && /spell damage/i.test(text)) buff = 'both';
+    else if (textAttack) buff = 'attack';
+    else if (/spell damage/i.test(text)) buff = 'damage';
+    else {
+      const pool = (r === 'common' || r === 'uncommon') ? ['damage', 'attack'] : ['damage', 'attack', 'both'];
+      buff = pool[nameHash(item.name) % pool.length];
+    }
+  }
+  const attackBonus = Number.isFinite(authored.attackBonus) ? authored.attackBonus
+    : textAttack ? parseInt(textAttack[1], 10) : (FOCUS_ATTACK_BY_RARITY[r] || 1);
+  return { stat, grade, buff, attackBonus };
+}
+// focus + ability modifiers -> the actual numbers to add to a spell: { damage, attack }.
+export function computeSpellFocusBonus(focus, mods) {
+  if (!focus) return { damage: 0, attack: 0 };
+  const scaled = Math.max(0, Math.round(SCALING_GRADE_MULT[focus.grade] * ((mods && mods[focus.stat]) || 0)));
+  if (focus.buff === 'damage') return { damage: scaled, attack: 0 };
+  if (focus.buff === 'attack') return { damage: 0, attack: focus.attackBonus };
+  return { damage: Math.round(scaled / 2), attack: Math.ceil(focus.attackBonus / 2) };
+}

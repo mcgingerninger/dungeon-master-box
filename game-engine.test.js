@@ -660,3 +660,100 @@ describe('deriveItemProperties/deriveItemTags — word-boundary regression guard
     assert.ok(GE.deriveItemTags(lance, [], lanceProps).includes('dragon'));
   });
 });
+
+describe('weapon stat scaling', () => {
+  const mods = { str: 3, dex: 1, con: 0, int: -1, wis: 0, cha: 0 };
+  const w = (name, extra = {}) => ({ name, type: 'weapon', slotSize: 1, ...extra });
+
+  test('defaults come from the weapon kind, found by name keywords (not just the breadcrumb)', () => {
+    assert.equal(GE.weaponScalingKind(w('Oaken Handaxe')), 'axe');
+    assert.equal(GE.weaponScalingKind(w('Iron Warhammer')), 'hammer');
+    assert.equal(GE.weaponScalingKind(w('Kukri of the Verdant')), 'dagger');
+    assert.equal(GE.weaponScalingKind(w('Steel Quarterstaff')), 'quarterstaff');
+    assert.equal(GE.weaponScalingKind(w('Thunderbolt Mace')), 'hammer'); // "bolt" in a name is not a bow
+    assert.deepEqual(GE.inferWeaponScaling(w('Iron Longsword')), { str: 'B', dex: 'D' });
+    assert.deepEqual(GE.inferWeaponScaling(w('Mithral Dagger')), { dex: 'B', str: 'D' });
+    assert.deepEqual(GE.inferWeaponScaling(w('Shortbow')), { dex: 'A', str: 'E' });
+  });
+
+  test('a named unique falls back to the weapon its description names, then to hands', () => {
+    assert.equal(GE.weaponScalingKind(w('Frosthowl', { desc: 'A greatsword of blue-white steel.' })), 'greatweapon');
+    assert.equal(GE.weaponScalingKind(w('Mystery', { slotSize: 2 })), 'twohanded');
+    assert.equal(GE.weaponScalingKind(w('Mystery')), 'onehanded');
+  });
+
+  test('rarity lifts grades: Super Rare the main stat, Legendary/Celestial the best two', () => {
+    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'superrare'), { str: 'S', dex: 'E' });
+    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'legendary'), { str: 'S', dex: 'D' });
+    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'rare'), { str: 'A', dex: 'E' });
+  });
+
+  test('authored scaling wins, and invalid entries are dropped', () => {
+    const s = GE.inferWeaponScaling(w('Longsword', { scaling: { str: 'a', int: 'S', cha: 'Z', luck: 'S' } }), 'legendary');
+    assert.deepEqual(s, { str: 'A', int: 'S' });
+  });
+
+  test('a finesse weapon is at least DEX B', () => {
+    assert.equal(GE.inferWeaponScaling(w('Longsword', { effect: 'Finesse.' })).dex, 'B');
+  });
+
+  test('scaling damage: multiplier x modifier, rounded; only the primary stat can go negative', () => {
+    assert.equal(GE.computeScalingDamage({ str: 'B', dex: 'D' }, mods).total, 3);   // 2.25 + 0.25 = 2.5 -> 3
+    assert.equal(GE.computeScalingDamage({ dex: 'B', str: 'D' }, mods).total, 2);   // 0.75 + 0.75 = 1.5 -> 2
+    assert.equal(GE.computeScalingDamage({ str: 'A', dex: 'E' }, { ...mods, str: -2 }).total, -2); // primary hurts
+    assert.equal(GE.computeScalingDamage({ str: 'A', int: 'B' }, { ...mods, int: -3 }).total, 3); // primary STR A=3; a secondary INT can't subtract
+    assert.equal(GE.computeScalingDamage({ str: 'B', int: 'A' }, { ...mods, int: -3 }).total, -1); // INT is the primary here, so its penalty counts
+    const parts = GE.computeScalingDamage({ str: 'B', dex: 'D' }, mods).parts;
+    assert.deepEqual(parts.map(p => p.stat), ['str', 'dex']);
+    assert.equal(parts[0].primary, true);
+  });
+
+  test('to-hit uses the best Str/Dex among stats graded C or better; ranged weapons use DEX', () => {
+    assert.deepEqual(GE.weaponToHitStat({ str: 'B', dex: 'D' }, mods), { stat: 'str', mod: 3 });
+    assert.deepEqual(GE.weaponToHitStat({ dex: 'B', str: 'D' }, mods), { stat: 'dex', mod: 1 });
+    assert.deepEqual(GE.weaponToHitStat({ str: 'C', dex: 'C' }, { ...mods, dex: 4 }), { stat: 'dex', mod: 4 });
+    assert.deepEqual(GE.weaponToHitStat({ dex: 'A', str: 'E' }, { str: 5, dex: 0 }), { stat: 'dex', mod: 0 });
+  });
+
+  test('spell focus: only staves/wands that deal with spells, stat from attunement classes', () => {
+    assert.equal(GE.isSpellFocusWeapon(w('Steel Quarterstaff', { effect: '+1 to attack and damage rolls.' })), false);
+    assert.equal(GE.isSpellFocusWeapon(w('Wand Blade of Fortune', { effect: 'Cast a spell.' })), false);
+    const staff = w('Staff of Healing', { effect: '10 charges. Cure Wounds (1). Requires attunement by a cleric or druid.', rarity: 'rare' });
+    assert.equal(GE.isSpellFocusWeapon(staff), true);
+    const f = GE.inferSpellFocus(staff);
+    assert.equal(f.stat, 'wis');
+    assert.equal(f.grade, 'B');
+    assert.ok(['damage', 'attack', 'both'].includes(f.buff));
+    assert.deepEqual(GE.inferSpellFocus(staff), f); // stable for the same staff
+  });
+
+  test('spell focus buff comes from the staff itself when it says so', () => {
+    const sharp = w('Staff of Sight', { effect: '5 charges. Cast Detect Magic. +3 to spell attack rolls.', rarity: 'rare' });
+    assert.deepEqual(GE.inferSpellFocus(sharp), { stat: 'int', grade: 'B', buff: 'attack', attackBonus: 3 });
+    const authored = w('Odd Staff', { effect: 'spells', spellFocus: { stat: 'cha', grade: 'A', buff: 'damage' } });
+    assert.deepEqual(GE.inferSpellFocus(authored, 'common'), { stat: 'cha', grade: 'A', buff: 'damage', attackBonus: 1 });
+  });
+
+  test('spell focus bonus: damage scales with the stat, attack is flat, "both" splits them', () => {
+    const m = { int: 4, wis: 0, cha: 0 };
+    assert.deepEqual(GE.computeSpellFocusBonus({ stat: 'int', grade: 'A', buff: 'damage', attackBonus: 2 }, m), { damage: 4, attack: 0 });
+    assert.deepEqual(GE.computeSpellFocusBonus({ stat: 'int', grade: 'A', buff: 'attack', attackBonus: 2 }, m), { damage: 0, attack: 2 });
+    assert.deepEqual(GE.computeSpellFocusBonus({ stat: 'int', grade: 'A', buff: 'both', attackBonus: 3 }, m), { damage: 2, attack: 2 });
+    assert.deepEqual(GE.computeSpellFocusBonus({ stat: 'int', grade: 'A', buff: 'damage', attackBonus: 2 }, { int: -2 }), { damage: 0, attack: 0 });
+  });
+
+  test('every weapon in the real catalog resolves to a valid scaling', async () => {
+    const fs = await import('node:fs');
+    const lootData = new Function(fs.readFileSync(new URL('./loot-data.js', import.meta.url), 'utf8') + '; return lootData')();
+    let n = 0;
+    for (const [rarity, items] of Object.entries(lootData)) {
+      for (const item of items.filter(i => i.type === 'weapon')) {
+        const s = GE.inferWeaponScaling(item, rarity);
+        assert.ok(Object.keys(s).length >= 1, item.name);
+        Object.entries(s).forEach(([stat, g]) => { assert.ok(GE.SCALING_STATS.includes(stat) && GE.SCALING_GRADE_MULT[g] != null, `${item.name}: ${stat} ${g}`); });
+        n++;
+      }
+    }
+    assert.ok(n > 300);
+  });
+});

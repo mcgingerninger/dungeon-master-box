@@ -2223,6 +2223,14 @@
   .tt-header.legendary { color:var(--legendary); }
   .tt-header.celestial { color:var(--celestial); }
   .tt-rarity { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+  /* Weapon scaling chips (tooltip + loot cards) */
+  .tt-scaling { display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; margin-bottom:0.4rem; }
+  .tt-scale-label { font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; }
+  .tt-scale-chip { background:var(--surface); border:1px solid var(--border); padding:0.05rem 0.4rem; font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--text); }
+  .tt-scale-chip b { color:var(--gold-bright); }
+  .tt-grade-S b { color:#ff9f43; } .tt-grade-A b { color:#c47cf5; } .tt-grade-B b { color:#5b9cf6; }
+  .tt-scale-bonus { font-size:0.75rem; color:var(--text-dim); font-style:italic; }
+  .meta-tag.scaling { color:var(--gold); }
   /* Spell / summon quick-reference links (see linkRefs) */
   .ref-link { border-bottom:1px dotted var(--gold); cursor:help; }
   .ref-link:hover { color:var(--gold-bright); }
@@ -5215,7 +5223,7 @@ function renderSpellbookAbilityIcons(html) {
 function castKnownSpell(name) {
   const spell = characterKnownSpells.find(s => s.name === name);
   if (!spell) return;
-  if (spell.level === 0) { flashInvMessage(`${spell.name}: ${(spell.description || '').slice(0, 300)}`); return; }
+  if (spell.level === 0) { flashInvMessage(`${spell.name}: ${(spell.description || '').slice(0, 300)}${equippedSpellFocusNote()}`); return; }
   const levels = Object.keys(characterSpellSlots).map(Number)
     .filter(lvl => lvl >= spell.level && (characterSpellSlots[lvl] || 0) > (characterSpellSlotsUsed[lvl] || 0));
   if (!levels.length) { flashInvMessage(`No open slot for ${spell.name}.`, true); return; }
@@ -5242,7 +5250,7 @@ function confirmCastSpell(name, level) {
   renderSpellbookSlotsGrid();
   if (typeof scheduleSave === 'function') scheduleSave();
   const upcastNote = level > spell.level ? ` (cast at level ${level})` : '';
-  flashInvMessage(`${spell.name}${upcastNote}: ${(spell.description || '').slice(0, 300)}`);
+  flashInvMessage(`${spell.name}${upcastNote}: ${(spell.description || '').slice(0, 300)}${equippedSpellFocusNote()}`);
 }
 // Click handler for a structured item.abilities entry (see resolveAbilityIconDef above).
 // Decrements usesLeft, flashes the ability's own text (or the live spell description for a
@@ -7996,6 +8004,11 @@ function buildInspectMeta(it, fieldsToHide, revealed, sourceKey) {
     } else {
       tags += `<span class="meta-tag dmg">DMG: ${it.dmg}</span>`;
     }
+  }
+  if (it.type === 'weapon') {
+    tags += `<span class="meta-tag scaling">Scales: ${formatScaling(inferWeaponScaling(it, it.rarity))}</span>`;
+    const focusMeta = inferSpellFocus(it, it.rarity);
+    if (focusMeta) tags += `<span class="meta-tag scaling">✦ Focus: ${SCALING_STAT_LABEL[focusMeta.stat]} ${focusMeta.grade}</span>`;
   }
   if (it.ac) {
     if (fieldsToHide.includes('ac') && !revealed.has('ac')) {
@@ -16707,16 +16720,25 @@ function parseWeaponEffectBonuses(effect, dmgField) {
 // attack and damage rolls" effect-text phrase used to sum independently here, double-counting the
 // same authored bonus (see docs/V2_MECHANICS_MIGRATION.md) — the migration reconciled that into a
 // single passive damageRoll entry, so bridged.damageDice never has a modifier left to double.
-function computeWeaponAttackRoll(item, sheet) {
+function currentAbilityMods(sheet) {
+  const sh = sheet || computeCharacterSheet();
+  const out = {};
+  SCALING_STATS.forEach(k => { out[k] = (sh.abilities && sh.abilities[k] && sh.abilities[k].mod) || 0; });
+  return out;
+}
+// Weapon stat scaling (game-engine.js, "WEAPON STAT SCALING"): to-hit is still a plain ability
+// check (the better of STR/DEX among the stats this weapon grades C or better), but DAMAGE adds
+// grade-multiplier x stat-modifier for every stat the weapon scales with.
+function computeWeaponAttackRoll(item, sheet, rarity) {
   const bridged = item.__canonical ? canonicalWeaponAttackData(item.__canonical) : null;
   const dmgRaw = bridged ? bridged.damageDice : String(item.dmg || '').trim();
   const dmgMatch = dmgRaw.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
-  const finesse = bridged ? bridged.finesse : /finesse/i.test(item.effect || '');
-  const strMod = sheet.abilities.str.mod;
-  const dexMod = sheet.abilities.dex.mod;
-  const useDex = finesse && dexMod > strMod;
-  const abilityMod = useDex ? dexMod : strMod;
-  const abilityLabel = useDex ? 'DEX' : 'STR';
+  const mods = currentAbilityMods(sheet);
+  const scaling = inferWeaponScaling(item, rarity || item.rarity);
+  const toHit = weaponToHitStat(scaling, mods);
+  const scaled = computeScalingDamage(scaling, mods);
+  const abilityMod = toHit.mod;
+  const abilityLabel = SCALING_STAT_LABEL[toHit.stat];
   const { atkBonus, dmgBonus, bonusDiceClauses } = bridged || parseWeaponEffectBonuses(item.effect, item.dmg);
   const d20 = rn(1, 20);
   const isCrit = d20 === 20;
@@ -16725,19 +16747,21 @@ function computeWeaponAttackRoll(item, sheet) {
   const dmgResult = dmgMatch ? battleRollDamage(dmgMatch[0].replace(/\s+/g, ''), isCrit) : null;
   const bonusRolls = bonusDiceClauses.map(c => ({ ...c, roll: battleRollDamage(c.dice, isCrit) })).filter(c => c.roll);
   const bonusDiceTotal = bonusRolls.reduce((sum, c) => sum + c.roll.total, 0);
-  const dmgTotal = dmgResult ? dmgResult.total + abilityMod + dmgBonus + bonusDiceTotal : null;
-  return { dmgRaw, abilityMod, abilityLabel, profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+  const dmgTotal = dmgResult ? dmgResult.total + scaled.total + dmgBonus + bonusDiceTotal : null;
+  return { dmgRaw, abilityMod, abilityLabel, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
 }
 function weaponAttackRollHtml(roll) {
   return `
     <div class="weapon-attack-line"><span>d20 roll</span><span class="${roll.isCrit ? 'weapon-attack-crit' : roll.isFumble ? 'weapon-attack-fumble' : ''}">${roll.d20}${roll.isCrit ? ' (CRIT!)' : roll.isFumble ? ' (FUMBLE!)' : ''}</span></div>
-    <div class="weapon-attack-line"><span>${roll.abilityLabel} modifier</span><span>${fmtMod(roll.abilityMod)}</span></div>
+    <div class="weapon-attack-line"><span>${roll.abilityLabel} modifier (to hit)</span><span>${fmtMod(roll.abilityMod)}</span></div>
     <div class="weapon-attack-line"><span>Proficiency bonus</span><span>${fmtMod(roll.profBonus)}</span></div>
     ${roll.atkBonus ? `<div class="weapon-attack-line"><span>Weapon attack bonus</span><span>${fmtMod(roll.atkBonus)}</span></div>` : ''}
     <div class="weapon-attack-total">To Hit: ${roll.toHitTotal}</div>
     ${roll.dmgResult ? `
       <div class="weapon-attack-line"><span>Damage dice (${escapeHtml(roll.dmgRaw)}${roll.isCrit ? ', doubled' : ''})</span><span>${roll.dmgResult.rolls.join(' + ')}${roll.dmgResult.mod ? ' ' + fmtMod(roll.dmgResult.mod) : ''}</span></div>
-      <div class="weapon-attack-line"><span>${roll.abilityLabel} modifier</span><span>${fmtMod(roll.abilityMod)}</span></div>
+      ${roll.scalingParts
+        ? roll.scalingParts.map(p => `<div class="weapon-attack-line"><span>${SCALING_STAT_LABEL[p.stat]} scaling ${p.grade} (×${p.mult}, ${fmtMod(p.mod)})</span><span>${fmtMod(Math.round(p.value * 100) / 100)}</span></div>`).join('') + `<div class="weapon-attack-line"><span>Scaling bonus (rounded)</span><span>${fmtMod(roll.scalingTotal)}</span></div>`
+        : `<div class="weapon-attack-line"><span>${roll.abilityLabel} modifier</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
       ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>Weapon damage bonus</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
       ${roll.bonusRolls.map(c => `<div class="weapon-attack-line"><span>Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
       <div class="weapon-attack-total">Damage: ${roll.dmgTotal}</div>
@@ -16753,7 +16777,7 @@ function rollEquippedWeaponAttack(slotId) {
   const entry = key && TOKEN_INDEX[key];
   if (!entry) { flashInvMessage('No weapon equipped there.', true); return; }
   const sheet = computeCharacterSheet();
-  const roll = computeWeaponAttackRoll(entry.item, sheet);
+  const roll = computeWeaponAttackRoll(entry.item, sheet, entry.rarity);
   const titleEl = document.getElementById('weaponAttackTitle');
   if (titleEl) titleEl.textContent = `⚔ Attack with ${entry.item.name}`;
   const bodyEl = document.getElementById('weaponAttackBody');
@@ -17408,6 +17432,47 @@ function effectBulletsHtml(text) {
   if (bullets.length > 1) return `<ul class="tt-effect-bullets">${bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`;
   return `<div class="tt-effect">${escapeHtml(text)}</div>`;
 }
+// ---------- Weapon scaling + spell focus display (see game-engine.js "WEAPON STAT SCALING") ----------
+function spellFocusBonusText(focus, bonus) {
+  const bits = [];
+  if (bonus.damage) bits.push(`+${bonus.damage} spell damage`);
+  if (bonus.attack) bits.push(`+${bonus.attack} spell attack`);
+  return bits.length ? bits.join(' · ') : (focus.buff === 'attack' || focus.buff === 'both' ? '+0 spell attack' : '+0 spell damage');
+}
+function weaponScalingTooltipHtml(item, rarity) {
+  if (!item || item.type !== 'weapon') return '';
+  const scaling = inferWeaponScaling(item, rarity);
+  let mods = null;
+  try { mods = currentAbilityMods(); } catch (e) { mods = null; }
+  const chips = scalingEntries(scaling).map(e => `<span class="tt-scale-chip tt-grade-${e.grade}">${e.label} <b>${e.grade}</b></span>`).join('');
+  const dmg = mods ? `<span class="tt-scale-bonus">your damage bonus ${fmtMod(computeScalingDamage(scaling, mods).total)}</span>` : '';
+  let html = `<div class="tt-scaling"><span class="tt-scale-label">Scales</span>${chips}${dmg}</div>`;
+  const focus = inferSpellFocus(item, rarity);
+  if (focus) {
+    const fb = mods ? computeSpellFocusBonus(focus, mods) : { damage: 0, attack: 0 };
+    const kind = focus.buff === 'both' ? 'spell damage + attack' : focus.buff === 'attack' ? 'spell attack' : 'spell damage';
+    html += `<div class="tt-scaling"><span class="tt-scale-label">✦ Focus</span><span class="tt-scale-chip tt-grade-${focus.grade}">${SCALING_STAT_LABEL[focus.stat]} <b>${focus.grade}</b></span><span class="tt-scale-bonus">${kind}${mods ? ' · ' + spellFocusBonusText(focus, fb) : ''}</span></div>`;
+  }
+  return html;
+}
+// What equipped staves/wands add to a spell cast right now — shown on the cast message since the
+// app resolves spell effects as text, not rolls.
+function equippedSpellFocusNote() {
+  buildTokenIndex();
+  let mods;
+  try { mods = currentAbilityMods(); } catch (e) { return ''; }
+  const notes = [];
+  Object.keys(SLOT_CATEGORY).forEach(slotId => {
+    const key = playerSlots[slotId];
+    const entry = key && TOKEN_INDEX[key];
+    if (!entry || entry.item.type !== 'weapon') return;
+    const focus = inferSpellFocus(entry.item, entry.rarity);
+    if (!focus) return;
+    const bonus = computeSpellFocusBonus(focus, mods);
+    if (bonus.damage || bonus.attack) notes.push(`${entry.item.name}: ${spellFocusBonusText(focus, bonus)}`);
+  });
+  return notes.length ? ' ✦ ' + notes.join('; ') : '';
+}
 function buildTooltipHtml(entry) {
   const item = entry.item;
   const rarity = entry.rarity;
@@ -17464,6 +17529,7 @@ function buildTooltipHtml(entry) {
     <div class="tt-rarity">${rarityNames[rarity] || rarity}${typeLabel ? ' · ' + escapeHtml(typeLabel) : ''} · ${SLOT_TYPES.find(s=>s.id===getTokenSlotType(entry))?.label || ''}</div>
     ${classHtml}
     ${statsLine}
+    ${weaponScalingTooltipHtml(item, rarity)}
     ${propsHtml}
     ${item.desc ? `<div class="tt-desc">${escapeHtml(item.desc)}</div>` : ''}
     ${(item.abilities && item.abilities.length) ? '' : effectBulletsHtml(effect)}
@@ -20688,7 +20754,7 @@ function openBattlefieldAttackPicker(monsterUid) {
   const monster = battlefieldRoster.find(e => e.uid === monsterUid);
   if (!monster) return;
   const sheet = computeCharacterSheet();
-  const roll = computeWeaponAttackRoll(entry.item, sheet);
+  const roll = computeWeaponAttackRoll(entry.item, sheet, entry.rarity);
   const monsterName = monster.displayName || monster.monster.name;
   const titleEl = document.getElementById('weaponAttackTitle');
   if (titleEl) titleEl.textContent = `⚔ Attack ${monsterName} with ${entry.item.name}`;
