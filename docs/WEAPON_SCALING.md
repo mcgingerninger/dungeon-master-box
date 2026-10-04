@@ -1,8 +1,9 @@
 # Weapon stat scaling
 
 Every weapon carries a letter grade per stat. **Damage** = weapon dice + (grade multiplier × your
-stat modifier, summed over the weapon's stats) + weapon bonuses. **To hit** is unchanged 5e: d20 +
-the better of STR/DEX among stats the weapon grades C or better + proficiency + weapon bonus.
+stat modifier, summed over the weapon's stats) + weapon bonuses. **To hit** = d20 + proficiency (only
+if proficient) + the weapon's own "+N to attack" — ability modifiers and scaling never affect hitting,
+only damage (and spell save DCs).
 
 | Grade | S | A | B | C | D | E |
 |---|---|---|---|---|---|---|

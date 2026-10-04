@@ -17,10 +17,7 @@ export function abilityModifier(score) {
   return Math.floor((score - 10) / 2);
 }
 
+// Flat +2 wherever proficiency applies — no longer scales with level (see game-engine.js's copy).
 export function proficiencyBonusForLevel(level) {
-  if (level >= 17) return 6;
-  if (level >= 13) return 5;
-  if (level >= 9) return 4;
-  if (level >= 5) return 3;
   return 2;
 }

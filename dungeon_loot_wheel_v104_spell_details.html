@@ -4233,8 +4233,8 @@
         <input type="number" id="sheetLevel" min="1" max="20" value="1" oninput="updateCharacterField('characterLevel', parseInt(this.value,10)||1)">
       </div>
       <div class="sheet-field sheet-field-narrow">
-        <label>Prof. <span class="sheet-hp-bonus-note">(auto)</span></label>
-        <strong id="sheetProfBonus" class="sheet-static-val" title="Proficiency bonus — calculated automatically from your level, not editable.">+2</strong>
+        <label>Prof. <span class="sheet-hp-bonus-note">(flat)</span></label>
+        <strong id="sheetProfBonus" class="sheet-static-val" title="Proficiency bonus — a flat +2 wherever you have proficiency (skills/saves ticked below, weapons you are proficient with). It does not grow with level.">+2</strong>
       </div>
       <div class="sheet-field">
         <label>Hit Dice <span class="sheet-hp-bonus-note">(short rest healing)</span></label>
@@ -5230,7 +5230,7 @@ function renderSpellbookAbilityIcons(html) {
 function castKnownSpell(name) {
   const spell = characterKnownSpells.find(s => s.name === name);
   if (!spell) return;
-  if (spell.level === 0) { flashInvMessage(`${spell.name}: ${(spell.description || '').slice(0, 300)}${equippedSpellFocusNote()}`); return; }
+  if (spell.level === 0) { showSpellCastPopup(spell.name, 0); return; }
   const levels = Object.keys(characterSpellSlots).map(Number)
     .filter(lvl => lvl >= spell.level && (characterSpellSlots[lvl] || 0) > (characterSpellSlotsUsed[lvl] || 0));
   if (!levels.length) { flashInvMessage(`No open slot for ${spell.name}.`, true); return; }
@@ -5256,8 +5256,149 @@ function confirmCastSpell(name, level) {
   renderPlayerSlots();
   renderSpellbookSlotsGrid();
   if (typeof scheduleSave === 'function') scheduleSave();
-  const upcastNote = level > spell.level ? ` (cast at level ${level})` : '';
-  flashInvMessage(`${spell.name}${upcastNote}: ${(spell.description || '').slice(0, 300)}${equippedSpellFocusNote()}`);
+  showSpellCastPopup(spell.name, level);
+}
+// ---------- Spell cast result popup ----------
+// Casting a spell used to only flash a 2-second toast with the first 300 characters of its text,
+// so picking a slot for Fireball closed the picker and showed nothing to roll. Now every cast opens
+// a popup with the actual numbers: the spell attack roll or save DC, the damage/healing dice rolled
+// (including extra dice from a higher slot or from your character level for cantrips), and anything
+// an equipped staff adds. Spell effects use the casting ability's modifier only — no proficiency
+// bonus (proficiency isn't level-based in this app).
+const SPELL_CASTING_STAT_BY_CLASS = { wizard: 'int', artificer: 'int', cleric: 'wis', druid: 'wis', ranger: 'wis', paladin: 'cha', bard: 'cha', sorcerer: 'cha', warlock: 'cha' };
+const SPELL_COUNT_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
+const SPELL_SAVE_ABBR = { strength: 'str', dexterity: 'dex', constitution: 'con', intelligence: 'int', wisdom: 'wis', charisma: 'cha' };
+function spellCastingStatFor(mods, focuses) {
+  const cls = String(characterClass || '').toLowerCase();
+  const hit = Object.keys(SPELL_CASTING_STAT_BY_CLASS).find(c => new RegExp('\\b' + c + 's?\\b').test(cls));
+  if (hit) return { stat: SPELL_CASTING_STAT_BY_CLASS[hit], why: `your class (${hit})` };
+  if (focuses.length) return { stat: focuses[0].focus.stat, why: `your equipped ${focuses[0].item.name}` };
+  const best = ['int', 'wis', 'cha'].reduce((b, k) => (mods[k] > mods[b] ? k : b), 'int');
+  return { stat: best, why: 'your best of INT/WIS/CHA (no class or spell focus to pick one)' };
+}
+function spellDiceParts(expr) {
+  const m = /^(\d+)d(\d+)([+-]\d+)?$/i.exec(String(expr || '').replace(/\s+/g, ''));
+  return m ? { n: +m[1], sides: +m[2], mod: m[3] ? parseInt(m[3], 10) : 0 } : null;
+}
+function resolveSpellCast(name, slotLevel) {
+  const known = characterKnownSpells.find(s => s.name === name) || {};
+  const full = (window.SpellCompendiumAPI && SpellCompendiumAPI.find(name)) || {};
+  const raw = { ...known, ...full };
+  const level = Number(raw.level ?? 0);
+  const sheet = computeCharacterSheet();
+  const mods = currentAbilityMods(sheet);
+  const focuses = equippedSpellFocusBonuses(mods);
+  const cast = spellCastingStatFor(mods, focuses);
+  const castMod = mods[cast.stat] || 0;
+  const entriesJson = JSON.stringify(raw.entries || []);
+  const higherJson = JSON.stringify(raw.entriesHigherLevel || []);
+  const plain = spellCleanTags(spellFlattenEntries(raw.entries));
+  const plainHigher = spellCleanTags(spellFlattenEntries(raw.entriesHigherLevel));
+  const r = { name, level, slotLevel: slotLevel || 0, castStat: cast.stat, castMod, castWhy: cast.why, focuses, notes: [], sources: {} };
+  // -- dice: base, cantrip scaling by character level, higher-slot extra dice, multiple darts/rays --
+  const dm = /\{@(?:damage|dice) ([^}|]+)/.exec(entriesJson);
+  let baseDice = dm ? dm[1].replace(/\s+/g, '') : null;
+  const cantripScale = raw.scalingLevelDice && raw.scalingLevelDice.scaling;
+  if (level === 0 && cantripScale) {
+    const key = Object.keys(cantripScale).map(Number).filter(k => k <= (characterLevel || 1)).sort((a, b) => b - a)[0];
+    if (key != null) baseDice = String(cantripScale[key]).replace(/\s+/g, '');
+    r.cantripNote = `Cantrip dice scale with your character level (level ${characterLevel || 1}).`;
+  }
+  const extraLevels = slotLevel && slotLevel > level ? slotLevel - level : 0;
+  const up = /\{@scaled(?:amage|ice) ([^|}]+)\|([^|}]*)\|([^}]+)\}/.exec(higherJson);
+  const incParts = up && extraLevels ? spellDiceParts(up[3]) : null;
+  let count = 1;
+  const cm = /\b(one|two|three|four|five|six)\s+(?:glowing\s+)?(darts?|rays?|bolts?|beams?|missiles?)\b/i.exec(plain);
+  if (cm) {
+    count = SPELL_COUNT_WORDS[cm[1].toLowerCase()];
+    const hm = /(?:one|1)\s+(?:more|additional)\s+(?:dart|ray|bolt|beam|missile)/i.exec(plainHigher);
+    if (hm && extraLevels) count += extraLevels;
+    r.projectile = cm[2].toLowerCase().replace(/s$/, '');
+  }
+  const isHealing = !(raw.damageInflict && raw.damageInflict.length) && /regains?\s+(?:a number of\s+)?hit points|heal/i.test(plain) && !!baseDice;
+  const isAttack = !!(raw.spellAttack && raw.spellAttack.length);
+  const saveKey = raw.savingThrow && raw.savingThrow[0] ? SPELL_SAVE_ABBR[String(raw.savingThrow[0]).toLowerCase()] : null;
+  r.isHealing = isHealing;
+  r.damageType = (raw.damageInflict && raw.damageInflict[0]) || '';
+  // -- attack roll / save DC --
+  const focusAtk = focuses.reduce((n, f) => n + f.bonus.attack, 0);
+  const focusDmg = focuses.reduce((n, f) => n + f.bonus.damage, 0);
+  if (isAttack) {
+    r.d20 = rn(1, 20);
+    r.isCrit = r.d20 === 20; r.isFumble = r.d20 === 1;
+    r.focusAtk = focusAtk;
+    r.toHit = r.d20 + focusAtk;
+    r.attackKind = raw.spellAttack[0] === 'M' ? 'Melee' : 'Ranged';
+  }
+  if (saveKey) { r.saveStat = saveKey; r.dc = 8 + castMod; r.halfOnSave = /half as much damage|half damage/i.test(plain); }
+  // -- damage / healing --
+  if (baseDice && (r.isHealing || r.damageType || /damage/i.test(plain))) {
+    const crit = !!r.isCrit;
+    r.rolls = [];
+    for (let i = 0; i < count; i++) { const roll = battleRollDamage(baseDice, crit); if (roll) r.rolls.push(roll); }
+    r.baseDice = baseDice; r.count = count;
+    if (incParts) {
+      r.extraDice = `${incParts.n * extraLevels}d${incParts.sides}`;
+      r.extraRoll = battleRollDamage(r.extraDice, crit);
+      r.extraLevels = extraLevels;
+    }
+    r.addMod = isHealing && /spellcasting ability modifier/i.test(plain) ? castMod : 0;
+    r.focusDmg = isHealing ? 0 : focusDmg;
+    r.total = r.rolls.reduce((n, x) => n + x.total, 0) + (r.extraRoll ? r.extraRoll.total : 0) + r.addMod + r.focusDmg;
+  } else {
+    r.notes.push('This spell doesn’t deal or restore hit points — read its effect below.');
+  }
+  if (extraLevels && !incParts && !(count > 1) && plainHigher) r.notes.push('Higher slot: ' + plainHigher.replace(/\s+/g, ' ').slice(0, 220));
+  r.description = (raw.description || plain || '').slice(0, 420);
+  // -- hover sources --
+  const L = SCALING_STAT_LABEL;
+  const castLines = [...abilitySourceLines(cast.stat, sheet), `Casting stat chosen from ${cast.why}.`];
+  r.sources.cast = attackTipBlock(`${L[cast.stat]} casting modifier ${fmtMod(castMod)}`, castLines);
+  r.sources.focus = attackTipBlock('Spell focus bonus', focuses.length ? focuses.map(f => `<b>${escapeHtml(f.item.name)}</b>: ${escapeHtml(spellFocusBonusText(f.focus, f.bonus))} (${L[f.focus.stat]} ${f.focus.grade} focus)`) : ['No equipped staff or wand is adding to spells.']);
+  r.sources.atkinfo = attackTipBlock('Spell attack roll', ['d20 plus any bonus from an equipped spell-focus staff or wand.', 'Ability modifiers never add to hitting — only to damage and save DCs.']);
+  if (r.dc != null) r.sources.dc = attackTipBlock(`Save DC ${r.dc}`, [`8 + your ${L[cast.stat]} casting modifier (${fmtMod(castMod)}).`, 'No proficiency bonus is added.']);
+  if (r.slotLevel) r.sources.slot = attackTipBlock(`Level ${r.slotLevel} slot`, [`${escapeHtml(name)} is a level ${level} spell. ${r.slotLevel > level ? `Casting it with a level ${r.slotLevel} slot adds ${r.extraDice || 'its higher-level benefit'}.` : 'Cast at its own level.'}`]);
+  if (r.baseDice) r.sources.dice = attackTipBlock(`Damage dice ${r.baseDice}${r.count > 1 ? ' × ' + r.count : ''}`, [`From the ${escapeHtml(name)} spell’s own description.`, r.cantripNote || '', r.count > 1 ? `${r.count} ${r.projectile}s (${extraLevels ? 'including one more per slot level above ' + level : 'base number'}).` : '', 'Doubled on a critical hit.']);
+  if (r.extraRoll) r.sources.extra = attackTipBlock(`Higher-slot dice ${r.extraDice}`, [`Using a level ${r.slotLevel} slot on a level ${level} spell adds ${up[3].replace(/\s+/g, '')} per level above (${extraLevels} level${extraLevels > 1 ? 's' : ''}).`]);
+  return r;
+}
+function spellCastRollHtml(r) {
+  _attackRollSources = r.sources || {};
+  const S = (key, label) => (r.sources && r.sources[key]) ? `<span class="attack-src" onmouseenter="showAttackSourceTip(event,'${key}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${label}</span>` : label;
+  const L = SCALING_STAT_LABEL;
+  const remaining = r.slotLevel ? Math.max(0, (characterSpellSlots[r.slotLevel] || 0) - (characterSpellSlotsUsed[r.slotLevel] || 0)) : null;
+  const rows = [];
+  if (r.slotLevel) rows.push(`<div class="weapon-attack-line"><span>${S('slot', 'Spell slot used')}</span><span>Level ${r.slotLevel} (${remaining} left)</span></div>`);
+  else rows.push(`<div class="weapon-attack-line"><span>Cantrip</span><span>no slot used</span></div>`);
+  if (r.toHit != null) {
+    rows.push(`<div class="weapon-attack-line"><span>${S('atkinfo', r.attackKind + ' spell attack — d20')}</span><span class="${r.isCrit ? 'weapon-attack-crit' : r.isFumble ? 'weapon-attack-fumble' : ''}">${r.d20}${r.isCrit ? ' (CRIT!)' : r.isFumble ? ' (FUMBLE!)' : ''}</span></div>`);
+    if (r.focusAtk) rows.push(`<div class="weapon-attack-line"><span>${S('focus', 'Spell focus attack bonus')}</span><span>${fmtMod(r.focusAtk)}</span></div>`);
+    rows.push(`<div class="weapon-attack-total">To Hit: ${r.toHit}</div>`);
+  }
+  if (r.dc != null) {
+    rows.push(`<div class="weapon-attack-total">${S('dc', `${L[r.saveStat]} save DC ${r.dc}`)}${r.halfOnSave ? ' — half damage on a success' : ''}</div>`);
+  }
+  if (r.rolls && r.rolls.length) {
+    const label = r.isHealing ? 'Healing' : 'Damage';
+    rows.push(`<div class="weapon-attack-line"><span>${S('dice', `${label} dice (${escapeHtml(r.baseDice)}${r.count > 1 ? ' × ' + r.count + ' ' + r.projectile + 's' : ''}${r.isCrit ? ', doubled' : ''})`)}</span><span>${r.rolls.map(x => x.rolls.join(' + ') + (x.mod ? ' ' + fmtMod(x.mod) : '')).join(' | ')}</span></div>`);
+    if (r.extraRoll) rows.push(`<div class="weapon-attack-line"><span>${S('extra', `Higher-slot dice (${escapeHtml(r.extraDice)})`)}</span><span>${r.extraRoll.rolls.join(' + ')}</span></div>`);
+    if (r.addMod) rows.push(`<div class="weapon-attack-line"><span>${S('cast', L[r.castStat] + ' casting modifier')}</span><span>${fmtMod(r.addMod)}</span></div>`);
+    if (r.focusDmg) rows.push(`<div class="weapon-attack-line"><span>${S('focus', 'Spell focus damage bonus')}</span><span>${fmtMod(r.focusDmg)}</span></div>`);
+    rows.push(`<div class="weapon-attack-total">${label}: ${r.total}${r.damageType ? ' ' + escapeHtml(r.damageType) : ''}</div>`);
+    if (r.toHit != null) rows.push('<p class="sheet-chip-empty">Damage applies only if the attack hits.</p>');
+    else if (r.dc != null) rows.push('<p class="sheet-chip-empty">Targets that fail the save take this damage.</p>');
+  }
+  r.notes.forEach(n => rows.push(`<p class="sheet-chip-empty">${escapeHtml(n)}</p>`));
+  if (r.description) rows.push(`<p class="sheet-chip-empty" style="white-space:pre-line">${escapeHtml(r.description)}${(r.description.length >= 420) ? '…' : ''}</p>`);
+  return rows.join('');
+}
+function showSpellCastPopup(name, slotLevel) {
+  const r = resolveSpellCast(name, slotLevel);
+  const titleEl = document.getElementById('weaponAttackTitle');
+  if (titleEl) titleEl.textContent = `✦ Cast ${name}${r.slotLevel && r.slotLevel > r.level ? ' (level ' + r.slotLevel + ' slot)' : ''}`;
+  const bodyEl = document.getElementById('weaponAttackBody');
+  if (bodyEl) bodyEl.innerHTML = spellCastRollHtml(r);
+  document.getElementById('weaponAttackModal')?.classList.add('open');
 }
 // Click handler for a structured item.abilities entry (see resolveAbilityIconDef above).
 // Decrements usesLeft, flashes the ability's own text (or the live spell description for a
@@ -16755,7 +16896,8 @@ function abilitySourceLines(stat, sheet) {
   return lines;
 }
 function proficiencySourceLines(sheet, check) {
-  const amount = `Your level-${characterLevel || 1} proficiency bonus is ${fmtMod(sheet.profBonus)} (+2 at levels 1–4, +3 at 5, +4 at 9, +5 at 13, +6 at 17).`;
+  const boost = check && check.boost && check.boost.total ? check.boost : null;
+  const amount = `Proficiency is a flat ${fmtMod(sheet.profBonus)} — it does not grow with character level.` + (boost ? ` Plus ${fmtMod(boost.total)} from ${boost.sources.map(x => escapeHtml(x.source)).join(', ')}.` : '');
   if (!check) return [amount, 'Unarmed strikes are always proficient.'];
   if (check.proficient) {
     const how = { class: 'From your class', manual: 'You ticked it on the Character Sheet', gear: 'From equipped gear', natural: 'Natural weapon', unconfigured: 'Assumed (nothing set up yet)' }[check.via] || '';
@@ -16773,8 +16915,7 @@ function scalingOriginText(item, rarity) {
 function buildAttackSources(item, rarity, sheet, d) {
   const src = {};
   const name = escapeHtml(item.name);
-  src.toHit = attackTipBlock(`${d.abilityLabel} modifier ${fmtMod(d.abilityMod)} (to hit)`, [...abilitySourceLines(d.toHitStat, sheet), `Used to hit because ${name} grades ${d.abilityLabel} ${d.scaling[d.toHitStat]} — the best Strength/Dexterity stat it grades C or better.`]);
-  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(d.prof.proficient ? sheet.profBonus : 0)}`, proficiencySourceLines(sheet, d.prof));
+  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(d.prof.proficient ? sheet.profBonus + d.prof.boost.total : 0)}`, proficiencySourceLines(sheet, d.prof));
   const atkClauses = attackEffectClauses(item, /\+\d+[^.;]*(?:attack|hit)/i);
   src.atk = attackTipBlock(`Weapon attack bonus ${fmtMod(d.atkBonus)}`, [`From <b>${name}</b>:`, ...atkClauses.map(c => '“' + escapeHtml(c) + '”'), atkClauses.length ? '' : 'Part of the weapon’s own stats.']);
   src.dmgDice = attackTipBlock(`Damage dice ${d.dmgRaw}`, [`${name}’s own weapon die${item.dmg && String(item.dmg).replace(/\s+/g, '') !== d.dmgRaw ? ` (the item lists ${escapeHtml(item.dmg)}; any flat bonus is counted under “Weapon damage bonus”)` : ''}.`, 'Doubled on a critical hit.']);
@@ -16823,30 +16964,28 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   const dmgMatch = dmgRaw.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
   const mods = currentAbilityMods(sheet);
   const scaling = inferWeaponScaling(item, rarity || item.rarity);
-  const toHit = weaponToHitStat(scaling, mods);
   const scaled = computeScalingDamage(scaling, mods);
-  const abilityMod = toHit.mod;
-  const abilityLabel = SCALING_STAT_LABEL[toHit.stat];
   const { atkBonus, dmgBonus, bonusDiceClauses } = bridged || parseWeaponEffectBonuses(item.effect, item.dmg);
   const d20 = rn(1, 20);
   const isCrit = d20 === 20;
   const isFumble = d20 === 1;
+  // To hit = d20 + proficiency (only if proficient) + the weapon's own "+N to attack". Ability
+  // modifiers and scaling never touch the attack roll — they only add to damage.
   const prof = weaponProficiencyFor(item);
-  const profApplied = prof.proficient ? sheet.profBonus : 0;
-  const toHitTotal = d20 + abilityMod + profApplied + atkBonus;
+  const profApplied = prof.proficient ? sheet.profBonus + prof.boost.total : 0;
+  const toHitTotal = d20 + profApplied + atkBonus;
   const dmgResult = dmgMatch ? battleRollDamage(dmgMatch[0].replace(/\s+/g, ''), isCrit) : null;
   const bonusRolls = bonusDiceClauses.map(c => ({ ...c, roll: battleRollDamage(c.dice, isCrit) })).filter(c => c.roll);
   const bonusDiceTotal = bonusRolls.reduce((sum, c) => sum + c.roll.total, 0);
   const dmgTotal = dmgResult ? dmgResult.total + scaled.total + dmgBonus + bonusDiceTotal : null;
-  const sources = buildAttackSources(item, rarity, sheet, { prof, abilityLabel, abilityMod, toHitStat: toHit.stat, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
-  return { dmgRaw, abilityMod, abilityLabel, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: profApplied, profProficient: prof.proficient, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
+  const sources = buildAttackSources(item, rarity, sheet, { prof, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
+  return { dmgRaw, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: profApplied, profProficient: prof.proficient, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
 }
 function weaponAttackRollHtml(roll) {
   _attackRollSources = roll.sources || {};
   const S = (key, label) => attackSrc(roll, key, label);
   return `
     <div class="weapon-attack-line"><span>d20 roll</span><span class="${roll.isCrit ? 'weapon-attack-crit' : roll.isFumble ? 'weapon-attack-fumble' : ''}">${roll.d20}${roll.isCrit ? ' (CRIT!)' : roll.isFumble ? ' (FUMBLE!)' : ''}</span></div>
-    <div class="weapon-attack-line"><span>${S('toHit', roll.abilityLabel + ' modifier (to hit)')}</span><span>${fmtMod(roll.abilityMod)}</span></div>
     <div class="weapon-attack-line"><span>${S('prof', roll.profProficient === false ? 'Proficiency bonus (not proficient)' : 'Proficiency bonus')}</span><span>${fmtMod(roll.profBonus)}</span></div>
     ${roll.atkBonus ? `<div class="weapon-attack-line"><span>${S('atk', 'Weapon attack bonus')}</span><span>${fmtMod(roll.atkBonus)}</span></div>` : ''}
     <div class="weapon-attack-total">To Hit: ${roll.toHitTotal}</div>
@@ -16854,7 +16993,7 @@ function weaponAttackRollHtml(roll) {
       <div class="weapon-attack-line"><span>${S('dmgDice', `Damage dice (${escapeHtml(roll.dmgRaw)}${roll.isCrit ? ', doubled' : ''})`)}</span><span>${roll.dmgResult.rolls.join(' + ')}${roll.dmgResult.mod ? ' ' + fmtMod(roll.dmgResult.mod) : ''}</span></div>
       ${roll.scalingParts
         ? roll.scalingParts.map(p => `<div class="weapon-attack-line"><span>${S('scale_' + p.stat, `${SCALING_STAT_LABEL[p.stat]} scaling ${p.grade} (×${p.mult}, ${fmtMod(p.mod)})`)}</span><span>${fmtMod(Math.round(p.value * 100) / 100)}</span></div>`).join('') + `<div class="weapon-attack-line"><span>${S('scaleTotal', 'Scaling bonus (rounded)')}</span><span>${fmtMod(roll.scalingTotal)}</span></div>`
-        : `<div class="weapon-attack-line"><span>${S('toHit', roll.abilityLabel + ' modifier')}</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
+        : `<div class="weapon-attack-line"><span>${S('strmod', roll.abilityLabel + ' modifier')}</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
       ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>${S('dmg', 'Weapon damage bonus')}</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
       ${roll.bonusRolls.map((c, i) => `<div class="weapon-attack-line"><span>${S('bonus' + i, `Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})`)}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
       <div class="weapon-attack-total">Damage: ${roll.dmgTotal}</div>
@@ -16914,10 +17053,10 @@ function computeUnarmedAttackRoll(sheet) {
   const d20 = rn(1, 20);
   const isCrit = d20 === 20;
   const isFumble = d20 === 1;
-  const toHitTotal = d20 + strMod + sheet.profBonus + atkBonus;
+  const toHitTotal = d20 + sheet.profBonus + atkBonus;
   const dmgResult = battleRollDamage(dice, isCrit);
   const dmgTotal = dmgResult ? dmgResult.total + strMod + dmgBonus : null;
-  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { toHit: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (to hit and damage)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet, null)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { strmod: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (damage only)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet, null)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
 }
 // The ability bar's always-present "Unarmed" icon — unlike rollEquippedWeaponAttack this never
 // needs an equipped weapon (that's the whole point), so it has no "nothing equipped there" guard.
@@ -17243,8 +17382,25 @@ function collectWeaponProficiencyGrants() {
   });
   return grants;
 }
+// "+N to your proficiency bonus" on equipped gear or in a selected feat raises the flat +2.
+function collectProficiencyBonusBoost() {
+  buildTokenIndex();
+  const sources = [];
+  const add = (source, text) => { const n = parseProficiencyBonusBoost(text); if (n) sources.push({ source, amount: n }); };
+  Object.keys(SLOT_CATEGORY).forEach(slotId => {
+    const key = playerSlots[slotId];
+    const entry = key && TOKEN_INDEX[key];
+    if (entry) add(entry.item.name, [entry.item.effect, ...(entry.item.mods || []).map(m => m.text)].filter(Boolean).join(' '));
+  });
+  (feats || []).forEach(name => {
+    const def = (typeof FEAT_LIBRARY !== 'undefined' ? FEAT_LIBRARY : []).find(f => f.name === name);
+    if (def) add(def.name + ' (feat)', def.description);
+  });
+  return { total: sources.reduce((n, x) => n + x.amount, 0), sources };
+}
 function weaponProficiencyFor(item) {
-  return weaponProficiencyCheck(item, { classText: characterClass, manual: weaponProf, grants: collectWeaponProficiencyGrants() });
+  const check = weaponProficiencyCheck(item, { classText: characterClass, manual: weaponProf, grants: collectWeaponProficiencyGrants() });
+  return { ...check, boost: collectProficiencyBonusBoost() };
 }
 function toggleWeaponProf(kind, id) {
   const list = weaponProf[kind];
@@ -17600,13 +17756,10 @@ function weaponScalingTooltipHtml(item, rarity) {
   }
   return html;
 }
-// What equipped staves/wands add to a spell cast right now — shown on the cast message since the
-// app resolves spell effects as text, not rolls.
-function equippedSpellFocusNote() {
+// What equipped staves/wands add to a spell cast right now. -> [{ item, focus, bonus:{damage,attack} }]
+function equippedSpellFocusBonuses(mods) {
   buildTokenIndex();
-  let mods;
-  try { mods = currentAbilityMods(); } catch (e) { return ''; }
-  const notes = [];
+  const out = [];
   Object.keys(SLOT_CATEGORY).forEach(slotId => {
     const key = playerSlots[slotId];
     const entry = key && TOKEN_INDEX[key];
@@ -17614,9 +17767,9 @@ function equippedSpellFocusNote() {
     const focus = inferSpellFocus(entry.item, entry.rarity);
     if (!focus) return;
     const bonus = computeSpellFocusBonus(focus, mods);
-    if (bonus.damage || bonus.attack) notes.push(`${entry.item.name}: ${spellFocusBonusText(focus, bonus)}`);
+    if (bonus.damage || bonus.attack) out.push({ item: entry.item, focus, bonus });
   });
-  return notes.length ? ' ✦ ' + notes.join('; ') : '';
+  return out;
 }
 function buildTooltipHtml(entry) {
   const item = entry.item;

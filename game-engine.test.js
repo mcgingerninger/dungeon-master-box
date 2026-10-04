@@ -90,14 +90,22 @@ describe('computeCharacterSheetFor', () => {
     assert.equal(sheet.abilities.dex.total, 17); // 16 base + 1 from armor
     assert.equal(sheet.abilities.dex.mod, 3);     // floor((17-10)/2)
   });
-  test('proficiency bonus scales with level', () => {
-    assert.equal(sheet.profBonus, 3); // level 5 -> +3
+  test('proficiency bonus is a flat +2 regardless of level', () => {
+    assert.equal(sheet.profBonus, 2); // level 5, but proficiency no longer scales with level
+    assert.equal(GE.proficiencyBonusForLevel(1), 2);
+    assert.equal(GE.proficiencyBonusForLevel(20), 2);
+  });
+  test('"+N to your proficiency bonus" text is read from gear and feats', () => {
+    assert.equal(GE.parseProficiencyBonusBoost('You gain a +1 bonus to your proficiency bonus with weapons.'), 0); // wording must match
+    assert.equal(GE.parseProficiencyBonusBoost('+1 to your proficiency bonus. Requires attunement.'), 1);
+    assert.equal(GE.parseProficiencyBonusBoost('+1 proficiency bonus. Also +2 to proficiency bonus when...'), 3);
+    assert.equal(GE.parseProficiencyBonusBoost('Proficiency with longbows.'), 0);
   });
   test('save total = mod + prof (if proficient) + flat bonus sources', () => {
-    assert.equal(sheet.saves.dex.total, sheet.abilities.dex.mod + 3 + 1);
+    assert.equal(sheet.saves.dex.total, sheet.abilities.dex.mod + 2 + 1);
   });
   test('skill total = ability mod + prof (if proficient) + direct sources', () => {
-    assert.equal(sheet.skills['Stealth'].total, sheet.abilities.dex.mod + 3);
+    assert.equal(sheet.skills['Stealth'].total, sheet.abilities.dex.mod + 2);
   });
   test('AC = armor base + dex mod, no double-counting the gear dex bonus', () => {
     assert.equal(sheet.ac.total, 13 + sheet.abilities.dex.mod);

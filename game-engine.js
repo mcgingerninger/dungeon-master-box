@@ -501,12 +501,20 @@ export const SHEET_STAT_ALIASES = {
   'AC': 'Armor Class', 'Speed': 'Movement Speed',
 };
 
+// Proficiency is a flat +2 wherever you have it (a skill/save ticked on the sheet, a weapon you are
+// proficient with) — it no longer climbs with character level. The `level` argument is kept so the
+// existing call sites don't change.
+export const PROFICIENCY_BONUS = 2;
 export function proficiencyBonusForLevel(level) {
-  if (level >= 17) return 6;
-  if (level >= 13) return 5;
-  if (level >= 9) return 4;
-  if (level >= 5) return 3;
-  return 2;
+  return PROFICIENCY_BONUS;
+}
+// "+1 to your proficiency bonus" on gear or in a feat -> 1 (summed across every match).
+export function parseProficiencyBonusBoost(text) {
+  let total = 0, m;
+  const re = /\+(\d+)\s+(?:to\s+)?(?:your\s+)?proficiency bonus/gi;
+  const t = String(text || '').replace(/<[^>]+>/g, ' ');
+  while ((m = re.exec(t)) !== null) total += parseInt(m[1], 10);
+  return total;
 }
 export function abilityModifier(score) { return Math.floor((score - 10) / 2); }
 export function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
