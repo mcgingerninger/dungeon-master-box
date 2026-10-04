@@ -1,7 +1,12 @@
 # Weapon proficiency
 
-A weapon attack adds the proficiency bonus **only if you're proficient with that weapon**. The bonus is a **flat +2** — it does not grow with character level (it's the same +2 for skills and saves you tick on the sheet) — and gear or a feat that says "+N to your proficiency bonus" raises it
-(`weaponProficiencyCheck` in `game-engine.js`). Sources, checked in this order:
+There is **no built-in proficiency bonus** — not by level and not a flat +2. Being proficient with a
+weapon (or ticking a skill/saving throw) only marks you as proficient; the number a proficient roll
+adds is whatever equipped gear or feats say they add ("+N to your proficiency bonus",
+`collectProficiencyBoost` in `game-engine.js`). With nothing like that equipped it is +0.
+
+A weapon attack adds that bonus **only if you're proficient with that weapon**. Sources of
+weapon proficiency, checked in this order:
 
 1. **Natural weapons** (claws, fangs, grafted limbs) — always.
 2. **Class** — the 5e class tables, matched from the free-text Class field (multiclass text like
@@ -13,6 +18,5 @@ A weapon attack adds the proficiency bonus **only if you're proficient with that
 
 Each weapon's base type and simple/martial category are read from its name
 (`WEAPON_PROFICIENCY_TABLE`); an unrecognizable custom weapon counts as martial, and an item can set
-`weaponCategory: 'simple'|'martial'|'natural'` to override. A sheet with no recognizable class and
-nothing ticked is assumed proficient with everything (the behavior before this existed).
+`weaponCategory: 'simple'|'martial'|'natural'` to override. An unset sheet is proficient with nothing.
 Unarmed strikes are always proficient. Armor and shield proficiency are not modeled.

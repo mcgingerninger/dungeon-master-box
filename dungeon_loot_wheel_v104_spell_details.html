@@ -4233,8 +4233,8 @@
         <input type="number" id="sheetLevel" min="1" max="20" value="1" oninput="updateCharacterField('characterLevel', parseInt(this.value,10)||1)">
       </div>
       <div class="sheet-field sheet-field-narrow">
-        <label>Prof. <span class="sheet-hp-bonus-note">(flat)</span></label>
-        <strong id="sheetProfBonus" class="sheet-static-val" title="Proficiency bonus — a flat +2 wherever you have proficiency (skills/saves ticked below, weapons you are proficient with). It does not grow with level.">+2</strong>
+        <label>Prof. <span class="sheet-hp-bonus-note">(gear/feats)</span></label>
+        <strong id="sheetProfBonus" class="sheet-static-val" title="Proficiency bonus — there is no built-in value. It is only what equipped gear or feats add ('+N to your proficiency bonus'), so it stays +0 until something raises it. Ticking a proficiency below marks you as proficient; this is what it adds.">+2</strong>
       </div>
       <div class="sheet-field">
         <label>Hit Dice <span class="sheet-hp-bonus-note">(short rest healing)</span></label>
@@ -4282,7 +4282,7 @@
     <div id="sheetFeatsList" class="sheet-feats-list"></div>
     <h3 class="sheet-section-title">Weapon Proficiencies</h3>
     <div id="sheetWeaponProf"></div>
-    <p class="sheet-note">The proficiency bonus is only added to a weapon attack when you're proficient with that weapon. Proficiencies come from your Class (the 5e class tables), anything you tick here, equipped gear whose text grants it (e.g. "Proficiency with longbows and shortbows"), and feats. Greyed-out boxes are granted automatically.</p>
+    <p class="sheet-note">Being proficient with a weapon only adds your proficiency bonus to hit — and there is no built-in proficiency bonus: it is only what equipped gear or feats say they add ("+N to your proficiency bonus"). Proficiencies come from your Class (the 5e class tables), anything you tick here, equipped gear whose text grants it (e.g. "Proficiency with longbows and shortbows"), and feats. Greyed-out boxes are granted automatically. The same goes for the skill and saving-throw boxes above.</p>
     <p class="sheet-note">A feat's numeric bonus (e.g. "+1 Constitution") is picked up automatically the same way an item's effect text is — see the Compendium's Reference tab for the full list and what each one does.</p>
   </div>
 
@@ -5264,7 +5264,7 @@ function confirmCastSpell(name, level) {
 // a popup with the actual numbers: the spell attack roll or save DC, the damage/healing dice rolled
 // (including extra dice from a higher slot or from your character level for cantrips), and anything
 // an equipped staff adds. Spell effects use the casting ability's modifier only — no proficiency
-// bonus (proficiency isn't level-based in this app).
+// bonus (the app has no built-in proficiency bonus).
 const SPELL_CASTING_STAT_BY_CLASS = { wizard: 'int', artificer: 'int', cleric: 'wis', druid: 'wis', ranger: 'wis', paladin: 'cha', bard: 'cha', sorcerer: 'cha', warlock: 'cha' };
 const SPELL_COUNT_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
 const SPELL_SAVE_ABBR = { strength: 'str', dexterity: 'dex', constitution: 'con', intelligence: 'int', wisdom: 'wis', charisma: 'cha' };
@@ -16873,7 +16873,7 @@ function parseWeaponEffectBonuses(effect, dmgField) {
 // single passive damageRoll entry, so bridged.damageDice never has a modifier left to double.
 // ---------- Where each number in an attack popup comes from ----------
 // Every line of the attack popup can be hovered for its source (ability score + the gear adding to
-// it, the level-based proficiency bonus, which item clause gives a weapon bonus, how a stat's
+// it, the proficiency bonus (only what gear/feats add), which item clause gives a weapon bonus, how a stat's
 // scaling grade was worked out). The text is built once per roll and kept in _attackRollSources.
 let _attackRollSources = {};
 function attackTipBlock(title, lines) {
@@ -16896,14 +16896,16 @@ function abilitySourceLines(stat, sheet) {
   return lines;
 }
 function proficiencySourceLines(sheet, check) {
-  const boost = check && check.boost && check.boost.total ? check.boost : null;
-  const amount = `Proficiency is a flat ${fmtMod(sheet.profBonus)} — it does not grow with character level.` + (boost ? ` Plus ${fmtMod(boost.total)} from ${boost.sources.map(x => escapeHtml(x.source)).join(', ')}.` : '');
+  const boost = sheet.profBoost && sheet.profBoost.total ? sheet.profBoost : null;
+  const amount = boost
+    ? `Your proficiency bonus is ${fmtMod(sheet.profBonus)}, all of it from: ${boost.sources.map(x => `${escapeHtml(x.source)} (${fmtMod(x.amount)})`).join(', ')}.`
+    : 'There is no built-in proficiency bonus (not by level, not flat). It is only what gear or feats say they add — "+N to your proficiency bonus" — and nothing equipped or taken does, so it is +0.';
   if (!check) return [amount, 'Unarmed strikes are always proficient.'];
   if (check.proficient) {
-    const how = { class: 'From your class', manual: 'You ticked it on the Character Sheet', gear: 'From equipped gear', natural: 'Natural weapon', unconfigured: 'Assumed (nothing set up yet)' }[check.via] || '';
-    return [`<b>Applied.</b> ${escapeHtml(check.detail)}`, amount, how ? `<i>${how}.</i>` : ''];
+    const how = { class: 'From your class', manual: 'You ticked it on the Character Sheet', gear: 'From equipped gear', natural: 'Natural weapon' }[check.via] || '';
+    return [`<b>Proficient.</b> ${escapeHtml(check.detail)}`, amount, how ? `<i>${how}.</i>` : ''];
   }
-  return [`<b>Not applied (+0).</b> ${escapeHtml(check.detail)}`, amount + ' You only get it with weapons you are proficient with.', '<i>To gain it: pick a class that has this weapon, tick it under Weapon Proficiencies on the Character Sheet, equip gear that grants it, or take a feat that does.</i>'];
+  return [`<b>Not proficient (+0).</b> ${escapeHtml(check.detail)}`, 'Proficiency only counts for weapons you are proficient with — and then only for whatever your gear and feats add to the proficiency bonus.', '<i>To become proficient: pick a class that has this weapon, tick it under Weapon Proficiencies on the Character Sheet, equip gear that grants it, or take a feat that does.</i>'];
 }
 function scalingOriginText(item, rarity) {
   if (Object.keys(normalizeScaling(item.scaling)).length) return 'These grades are set on the item itself.';
@@ -16915,7 +16917,7 @@ function scalingOriginText(item, rarity) {
 function buildAttackSources(item, rarity, sheet, d) {
   const src = {};
   const name = escapeHtml(item.name);
-  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(d.prof.proficient ? sheet.profBonus + d.prof.boost.total : 0)}`, proficiencySourceLines(sheet, d.prof));
+  src.prof = attackTipBlock(`Proficiency bonus ${fmtMod(d.prof.proficient ? sheet.profBonus : 0)}`, proficiencySourceLines(sheet, d.prof));
   const atkClauses = attackEffectClauses(item, /\+\d+[^.;]*(?:attack|hit)/i);
   src.atk = attackTipBlock(`Weapon attack bonus ${fmtMod(d.atkBonus)}`, [`From <b>${name}</b>:`, ...atkClauses.map(c => '“' + escapeHtml(c) + '”'), atkClauses.length ? '' : 'Part of the weapon’s own stats.']);
   src.dmgDice = attackTipBlock(`Damage dice ${d.dmgRaw}`, [`${name}’s own weapon die${item.dmg && String(item.dmg).replace(/\s+/g, '') !== d.dmgRaw ? ` (the item lists ${escapeHtml(item.dmg)}; any flat bonus is counted under “Weapon damage bonus”)` : ''}.`, 'Doubled on a critical hit.']);
@@ -16972,7 +16974,7 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   // To hit = d20 + proficiency (only if proficient) + the weapon's own "+N to attack". Ability
   // modifiers and scaling never touch the attack roll — they only add to damage.
   const prof = weaponProficiencyFor(item);
-  const profApplied = prof.proficient ? sheet.profBonus + prof.boost.total : 0;
+  const profApplied = prof.proficient ? sheet.profBonus : 0;
   const toHitTotal = d20 + profApplied + atkBonus;
   const dmgResult = dmgMatch ? battleRollDamage(dmgMatch[0].replace(/\s+/g, ''), isCrit) : null;
   const bonusRolls = bonusDiceClauses.map(c => ({ ...c, roll: battleRollDamage(c.dice, isCrit) })).filter(c => c.roll);
@@ -17382,25 +17384,8 @@ function collectWeaponProficiencyGrants() {
   });
   return grants;
 }
-// "+N to your proficiency bonus" on equipped gear or in a selected feat raises the flat +2.
-function collectProficiencyBonusBoost() {
-  buildTokenIndex();
-  const sources = [];
-  const add = (source, text) => { const n = parseProficiencyBonusBoost(text); if (n) sources.push({ source, amount: n }); };
-  Object.keys(SLOT_CATEGORY).forEach(slotId => {
-    const key = playerSlots[slotId];
-    const entry = key && TOKEN_INDEX[key];
-    if (entry) add(entry.item.name, [entry.item.effect, ...(entry.item.mods || []).map(m => m.text)].filter(Boolean).join(' '));
-  });
-  (feats || []).forEach(name => {
-    const def = (typeof FEAT_LIBRARY !== 'undefined' ? FEAT_LIBRARY : []).find(f => f.name === name);
-    if (def) add(def.name + ' (feat)', def.description);
-  });
-  return { total: sources.reduce((n, x) => n + x.amount, 0), sources };
-}
 function weaponProficiencyFor(item) {
-  const check = weaponProficiencyCheck(item, { classText: characterClass, manual: weaponProf, grants: collectWeaponProficiencyGrants() });
-  return { ...check, boost: collectProficiencyBonusBoost() };
+  return weaponProficiencyCheck(item, { classText: characterClass, manual: weaponProf, grants: collectWeaponProficiencyGrants() });
 }
 function toggleWeaponProf(kind, id) {
   const list = weaponProf[kind];
@@ -17424,8 +17409,8 @@ function renderWeaponProficiencies() {
   };
   const cats = ['simple', 'martial'].map(c => row('categories', c, cap(c) + ' weapons', cls.categories.has(c), grants.find(g => g.all || g.categories.includes(c)))).join('');
   const specific = ['simple', 'martial'].map(c => `<div><div class="sheet-prof-group">${cap(c)}</div>${WEAPON_PROFICIENCY_IDS.filter(w => w.category === c).map(w => row('weapons', w.id, w.label, cls.weapons.has(w.id) || cls.categories.has(c), grants.find(g => g.all || g.weapons.includes(w.id) || g.categories.includes(c)))).join('')}</div>`).join('');
-  const unconfigured = !cls.classes.length && !weaponProf.categories.length && !weaponProf.weapons.length;
-  el.innerHTML = `${unconfigured ? '<p class="sheet-note">No class or weapon proficiencies set yet — every weapon currently counts as proficient. Enter a Class above or tick a box to turn the rules on.</p>' : ''}
+  const bonus = (computeCharacterSheet().profBonus) || 0;
+  el.innerHTML = `<p class="sheet-note">Current proficiency bonus: <b>${fmtMod(bonus)}</b>${bonus ? '' : ' — nothing equipped or taken raises it, so proficiency adds nothing yet'}.</p>
     <div class="sheet-feats-list">${cats}</div>
     <details style="margin-top:0.4rem"><summary style="cursor:pointer;color:var(--text-dim)">Specific weapons</summary><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;margin-top:0.4rem">${specific}</div></details>`;
 }

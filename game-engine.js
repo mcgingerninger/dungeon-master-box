@@ -501,10 +501,11 @@ export const SHEET_STAT_ALIASES = {
   'AC': 'Armor Class', 'Speed': 'Movement Speed',
 };
 
-// Proficiency is a flat +2 wherever you have it (a skill/save ticked on the sheet, a weapon you are
-// proficient with) — it no longer climbs with character level. The `level` argument is kept so the
+// There is NO built-in proficiency bonus: not by level, not a flat +2. Ticking a skill/save/weapon
+// proficiency only marks you as proficient; the number added comes entirely from gear or feats that
+// say "+N to your proficiency bonus" (collectProficiencyBoost). The `level` argument is kept so the
 // existing call sites don't change.
-export const PROFICIENCY_BONUS = 2;
+export const PROFICIENCY_BONUS = 0;
 export function proficiencyBonusForLevel(level) {
   return PROFICIENCY_BONUS;
 }
@@ -515,6 +516,24 @@ export function parseProficiencyBonusBoost(text) {
   const t = String(text || '').replace(/<[^>]+>/g, ' ');
   while ((m = re.exec(t)) !== null) total += parseInt(m[1], 10);
   return total;
+}
+// Every "+N to your proficiency bonus" on equipped gear or in an active effect/feat ->
+// { total, sources:[{ source, amount }] }. This is the whole proficiency bonus.
+export function collectProficiencyBoost(slots, resolveItem, activeEffects) {
+  const sources = [];
+  const add = (source, text) => { const n = parseProficiencyBonusBoost(text); if (n) sources.push({ source, amount: n }); };
+  Object.keys(slots || {}).forEach(slotId => {
+    const key = slots[slotId];
+    if (!key || sources.some(s => s.key === key)) return;
+    const entry = resolveItem(key);
+    if (!entry || !entry.item) return;
+    const it = entry.item;
+    const before = sources.length;
+    add(it.name, [it.effect, ...(it.mods || []).map(m => m.text)].filter(Boolean).join(' '));
+    if (sources.length > before) sources[sources.length - 1].key = key; // the same item in two slots counts once
+  });
+  (activeEffects || []).forEach(e => { if (e && e.text) add(e.name || 'Active effect', e.text); });
+  return { total: sources.reduce((n, s) => n + s.amount, 0), sources: sources.map(({ source, amount }) => ({ source, amount })) };
 }
 export function abilityModifier(score) { return Math.floor((score - 10) / 2); }
 export function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
@@ -803,7 +822,8 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
     const modDelta = mod - abilityModifier(base);
     abilities[abbr] = { base, bonus, total, mod, modDelta, sources, status: statusFor(bonus), tooltip: describeStatSources(sources) };
   });
-  const profBonus = proficiencyBonusForLevel(level || 1);
+  const profBoost = collectProficiencyBoost(slots, resolveItem, activeEffects);
+  const profBonus = proficiencyBonusForLevel(level || 1) + profBoost.total;
   const saveFlatSources = breakdown['Saving Throws'] || [];
   const saveFlatTotal = sumBreakdown(saveFlatSources);
   const saves = {};
@@ -857,7 +877,7 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   const speedBonus = sumBreakdown(speedSources);
   const speedBase = baseSpeed != null ? baseSpeed : 30;
   const speed = { base: speedBase, bonus: speedBonus, total: speedBase + speedBonus, sources: speedSources, status: statusFor(speedBonus), tooltip: describeStatSources(speedSources) };
-  return { abilities, profBonus, saves, skills, ac, maxHp, speed };
+  return { abilities, profBonus, profBoost, saves, skills, ac, maxHp, speed };
 }
 
 // ===================== BATTLE =====================
@@ -1551,9 +1571,9 @@ export function computeSpellFocusBonus(focus, mods) {
 // A weapon attack only adds the proficiency bonus if the character is PROFICIENT with that weapon.
 // Proficiency comes from four places: the class (5e class tables, matched from the free-text Class
 // field), what the player ticks on the Character Sheet, equipped gear/feats whose text grants it
-// ("Proficiency with longbows and shortbows"), or the weapon itself. A character with no
-// recognizable class and nothing ticked is treated as proficient with everything, so a sheet nobody
-// has filled in yet behaves as it did before this system existed.
+// ("Proficiency with longbows and shortbows"), or the weapon itself. Being proficient only matters
+// numerically if something raises the proficiency bonus (collectProficiencyBoost) — there is no
+// built-in +2 — and an unset sheet is proficient with nothing.
 const SIMPLE = 'simple', MARTIAL = 'martial';
 // [name regex (lowercase), id, label, category] — first match wins, so specific names come before
 // generic ones ("greatclub" before "club", "battleaxe" before "axe").
@@ -1683,7 +1703,5 @@ export function weaponProficiencyCheck(item, ctx = {}) {
   }
   const g = grants.find(x => x.all || (x.categories || []).includes(info.category) || (x.weapons || []).includes(info.id));
   if (g) return { ...base, proficient: true, via: 'gear', source: g.source, detail: `${g.source} grants proficiency with ${g.all ? 'all weapons' : (g.categories || []).includes(info.category) ? info.category + ' weapons' : info.label.toLowerCase() + 's'}.` };
-  const unconfigured = !cls.classes.length && !(manual.categories || []).length && !(manual.weapons || []).length;
-  if (unconfigured) return { ...base, proficient: true, via: 'unconfigured', detail: 'No class or weapon proficiencies are set on the Character Sheet yet, so every weapon is assumed proficient.' };
   return { ...base, proficient: false, via: 'none', detail: `Not proficient with ${info.label.toLowerCase()}s (${info.category}).` };
 }

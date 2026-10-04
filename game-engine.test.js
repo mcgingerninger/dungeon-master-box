@@ -90,10 +90,17 @@ describe('computeCharacterSheetFor', () => {
     assert.equal(sheet.abilities.dex.total, 17); // 16 base + 1 from armor
     assert.equal(sheet.abilities.dex.mod, 3);     // floor((17-10)/2)
   });
-  test('proficiency bonus is a flat +2 regardless of level', () => {
-    assert.equal(sheet.profBonus, 2); // level 5, but proficiency no longer scales with level
-    assert.equal(GE.proficiencyBonusForLevel(1), 2);
-    assert.equal(GE.proficiencyBonusForLevel(20), 2);
+  test('there is no built-in proficiency bonus — not by level, not flat', () => {
+    assert.equal(sheet.profBonus, 0); // level 5, nothing equipped that raises it
+    assert.equal(GE.proficiencyBonusForLevel(1), 0);
+    assert.equal(GE.proficiencyBonusForLevel(20), 0);
+  });
+  test('the proficiency bonus is only what gear and feats say they add', () => {
+    const items = { ring: { item: { name: 'Ring of the Duelist', effect: '+1 to your proficiency bonus. Requires attunement.' } }, dup: null };
+    const boost = GE.collectProficiencyBoost({ ring1: 'ring', ring2: 'ring', neck: 'dup' }, k => items[k], [{ name: 'Prodigy (feat)', text: '+2 proficiency bonus.' }]);
+    assert.equal(boost.total, 3);                       // the same ring in two slots counts once
+    assert.deepEqual(boost.sources.map(s => s.source), ['Ring of the Duelist', 'Prodigy (feat)']);
+    assert.equal(GE.collectProficiencyBoost({}, () => null, []).total, 0);
   });
   test('"+N to your proficiency bonus" text is read from gear and feats', () => {
     assert.equal(GE.parseProficiencyBonusBoost('You gain a +1 bonus to your proficiency bonus with weapons.'), 0); // wording must match
@@ -102,10 +109,10 @@ describe('computeCharacterSheetFor', () => {
     assert.equal(GE.parseProficiencyBonusBoost('Proficiency with longbows.'), 0);
   });
   test('save total = mod + prof (if proficient) + flat bonus sources', () => {
-    assert.equal(sheet.saves.dex.total, sheet.abilities.dex.mod + 2 + 1);
+    assert.equal(sheet.saves.dex.total, sheet.abilities.dex.mod + 0 + 1); // proficient, but proficiency adds nothing by itself
   });
   test('skill total = ability mod + prof (if proficient) + direct sources', () => {
-    assert.equal(sheet.skills['Stealth'].total, sheet.abilities.dex.mod + 2);
+    assert.equal(sheet.skills['Stealth'].total, sheet.abilities.dex.mod + 0);
   });
   test('AC = armor base + dex mod, no double-counting the gear dex bonus', () => {
     assert.equal(sheet.ac.total, 13 + sheet.abilities.dex.mod);
@@ -813,10 +820,9 @@ describe('weapon proficiency', () => {
     assert.equal(bow.proficient, true);
   });
 
-  test('a sheet nobody has configured keeps the old behavior (proficient with everything)', () => {
+  test('an unset sheet is proficient with nothing (natural weapons aside)', () => {
     const r = GE.weaponProficiencyCheck({ name: 'Greataxe', type: 'weapon' }, { classText: '' });
-    assert.deepEqual([r.proficient, r.via], [true, 'unconfigured']);
-    // ...but ticking anything (or having a class) turns the rules on
+    assert.deepEqual([r.proficient, r.via], [false, 'none']);
     assert.equal(GE.weaponProficiencyCheck({ name: 'Greataxe', type: 'weapon' }, { classText: '', manual: { weapons: ['dagger'] } }).proficient, false);
     assert.equal(GE.weaponProficiencyCheck({ name: 'Wyvern Claw', type: 'weapon' }, { classText: 'Wizard' }).via, 'natural');
   });
