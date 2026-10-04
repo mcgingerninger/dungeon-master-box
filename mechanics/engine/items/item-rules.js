@@ -210,6 +210,8 @@ export function scoreItem(item, cfg = DEFAULT_ITEM_RULES) {
       if (mod.type === 'Power/Spell' && !parts.some(c => c.kind === 'spell')) parts = [...parts, { kind: 'spell', label: 'spell', weight: cfg.weights.kinds.spellGrant }];
       parts.forEach(c => comps.push({ ...c, mod: mod.type || '' }));
     });
+    // a mangled item keeps its original effect text in `baseEffect` (the infusion is one of the mods)
+    if (item.baseEffect) scoreText(item.baseEffect, cfg).components.forEach(c => comps.push(c));
   } else if (item) {
     scoreText(item.effect || '', cfg).components.forEach(c => comps.push(c));
   }

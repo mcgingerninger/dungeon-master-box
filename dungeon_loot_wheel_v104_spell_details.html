@@ -12245,9 +12245,23 @@ let fleshSelectedIndex = null;
 
 function fleshGenerateCandidate() {
   const limbDef = ri(FLESH_LIMB_DEFS);
-  const { mods, tiers } = fleshGenerateEffects();
-  const rarity = fleshRarityFromTiers(tiers);
-  const gp = fleshAttachCost(rarity, mods.length);
+  // Same Item Rules as every other source: re-roll the effects until the limb obeys them (no
+  // attack-roll modifiers, at least one real benefit, modifier cap, ...), then let its total
+  // modifier weight decide its rarity and its gp price.
+  const cfg = getItemRules(), IR = window.ItemRules;
+  let rolled = null, scored = null;
+  for (let t = 0; t < ITEM_RULE_ATTEMPTS; t++) {
+    const r = fleshGenerateEffects();
+    if (!cfg || !IR) { rolled = r; break; }
+    const sc = IR.scoreItem({ type: 'limb', mods: r.mods }, cfg);
+    const want = IR.rarityForWeight(sc.total, cfg);
+    const bad = IR.evaluateItem({ type: 'limb', mods: r.mods }, cfg, { rarity: want, score: sc, exempt: true }).filter(v => v.severity === 'error');
+    if (!rolled || bad.length === 0) { rolled = r; scored = sc; }
+    if (!bad.length) break;
+  }
+  const { mods, tiers } = rolled;
+  const rarity = scored ? IR.rarityForWeight(scored.total, cfg) : fleshRarityFromTiers(tiers);
+  const gp = scored ? IR.priceForWeight(scored.total, rarity, cfg) : fleshAttachCost(rarity, mods.length);
   const name = fleshBuildName(limbDef.name, rarity, mods);
   const desc = `A freshly harvested ${limbDef.name.toLowerCase()}, cleaned and preserved, ready for grafting.`;
   return { limbDef, mods, rarity, gp, name, desc };
@@ -12461,7 +12475,7 @@ const FLESH_GRAFT_EFFECT_POOL = {
     { id:'crushinggrip', label:'Crushing Grip', text:m => `+${m} to grapple and shove checks.` },
   ],
   hand: [
-    { id:'nimblegrip', label:'Nimble Grip', text:m => `+${m} to Sleight of Hand checks and Dexterity-based weapon attack rolls.` },
+    { id:'nimblegrip', label:'Nimble Grip', text:m => `+${m} to Sleight of Hand checks and Dexterity-based weapon damage rolls.` },
     { id:'ironclaw', label:'Iron Claw', text:m => `+${m * 2} damage on unarmed strikes.` },
     { id:'lockbreaker', label:'Lockbreaker', text:m => `+${m} to checks made to pick locks or disarm traps.` },
     // The one grafted effect in this pool that also grants a real castable ability, not just a
@@ -12493,7 +12507,7 @@ const FLESH_GRAFT_EFFECT_POOL = {
   ],
   finger: [
     { id:'gracefultouch', label:'Graceful Touch', text:m => `+${m} to Sleight of Hand checks.` },
-    { id:'spellconduit', label:'Spell Conduit', text:m => `+${m} to spell attack rolls.` },
+    { id:'spellconduit', label:'Spell Conduit', text:m => `+${m} to spell damage rolls.` },
     { id:'deftpick', label:'Deft Pick', text:m => `+${m} to checks made to pick locks or pick pockets.` },
   ],
   heart: [
@@ -13245,7 +13259,7 @@ const MERCHANTS = {
     staples: [
       { name:'Scroll of Magic Missile', desc:'A one-use scroll, ink still faintly glowing.', gp:'60 gp', effect:'Casts Magic Missile once.', icon:'scroll', type:'consumable', charges:'1 use', stock:12 },
       { name:'Scroll of Shield', desc:'Smells of ash and static.', gp:'80 gp', effect:'Casts Shield once.', icon:'scroll', type:'consumable', charges:'1 use', stock:12 },
-      { name:"Apprentice's Staff", desc:'A plain ashwood staff, worn smooth by practice.', gp:'100 gp', effect:'+1 to spell attack rolls while wielded.', icon:'staff', type:'weapon', dmg:'1d6', stock:4 },
+      { name:"Apprentice's Staff", desc:'A plain ashwood staff, worn smooth by practice.', gp:'100 gp', effect:'+1 to spell damage rolls while wielded.', icon:'staff', type:'weapon', dmg:'1d6', stock:4 },
       { name:"Traveler's Robe", desc:'Sturdy, unremarkable, faintly warm.', gp:'35 gp', effect:'Light, unassuming spellcasting garb.', icon:'robe', type:'armor', ac:'11', stock:6 },
       { name:'Component Pouch', desc:'A worn leather pouch, always stocked.', gp:'25 gp', effect:'Holds material components for spellcasting.', icon:'gem', type:'misc', stock:10 },
     ],
@@ -24669,7 +24683,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'watchful', label:'Watchful', appliesTo:['weapon','armor'], utilityText:m => `Advantage on Perception checks (+${m} when contested).` },
     { id:'nightsight', label:'Night Sight', appliesTo:['weapon','armor'], utilityText:() => `Grants Darkvision 60 ft. (or +60 ft. if you already have it).` },
     { id:'truesight', label:'Preternatural Sight', appliesTo:['weapon','armor'], utilityText:() => `See through illusions and invisibility within 30 ft., so long as you have line of sight.` },
-    { id:'huntersfocus', label:"Hunter's Focus", appliesTo:['weapon'], utilityText:() => `Advantage on your first attack roll each combat against a creature you can see.` },
+    { id:'huntersfocus', label:"Hunter's Focus", appliesTo:['weapon'], utilityText:() => `Your first hit each combat against a creature you can see deals an extra 1d6 damage.` },
     { id:'analyticaleye', label:'Analytical Eye', appliesTo:['weapon','armor'], intAdd:true, text:m => `+${m} Intelligence — it studies wounds and openings with unsettling precision.` },
   ],
   fang: [
@@ -24723,7 +24737,7 @@ const MONSTER_PART_EFFECT_POOL = {
   venomsac: [
     { id:'poisoncoat', label:'Poison Coating', appliesTo:['weapon'], dmgAdd:true, dmgType:'poison', text:d => `+${d} poison damage on hit; target must save or be Poisoned for 1 minute.` },
     { id:'toxicresist', label:'Toxin-Hardened', appliesTo:['weapon','armor'], utilityText:() => `Resistance to poison damage; advantage on saves vs. poison.` },
-    { id:'numbing', label:'Numbing Venom', appliesTo:['weapon'], utilityText:() => `On a critical hit, the target has disadvantage on its next attack roll.` },
+    { id:'numbing', label:'Numbing Venom', appliesTo:['weapon'], utilityText:() => `On a critical hit, the target has disadvantage on its next saving throw.` },
     { id:'paralytic', label:'Paralytic Venom', appliesTo:['weapon'], utilityText:() => `On a critical hit, the target must succeed on a Constitution save or be Paralyzed until the end of its next turn.` },
     { id:'weakening', label:'Weakening Toxin', appliesTo:['weapon'], utilityText:() => `On a hit, the target has disadvantage on Strength checks and Strength saving throws for 1 minute.` },
     { id:'venomsense', label:'Venom Sense', appliesTo:['weapon','armor'], wisAdd:true, text:m => `+${m} Wisdom — you've learned to notice what's about to hurt you.` },
@@ -24867,6 +24881,7 @@ function applyMonsterPartToItem(item, part, partRarity) {
   }
   if (!item.mods) item.mods = [];
   item.mods.push({ type: template.label, text: `${template.label}: ${mechText} (worked in from ${part.name})` });
+  if (item.baseEffect === undefined) item.baseEffect = item.effect || '';
   item.effect = (item.effect ? item.effect + ' ' : '') + `Infused with ${part.name}: ${mechText}`;
   const partLabel = (MONSTER_PART_TYPE_LABEL[part.anatomicalId] || 'monstrous part').toLowerCase();
   item.desc = (item.desc || '') + ` Bears a trace of ${part.sourceMonster || 'something monstrous'} — a ${partLabel} worked into its make.`;
@@ -24995,6 +25010,20 @@ function combineMonsterPart() {
   const result = JSON.parse(JSON.stringify(itemEntry.item));
   if (!result.rarity) result.rarity = itemEntry.rarity;
   applyMonsterPartToItem(result, part, partEntry.rarity);
+  // Item Rules apply here too: the worked-in effect must not break a rule (modifier cap for the
+  // item's rarity, duplicate stat boosts, ...). Nothing is consumed if it would. If the added
+  // weight pushes the item into a higher rarity band, the item is re-rated up and re-priced.
+  const rulesCfg = getItemRules(), IR = window.ItemRules;
+  if (rulesCfg && IR) {
+    const sc = IR.scoreItem(result, rulesCfg);
+    const bad = IR.evaluateItem(result, rulesCfg, { rarity: result.rarity, score: sc, exempt: true }).filter(v => v.severity === 'error');
+    if (bad.length) { flashManglerMessage(`The workbench refuses: ${bad.map(v => v.message).join('; ')}.`, true); return; }
+    const earned = IR.rarityForWeight(sc.total, rulesCfg);
+    if (IR.RARITY_ORDER.indexOf(earned) > IR.RARITY_ORDER.indexOf(result.rarity)) {
+      result.rarity = earned;
+      result.gp = formatGpAmount(IR.priceForWeight(sc.total, earned, rulesCfg));
+    }
+  }
   removeTokenEverywhere(manglerPartKey);
   // A shared catalog template isn't "used up" — only a real owned instance (equipped, in
   // inventory, or sitting in the Token Library) is consumed by the combine.
@@ -25180,6 +25209,9 @@ function refreshSavedItemsFromCatalog() {
       before[k] = cur; after[k] = next;
       if (next === undefined) delete item[k]; else item[k] = JSON.parse(JSON.stringify(next));
     });
+    // The catalog re-tiers an item when its modifier weight earns a different rarity (Item Rules) —
+    // a saved copy follows its catalog twin so it is not left in the old tier.
+    if (item.rarity !== twin.tier) { before.rarity = item.rarity; after.rarity = twin.tier; item.rarity = twin.tier; }
     const fresh = CANONICAL_BY_LEGACY_KEY.get('loot:' + (item.rarity || twin.tier) + ':' + item.name);
     let canonChanged = false;
     if (fresh && JSON.stringify(item.__canonical) !== JSON.stringify(fresh)) { item.__canonical = fresh; canonChanged = true; }

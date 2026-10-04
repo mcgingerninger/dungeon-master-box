@@ -851,7 +851,8 @@ describe('generated-item effects reach the character sheet', () => {
     assert.doesNotMatch(t, /Fly/);
   });
   test('a catalog item keeps using its own effect text', () => {
-    assert.equal(GE.itemMechanicsText({ effect: '+1 AC', mods: [{ type: 'Affix', text: '+9 Strength' }] }), '+1 AC');
+    assert.equal(GE.itemMechanicsText({ effect: '+1 AC', mods: [{ type: 'Power/Spell', text: 'cast Fly, +9 Strength' }] }), '+1 AC');
+    assert.equal(GE.itemMechanicsText({ effect: 'Infused with a Talon: x', mods: [{ type: 'Affix', text: '+2 Wisdom.' }] }), 'Infused with a Talon: x +2 Wisdom.');
   });
   test('equipping it changes the sheet: abilities, AC, skills and other stats', () => {
     const sheet = GE.computeCharacterSheetFor({ str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, 1, [], [], { charm1: 'k' }, () => ({ item: gen, rarity: 'rare' }), 10, 30, []);

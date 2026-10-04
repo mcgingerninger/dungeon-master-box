@@ -733,8 +733,8 @@ export function passiveModText(mod) {
 }
 export function itemMechanicsText(item) {
   if (!item) return '';
-  if (item.effect) return item.effect;
-  return Array.isArray(item.mods) ? item.mods.map(passiveModText).filter(Boolean).join(' ') : '';
+  const passive = Array.isArray(item.mods) ? item.mods.map(passiveModText).filter(Boolean).join(' ') : '';
+  return [item.effect, passive].filter(Boolean).join(' ');
 }
 export function collectEquippedStatBreakdown(slots, resolveItem) {
   const breakdown = {};

@@ -17,7 +17,8 @@ export function abilityModifier(score) {
   return Math.floor((score - 10) / 2);
 }
 
-// Flat +2 wherever proficiency applies — no longer scales with level (see game-engine.js's copy).
+// There is no built-in proficiency bonus at all: it comes only from gear or feats that say
+// "+N to your proficiency bonus" (see game-engine.js's copy, collectProficiencyBoost).
 export function proficiencyBonusForLevel(level) {
-  return 2;
+  return 0;
 }

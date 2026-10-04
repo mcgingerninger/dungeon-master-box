@@ -89,16 +89,16 @@ Base list = name + damage die only (no damage type, weapon properties or weight 
 
 | Affix | Rarity range | Effect | Touches |
 |---|---|---|---|
-| Rusty | common – uncommon | -1 to attack rolls — the corroded edge bites unevenly. | **ATTACK** |
+| Rusty | common – uncommon | -1 to damage rolls — the corroded edge bites unevenly. | damage |
 | Steel | common – rare | +1 to damage rolls — a properly tempered edge. | damage |
-| Silvered | uncommon+ | +1 to attack rolls against shapechangers and undead specifically. | **ATTACK** |
+| Silvered | uncommon+ | +1 to damage rolls against shapechangers and undead specifically. | damage |
 | Mithral | rare+ | Considerably lighter than it looks — never imposes a heavy-weapon penalty. | utility |
 | Adamantine | rare+ | Critical hits with this weapon automatically maximize their damage dice. | damage |
 | Dragonbone | superrare+ | +2 to damage rolls, and once per turn deals an extra 2d4 damage of a damage type matching a dragon's breath (wielder's choice). | damage |
-| Voidsteel | superrare+ | +2 to attack and damage rolls; on a critical hit, the target has disadvantage on its next saving throw. | **ATTACK**, damage |
-| Sharp | common+ | +2 to attack rolls. | **ATTACK** |
-| Heavy | common+ | +3 to damage rolls, but -1 to attack rolls. | **ATTACK**, damage |
-| Balanced | common+ | +1 to attack rolls and +1 to damage rolls. | **ATTACK**, damage |
+| Voidsteel | superrare+ | +2 to damage rolls; on a critical hit, the target has disadvantage on its next saving throw. | damage |
+| Sharp | common+ | +2 to damage rolls. | damage |
+| Heavy | common+ | +3 to damage rolls, but -1 Dexterity — the weight throws off your footing. | damage |
+| Balanced | common+ | +2 to damage rolls — perfectly weighted for the wielder. | damage |
 | Flaming | uncommon+ | +2d4 fire damage on a hit. | damage |
 | Frost | uncommon+ | +2d4 cold damage on a hit, and the target's speed is reduced by 10 ft. until the end of its next turn. | damage |
 | Shocking | uncommon+ | +2d4 lightning damage on a hit. | damage |
@@ -139,26 +139,26 @@ Base list = name + damage die only (no damage type, weapon properties or weight 
 
 ### Affixes that change attack rolls
 
-Rusty (weapon), Silvered (weapon), Adamantine (armor), Voidsteel (weapon), Ancient (weapon/armor), Sharp (weapon), Heavy (weapon), Balanced (weapon).
+None any more — the Item Rules forbid attack-roll modifiers (see ITEM_RULES.md). Rusty, Silvered, Voidsteel, Sharp, Heavy and Balanced were converted to damage-only. Ancient (a once-per-rest reroll) is the only affix that still mentions an attack roll.
 
 ## Monster-part effects that can land on a weapon or armor
 
-85 effects across the part families; those touching attack rolls:
+85 effects across the part families; the former attack-roll effects, now damage-only:
 
 | Part | Effect | Applies to | Text (magnitude 2) |
 |---|---|---|---|
-| eye | Keen Eye | weapon | +2 to attack rolls — it sees the opening before you do. |
-| eye | Hunter's Focus | weapon | Advantage on your first attack roll each combat against a creature you can see. |
-| claw | Quick Strike | weapon | +2 to attack rolls. |
-| horn | Charging Point | weapon | +2 to attack rolls when you moved 10+ ft. before the attack. |
-| venomsac | Numbing Venom | weapon | On a critical hit, the target has disadvantage on its next attack roll. |
-| heart | Furious Heart | weapon | +2 to attack rolls once you're below half HP. |
-| talon | Talon Strike | weapon | +2 to attack rolls. |
-| talon | Diving Strike | weapon | +2 to attack rolls if you moved at least 10 ft. straight toward the target this turn. |
+| eye | Keen Eye | weapon | +2 to damage rolls — it sees the opening before you do. |
+| eye | Hunter's Focus | weapon | Your first hit each combat against a creature you can see deals an extra 1d6 damage. |
+| claw | Quick Strike | weapon | +2 to damage rolls. |
+| horn | Charging Point | weapon | +2 to damage rolls when you moved 10+ ft. before the attack. |
+| venomsac | Numbing Venom | weapon | On a critical hit, the target has disadvantage on its next saving throw. |
+| heart | Furious Heart | weapon | +2 to damage rolls once you're below half HP. |
+| talon | Talon Strike | weapon | +2 to damage rolls. |
+| talon | Diving Strike | weapon | +2 to damage rolls if you moved at least 10 ft. straight toward the target this turn. |
 
 ## Observations
 
-- **Attack-roll modifiers are everywhere.** Besides the affixes above, 359 catalog weapons say “+N to attack (and damage) rolls”, and Masterwork is a pure +1-to-attack material. If modifiers should only affect damage, these are what would need converting.
+- **Attack-roll modifiers are gone.** The catalog's 375 "+N to attack (and damage)" weapons, Masterwork, the affixes and the monster-part effects above were all converted to damage-only by the Item Rules (docs/ITEM_RULES.md).
 - **Base weapon data is thin.** `WEAPON_BASE_TYPES` has no damage type, properties (finesse, two-handed, reach, thrown, ammunition) or weight; those exist only on migrated catalog items.
 - **Scaling and proficiency are derived, not stored.** Both come from the weapon's name (`weaponScalingKind` / `weaponProficiencyInfo`), so a renamed or unusual weapon falls back to a generic kind or martial.
 - **Armor modifiers are mostly AC/stat/utility** (Sturdy, Warded, Padded, Silent, Reflective, Grounded, Mithral, Adamantine); only Ancient and a few part effects touch attack rolls.
