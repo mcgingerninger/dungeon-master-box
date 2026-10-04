@@ -541,13 +541,29 @@ export function collectProficiencyBoost(slots, resolveItem, activeEffects) {
 export function abilityModifier(score) { return Math.floor((score - 10) / 2); }
 export function fmtMod(n) { return (n >= 0 ? '+' : '') + n; }
 
+// Item stats that have no dedicated sheet field but are still real, numeric, equippable bonuses.
+// They are collected into computeCharacterSheetFor(...).otherStats and shown on the sheet under
+// "Other bonuses" (Initiative and Spell Save DC also feed the init banner and spell save DCs;
+// Damage Dealt feeds weapon damage — see the monolith).
+export const OTHER_SHEET_STATS = [
+  'Initiative', 'Spell Save DC', 'Damage Dealt', 'Critical Hit Range', 'Spell Slot Level', 'Healing Received', 'Death Saving Throws',
+  'Darkvision Range (feet)', 'Tremorsense Range (feet)', 'Telepathy Range (feet)',
+  'Fly Speed (feet)', 'Swim Speed (feet)', 'Burrow Speed (feet)', 'Carrying Capacity (lbs)',
+];
+// Names the generators can roll that have no sheet field of their own (the invented skills like
+// "Trap Expertise") are registered here once at startup so a "+N Trap Expertise" bonus is collected
+// into otherStats instead of silently ignored.
+export function registerCustomSheetStats(names) {
+  (names || []).forEach(n => { if (n && !OTHER_SHEET_STATS.includes(n) && !(n in SKILL_ABILITY_MAP) && !Object.values(ABILITY_NAMES).includes(n)) OTHER_SHEET_STATS.push(n); });
+  _sheetStatVocabRegex = null;
+}
 let _sheetStatVocabRegex = null;
 export function extractStatDeltasFromText(text) {
   if (!text) return [];
   if (!_sheetStatVocabRegex) {
-    const names = new Set([...Object.values(ABILITY_NAMES), 'Maximum Hit Points', 'Saving Throws', 'Armor Class', 'Movement Speed', ...Object.keys(SKILL_ABILITY_MAP), ...Object.keys(SHEET_STAT_ALIASES)]);
+    const names = new Set([...Object.values(ABILITY_NAMES), 'Maximum Hit Points', 'Saving Throws', 'Armor Class', 'Movement Speed', ...Object.keys(SKILL_ABILITY_MAP), ...Object.keys(SHEET_STAT_ALIASES), ...OTHER_SHEET_STATS]);
     const alt = [...names].sort((a, b) => b.length - a.length).map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-    _sheetStatVocabRegex = new RegExp(`([+-]\\d+)\\s+(${alt})\\b`, 'g');
+    _sheetStatVocabRegex = new RegExp(`([+-]\\d+)\\s+(${alt})(?![A-Za-z0-9])`, 'g');
   }
   const plain = String(text).replace(/<[^>]+>/g, ' ');
   const out = [];
@@ -698,6 +714,28 @@ export function canonicalConsumableHealDice(canonicalItem) {
   return healEffect ? healEffect.healDice : null;
 }
 
+// The always-on (passive) text of an item, which is what the sheet reads. A hand-authored catalog
+// item carries it in `.effect`. A generated item (Store, Generate Item, wheel modifiers) has no
+// `.effect` — its effects live in `mods` — so the passive mods (affixes, traits, self-curses,
+// skill aptitudes) are turned into stat-parseable clauses here. Activated mods (a buff you trigger
+// "1x per day", a spell, a summon) are NOT passive and are left to the ability bar.
+export function passiveModText(mod) {
+  if (!mod || !mod.text) return '';
+  const plain = String(mod.text).replace(/<[^>]+>/g, ' ');
+  if (mod.type === 'Affix' || mod.type === 'Trait') return plain;
+  if (mod.type === 'Debuff' && /^\s*While attuned/i.test(plain)) return plain;
+  if (mod.type === 'Skill') {
+    const skill = String(mod.key || '').replace(/^skill:/, '');
+    const n = (plain.match(/\+(\d+)/) || [])[1];
+    return skill && n ? `+${n} ${skill}.` : '';
+  }
+  return '';
+}
+export function itemMechanicsText(item) {
+  if (!item) return '';
+  if (item.effect) return item.effect;
+  return Array.isArray(item.mods) ? item.mods.map(passiveModText).filter(Boolean).join(' ') : '';
+}
 export function collectEquippedStatBreakdown(slots, resolveItem) {
   const breakdown = {};
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
@@ -705,7 +743,7 @@ export function collectEquippedStatBreakdown(slots, resolveItem) {
     if (!entry) return;
     const deltas = entry.item.__canonical
       ? canonicalPassiveDeltas(entry.item.__canonical)
-      : extractStatDeltasFromText(entry.item.effect);
+      : extractStatDeltasFromText(itemMechanicsText(entry.item));
     deltas.forEach(({ stat, amount }) => {
       (breakdown[stat] = breakdown[stat] || []).push({ itemName: entry.item.name, amount });
     });
@@ -737,7 +775,7 @@ export function collectStatSetOverrides(slots, resolveItem, activeEffects) {
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
     const entry = resolveItem(key);
     if (!entry) return;
-    extractStatSetValuesFromText(entry.item.effect).forEach(({ stat, value }) => {
+    extractStatSetValuesFromText(itemMechanicsText(entry.item)).forEach(({ stat, value }) => {
       (overrides[stat] = overrides[stat] || []).push({ itemName: entry.item.name, value });
     });
   });
@@ -880,7 +918,13 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   const speedBonus = sumBreakdown(speedSources);
   const speedBase = baseSpeed != null ? baseSpeed : 30;
   const speed = { base: speedBase, bonus: speedBonus, total: speedBase + speedBonus, sources: speedSources, status: statusFor(speedBonus), tooltip: describeStatSources(speedSources) };
-  return { abilities, profBonus, profBoost, saves, skills, ac, maxHp, speed };
+  const otherStats = {};
+  OTHER_SHEET_STATS.forEach(name => {
+    const sources = breakdown[name] || [];
+    const total = sumBreakdown(sources);
+    otherStats[name] = { total, sources, status: statusFor(total), tooltip: describeStatSources(sources) };
+  });
+  return { abilities, profBonus, profBoost, saves, skills, ac, maxHp, speed, otherStats };
 }
 
 // ===================== BATTLE =====================

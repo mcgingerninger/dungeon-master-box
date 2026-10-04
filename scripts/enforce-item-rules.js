@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { DEFAULT_ITEM_RULES } from '../mechanics/data/item-rules-default.js';
-import { mergeItemRules, scoreItem, evaluateItem, rarityForWeight, priceForWeight, parseGp, ruleOf, RARITY_ORDER } from '../mechanics/engine/items/item-rules.js';
+import { mergeItemRules, scoreItem, evaluateItem, rarityForWeight, priceForWeight, parseGp, ruleOf, RARITY_ORDER, isValueExempt } from '../mechanics/engine/items/item-rules.js';
 
 const root = path.join(import.meta.dirname, '..');
 const cfg = mergeItemRules(null);
@@ -43,7 +43,7 @@ const EFFECT_FIELD = /(\beffect"?\s*:\s*)"((?:[^"\\]|\\.)*)"/;
 const NAME_FIELD = /^\s*\{\s*"?name"?\s*:\s*"((?:[^"\\]|\\.)*)"/;
 const GP_FIELD = /(\bgp"?\s*:\s*)"[^"]*"/;
 const isItemLine = l => NAME_FIELD.test(l);
-const isSpecial = i => !!i.chestRarity || /open to find a haul/i.test(i.effect || '') || i.type === 'questitem' || i.type === 'document' || i.gp === 'Unknown';
+const isSpecial = isValueExempt;
 
 function load(file) { return fs.readFileSync(path.join(root, file), 'utf8'); }
 

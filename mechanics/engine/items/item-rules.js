@@ -260,6 +260,15 @@ export function parseGp(str) {
 }
 
 // ---------- rules ----------
+// Items whose rarity/price is authored on purpose, not earned from modifier weight: treasure chests,
+// quest items, documents, unpriced ("Unknown") unique pieces, and raw monster-part crafting
+// materials (they carry no modifier of their own — the effect is applied when the Monster Mangler
+// works one into gear, and that finished item is scored like any other).
+export function isValueExempt(i) {
+  return !!i.chestRarity || /open to find a haul/i.test(i.effect || '') || i.type === 'questitem' || i.type === 'document'
+    || i.gp === 'Unknown' || (i.type === 'craftable' && i.subcategory === 'monsterpart');
+}
+
 // opts: { rarity, exempt:Set<ruleId> | true, score } — `exempt: true` skips rarity/price rules for
 // items whose rarity/price is authored on purpose (chests, quest items, unique campaign pieces).
 export function evaluateItem(item, cfg = DEFAULT_ITEM_RULES, opts = {}) {

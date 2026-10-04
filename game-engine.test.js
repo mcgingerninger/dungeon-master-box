@@ -830,3 +830,40 @@ describe('weapon proficiency', () => {
     assert.equal(GE.weaponProficiencyCheck({ name: 'Wyvern Claw', type: 'weapon' }, { classText: 'Wizard' }).via, 'natural');
   });
 });
+
+describe('generated-item effects reach the character sheet', () => {
+  const gen = {
+    name: 'Wise Handaxe of Storm', rarity: 'rare', type: 'weapon',
+    mods: [
+      { type: 'Affix', key: 'affix:Wise', text: '+2 Wisdom.' },
+      { type: 'Trait', key: 'trait:Bloody', text: '<strong>Bloody</strong>: +2 Strength, -1 Armor Class' },
+      { type: 'Debuff', key: 'debuff:Initiative', text: 'While attuned, the bearer suffers <strong>-1 Initiative</strong>.' },
+      { type: 'Skill', key: 'skill:Stealth', text: 'Grants exceptional aptitude in <strong>Stealth</strong>, providing a <strong>+3</strong> bonus to related checks.' },
+      { type: 'Buff', key: 'buff:Charisma', text: 'Grants <strong>+3 Charisma</strong> to <strong>the bearer</strong> for <strong>1 hour</strong> (<strong>1× per day</strong>).' },
+      { type: 'Power/Spell', key: 'power:Fly', text: 'Grants the ability to cast <strong>Fly</strong> (<strong>1× per day</strong>).' },
+    ],
+  };
+  test('only passive mods become sheet text; activated ones stay on the ability bar', () => {
+    const t = GE.itemMechanicsText(gen);
+    assert.match(t, /\+2 Wisdom/);
+    assert.match(t, /\+3 Stealth/);
+    assert.doesNotMatch(t, /Charisma/);
+    assert.doesNotMatch(t, /Fly/);
+  });
+  test('a catalog item keeps using its own effect text', () => {
+    assert.equal(GE.itemMechanicsText({ effect: '+1 AC', mods: [{ type: 'Affix', text: '+9 Strength' }] }), '+1 AC');
+  });
+  test('equipping it changes the sheet: abilities, AC, skills and other stats', () => {
+    const sheet = GE.computeCharacterSheetFor({ str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, 1, [], [], { charm1: 'k' }, () => ({ item: gen, rarity: 'rare' }), 10, 30, []);
+    assert.equal(sheet.abilities.wis.bonus, 2);
+    assert.equal(sheet.abilities.str.bonus, 2);
+    assert.equal(sheet.abilities.cha.bonus, 0);
+    assert.equal(sheet.ac.total, 10 - 1);
+    assert.equal(sheet.skills.Stealth.total, 0 + 3);
+    assert.equal(sheet.otherStats.Initiative.total, -1);
+  });
+  test('extra stats parse, including ones whose name ends in a parenthesis', () => {
+    const d = GE.extractStatDeltasFromText('+2 Initiative. +1 Spell Save DC. +30 Fly Speed (feet). +50 Carrying Capacity (lbs).');
+    assert.deepEqual(d.map(x => x.stat), ['Initiative', 'Spell Save DC', 'Fly Speed (feet)', 'Carrying Capacity (lbs)']);
+  });
+});

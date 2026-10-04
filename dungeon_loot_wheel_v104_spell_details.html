@@ -1491,6 +1491,21 @@
   .interactions-ref-cat { color:var(--gold); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; font-family:'Share Tech Mono',monospace; }
   .interactions-ref-chips, .interactions-item-chips { display:flex; flex-wrap:wrap; gap:0.3rem; }
   .interactions-results { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.6rem; }
+  /* Item Rules panel */
+  .ir-card { background:var(--surface); border:1px solid var(--border); padding:0.6rem 0.8rem; margin-bottom:0.5rem; }
+  .ir-card.off { opacity:0.55; }
+  .ir-head { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
+  .ir-head strong { color:var(--gold); }
+  .ir-desc { color:var(--text-dim); font-size:0.82rem; margin:0.2rem 0 0.35rem; }
+  .ir-num { width:5.2rem; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:0.2rem 0.3rem; font-family:inherit; }
+  .ir-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:0.25rem 0.8rem; }
+  .ir-grid label { display:flex; justify-content:space-between; align-items:center; gap:0.4rem; font-size:0.85rem; }
+  .ir-table { border-collapse:collapse; font-size:0.85rem; width:100%; }
+  .ir-table th, .ir-table td { border:1px solid var(--border); padding:0.25rem 0.5rem; text-align:left; }
+  .ir-table th { color:var(--gold); }
+  .ir-bad { color:var(--danger); }
+  .ir-good { color:var(--uncommon); }
+  .ir-sec { color:var(--gold); font-size:1rem; letter-spacing:0.05em; margin:1.2rem 0 0.5rem; }
   .dm-toggles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:0.6rem; }
   .dm-toggle-card {
     display:flex; align-items:flex-start; gap:0.6rem; background:var(--surface); border:1px solid var(--border);
@@ -3932,6 +3947,7 @@
   <div class="dmcontrols-subtabs">
     <button class="dmcontrols-subtab-btn active" onclick="showDmControlsSub('lore',this)">📖 Lore</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('lists',this)">🎛 Lists</button>
+    <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('itemrules',this)">⚖ Item Rules</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('interactions',this)">⚙ Interactions</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('reference',this)">📜 Reference</button>
     <button class="dmcontrols-subtab-btn" onclick="showDmControlsSub('maps',this)">🗺 Maps</button>
@@ -3989,6 +4005,19 @@
       </ul>
       <p class="lore-p" style="margin-bottom:0;">See the <strong>NPCs tab</strong> for the full roster (backstories, stats, and DM-only secrets for all twenty-nine), the <strong>Cults</strong> sub-tab under Compendium for the Ashbond/Queen's Legion/Black Books writeups this page references, and the <strong>Fragments of Suffering</strong> and pantheon entries under Reference below if you want to tie divine or Court-of-Sin patronage into any of the above.</p>
     </div>
+  </div>
+
+  <div id="dmcontrols-itemrules" class="dmcontrols-subpanel">
+    <h3 style="color:var(--gold);font-size:1.05rem;letter-spacing:0.05em;margin-bottom:0.4rem;">⚖ Item Rules</h3>
+    <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem;">One set of weights and rules for <strong>every</strong> item source — the default catalog, rolled loot, Store wares and Generate Item. Each modifier has a weight; an item's total weight decides its rarity and its gp price. Saved in this browser; export it as JSON to share or back it up.</p>
+    <div class="token-toolbar">
+      <button class="dmcontrols-subtab-btn" onclick="itemRulesExport()">⬇ Export JSON</button>
+      <button class="dmcontrols-subtab-btn" onclick="document.getElementById('itemRulesImportFile').click()">⬆ Import JSON</button>
+      <input type="file" id="itemRulesImportFile" accept="application/json,.json" style="display:none" onchange="itemRulesImport(this)">
+      <button class="dmcontrols-subtab-btn" onclick="itemRulesReset()">↺ Reset to defaults</button>
+      <span class="token-count" id="itemRulesMsg"></span>
+    </div>
+    <div id="itemRulesPanel"></div>
   </div>
 
   <div id="dmcontrols-lists" class="dmcontrols-subpanel">
@@ -4263,6 +4292,7 @@
     </div>
 
     <div class="sheet-weapons-info" id="sheetWeaponsInfo"></div>
+    <div class="sheet-chip-row" id="sheetOtherStats" style="margin-bottom:0.6rem;"></div>
 
     <div class="sheet-abilities-grid" id="sheetAbilitiesGrid"></div>
 
@@ -5336,7 +5366,8 @@ function resolveSpellCast(name, slotLevel) {
     r.toHit = r.d20 + focusAtk;
     r.attackKind = raw.spellAttack[0] === 'M' ? 'Melee' : 'Ranged';
   }
-  if (saveKey) { r.saveStat = saveKey; r.dc = 8 + castMod; r.halfOnSave = /half as much damage|half damage/i.test(plain); }
+  const dcGear = (sheet.otherStats && sheet.otherStats['Spell Save DC'] && sheet.otherStats['Spell Save DC'].total) || 0;
+  if (saveKey) { r.saveStat = saveKey; r.dc = 8 + castMod + dcGear; r.halfOnSave = /half as much damage|half damage/i.test(plain); }
   // -- damage / healing --
   if (baseDice && (r.isHealing || r.damageType || /damage/i.test(plain))) {
     const crit = !!r.isCrit;
@@ -5362,7 +5393,7 @@ function resolveSpellCast(name, slotLevel) {
   r.sources.cast = attackTipBlock(`${L[cast.stat]} casting modifier ${fmtMod(castMod)}`, castLines);
   r.sources.focus = attackTipBlock('Spell focus bonus', focuses.length ? focuses.map(f => `<b>${escapeHtml(f.item.name)}</b>: ${escapeHtml(spellFocusBonusText(f.focus, f.bonus))} (${L[f.focus.stat]} ${f.focus.grade} focus)`) : ['No equipped staff or wand is adding to spells.']);
   r.sources.atkinfo = attackTipBlock('Spell attack roll', ['d20 plus any bonus from an equipped spell-focus staff or wand.', 'Ability modifiers never add to hitting — only to damage and save DCs.']);
-  if (r.dc != null) r.sources.dc = attackTipBlock(`Save DC ${r.dc}`, [`8 + your ${L[cast.stat]} casting modifier (${fmtMod(castMod)}).`, 'No proficiency bonus is added.']);
+  if (r.dc != null) r.sources.dc = attackTipBlock(`Save DC ${r.dc}`, [`8 + your ${L[cast.stat]} casting modifier (${fmtMod(castMod)})${dcGear ? ` ${fmtMod(dcGear)} from gear (Spell Save DC)` : ''}.`, 'No proficiency bonus is added.']);
   if (r.slotLevel) r.sources.slot = attackTipBlock(`Level ${r.slotLevel} slot`, [`${escapeHtml(name)} is a level ${level} spell. ${r.slotLevel > level ? `Casting it with a level ${r.slotLevel} slot adds ${r.extraDice || 'its higher-level benefit'}.` : 'Cast at its own level.'}`]);
   if (r.baseDice) r.sources.dice = attackTipBlock(`Damage dice ${r.baseDice}${r.count > 1 ? ' × ' + r.count : ''}`, [`From the ${escapeHtml(name)} spell’s own description.`, r.cantripNote || '', r.count > 1 ? `${r.count} ${r.projectile}s (${extraLevels ? 'including one more per slot level above ' + level : 'base number'}).` : '', 'Doubled on a critical hit.']);
   if (r.extraRoll) r.sources.extra = attackTipBlock(`Higher-slot dice ${r.extraDice}`, [`Using a level ${r.slotLevel} slot on a level ${level} spell adds ${up[3].replace(/\s+/g, '')} per level above (${extraLevels} level${extraLevels > 1 ? 's' : ''}).`]);
@@ -9956,7 +9987,7 @@ const ITEM_AFFIXES = [
   { name: 'Adamantine', appliesTo: ['armor'], minRarity: 'rare', text: () => "Attack rolls against the wearer can't score a critical hit." },
   { name: 'Dragonbone', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to damage rolls, and once per turn deals an extra ${m}d4 damage of a damage type matching a dragon's breath (wielder's choice).` },
   { name: 'Voidsteel', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to damage rolls; on a critical hit, the target has disadvantage on its next saving throw.` },
-  { name: 'Runic', appliesTo: ['weapon','armor'], minRarity: 'rare', text: m => `+${m} to saving throws made by whoever wields/wears this.` },
+  { name: 'Runic', appliesTo: ['weapon','armor'], minRarity: 'rare', text: m => `+${m} Saving Throws — the runes ward whoever wields or wears this.` },
   { name: 'Ancient', appliesTo: ['weapon','armor'], minRarity: 'legendary', text: () => 'Once per short rest, treat a failed attack roll, ability check, or saving throw made with/while wearing this as a success instead.' },
   // -- Weapon enchantments --
   { name: 'Sharp', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m} to damage rolls.` },
@@ -9973,9 +10004,9 @@ const ITEM_AFFIXES = [
   // -- Armor enchantments --
   { name: 'Sturdy', appliesTo: ['armor'], minRarity: 'common', text: m => `+${m} AC.` },
   { name: 'Warded', appliesTo: ['armor'], minRarity: 'uncommon', text: () => "Resistance to one damage type of the wearer's choice, chosen when this armor is equipped." },
-  { name: 'Padded', appliesTo: ['armor'], minRarity: 'common', text: m => `+${m * 2} to the wearer's maximum hit points.` },
+  { name: 'Padded', appliesTo: ['armor'], minRarity: 'common', text: m => `+${m * 2} Maximum Hit Points — extra padding soaks up the blows.` },
   { name: 'Silent', appliesTo: ['armor'], minRarity: 'common', text: () => 'Advantage on Dexterity (Stealth) checks made while wearing this.' },
-  { name: 'Reflective', appliesTo: ['armor'], minRarity: 'uncommon', text: () => '+1 AC against ranged attacks specifically.' },
+  { name: 'Reflective', appliesTo: ['armor'], minRarity: 'uncommon', text: () => 'Ranged attacks against the wearer deal 1 less damage — the surface turns shots aside.' },
   { name: 'Grounded', appliesTo: ['armor'], minRarity: 'common', text: () => 'Advantage on saving throws against being knocked prone.' },
   // -- Universal stat prefixes (weapon or armor) -- reuse GEN.buffsSelf.scalar's own stat names.
   { name: 'Mighty', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Strength.` },
@@ -16775,6 +16806,8 @@ function setItemRulesConfig(cfg) {
   try { if (cfg) localStorage.setItem('dmItemRules', JSON.stringify(cfg)); else localStorage.removeItem('dmItemRules'); } catch (e) {}
 }
 loadItemRulesOverride();
+// Invented skills (GEN.skills beyond the 18 real ones) become 'Other bonuses' on the sheet.
+document.addEventListener('DOMContentLoaded', () => { if (typeof registerCustomSheetStats === 'function') registerCustomSheetStats(GEN.skills); });
 // Stat / condition names the "no attack-roll modifiers" rule keeps out of generated items.
 function ruleStatAllowed(name) {
   const cfg = getItemRules();
@@ -16982,7 +17015,7 @@ function buildAttackSources(item, rarity, sheet, d) {
   });
   src.scaleTotal = attackTipBlock(`Scaling bonus ${fmtMod(d.scalingTotal)}`, ['The scaling lines above added together, rounded to a whole number. Scaling affects damage only — not the to-hit roll.']);
   const dmgClauses = attackEffectClauses(item, /\+\d+[^.;]*damage/i);
-  src.dmg = attackTipBlock(`Weapon damage bonus ${fmtMod(d.dmgBonus)}`, [`From <b>${name}</b>:`, ...dmgClauses.map(c => '“' + escapeHtml(c) + '”')]);
+  src.dmg = attackTipBlock(`Weapon damage bonus ${fmtMod(d.dmgBonus)}`, [`From <b>${name}</b>:`, ...dmgClauses.map(c => '“' + escapeHtml(c) + '”'), ...(sheet.otherStats && sheet.otherStats['Damage Dealt'].total ? [`Damage Dealt from gear/effects: ${escapeHtml(sheet.otherStats['Damage Dealt'].tooltip)}`] : [])]);
   d.bonusRolls.forEach((c, i) => {
     const clauses = attackEffectClauses(item, new RegExp(c.dice.replace(/[+]/g, '\\+')));
     src['bonus' + i] = attackTipBlock(`Bonus ${c.type ? c.type + ' ' : ''}damage ${c.dice}`, [`From <b>${name}</b>:`, ...clauses.map(x => '“' + escapeHtml(x) + '”')]);
@@ -17017,7 +17050,11 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   const mods = currentAbilityMods(sheet);
   const scaling = inferWeaponScaling(item, rarity || item.rarity);
   const scaled = computeScalingDamage(scaling, mods);
-  const { atkBonus, dmgBonus, bonusDiceClauses } = bridged || parseWeaponEffectBonuses(item.effect, item.dmg);
+  const parsedBonuses = bridged || parseWeaponEffectBonuses(itemMechanicsText(item), item.dmg);
+  const { atkBonus, bonusDiceClauses } = parsedBonuses;
+  // "+N Damage Dealt" from any equipped gear or active effect is a flat bonus to every weapon hit.
+  const dealt = sheet.otherStats && sheet.otherStats['Damage Dealt'];
+  const dmgBonus = parsedBonuses.dmgBonus + (dealt ? dealt.total : 0);
   const d20 = rn(1, 20);
   const isCrit = d20 === 20;
   const isFumble = d20 === 1;
@@ -17500,7 +17537,7 @@ function renderCharacterSheet() {
   // wherever the HP badge already is, same reasoning: don't make them flip to a specific tab
   // just to see it.
   const initBannerEl = document.getElementById('invPlayerInitiative');
-  if (initBannerEl) initBannerEl.textContent = `Init ${fmtMod(characterInitiative || 0)}`;
+  if (initBannerEl) initBannerEl.textContent = `Init ${fmtMod((characterInitiative || 0) + sheet.otherStats.Initiative.total)}`;
   const speedEl = document.getElementById('sheetSpeed');
   if (speedEl && document.activeElement !== speedEl) speedEl.value = characterSpeed;
   const speedValueEl = document.getElementById('sheetSpeedValue');
@@ -17540,6 +17577,11 @@ function renderCharacterSheet() {
     if (sheet.ac.tooltip) equipAcEl.title = sheet.ac.tooltip; else equipAcEl.removeAttribute('title');
   }
 
+  const otherEl = document.getElementById('sheetOtherStats');
+  if (otherEl) {
+    const rows = Object.entries(sheet.otherStats || {}).filter(([, v]) => v.total);
+    otherEl.innerHTML = rows.length ? rows.map(([name, v]) => `<span class="sheet-chip${v.status ? ' stat-' + v.status : ''}" title="${escapeHtml(v.tooltip)}">${escapeHtml(name)} ${fmtMod(v.total)}</span>`).join('') : '';
+  }
   const weaponsEl = document.getElementById('sheetWeaponsInfo');
   if (weaponsEl) {
     buildTokenIndex();
@@ -23575,6 +23617,7 @@ function renderDmControlsTab() {
 function initDmControlsSub(sub) {
   if (sub === 'lore') { /* static content, nothing to render */ }
   else if (sub === 'lists') { renderGenerationTogglesPanel(); renderGenerationListsViewer(); }
+  else if (sub === 'itemrules') renderItemRulesPanel();
   else if (sub === 'interactions') renderInteractionsCompendium();
   else if (sub === 'reference') renderReferenceSection();
   else if (sub === 'maps') renderMapsPanel();
@@ -23628,6 +23671,168 @@ function showDmControlsSub(sub, btn) {
   document.getElementById('dmcontrols-' + sub).classList.add('active');
   btn.classList.add('active');
   initDmControlsSub(sub);
+}
+// ===================== ITEM RULES PANEL (DM Controls > Item Rules) =====================
+let itemRulesUi = { group: 'scalar', q: '', simOut: '', auditOut: '' };
+const ITEM_RULE_RARITIES = ['common','uncommon','rare','superrare','legendary','celestial'];
+const ITEM_RULE_WEIGHT_GROUPS = [
+  ['scalar', 'Stat boosts (per +1)'], ['conditions', 'Beneficial conditions'], ['inflict', 'Inflicted conditions'],
+  ['drawbacks', 'Drawbacks (negative)'], ['affixes', 'Affixes (by name)'], ['kinds', 'Other effect kinds'], ['activation', 'Activation factors'],
+];
+function itemRulesMsg(t) { const el = document.getElementById('itemRulesMsg'); if (el) el.textContent = t || ''; }
+function mutateItemRules(fn) {
+  const cfg = window.ItemRules.cloneRules(getItemRules());
+  fn(cfg);
+  setItemRulesConfig(cfg);
+  renderItemRulesPanel();
+}
+function itemRuleToggle(id, on) { mutateItemRules(c => { const r = c.rules.find(x => x.id === id); if (r) r.enabled = !!on; }); }
+function itemRuleParam(id, key, val) {
+  const n = key === 'forbiddenStats' ? String(val).split(',').map(x => x.trim()).filter(Boolean) : parseFloat(val);
+  if (key !== 'forbiddenStats' && !Number.isFinite(n)) return;
+  mutateItemRules(c => { const r = c.rules.find(x => x.id === id); if (r) r.params[key] = n; });
+}
+function itemRuleSeverity(id, v) { mutateItemRules(c => { const r = c.rules.find(x => x.id === id); if (r) r.severity = v; }); }
+function itemBandSet(rarity, which, val) {
+  const n = parseFloat(val); if (!Number.isFinite(n)) return;
+  mutateItemRules(c => {
+    if (which === 'wlow') {
+      c.rarityBands[rarity][0] = n;
+      const i = ITEM_RULE_RARITIES.indexOf(rarity);
+      if (i > 0) c.rarityBands[ITEM_RULE_RARITIES[i - 1]][1] = n;
+    } else if (which === 'pmin') c.priceBands[rarity][0] = n;
+    else if (which === 'pmax') c.priceBands[rarity][1] = Math.min(n, 100000);
+  });
+}
+function itemWeightSet(group, key, val) {
+  const n = parseFloat(val); if (!Number.isFinite(n)) return;
+  mutateItemRules(c => { c.weights[group][key] = n; });
+}
+function itemWeightFilter(el) { itemRulesUi.q = el.value; renderItemRulesPanel(); const f = document.getElementById('irWeightSearch'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }
+function itemRulesExport() {
+  const blob = new Blob([JSON.stringify(getItemRules(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'item-rules.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  itemRulesMsg('Exported item-rules.json');
+}
+function itemRulesImport(input) {
+  const f = input.files && input.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const raw = JSON.parse(rd.result);
+      if (!raw || typeof raw !== 'object' || !raw.weights) throw new Error('not an item-rules file (no "weights")');
+      const merged = window.ItemRules.mergeItemRules(raw);
+      setItemRulesConfig(merged); renderItemRulesPanel(); itemRulesMsg('Imported ' + f.name);
+    } catch (e) { itemRulesMsg('Import failed: ' + e.message); }
+    input.value = '';
+  };
+  rd.readAsText(f);
+}
+function itemRulesReset() {
+  if (!confirm('Reset every Item Rules weight, band and rule to the defaults?')) return;
+  setItemRulesConfig(null); renderItemRulesPanel(); itemRulesMsg('Reset to defaults');
+}
+function renderItemRulesPanel() {
+  const wrap = document.getElementById('itemRulesPanel');
+  if (!wrap || !window.ItemRules) { if (wrap) wrap.innerHTML = '<p class="ir-bad">Item Rules engine did not load.</p>'; return; }
+  const cfg = getItemRules();
+  const e = escapeHtml;
+  const rulesHtml = cfg.rules.map(r => {
+    const params = Object.entries(r.params || {}).map(([k, v]) => k === 'forbiddenStats'
+      ? `<label style="grid-column:1/-1;">${e(k)} <input class="token-search" style="min-width:0" value="${e((v || []).join(', '))}" onchange="itemRuleParam('${r.id}','${k}',this.value)"></label>`
+      : `<label>${e(k)} <input type="number" step="any" class="ir-num" value="${v}" onchange="itemRuleParam('${r.id}','${k}',this.value)"></label>`).join('');
+    return `<div class="ir-card${r.enabled ? '' : ' off'}">
+      <div class="ir-head"><label><input type="checkbox" ${r.enabled ? 'checked' : ''} onchange="itemRuleToggle('${r.id}',this.checked)"> <strong>${e(r.label)}</strong></label>
+        <select onchange="itemRuleSeverity('${r.id}',this.value)" class="ir-num" style="width:auto"><option value="error"${r.severity === 'error' ? ' selected' : ''}>error</option><option value="warn"${r.severity === 'warn' ? ' selected' : ''}>warn</option></select></div>
+      <div class="ir-desc">${e(r.desc)}</div>
+      ${params ? `<div class="ir-grid">${params}</div>` : ''}</div>`;
+  }).join('');
+  const bandRows = ITEM_RULE_RARITIES.map(r => {
+    const [wl, wh] = cfg.rarityBands[r], [pl, ph] = cfg.priceBands[r];
+    return `<tr><td>${r}</td>
+      <td><input type="number" step="any" class="ir-num" value="${wl}" ${r === 'common' ? 'disabled' : ''} onchange="itemBandSet('${r}','wlow',this.value)"></td>
+      <td>${wh >= 1e8 ? '∞' : wh}</td>
+      <td><input type="number" step="any" class="ir-num" value="${pl}" onchange="itemBandSet('${r}','pmin',this.value)"></td>
+      <td><input type="number" step="any" class="ir-num" value="${ph}" onchange="itemBandSet('${r}','pmax',this.value)"></td></tr>`;
+  }).join('');
+  const grp = itemRulesUi.group, q = itemRulesUi.q.toLowerCase();
+  const wEntries = Object.entries(cfg.weights[grp] || {}).filter(([k]) => !q || k.toLowerCase().includes(q));
+  const groupBtns = ITEM_RULE_WEIGHT_GROUPS.map(([g, label]) => `<button class="dmcontrols-subtab-btn${g === grp ? ' active' : ''}" onclick="itemRulesUi.group='${g}';renderItemRulesPanel()">${e(label)}</button>`).join('');
+  wrap.innerHTML = `
+    <h4 class="ir-sec">Rules (enforced on every source)</h4>${rulesHtml}
+    <h4 class="ir-sec">Rarity bands &amp; gp price bands</h4>
+    <p class="ir-desc">An item's total weight picks its rarity band; where it sits inside the band picks its gp inside that rarity's price band. No price may ever exceed 100,000 gp.</p>
+    <table class="ir-table"><tr><th>Rarity</th><th>Weight from</th><th>to (next tier's start)</th><th>Min gp</th><th>Max gp</th></tr>${bandRows}</table>
+    <h4 class="ir-sec">Modifier weights</h4>
+    <div class="token-toolbar">${groupBtns}</div>
+    <div class="token-toolbar"><input id="irWeightSearch" class="token-search" placeholder="Filter…" value="${e(itemRulesUi.q)}" oninput="itemWeightFilter(this)"><span class="token-count">${wEntries.length} entries</span></div>
+    <div class="ir-card"><div class="ir-grid">${wEntries.map(([k, v]) => `<label>${e(k)} <input type="number" step="any" class="ir-num" value="${v}" onchange="itemWeightSet('${grp}','${k.replace(/'/g, "\\'")}',this.value)"></label>`).join('')}</div></div>
+    <h4 class="ir-sec">Simulator &amp; audit</h4>
+    <div class="token-toolbar">
+      <select id="irSimSource" class="token-search" style="flex:0 0 auto"><option value="store">Store wares</option><option value="generate">Generate Item tab</option></select>
+      <input id="irSimN" type="number" class="ir-num" value="100" min="10" max="2000">
+      <button class="dmcontrols-subtab-btn" onclick="runItemRuleSimulation()">▶ Roll items</button>
+      <button class="dmcontrols-subtab-btn" onclick="runItemRuleCatalogAudit()">🔎 Audit default catalog</button>
+    </div>
+    <div id="irSimOut">${itemRulesUi.simOut}</div>`;
+}
+function itemRuleViolationSummary(counts) {
+  const keys = Object.keys(counts);
+  return keys.length ? keys.map(k => `<span class="ir-bad">${escapeHtml(k)} ×${counts[k]}</span>`).join(', ') : '<span class="ir-good">none</span>';
+}
+function runItemRuleSimulation() {
+  const cfg = getItemRules(), IR = window.ItemRules;
+  const source = document.getElementById('irSimSource').value;
+  const n = Math.max(10, Math.min(2000, parseInt(document.getElementById('irSimN').value, 10) || 100));
+  const keys = Object.keys(MERCHANTS).filter(k => !['fleshmancer','monstermangler','bountyhunter','animaltamer'].includes(k));
+  const before = { ...itemRuleGenStats };
+  const rows = {}; const viol = {};
+  for (let i = 0; i < n; i++) {
+    let it;
+    if (source === 'store') it = generateStoreItem(keys[i % keys.length]);
+    else {
+      const rarity = ITEM_RULE_RARITIES[i % ITEM_RULE_RARITIES.length];
+      const cat = ri(['armor','weapon','consumable','misc']), baseName = ri(GEN[cat]);
+      const tags = detectTags(baseName); const { pool } = buildWeightedModPool(tags);
+      const b = buildItemUnderRules({ cat, rarity, baseName, weightedPool: pool, countFn: () => 2 + (['legendary','celestial'].includes(rarity) ? 1 : 0), countIncludesStarting: true });
+      it = { name: baseName, rarity: b.rarity, cat, type: cat, mods: b.mods, dmg: b.stats.dmg, ac: b.stats.ac, gp: b.gp, _asked: rarity };
+    }
+    const sc = IR.scoreItem(it, cfg);
+    const rr = rows[it.rarity] || (rows[it.rarity] = { n: 0, w: 0, wmin: 1e9, wmax: 0, gpmin: 1e12, gpmax: 0, mods: 0 });
+    const gp = IR.parseGp(it.gp) || 0;
+    rr.n++; rr.w += sc.total; rr.wmin = Math.min(rr.wmin, sc.total); rr.wmax = Math.max(rr.wmax, sc.total);
+    rr.gpmin = Math.min(rr.gpmin, gp); rr.gpmax = Math.max(rr.gpmax, gp); rr.mods += it.mods.length;
+    IR.evaluateItem(it, cfg, { rarity: it.rarity, score: sc }).forEach(v => { const k = v.rule + ' (' + v.severity + ')'; viol[k] = (viol[k] || 0) + 1; });
+  }
+  const used = { built: itemRuleGenStats.built - before.built, attempts: itemRuleGenStats.attempts - before.attempts, relabeled: itemRuleGenStats.relabeled - before.relabeled, unresolved: itemRuleGenStats.unresolved - before.unresolved };
+  const body = ITEM_RULE_RARITIES.filter(r => rows[r]).map(r => { const x = rows[r];
+    return `<tr><td>${r}</td><td>${x.n}</td><td>${(x.w / x.n).toFixed(2)} (${x.wmin.toFixed(1)}–${x.wmax.toFixed(1)})</td><td>${(x.mods / x.n).toFixed(1)}</td><td>${x.gpmin}–${x.gpmax} gp</td></tr>`; }).join('');
+  itemRulesUi.simOut = `<p class="ir-desc">${n} ${source === 'store' ? 'Store wares' : 'Generate Item rolls'} — ${used.attempts} build attempts for ${used.built} items; ${used.relabeled} re-rated to the rarity their weight earned; ${used.unresolved} could not satisfy every rule.</p>
+    <table class="ir-table"><tr><th>Rarity</th><th>Items</th><th>Avg weight (range)</th><th>Avg modifiers</th><th>gp range</th></tr>${body}</table>
+    <p class="ir-desc">Rule violations: ${itemRuleViolationSummary(viol)}</p>`;
+  document.getElementById('irSimOut').innerHTML = itemRulesUi.simOut;
+}
+// Every default-catalog item against the same rules (special items — chests, quest items,
+// documents, unpriced pieces — are exempt from the rarity/price rules only).
+function runItemRuleCatalogAudit() {
+  const cfg = getItemRules(), IR = window.ItemRules;
+  let total = 0, clean = 0; const byRule = {}; const worst = [];
+  Object.entries(lootData).forEach(([tier, arr]) => arr.forEach(item => {
+    total++;
+    const special = IR.isValueExempt(item) || IR.parseGp(item.gp) == null;
+    const v = IR.evaluateItem(item, cfg, { rarity: tier, exempt: special ? true : undefined }).filter(x => x.severity === 'error');
+    if (!v.length) { clean++; return; }
+    v.forEach(x => { byRule[x.label] = (byRule[x.label] || 0) + 1; });
+    worst.push({ name: item.name, tier, v });
+  }));
+  const list = worst.slice(0, 40).map(w => `<tr><td>${escapeHtml(w.name)}</td><td>${w.tier}</td><td>${w.v.map(x => escapeHtml(x.message)).join('; ')}</td></tr>`).join('');
+  itemRulesUi.simOut = `<p class="ir-desc">${total} catalog items — <span class="ir-good">${clean} clean</span>, <span class="${worst.length ? 'ir-bad' : 'ir-good'}">${worst.length} breaking a rule</span>.</p>
+    <p class="ir-desc">By rule: ${itemRuleViolationSummary(byRule)}</p>
+    ${list ? `<table class="ir-table"><tr><th>Item</th><th>Tier</th><th>Problem</th></tr>${list}</table>${worst.length > 40 ? `<p class="ir-desc">…and ${worst.length - 40} more.</p>` : ''}` : ''}`;
+  document.getElementById('irSimOut').innerHTML = itemRulesUi.simOut;
 }
 function renderGenerationTogglesPanel() {
   const wrap = document.getElementById('generationTogglesWrap');
