@@ -464,6 +464,7 @@ const FEAT_LIBRARY = [
   { name: "Swift Runner", description: "Your walking speed increases by 10 feet. Difficult terrain no longer costs you extra movement when you Dash." },
   { name: "Steady Aim", description: "If you haven't moved yet on your turn, your first attack roll that turn has advantage." },
   { name: "Arcane Aptitude", description: "+1 Intelligence. You learn one cantrip of your choice from any spell list (DM's discretion on how it's cast if your character has no other spellcasting)." },
+  { name: "Disciplined Training", description: "+1 to your proficiency bonus. It applies to every roll you are proficient in — weapons, skills, and saving throws." },
   { name: "Precise Striker", description: "Choose one weapon type you're proficient with. You have a +1 bonus to attack rolls made with that weapon type." },
   { name: "Battlefield Coordinator", description: "Once per combat as a bonus action, you can direct up to two allies within 30 feet who can hear you; each gains a +2 bonus to their next initiative-order action's attack roll or ability check." },
   { name: "Painstaking Tracker", description: "+2 Survival. You can follow tracks at a normal travel pace without disadvantage, and you always know roughly how old a trail is." },
