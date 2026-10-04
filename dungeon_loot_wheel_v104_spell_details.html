@@ -4450,7 +4450,7 @@
 </script>
 <script>
 // Bump this whenever the file is saved as a new version (filename should match, e.g. v96).
-const APP_VERSION = 'v96';
+const APP_VERSION = 'v104';
 { const _vEl = document.getElementById('appVersionTag'); if (_vEl) _vEl.textContent = APP_VERSION; }
 // ===================== ITEM DATA =====================
 </script>
@@ -24909,6 +24909,72 @@ function saveAppState() {
 // Applies a full state blob (from localStorage OR a remote multiplayer sync — same shape
 // either way) onto the live app state. Field-by-field and defensive (only overwrites a field
 // if the blob actually has it) so a partial/corrupt blob can't wipe things clean.
+// ---------- Keeping saved item copies in step with the catalog ----------
+// An item looted or saved from the catalog is stored in the save as a COPY (savedGeneratedItems),
+// including its structured __canonical mechanics (JSON.stringify serializes that too). So when the
+// catalog is reworked — armor values, weapon dice, gp prices, effect text — an old save kept its old
+// numbers forever (e.g. plate armor still at its pre-rework AC). On every load, each saved copy that
+// matches a catalog item by name (and rarity) takes the catalog's current stat fields and current
+// canonical mechanics. Copies the player built or changed themselves (monster-part mangling,
+// generated/store/Fleshmancer rolls with their own mods) have no catalog twin or are skipped, and
+// per-copy state (id, charges used, ability uses, tags) is left alone.
+const SAVED_ITEM_SYNC_FIELDS = ['type', 'subcategory', 'ac', 'dmg', 'hp', 'gp', 'slotSize', 'effect', 'desc', 'armorStyle', 'isBodySlot', 'requirement', 'weaponCategory', 'scaling', 'spellFocus'];
+function findCatalogTwin(item) {
+  const tier = item.rarity;
+  const inTier = tier && lootData[tier] && lootData[tier].find(c => c.name === item.name);
+  if (inTier) return { cat: inTier, tier };
+  const all = Object.entries(lootData).flatMap(([r, arr]) => arr.filter(c => c.name === item.name).map(c => ({ cat: c, tier: r })));
+  return all.length === 1 ? all[0] : null; // an ambiguous name (same item in two tiers) is left alone
+}
+function refreshSavedItemsFromCatalog() {
+  const changes = [];
+  (savedGeneratedItems || []).forEach(item => {
+    if (!item || !item.name) return;
+    if ((item.mangledParts && item.mangledParts.length) || (item.mods && item.mods.length)) return;
+    const twin = findCatalogTwin(item);
+    if (!twin) return;
+    const before = {}, after = {};
+    SAVED_ITEM_SYNC_FIELDS.forEach(k => {
+      const cur = item[k], next = twin.cat[k];
+      if (JSON.stringify(cur) === JSON.stringify(next)) return;
+      before[k] = cur; after[k] = next;
+      if (next === undefined) delete item[k]; else item[k] = JSON.parse(JSON.stringify(next));
+    });
+    const fresh = CANONICAL_BY_LEGACY_KEY.get('loot:' + (item.rarity || twin.tier) + ':' + item.name);
+    let canonChanged = false;
+    if (fresh && JSON.stringify(item.__canonical) !== JSON.stringify(fresh)) { item.__canonical = fresh; canonChanged = true; }
+    if (!Object.keys(after).length && !canonChanged) return;
+    // Derived fields (classification, properties, tags, interactions) follow the new stats.
+    delete item.classification; delete item.properties; delete item.tags; delete item.interactions;
+    try { inferItemMetadata(item, item.rarity || twin.tier); } catch (e) { console.warn('Could not re-derive', item.name, e); }
+    changes.push({ name: item.name, before, after, canonChanged });
+  });
+  return changes;
+}
+function showUpdateNotice(html) {
+  let el = document.getElementById('appUpdateNotice');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'appUpdateNotice';
+    el.style.cssText = 'position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);z-index:1300;max-width:min(640px,92vw);background:var(--surface2);border:1px solid var(--gold);padding:0.7rem 2rem 0.7rem 0.9rem;box-shadow:0 6px 24px rgba(0,0,0,.6);font-size:0.85rem;line-height:1.4;';
+    el.innerHTML = '<span id="appUpdateNoticeBody"></span><button style="position:absolute;top:0.2rem;right:0.4rem;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:1.1rem" onclick="this.parentNode.remove()">×</button>';
+    document.body.appendChild(el);
+  }
+  document.getElementById('appUpdateNoticeBody').innerHTML = html;
+  clearTimeout(window._appUpdateNoticeTimer);
+  window._appUpdateNoticeTimer = setTimeout(() => el.remove(), 20000);
+}
+function runSavedItemRefresh() {
+  const changes = refreshSavedItemsFromCatalog();
+  window._savedItemRefresh = changes;
+  if (!changes.length) return;
+  console.info('Refreshed saved items to the current catalog:', changes);
+  buildTokenIndex();
+  if (typeof refreshAllViewsAfterStateApply === 'function') refreshAllViewsAfterStateApply();
+  if (typeof scheduleSave === 'function') scheduleSave();
+  const brief = changes.slice(0, 4).map(c => `${escapeHtml(c.name)}${c.after.ac !== undefined || c.before.ac !== undefined ? ` (AC ${escapeHtml(String(c.before.ac ?? '—'))} → ${escapeHtml(String(c.after.ac ?? '—'))})` : c.after.dmg !== undefined ? ` (${escapeHtml(String(c.before.dmg ?? '—'))} → ${escapeHtml(String(c.after.dmg ?? '—'))})` : ''}`).join(', ');
+  showUpdateNotice(`<b>Updated ${changes.length} saved item${changes.length === 1 ? '' : 's'}</b> to the current catalog stats: ${brief}${changes.length > 4 ? ` and ${changes.length - 4} more` : ''}.`);
+}
 function applyStateBlob(data) {
   if (!data) return;
   if (data.inventoryGrid) inventoryGrid = data.inventoryGrid;
@@ -24924,6 +24990,11 @@ function applyStateBlob(data) {
   if (data.savedGeneratedItems) {
     savedGeneratedItems = data.savedGeneratedItems;
     savedGeneratedItems.forEach(item => attachCanonicalIfMigrated(item, item.rarity));
+    // inferItemMetadata needs the game-engine module, which loads after this classic script runs on
+    // a first page load — so on load the refresh waits for DOMContentLoaded, otherwise (a remote
+    // state push) it runs right away.
+    if (typeof window.classifyItemFull === 'function') runSavedItemRefresh();
+    else document.addEventListener('DOMContentLoaded', runSavedItemRefresh, { once: true });
   }
   if (data.playerSlots) playerSlots = data.playerSlots;
   if (data.tokenSlotOverrides) tokenSlotOverrides = data.tokenSlotOverrides;

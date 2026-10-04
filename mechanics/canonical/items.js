@@ -23421,7 +23421,7 @@ const canonicalItems = [
     "weight": 20,
     "value": "6000 gp",
     "flavorText": "Full plate of extraordinary quality, magically reinforced.",
-    "description": "AC 12 (18 base + 3). Standard plate Stealth disadvantage applies. Requires heavy armor proficiency. Requires attunement.",
+    "description": "AC 12 (heavy plate with a +3 enchantment). Standard plate Stealth disadvantage applies. Requires heavy armor proficiency. Requires attunement.",
     "requiresAttunement": true,
     "armor": {
       "armorType": "heavy",
