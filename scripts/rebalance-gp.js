@@ -1,3 +1,6 @@
+// SUPERSEDED for pricing by scripts/enforce-item-rules.js (gp now follows modifier weight, see
+// docs/ITEM_RULES.md). Kept for its band/cap helpers and tests; do not re-run it over the catalog.
+//
 // Reprices every item in loot-data.js (and marks untradeable NPC signature weapons in
 // npc-data.js) so gp value scales with rarity tier AND with how strong the item actually is.
 // Run: node scripts/rebalance-gp.js          (rewrites the two data files in place)

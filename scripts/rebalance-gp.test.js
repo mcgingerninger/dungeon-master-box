@@ -42,11 +42,15 @@ test('tier medians rise from Uncommon up to Super Rare', () => {
   assert.ok(med('uncommon') < med('rare') && med('rare') < med('superrare') && med('superrare') < med('legendary'));
 });
 
-test('stronger items cost more than weaker ones in the same tier', () => {
-  const weapons = lootData.rare.filter(i => i.type === 'weapon' && parseGp(i.gp) !== null);
-  const avg = f => { const l = weapons.filter(f); return l.reduce((s, i) => s + parseGp(i.gp), 0) / l.length; };
-  const bonus = i => /\+[23] to attack/i.test(i.effect || '');
-  assert.ok(avg(bonus) > avg(i => !bonus(i)));
+test('within a tier a heavier item (more modifier weight) never costs less than a lighter one', async () => {
+  const { scoreItem, parseGp } = await import('../mechanics/engine/items/item-rules.js');
+  for (const tier of ['uncommon', 'rare', 'superrare', 'legendary']) {
+    const rows = lootData[tier]
+      .filter(i => parseGp(i.gp) !== null && !i.chestRarity && !/open to find a haul/i.test(i.effect || '') && i.type !== 'questitem' && i.type !== 'document')
+      .map(i => ({ name: i.name, w: scoreItem(i).total, gp: parseGp(i.gp) }))
+      .sort((a, b) => a.w - b.w);
+    for (let k = 1; k < rows.length; k++) assert.ok(rows[k].gp >= rows[k - 1].gp, `${tier}: ${rows[k - 1].name} (${rows[k - 1].w}) costs ${rows[k - 1].gp} but ${rows[k].name} (${rows[k].w}) costs ${rows[k].gp}`);
+  }
 });
 
 test('the repricer output always lands inside the bands, even if re-run on its own output', () => {
