@@ -118,13 +118,14 @@ function compareWeaponAttack(canonical, legacy, findings) {
     // even though that phrasing is an unconditional bonus, not a conditional one the guard was
     // meant to exclude — a pre-existing gap this migration doesn't fix in the live regex path
     // itself, only bypasses for the item's own real mechanic via the materials system instead.
-    if (/masterwork/i.test(legacy.name) && bridged.atkBonus === oldAtkBonus + 1) {
-      expectedFixes.masterworkAttackBonus = (expectedFixes.masterworkAttackBonus || 0) + 1;
-    } else {
+    {
       findings.push({ kind: 'attack-bonus-mismatch', oldAtkBonus, newAtkBonus: bridged.atkBonus });
     }
   }
   if (oldLiveDmgBonus === bridged.dmgBonus) return; // no double-count in this item; must agree exactly
+  // Documented addition: a name-tagged "Masterwork" weapon gets +1 damageRoll from the materials
+  // system (item rules forbid attack-roll modifiers, so the Masterwork bonus is damage-only).
+  if (/masterwork/i.test(legacy.name) && bridged.dmgBonus === oldLiveDmgBonus + 1) { expectedFixes.masterworkAttackBonus = (expectedFixes.masterworkAttackBonus || 0) + 1; return; }
   // Documented fix: old dmg field's embedded modifier and the text bonus were the SAME number
   // (redundant phrasing) — migrateWeapon applies it once. Confirm the fixed value truly is "one
   // copy of the redundant number," not just "different."
@@ -162,7 +163,7 @@ for (const canonical of canonicalItems) {
 }
 
 console.log(`Checked ${checked} migrated items against the live regex path they replace.`);
-console.log(`Expected, documented fixes/additions confirmed: ${expectedFixes.armorAcDedup} armor AC dedup, ${expectedFixes.weaponDamageDedup} weapon damage dedup, ${expectedFixes.armorAcTotalRecapDrop || 0} AC "total" recap drop, ${expectedFixes.masterworkAttackBonus || 0} masterwork attackRoll addition.`);
+console.log(`Expected, documented fixes/additions confirmed: ${expectedFixes.armorAcDedup} armor AC dedup, ${expectedFixes.weaponDamageDedup} weapon damage dedup, ${expectedFixes.armorAcTotalRecapDrop || 0} AC "total" recap drop, ${expectedFixes.masterworkAttackBonus || 0} masterwork damageRoll addition.`);
 if (unexpected.length) {
   console.log(`\n${unexpected.length} item(s) with UNEXPECTED divergence between old and new:`);
   for (const u of unexpected) {

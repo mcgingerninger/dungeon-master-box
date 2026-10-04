@@ -4447,6 +4447,12 @@
   // doubling that bulk work for a purely-browsable catalog wasn't worth the risk.
   import { buildMonsterPartMaterial, buildMonsterPartWondrous } from './mechanics/engine/items/monster-parts.js';
   Object.assign(window, GameEngine, { buildMonsterPartMaterial, buildMonsterPartWondrous });
+  // Item Rules (docs/ITEM_RULES.md): modifier weights decide rarity + gp, and a shared rule set
+  // (no attack-roll modifiers, no only-bad items, modifier cap, ...) is enforced on every item
+  // source. Classic code reaches the engine through window.ItemRules at generation time.
+  import * as ItemRulesEngine from './mechanics/engine/items/item-rules.js';
+  import { DEFAULT_ITEM_RULES, SOURCES as ITEM_RULE_SOURCES } from './mechanics/data/item-rules-default.js';
+  window.ItemRules = { ...ItemRulesEngine, DEFAULT_ITEM_RULES, SOURCES: ITEM_RULE_SOURCES };
 </script>
 <script>
 // Bump this whenever the file is saved as a new version (filename should match, e.g. v96).
@@ -9427,9 +9433,11 @@ function synthesizeNamedTraitText(traitName, rarity) {
   if (!mod) return null;
   const modest = modestAmountForRarity(rarity);
   const debuffAmt = Math.max(1, Math.round(modest * 0.6));
+  const buffStats = ruleSafeTraitStats(mod.buffs);
+  const debuffStats = ruleSafeTraitStats(mod.debuffs).filter(st => !buffStats.includes(st));
   const parts = [
-    ...(mod.buffs || []).map(stat => `+${scaledStatAmount(stat, rarity, modest)} ${stat}`),
-    ...(mod.debuffs || []).map(stat => `-${scaledStatAmount(stat, rarity, debuffAmt)} ${stat}`),
+    ...buffStats.map(stat => `+${scaledStatAmount(stat, rarity, modest)} ${stat}`),
+    ...debuffStats.map(stat => `-${scaledStatAmount(stat, rarity, debuffAmt)} ${stat}`),
   ];
   return `<strong>${mod.name}</strong>: ${parts.join(', ')}`;
 }
@@ -9936,24 +9944,24 @@ const MISC_BASE_FORMS = ['Ring', 'Amulet', 'Pendant', 'Wand', 'Rod', 'Orb', 'Cha
 const ITEM_AFFIXES = [
   // -- Materials (roughly common → exotic; several are pure flavor at low tiers on purpose,
   //    same as a real "Rusty" or "Iron" prefix never being mechanically special) --
-  { name: 'Rusty', appliesTo: ['weapon'], minRarity: 'common', maxRarity: 'uncommon', text: () => '-1 to attack rolls — the corroded edge bites unevenly.' },
+  { name: 'Rusty', appliesTo: ['weapon'], minRarity: 'common', maxRarity: 'uncommon', text: () => '-1 to damage rolls — the corroded edge bites unevenly.' },
   { name: 'Rusty', appliesTo: ['armor'], minRarity: 'common', maxRarity: 'uncommon', text: () => "-1 AC — it doesn't seal right anymore." },
   { name: 'Iron', appliesTo: ['weapon','armor'], minRarity: 'common', maxRarity: 'uncommon', text: () => 'No mechanical change — a plain, honestly-made iron piece.' },
   { name: 'Steel', appliesTo: ['weapon'], minRarity: 'common', maxRarity: 'rare', text: () => '+1 to damage rolls — a properly tempered edge.' },
   { name: 'Steel', appliesTo: ['armor'], minRarity: 'common', maxRarity: 'rare', text: () => '+1 AC — properly tempered plate.' },
-  { name: 'Silvered', appliesTo: ['weapon'], minRarity: 'uncommon', text: () => '+1 to attack rolls against shapechangers and undead specifically.' },
+  { name: 'Silvered', appliesTo: ['weapon'], minRarity: 'uncommon', text: () => '+1 to damage rolls against shapechangers and undead specifically.' },
   { name: 'Mithral', appliesTo: ['weapon'], minRarity: 'rare', text: () => 'Considerably lighter than it looks — never imposes a heavy-weapon penalty.' },
   { name: 'Mithral', appliesTo: ['armor'], minRarity: 'rare', text: () => '+1 AC, and no Strength requirement no matter how heavy the base piece.' },
   { name: 'Adamantine', appliesTo: ['weapon'], minRarity: 'rare', text: () => 'Critical hits with this weapon automatically maximize their damage dice.' },
   { name: 'Adamantine', appliesTo: ['armor'], minRarity: 'rare', text: () => "Attack rolls against the wearer can't score a critical hit." },
   { name: 'Dragonbone', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to damage rolls, and once per turn deals an extra ${m}d4 damage of a damage type matching a dragon's breath (wielder's choice).` },
-  { name: 'Voidsteel', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to attack and damage rolls; on a critical hit, the target has disadvantage on its next saving throw.` },
+  { name: 'Voidsteel', appliesTo: ['weapon'], minRarity: 'superrare', text: m => `+${m} to damage rolls; on a critical hit, the target has disadvantage on its next saving throw.` },
   { name: 'Runic', appliesTo: ['weapon','armor'], minRarity: 'rare', text: m => `+${m} to saving throws made by whoever wields/wears this.` },
   { name: 'Ancient', appliesTo: ['weapon','armor'], minRarity: 'legendary', text: () => 'Once per short rest, treat a failed attack roll, ability check, or saving throw made with/while wearing this as a success instead.' },
   // -- Weapon enchantments --
-  { name: 'Sharp', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m} to attack rolls.` },
-  { name: 'Heavy', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m + 1} to damage rolls, but -1 to attack rolls.` },
-  { name: 'Balanced', appliesTo: ['weapon'], minRarity: 'common', text: () => '+1 to attack rolls and +1 to damage rolls.' },
+  { name: 'Sharp', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m} to damage rolls.` },
+  { name: 'Heavy', appliesTo: ['weapon'], minRarity: 'common', text: m => `+${m + 1} to damage rolls, but -1 Dexterity — the weight throws off your footing.` },
+  { name: 'Balanced', appliesTo: ['weapon'], minRarity: 'common', text: () => '+2 to damage rolls — perfectly weighted for the wielder.' },
   { name: 'Flaming', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 fire damage on a hit.` },
   { name: 'Frost', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 cold damage on a hit, and the target's speed is reduced by 10 ft. until the end of its next turn.` },
   { name: 'Shocking', appliesTo: ['weapon'], minRarity: 'uncommon', text: m => `+${m}d4 lightning damage on a hit.` },
@@ -10619,9 +10627,59 @@ function rollItemStats(cat, rarity, baseName) {
   return { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot };
 }
 
+// Builds an item's base stats + modifiers and keeps rolling until the result obeys every Item Rule
+// and its total modifier weight lands in the target rarity's weight band (rejection sampling; the
+// Store and the Generate Item tab share it, so neither gets special treatment). Rarity ends up
+// following weight, and gp is priced from the weight inside that rarity's price band.
+const ITEM_RULE_ATTEMPTS = 80;
+let itemRuleGenStats = { built: 0, attempts: 0, relabeled: 0, unresolved: 0 };
+function buildItemUnderRules({ cat, rarity, baseName, weightedPool, countFn, countIncludesStarting }) {
+  const cfg = getItemRules(), IR = window.ItemRules;
+  const capRule = cfg && (cfg.rules || []).find(r => r.id === 'max-modifiers-by-rarity' && r.enabled);
+  const attempt = bump => {
+    const stats = rollItemStats(cat, rarity, baseName);
+    const affixMods = rollItemAffixes(cat, rarity);
+    const potionStatus = stats.subcategory === 'potion' ? rollPotionStatusEffect(rarity) : null;
+    const starting = potionStatus ? [...affixMods, potionStatus] : affixMods;
+    let goal = countFn() + bump + (countIncludesStarting ? 0 : starting.length);
+    if (capRule && capRule.params[rarity] != null) goal = Math.min(goal, capRule.params[rarity]);
+    const mods = [...starting], usedTypes = [], usedKeys = starting.map(m => m.key);
+    let tries = 0;
+    while (mods.length < goal && tries < 40) {
+      tries++;
+      const type = pickWeightedType(weightedPool, usedTypes);
+      if (!type) break;
+      const m = generateModifierOfType(type, rarity, usedKeys);
+      if (!m || (m.key && usedKeys.includes(m.key))) continue;
+      mods.push(m); usedTypes.push(type);
+      if (m.key) usedKeys.push(m.key);
+    }
+    return { stats, mods };
+  };
+  if (!cfg || !IR) return { rarity, ...attempt(0), score: null, gp: null };
+  const order = IR.RARITY_ORDER;
+  let best = null, used = 0;
+  for (let t = 0; t < ITEM_RULE_ATTEMPTS; t++) {
+    used++;
+    const c = attempt(Math.floor(t / 12));
+    const probe = { name: baseName, rarity, type: cat, cat, mods: c.mods, dmg: c.stats.dmg, ac: c.stats.ac };
+    const score = IR.scoreItem(probe, cfg);
+    const viol = IR.evaluateItem(probe, cfg, { rarity, score, exempt: true }).filter(v => v.severity === 'error');
+    const got = IR.rarityForWeight(score.total, cfg);
+    const cost = viol.length * 10 + Math.abs(order.indexOf(got) - order.indexOf(rarity));
+    if (!best || cost < best.cost) best = { ...c, score, got, viol, cost };
+    if (cost === 0) break;
+  }
+  itemRuleGenStats.built++; itemRuleGenStats.attempts += used;
+  let finalRarity = rarity;
+  if (!best.viol.length && best.got !== rarity) { finalRarity = best.got; itemRuleGenStats.relabeled++; }
+  if (best.viol.length) itemRuleGenStats.unresolved++;
+  return { rarity: finalRarity, stats: best.stats, mods: best.mods, score: best.score, gp: formatGpAmount(IR.priceForWeight(best.score.total, finalRarity, cfg)), violations: best.viol };
+}
+
 function generateUniqueItem() {
-  const rarity = genRarity;
-  const s = GEN.scale[rarity];
+  let rarity = genRarity;
+  let s = GEN.scale[rarity];
   const catSel = document.getElementById('genCategory').value;
   const catPool = catSel === 'random' ? ['armor','weapon','consumable','misc'] : [catSel];
   const cat = ri(catPool);
@@ -10632,48 +10690,15 @@ function generateUniqueItem() {
   const tags = detectTags(baseName);
   const { pool: weightedPool, synergyNotes } = buildWeightedModPool(tags);
 
-  // Stats — subcategory/slotSize/dmg/ac/hp/charges all come from the shared roller so
-  // this matches the Store's items exactly.
-  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = rollItemStats(cat, rarity, baseName);
-  const gp = scaledGP(rarity);
-
-  // --- Weapon/armor affixes (materials + enchantments — see ITEM_AFFIXES) — rolled first and
-  // seeded into mods/usedModKeys so the buff/debuff loop below can't pick a colliding key, and
-  // so buildItemName sees them when composing the final name (each stacks as its own prefix
-  // word, e.g. "Flaming Sharp Shortsword", rather than the single-descriptor system below). A
-  // no-op for consumable/misc — rollItemAffixes only ever returns entries for weapon/armor.
-  const affixMods = rollItemAffixes(cat, rarity);
-  // --- Potion status effect (see POTION_STATUS_EFFECTS) — a guaranteed, classic-named potion
-  // effect (Giant Strength, Gaseous Form, ...), on top of whatever the general buff/debuff loop
-  // below also rolls, same "supplement, don't replace" relationship affixes have with weapons.
-  // Only for the potion subcategory specifically — a scroll or ration doesn't drink like one.
-  const potionStatus = subcategory === 'potion' ? rollPotionStatusEffect(rarity) : null;
-  const startingMods = potionStatus ? [...affixMods, potionStatus] : affixMods;
-
-  // --- Modifier generation: NO duplicates, synergy-weighted, spell/buff heavy ---
-  const modCount = getModifierCount();
-  const mods = [...startingMods];
-  const usedModTypes = []; // tracks modifier categories already used (prevents duplicate category)
-  const usedModKeys = startingMods.map(m => m.key);  // tracks specific buff/debuff/power/affix/potion strings already picked (prevents duplicate content)
-
-  let attempts = 0;
-  while (mods.length < modCount && attempts < 40) {
-    attempts++;
-    // Pick a type from the weighted pool, excluding already-used categories
-    const type = pickWeightedType(weightedPool, usedModTypes);
-    if (!type) break;
-
-    // Generate the modifier for this type/rarity
-    const m = generateModifierOfType(type, rarity, usedModKeys);
-    if (!m) continue;
-
-    // Deduplicate on the specific content key (e.g. buff stat name, spell name)
-    if (m.key && usedModKeys.includes(m.key)) continue;
-
-    mods.push(m);
-    usedModTypes.push(type); // each modifier type can only appear once
-    if (m.key) usedModKeys.push(m.key);
-  }
+  // Stats + modifiers are built together under the Item Rules (docs/ITEM_RULES.md): weapon/armor
+  // affixes (ITEM_AFFIXES) and a potion's status effect seed the mod list, then synergy-weighted,
+  // duplicate-free modifiers fill it; the whole roll repeats until it obeys the rules and its
+  // weight earns the target rarity. Rarity and gp then follow the modifier weight.
+  const built = buildItemUnderRules({ cat, rarity, baseName, weightedPool, countFn: getModifierCount, countIncludesStarting: true });
+  rarity = built.rarity; s = GEN.scale[rarity];
+  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = built.stats;
+  const gp = built.gp || scaledGP(rarity);
+  const mods = built.mods;
 
   const itemName = buildItemName(baseName, rarity, { dmg, ac, hp }, mods);
 
@@ -11014,7 +11039,7 @@ function pickBuffEffect(rarity, dur, modest, idx, usedKeys = []) {
   // with rarity (see scaledStatAmount) — since GEN.buffsSelf/etc. aren't ordered by power
   // tier, so pickTier() here would just arbitrarily narrow variety to ~1/6 of the list.
   const take = (list, isCondition) => {
-    const options = list.filter(v => !usedKeys.includes('buff:'+v));
+    const options = list.filter(v => !usedKeys.includes('buff:'+v) && ruleStatAllowed(v));
     if (!options.length) return null;
     return { stat: ri(options), isCondition };
   };
@@ -11037,7 +11062,7 @@ function pickDebuffEffect(rarity, dur, modest, idx, usedKeys = []) {
   const wantCondition = Math.random() < 0.5 || idx >= 2;
   // Same reasoning as pickBuffEffect: full-pool name selection, rarity only scales magnitude.
   const take = (list, isCondition) => {
-    const options = list.filter(v => !usedKeys.includes('debuff:'+v));
+    const options = list.filter(v => !usedKeys.includes('debuff:'+v) && ruleStatAllowed(v));
     if (!options.length) return null;
     return { stat: ri(options), isCondition };
   };
@@ -11059,9 +11084,11 @@ function pickNamedTrait(rarity, modest, usedKeys = []) {
   if (!options.length) return null;
   const mod = ri(options);
   const debuffAmt = Math.max(1, Math.round(modest * 0.6));
+  const buffStats = ruleSafeTraitStats(mod.buffs);
+  const debuffStats = ruleSafeTraitStats(mod.debuffs).filter(st => !buffStats.includes(st));
   const parts = [
-    ...(mod.buffs || []).map(stat => `+${scaledStatAmount(stat, rarity, modest)} ${stat}`),
-    ...(mod.debuffs || []).map(stat => `-${scaledStatAmount(stat, rarity, debuffAmt)} ${stat}`),
+    ...buffStats.map(stat => `+${scaledStatAmount(stat, rarity, modest)} ${stat}`),
+    ...debuffStats.map(stat => `-${scaledStatAmount(stat, rarity, debuffAmt)} ${stat}`),
   ];
   const text = `<strong>${mod.name}</strong>: ${parts.join(', ')}`;
   return { key: 'trait:'+mod.name, name: mod.name, text };
@@ -13281,7 +13308,7 @@ function merchantWillBuy(merchantKey, item) {
 // actually deals in — see MERCHANT_ITEM_CATS — so a Blacksmith's daily wares are always
 // armor/weapons, never a random potion.
 function generateStoreItem(merchantKey) {
-  const rarity = pickRarity();
+  let rarity = pickRarity();
   const allowedCats = MERCHANT_ITEM_CATS[merchantKey] || ['armor','weapon','consumable','misc'];
   let cat, baseName, catAttempts = 0;
   do {
@@ -13292,34 +13319,17 @@ function generateStoreItem(merchantKey) {
   const tags = detectTags(baseName);
   const { pool: weightedPool } = buildWeightedModPool(tags);
 
-  // Same shared stat roller the Unique Item Generator uses — subcategory/slotSize/
-  // dmg/ac/hp/charges are built identically regardless of which tab produced the item.
-  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = rollItemStats(cat, rarity, baseName);
-
-  // Weapon/armor affixes (materials + enchantments — see ITEM_AFFIXES) roll the same way here
-  // as in the Unique Item Generator, so Store wares stack "Flaming Sharp"-style prefixes too
-  // instead of only ever getting the generic buff/debuff/power modifiers below.
-  const affixMods = rollItemAffixes(cat, rarity);
-  const potionStatus = subcategory === 'potion' ? rollPotionStatusEffect(rarity) : null;
-  const startingMods = potionStatus ? [...affixMods, potionStatus] : affixMods;
-  const r = Math.random();
-  const modCount = r > 0.85 ? 3 : r > 0.4 ? 2 : 1;
-  const mods = [...startingMods], usedTypes = [], usedKeys = startingMods.map(m => m.key);
-  let attempts = 0;
-  while (mods.length < modCount + startingMods.length && attempts < 30) {
-    attempts++;
-    const type = pickWeightedType(weightedPool, usedTypes);
-    if (!type) break;
-    const m = generateModifierOfType(type, rarity, usedKeys);
-    if (!m || (m.key && usedKeys.includes(m.key))) continue;
-    mods.push(m); usedTypes.push(type);
-    if (m.key) usedKeys.push(m.key);
-  }
+  // Same builder (and the same Item Rules) the Generate Item tab uses — stats, affixes and
+  // modifiers are rolled together until the item obeys the rules and its weight earns the rarity.
+  const built = buildItemUnderRules({ cat, rarity, baseName, weightedPool, countFn: () => { const r = Math.random(); return r > 0.85 ? 3 : r > 0.4 ? 2 : 1; }, countIncludesStarting: false });
+  rarity = built.rarity;
+  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = built.stats;
+  const mods = built.mods;
 
   const itemName = buildItemName(baseName, rarity, { dmg, ac, hp }, mods);
   const descParagraphs = buildDescParagraphs(baseName, cat, rarity, tags, mods, { dmg, ac, hp });
   const flavor = descParagraphs.map(p => p.text).join('\n\n');
-  const gp = formatGpAmount(commercePrice(rarity, mods.length, rollPowerRatio(cat, rarity, dmg, ac, hp, mods)));
+  const gp = built.gp || formatGpAmount(commercePrice(rarity, mods.length, rollPowerRatio(cat, rarity, dmg, ac, hp, mods)));
   const weight = computeItemWeight({ type: cat, subcategory, name: itemName });
 
   // Same genTags/desc split as generateUniqueItem above — see that function's comment for why.
@@ -16742,6 +16752,45 @@ function setGenerationToggle(key, value) {
   renderDmControlsTab();
 }
 loadGenerationToggles();
+
+// ===================== ITEM RULES (DM-managed) =====================
+// One rule set + one weight table for every item source (default catalog, rolled loot, Store
+// wares, Generate Item). The DM's edits live in localStorage ('dmItemRules', a full config) and
+// are exported/imported as JSON from DM Controls > Item Rules. getItemRules() is null only if the
+// engine module failed to load, in which case generation falls back to the legacy behaviour.
+let itemRulesOverride = null;
+let _itemRulesCache = null;
+function loadItemRulesOverride() {
+  try { const raw = localStorage.getItem('dmItemRules'); itemRulesOverride = raw ? JSON.parse(raw) : null; } catch (e) { itemRulesOverride = null; }
+  _itemRulesCache = null;
+}
+function getItemRules() {
+  if (!window.ItemRules) return null;
+  if (!_itemRulesCache) _itemRulesCache = window.ItemRules.mergeItemRules(itemRulesOverride);
+  return _itemRulesCache;
+}
+function setItemRulesConfig(cfg) {
+  itemRulesOverride = cfg || null;
+  _itemRulesCache = null;
+  try { if (cfg) localStorage.setItem('dmItemRules', JSON.stringify(cfg)); else localStorage.removeItem('dmItemRules'); } catch (e) {}
+}
+loadItemRulesOverride();
+// Stat / condition names the "no attack-roll modifiers" rule keeps out of generated items.
+function ruleStatAllowed(name) {
+  const cfg = getItemRules();
+  const rule = cfg && (cfg.rules || []).find(r => r.id === 'no-attack-roll-modifiers');
+  if (!rule || !rule.enabled) return true;
+  const n = String(name || '').toLowerCase();
+  if ((rule.params.forbiddenStats || []).some(f => f.toLowerCase() === n)) return false;
+  return !/\battack rolls?\b|\bto hit\b|\battack bonus\b/.test(n);
+}
+// Named traits (Frenzied, Berserk...) pair stats; in an item an attack-roll stat becomes the
+// damage stat instead so the trait keeps its personality without touching to-hit.
+function ruleSafeTraitStats(list) {
+  const out = [];
+  (list || []).forEach(st => { const v = ruleStatAllowed(st) ? st : 'Damage Dealt'; if (!out.includes(v)) out.push(v); });
+  return out;
+}
 
 // Draw history for the Deck of Many Things (see DECK_OF_MANY_THINGS_CARDS/drawDeckOfManyThingsCard
 // further below) -- one entry per card ever drawn by this character, newest first. Synced like
@@ -24411,7 +24460,7 @@ MONSTER_PARTS.forEach(p => { MONSTER_PART_TYPE_LABEL[p.id] = p.anatomicalPart; }
 // even a "wrong" body part for the base item still does something interesting.
 const MONSTER_PART_EFFECT_POOL = {
   eye: [
-    { id:'keeneye', label:'Keen Eye', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls — it sees the opening before you do.` },
+    { id:'keeneye', label:'Keen Eye', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to damage rolls — it sees the opening before you do.` },
     { id:'watchful', label:'Watchful', appliesTo:['weapon','armor'], utilityText:m => `Advantage on Perception checks (+${m} when contested).` },
     { id:'nightsight', label:'Night Sight', appliesTo:['weapon','armor'], utilityText:() => `Grants Darkvision 60 ft. (or +60 ft. if you already have it).` },
     { id:'truesight', label:'Preternatural Sight', appliesTo:['weapon','armor'], utilityText:() => `See through illusions and invisibility within 30 ft., so long as you have line of sight.` },
@@ -24429,7 +24478,7 @@ const MONSTER_PART_EFFECT_POOL = {
   claw: [
     { id:'rendingclaw', label:'Rending Claw', appliesTo:['weapon'], dmgAdd:true, dmgType:'slashing', text:d => `+${d} slashing damage on hit.` },
     { id:'grappler', label:"Grappler's Grip", appliesTo:['weapon','armor'], utilityText:m => `Advantage on grapple checks (+${m}).` },
-    { id:'quickstrike', label:'Quick Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls.` },
+    { id:'quickstrike', label:'Quick Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to damage rolls.` },
     { id:'shred', label:'Shredding Claws', appliesTo:['weapon'], utilityText:() => `On a hit, the target also takes 1d4 damage at the start of its next turn from the wound (once per hit).` },
     { id:'climber', label:'Climbing Claws', appliesTo:['weapon','armor'], utilityText:() => `Grants a climbing speed equal to your walking speed.` },
     { id:'nimblegrip', label:'Nimble Grip', appliesTo:['weapon','armor'], dexAdd:true, text:m => `+${m} Dexterity — the claw's own quickness lingers in the grip.` },
@@ -24445,7 +24494,7 @@ const MONSTER_PART_EFFECT_POOL = {
   horn: [
     { id:'gore', label:'Goring Point', appliesTo:['weapon'], dmgAdd:true, dmgType:'piercing', text:d => `+${d} piercing damage on the first hit each combat.` },
     { id:'reach', label:'Extended Reach', appliesTo:['weapon'], reachAdd:true, text:() => `Reach increased by 5 ft.` },
-    { id:'charge', label:'Charging Point', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls when you moved 10+ ft. before the attack.` },
+    { id:'charge', label:'Charging Point', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to damage rolls when you moved 10+ ft. before the attack.` },
     { id:'trample', label:'Trampling Point', appliesTo:['weapon'], utilityText:() => `Deal an extra 1d6 damage on a hit against a Prone creature.` },
     { id:'unyielding', label:'Unyielding Horn', appliesTo:['armor'], hpAdd:true, text:m => `+${m * 2} Maximum Hit Points while worn.` },
     { id:'brutishmight', label:'Brutish Might', appliesTo:['weapon','armor'], strAdd:true, text:m => `+${m} Strength — mounted or worn, it carries the same raw force.` },
@@ -24479,7 +24528,7 @@ const MONSTER_PART_EFFECT_POOL = {
     { id:'lifedrink', label:'Lifedrinker', appliesTo:['weapon'], utilityText:m => `On a killing blow, regain ${m}d4 HP.` },
     { id:'steadfast', label:'Steadfast Heart', appliesTo:['weapon','armor'], utilityText:() => `Advantage on saving throws against being Frightened.` },
     { id:'secondwind', label:'Second Wind', appliesTo:['weapon','armor'], utilityText:() => `Once per long rest, drop to 1 HP instead of 0 when you would be reduced to 0.` },
-    { id:'furious', label:'Furious Heart', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls once you're below half HP.` },
+    { id:'furious', label:'Furious Heart', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to damage rolls once you're below half HP.` },
     { id:'fearlessheart', label:'Fearless Heart', appliesTo:['weapon','armor'], chaAdd:true, text:m => `+${m} Charisma — courage like that is contagious, even secondhand.` },
   ],
   bone: [
@@ -24493,8 +24542,8 @@ const MONSTER_PART_EFFECT_POOL = {
   talon: [
     { id:'piercingtalon', label:'Piercing Talon', appliesTo:['weapon'], dmgAdd:true, dmgType:'piercing', text:d => `+${d} piercing damage on hit.` },
     { id:'snatch', label:'Snatching Grip', appliesTo:['weapon','armor'], utilityText:m => `Advantage on grapple checks (+${m}).` },
-    { id:'talonstrike', label:'Talon Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls.` },
-    { id:'divestrike', label:'Diving Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to attack rolls if you moved at least 10 ft. straight toward the target this turn.` },
+    { id:'talonstrike', label:'Talon Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to damage rolls.` },
+    { id:'divestrike', label:'Diving Strike', appliesTo:['weapon'], attackBonus:true, text:m => `+${m} to damage rolls if you moved at least 10 ft. straight toward the target this turn.` },
     { id:'irongrip', label:'Iron Grip', appliesTo:['armor'], utilityText:() => `Advantage on checks and saves made to avoid being disarmed.` },
     { id:'precisegrip', label:'Precise Grip', appliesTo:['weapon','armor'], dexAdd:true, text:m => `+${m} Dexterity — its grip finds purchase you never had to think about.` },
   ],

@@ -5072,7 +5072,7 @@ const canonicalItems = [
         "value": 1
       },
       {
-        "stat": "attackRoll",
+        "stat": "damageRoll",
         "value": 1
       }
     ],
@@ -5111,7 +5111,7 @@ const canonicalItems = [
         "value": 1
       },
       {
-        "stat": "attackRoll",
+        "stat": "damageRoll",
         "value": 1
       }
     ],

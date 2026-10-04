@@ -16,7 +16,7 @@
 //     in this catalog's own flavor text.
 //   - Adamantine: any critical hit against the wearer becomes a normal hit; an adamantine weapon
 //     automatically scores a critical hit against objects (not creatures).
-//   - Masterwork: a purely mundane +1 to attack rolls only (no damage bonus, no AC bonus) —
+//   - Masterwork: a purely mundane +1 to damage rolls only (no attack bonus — item rules forbid attack-roll modifiers — no AC bonus) —
 //     explicitly NOT magical, distinct from a true +1 weapon/armor.
 //
 // These are migration-time modifiers, applied by scripts/migrate-legacy-content.js when an
@@ -57,7 +57,7 @@ export const MATERIAL_MODIFIERS = {
     appliesTo: ['weapon', 'armor'],
     rarity: 'common',
     magical: false,
-    passiveMods: [{ stat: 'attackRoll', value: 1 }],
+    passiveMods: [{ stat: 'damageRoll', value: 1 }],
     nameTemplate: '{base} (Masterwork)',
   },
 };

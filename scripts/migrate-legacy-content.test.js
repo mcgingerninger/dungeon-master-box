@@ -361,11 +361,11 @@ describe('applyMaterialModifiers — real mechanics, not classification labels',
     assert.equal(applyMaterialModifiers(armor, armor.name, '', '').item.armor.critImmuneWhileWorn, true);
   });
 
-  test('masterwork grants a real, non-magical +1 to attack rolls only (no damage, no AC)', () => {
+  test('masterwork grants a real, non-magical +1 to damage rolls only (no attack bonus, no AC)', () => {
     const base = { id: 'x', name: 'Masterwork Longsword', itemType: 'weapon', rarity: 'common', weapon: { damageDice: '1d8', damageType: 'slashing' } };
     const { item } = applyMaterialModifiers(base, 'Masterwork Longsword', '', '');
     assert.equal(item.weapon.magical, false);
-    assert.deepEqual(item.passive, [{ stat: 'attackRoll', value: 1 }]);
+    assert.deepEqual(item.passive, [{ stat: 'damageRoll', value: 1 }]);
   });
 
   // Real, already-live bug found by scripts/validate-migration-bridge.js's shadow-mode comparison

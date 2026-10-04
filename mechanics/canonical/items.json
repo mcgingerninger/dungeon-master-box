@@ -5070,7 +5070,7 @@
         "value": 1
       },
       {
-        "stat": "attackRoll",
+        "stat": "damageRoll",
         "value": 1
       }
     ],
@@ -5109,7 +5109,7 @@
         "value": 1
       },
       {
-        "stat": "attackRoll",
+        "stat": "damageRoll",
         "value": 1
       }
     ],
