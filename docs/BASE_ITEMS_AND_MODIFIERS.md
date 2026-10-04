@@ -2,7 +2,7 @@
 
 A snapshot of everything a weapon or armor piece is built from and what can be applied on top of it, taken from the live data (`WEAPON_BASE_TYPES`, `ARMOR_BASE_TYPES`, `ITEM_AFFIXES`, `MATERIAL_MODIFIERS`, `MONSTER_PART_EFFECT_POOL`). **ATTACK** marks anything that changes an attack (to-hit) roll, since to-hit modifiers are the thing under review.
 
-- **31 base weapon types**, **26 base armor pieces**, **36 prefix affixes**, **4 materials**, **85 monster-part effects** that can land on a weapon or armor.
+- **31 base weapon types**, **26 base armor pieces**, **37 prefix affixes**, **4 materials**, **85 monster-part effects** that can land on a weapon or armor.
 - The hand-authored catalog has **405 weapons** and **289 armor items**; **359 of the weapons** carry a “+N … attack” bonus in their effect text.
 
 ## Base weapons
@@ -105,6 +105,7 @@ Base list = name + damage die only (no damage type, weapon properties or weight 
 | Venomous | uncommon+ | +2d4 poison damage on a hit, and the target has disadvantage on its next Constitution saving throw. | damage, stat |
 | Radiant | rare+ | +2d4 radiant damage on a hit (+2d4 more against undead and fiends). | damage |
 | Vicious | rare+ | Deals an extra 2d6 damage on a critical hit. | damage |
+| Masterful | superrare+ | +2 to your proficiency bonus while wielded — it applies to every proficient roll: weapons, skills, and saving throws. | stat |
 | Vampiric | superrare+ | The wielder regains 2 hit points whenever this weapon deals damage. | damage |
 
 ### Armor only

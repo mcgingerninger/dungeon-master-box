@@ -20,3 +20,11 @@ Each weapon's base type and simple/martial category are read from its name
 (`WEAPON_PROFICIENCY_TABLE`); an unrecognizable custom weapon counts as martial, and an item can set
 `weaponCategory: 'simple'|'martial'|'natural'` to override. An unset sheet is proficient with nothing.
 Unarmed strikes are always proficient. Armor and shield proficiency are not modeled.
+
+## Where a proficiency bonus can come from
+- **Feat — Disciplined Training:** +1 to your proficiency bonus.
+- **Weapon modifier — Masterful** (Super Rare and above weapons): "+N to your proficiency bonus while
+  wielded", N = 2 at Super Rare, 3 at Legendary, 4 at Celestial. It applies to every proficient roll
+  (weapons, skills, saving throws) and stacks with the feat and other sources.
+- Any other gear or feat whose text says "+N to your proficiency bonus" — read by
+  `collectProficiencyBoost`.

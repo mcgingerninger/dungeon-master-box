@@ -529,7 +529,10 @@ export function collectProficiencyBoost(slots, resolveItem, activeEffects) {
     if (!entry || !entry.item) return;
     const it = entry.item;
     const before = sources.length;
-    add(it.name, [it.effect, ...(it.mods || []).map(m => m.text)].filter(Boolean).join(' '));
+    // Some items carry the same text twice (a flattened `effect` AND the `mods` it came from — Fleshmancer
+    // limbs, many generated items), so take the larger of the two readings instead of adding them.
+    const n = Math.max(parseProficiencyBonusBoost(it.effect), parseProficiencyBonusBoost((it.mods || []).map(m => m.text).join(' ')));
+    if (n) sources.push({ source: it.name, amount: n });
     if (sources.length > before) sources[sources.length - 1].key = key; // the same item in two slots counts once
   });
   (activeEffects || []).forEach(e => { if (e && e.text) add(e.name || 'Active effect', e.text); });

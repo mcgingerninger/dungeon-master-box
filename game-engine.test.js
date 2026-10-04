@@ -101,6 +101,9 @@ describe('computeCharacterSheetFor', () => {
     assert.equal(boost.total, 3);                       // the same ring in two slots counts once
     assert.deepEqual(boost.sources.map(s => s.source), ['Ring of the Duelist', 'Prodigy (feat)']);
     assert.equal(GE.collectProficiencyBoost({}, () => null, []).total, 0);
+    // an item carrying the same text as both `effect` and `mods` counts once, not twice
+    const both = { masterful: { item: { name: 'Masterful Dagger', effect: '+3 to your proficiency bonus while wielded.', mods: [{ text: '+3 to your proficiency bonus while wielded.' }] } } };
+    assert.equal(GE.collectProficiencyBoost({ weapon1: 'masterful' }, k => both[k], []).total, 3);
   });
   test('"+N to your proficiency bonus" text is read from gear and feats', () => {
     assert.equal(GE.parseProficiencyBonusBoost('You gain a +1 bonus to your proficiency bonus with weapons.'), 0); // wording must match
