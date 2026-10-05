@@ -787,13 +787,16 @@
     12%  { opacity:1; }
     100% { transform:translate(5px,-28px) scale(0.1); opacity:0; }
   }
-  .icon-fx-legendary::before, .icon-fx-legendary::after {
+  /* The rising ember dots were removed: the new item art draws its own effects on the object, and loose
+     moving dots read as stray pixels. Kept as display:none so the keyframes above stay valid. */
+  .icon-fx-legendary::before, .icon-fx-legendary::after { display:none; }
+  .icon-fx-legendary-embers::before, .icon-fx-legendary-embers::after {
     content:''; position:absolute; left:50%; bottom:8%; width:3px; height:3px; border-radius:50%;
     background:#ffb84d; pointer-events:none;
     box-shadow: 8px 2px 0 -0.5px #ff7a1a, -7px 4px 0 -0.5px #ffd08a, 3px -6px 0 -1px #ff9f43;
   }
-  .icon-fx-legendary::before { animation: emberRiseA 2.1s ease-in infinite; }
-  .icon-fx-legendary::after  { animation: emberRiseB 2.1s ease-in infinite 1.05s; }
+  .icon-fx-legendary-embers::before { animation: emberRiseA 2.1s ease-in infinite; }
+  .icon-fx-legendary-embers::after  { animation: emberRiseB 2.1s ease-in infinite 1.05s; }
   /* Real bug found in testing: a reported "dragging an item freezes the app" that never showed
      up as a slow synchronous function anywhere (every drag/drop handler measured well under 10ms
      even against a heavily populated inventory) — the remaining, unreproducible-via-script
@@ -12330,7 +12333,7 @@ function renderFleshCandidates() {
     const selected = i === fleshSelectedIndex ? ' selected' : '';
     return `
       <div class="flesh-card ${c.rarity}${selected}" onclick="selectFleshCandidate(${i})">
-        <div class="flesh-icon-box">${fleshLimbIconSvg(c.limbDef.category, color)}</div>
+        <div class="flesh-icon-box">${(typeof itemArtSvg === 'function' && itemArtSvg({ name: c.name, type: 'limb', subcategory: c.limbDef.category, mods: c.mods, rarity: c.rarity }, 56, c.rarity)) || fleshLimbIconSvg(c.limbDef.category, color)}</div>
         <div class="flesh-card-name">${escapeHtml(c.name)}</div>
         <div class="flesh-card-rarity">${rarityNames[c.rarity] || c.rarity}</div>
         <div class="flesh-card-effects">${effectsHtml}</div>

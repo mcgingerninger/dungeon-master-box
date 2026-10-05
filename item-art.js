@@ -92,7 +92,7 @@
     const tier = RAR[rarity || item.rarity] ?? 0;
     const need = (mods.length || tier >= 2) ? 2 : 3.5;
     const list = Object.keys(sc).filter(id => sc[id] >= need).sort((a, b) => sc[b] - sc[a]).slice(0, 2);
-    if (!list.length && (tier >= 1 || /\+\d/.test(nameT) || mods.length || /magic|enchant/.test(effText))) list.push(tier >= 4 ? 'luck' : 'magic');
+    if (!list.length && (tier >= 1 || /\+\d/.test(nameT) || mods.length || /magic|enchant/.test(effText))) list.push('magic');
     return list;
   }
 
@@ -138,7 +138,7 @@
     const at = (x, y) => (x >= 0 && y >= 0 && x < N && y < N ? g[y][x] : null);
     const mat = matColors(spec.material), tier = RAR[rarity] ?? 0;
     const fxIds = (spec.effects || []).filter(id => FX[id] || id === 'magic');
-    const fxColor = fxIds.length ? (FX[fxIds[0]] ? FX[fxIds[0]].color : '#9fd0ff') : null;
+    const fxColor = fxIds.length ? (FX[fxIds[0]] ? FX[fxIds[0]].color : (GEM[rarity] || '#9fd0ff')) : null;
     const tintable = fxIds.some(id => ['fire', 'frost', 'storm', 'poison', 'acid', 'holy', 'shadow', 'necrotic', 'blood', 'arcane', 'nature'].includes(id));
     const gemColor = spec.liquid || fxColor || GEM[rarity] || GEM.common;
     const baseColor = r => r === 'a' ? mat.a : r === 'b' ? mat.b : r === 'c' ? mat.c : r === 't' ? mat.t : r === 'g' ? gemColor : r === 'f' ? (fxColor || mix(mat.b, mat.a, 0.3)) : FIXED[r] || mat.a;
@@ -189,6 +189,7 @@
     const wisp = (e, L, w0, cols, rise) => { const ph = rnd() * 6, sgn = rnd() > 0.5 ? 1 : -1; for (let i = 0; i < L; i++) { const t = i / L, x = Math.round(e.x + e.nx * i * 0.5 + Math.sin(i * 0.7 + ph) * (1 + t * 1.6) * sgn), y = Math.round(e.y + (rise ? -i * 0.95 : e.ny * i * 0.9 - i * 0.35)); const hw = Math.max(0, Math.round(w0 * (1 - t))); for (let dx = -hw; dx <= hw; dx++) putFx(x + dx, y, Math.abs(dx) === hw && hw > 0 ? cols[1] : cols[0], 1 - t * 0.35); if (hw === 0 && t < 0.9) putFx(x, y, cols[2] || cols[1], 1 - t * 0.35); } };
     const drip = (e, pal, thick) => { const L = 2 + Math.floor(rnd() * 3) + (tier >= 3 ? 1 : 0); for (let k = 0; k < L; k++) { putFx(e.x, e.y + k, pal[1]); if (thick && k < L - 1) putFx(e.x + 1, e.y + k, pal[0]); } putFx(e.x, e.y + L, pal[2]); putFx(e.x, e.y + L + 1, pal[1]); if (thick) { putFx(e.x + 1, e.y + L, pal[1]); putFx(e.x + 1, e.y + L + 1, pal[0]); } };
     const bubble = (e, pal) => { const cx = e.x, cy = e.y - 2; [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([dx, dy]) => putFx(cx + dx, cy + dy, dx === -1 && dy === -1 ? pal[2] : pal[1])); };
+    const spark = GEM[rarity] || '#ffe27a';
     const noCircle = LIQUID_BASES.has(spec.base) || /^(scroll|ration|mushroom|fruit|cheese|candy|bread|salve|herbs|dust|bead)$/.test(spec.base);
     const FXF = {
       fire() { const cols = ['#b22410', '#ff5a1a', '#ff9a2a', '#ffd04a', '#fff3b0']; spread(fit(tops, 5, true), count(2), 3).forEach(e => { const h = 6 + Math.floor(rnd() * 4) + tier, ph = rnd() * 6; for (let k = 0; k < h; k++) { const t = k / h, hw = t < 0.55 ? 1 : 0, sway = Math.round(Math.sin(k * 0.7 + ph) * 1.6 * t), ci = Math.min(4, Math.floor(t * 4.6)); for (let dx = -hw; dx <= hw; dx++) putFx(e.x + sway + dx, e.y - k, dx === 0 && t > 0.1 && t < 0.7 ? cols[Math.min(4, ci + 1)] : cols[ci]); } }); },
@@ -204,6 +205,7 @@
       necrotic() { spread(fit(edges.filter(e => e.ny <= 0 || e.nx), 6, true), count(1.6), 4).forEach(e => wisp(e, 8 + Math.floor(rnd() * 5) + tier, 1, ['#2fae4a', '#7fe08a', '#d4ffd0'], true)); pickCells(4 + tier, () => true).forEach(([x, y]) => paint(x, y, '#14331c')); },
       nature() { const used = new Set(); for (let v = 0; v < (tier >= 3 ? 2 : 1) + 1; v++) { const starts = ring1.map(c => c.y * N + c.x).filter(k => !used.has(k)); if (!starts.length) break; let cur = starts[Math.floor(rnd() * starts.length)], pdx = 1, pdy = 0; for (let s = 0; s < 16 + tier * 3; s++) { used.add(cur); const x = cur % N, y = Math.floor(cur / N); putFx(x, y, '#2f7a2f'); if (s % 3 === 2) { const out = [[1, 0], [-1, 0], [0, 1], [0, -1]].find(([dx, dy]) => free(x + dx, y + dy) && dist[y + dy] && dist[y + dy][x + dx] === 2); if (out) { putFx(x + out[0], y + out[1], '#5fbf5f'); putFx(x + out[0] * 2, y + out[1] * 2, '#9fe89f'); putFx(x + out[0] * 2 + out[1], y + out[1] * 2 + out[0], '#5fbf5f'); } } let best = null, bs = -9; [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(([dx, dy]) => { const k = (y + dy) * N + (x + dx); if (dist[y + dy] && dist[y + dy][x + dx] === 1 && !used.has(k)) { const sc = dx * pdx + dy * pdy + rnd() * 0.3; if (sc > bs) { bs = sc; best = [k, dx, dy]; } } }); if (!best) break; cur = best[0]; pdx = best[1]; pdy = best[2]; } } pickCells(4 + tier, () => true).forEach(([x, y]) => paint(x, y, rnd() > 0.5 ? '#3f7a3a' : '#6fb85f')); },
       wind(col) { spread(fit(outward, 4), count(1.6), 6).forEach(e => { const L = 10 + Math.floor(rnd() * 4), sg = rnd() > 0.5 ? 1 : -1; for (let i = 0; i < L; i++) { const t = i / L, x = Math.round(e.x + e.nx * i * 0.8 + e.ny * Math.sin(t * 4) * 2.2 * sg), y = Math.round(e.y + e.ny * i * 0.8 + e.nx * Math.sin(t * 4) * 2.2 * sg); putFx(x, y, i < 3 ? '#ffffff' : col, 1 - t * 0.5); { const sd = e.nx && e.ny ? [e.nx, 0] : [e.ny ? 1 : 0, e.nx ? 1 : 0]; if (i < L * 0.6) putFx(x + sd[0], y + sd[1], col, 0.85); if (i < L * 0.3) putFx(x - sd[0], y - sd[1], col, 0.85); } } }); },
+      magic() { if (tier < 3) return; const n = tier >= 5 ? 4 : tier >= 4 ? 3 : 2; spread(fit(outward, 4), n, 6).forEach((e, i) => { const len = 2 + (i % 2); for (let j = 0; j < len; j++) putFx(e.x + e.nx * j, e.y + e.ny * j, j ? '#ffffff' : spark); plus(e.x + e.nx * (len + 1), e.y + e.ny * (len + 1), spark, '#ffffff'); }); },
       sonic() { [[12, '#d4f0ff'], [14.6, '#9fd0f0'], [17.2, '#6fa8d8']].forEach(([r, c], ri) => { if (ri > 1 + Math.floor(tier / 2)) return; [0, Math.PI].forEach(base => { for (let a = -0.75; a <= 0.75; a += 0.4 / r * 2) putFx(Math.round(16 + Math.cos(base + a) * r), Math.round(16 + Math.sin(base + a) * r), c); }); }); },
       circle(col, runes) { const r = 14.2; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = Math.hypot(x + 0.5 - 16, y + 0.5 - 16); if (Math.abs(d - r) < 0.55) under.push({ x, y, c: col, o: 0.6 }); else if (Math.abs(d - (r - 2.4)) < 0.4 && tier >= 3) under.push({ x, y, c: col, o: 0.35 }); }
         [[16, 1, 0, 1], [16, 30, 0, -1], [1, 16, 1, 0], [30, 16, -1, 0]].forEach(([x, y, dx, dy]) => { for (let k = 1; k <= 3; k++) under.push({ x: x + dx * k, y: y + dy * k, c: col, o: 0.6 }); });
@@ -215,7 +217,7 @@
       else if (id === 'holy') FXF.holy(); else if (id === 'luck') FXF.luck();
       else if (id === 'shadow') FXF.shadow(); else if (id === 'necrotic') FXF.necrotic();
       else if (id === 'nature') FXF.nature(); else if (id === 'wind') FXF.wind('#bfe4ff'); else if (id === 'sonic') FXF.sonic();
-      else if (id === 'arcane') { if (!noCircle) FXF.circle('#b98cff', true); } else if (id === 'magic' && tier >= 2) { if (!noCircle) FXF.circle('#9fd0ff', false); }
+      else if (id === 'arcane') { if (!noCircle) FXF.circle('#b98cff', true); } else if (id === 'magic') FXF.magic();
     });
     const glow = [];
     if (fxColor && tier >= 1) { const reach = Math.min(4, 1 + Math.ceil(tier / 2)); for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = dist[y][x]; if (d >= 2 && d <= 1 + reach && !fxCells.has(y * N + x)) glow.push({ x, y, c: fxColor, o: d === 2 ? 0.3 : d === 3 ? 0.17 : 0.09 }); } }
