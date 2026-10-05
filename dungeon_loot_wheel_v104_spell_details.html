@@ -18567,6 +18567,35 @@ function firstFluffText(node) {
   if (node && typeof node === 'object') return firstFluffText(node.entries || node.items || null);
   return null;
 }
+// A stat block's spellcasting lives outside traits/actions (5etools: raw.spellcasting[]), so it was
+// invisible to combat. Turns it into { name, ability, dc, toHit, groups:[{label, kind, spells,
+// uses|slots, level}] } where kind is 'will' | 'daily' | 'slots'. The save DC / spell attack bonus
+// come from the block's own header text when it states them, otherwise from proficiency + the
+// casting ability.
+function monsterParseSpellcasting(raw) {
+  const blocks = Array.isArray(raw.spellcasting) ? raw.spellcasting : [];
+  const crNum = (() => { const c = raw.cr && typeof raw.cr === 'object' ? raw.cr.cr : raw.cr; const t = String(c || '0'); return t.includes('/') ? (+t.split('/')[0]) / (+t.split('/')[1]) : (parseFloat(t) || 0); })();
+  const prof = 2 + Math.max(0, Math.floor((Math.max(1, crNum) - 1) / 4));
+  const names = list => (list || []).flatMap(x => typeof x === 'string' ? [x] : (x && x.entry ? [x.entry] : [])).map(t => spellCleanTags(String(t)).replace(/\s*\(.*\)\s*$/, '').replace(/[*_]/g, '').trim()).filter(Boolean);
+  const out = [];
+  blocks.forEach(b => {
+    const header = spellCleanTags(spellFlattenEntries(b.headerEntries || []));
+    const abilityKey = b.ability || 'int';
+    const mod = Math.floor(((raw[abilityKey] ?? 10) - 10) / 2);
+    const dcM = /spell save DC (\d+)/i.exec(header), hitM = /([+-]\d+) to hit with spell attacks/i.exec(header);
+    const dc = dcM ? +dcM[1] : 8 + prof + mod, toHit = hitM ? parseInt(hitM[1], 10) : prof + mod;
+    const groups = [];
+    if (b.will && b.will.length) groups.push({ label: 'At will', kind: 'will', spells: names(b.will) });
+    Object.entries(b.daily || {}).forEach(([k, list]) => { const n = parseInt(k, 10) || 1; groups.push({ label: `${n}/day${/e$/.test(k) ? ' each' : ''}`, kind: 'daily', uses: n, spells: names(list) }); });
+    Object.entries(b.rest || {}).forEach(([k, list]) => { const n = parseInt(k, 10) || 1; groups.push({ label: `${n}/rest${/e$/.test(k) ? ' each' : ''}`, kind: 'daily', uses: n, spells: names(list) }); });
+    Object.entries(b.spells || {}).forEach(([lvl, v]) => {
+      const level = parseInt(lvl, 10) || 0;
+      groups.push(level === 0 ? { label: 'Cantrips (at will)', kind: 'will', level: 0, spells: names(v.spells) } : { label: `Level ${level}${v.slots ? ` (${v.slots} slot${v.slots > 1 ? 's' : ''})` : ''}`, kind: 'slots', level, slots: v.slots || 1, spells: names(v.spells) });
+    });
+    if (groups.some(g => g.spells.length)) out.push({ name: spellCleanTags(b.name || 'Spellcasting'), ability: abilityKey, dc, toHit, groups: groups.filter(g => g.spells.length) });
+  });
+  return out;
+}
 function monsterNormalize(raw, fluffByKey) {
   const acEntry = Array.isArray(raw.ac) ? raw.ac[0] : raw.ac;
   const ac = acEntry == null ? '—' : (typeof acEntry === 'number' ? acEntry : (acEntry.ac ?? '—'));
@@ -18603,6 +18632,7 @@ function monsterNormalize(raw, fluffByKey) {
     resist, immune, vulnerable, conditionImmune,
     traits,
     actions,
+    spellcasting: monsterParseSpellcasting(raw),
     bonusActions: monsterActionList(raw.bonus),
     reactions: monsterActionList(raw.reaction),
     legendary: monsterActionList(raw.legendary),
@@ -19414,14 +19444,17 @@ function monsterHasWeaponAttack(monster) {
 // save for 8d6 fire, not a generic bolt); otherwise (or for a utility spell) it falls back to a
 // generic bolt / a plain description. The creature's spell attack bonus and save DC scale with the
 // gear's rarity.
-function buildChaosSpellAction(spellName, idx) {
-  const toHit = 4 + idx * 2, dc = 8 + toHit;
+function buildChaosSpellAction(spellName, idx, opts) {
+  const o = opts || {};
+  const toHit = o.toHit != null ? o.toHit : 4 + idx * 2, dc = o.dc != null ? o.dc : 8 + toHit;
   const raw = (window.SpellCompendiumAPI && SpellCompendiumAPI.find && SpellCompendiumAPI.find(spellName)) || null;
   const generic = { name: spellName, isSpell: true, text: `Ranged Spell Attack: +${toHit} to hit, range 60 ft., one target. Hit: ${CHAOS_SPELL_DAMAGE_DICE[idx]} force damage.` };
-  if (!raw) return generic;
+  if (!raw) return o.strict ? null : generic;
   const json = JSON.stringify(raw.entries || []);
   const dm = /\{@(?:damage|dice) ([^}|]+)/.exec(json);
-  const dice = dm ? dm[1].replace(/\s+/g, '') : null;
+  let dice = dm ? dm[1].replace(/\s+/g, '') : null;
+  // a cantrip grows with the caster's tier like it does for a character (5th/11th/17th level)
+  if (dice && Number(raw.level ?? 0) === 0 && o.casterLevel) { const q = /^(\d+)d(\d+)(.*)$/.exec(dice); if (q) dice = `${(+q[1]) * (o.casterLevel >= 17 ? 4 : o.casterLevel >= 11 ? 3 : o.casterLevel >= 5 ? 2 : 1)}d${q[2]}${q[3]}`; }
   const type = (raw.damageInflict && raw.damageInflict[0]) || '';
   const save = raw.savingThrow && raw.savingThrow[0] ? String(raw.savingThrow[0]) : '';
   const range = (raw.rangeLabel || '').replace(/\s+/g, ' ').replace(/\.$/, '');

@@ -186,6 +186,8 @@
       tt.innerHTML = `<div class="tt-header" style="margin-bottom:0.3rem">${esc(t.name)}</div>`
         + buildMonsterTooltipHtml(t.monster).replace(/<div class="tt-header"[\s\S]*?<\/div>/, '')
         + modifiersHtml(t)
+        + (() => { const sc = t.monster.spellcasting || []; if (!sc.length) return ''; const st = spellState(t);
+            return sc.map(b => `<div class="bt-sec"><b>${esc(b.name)}</b> <span class="bt-note">DC ${b.dc} · ${fmt(b.toHit)} to hit</span>${b.groups.map(g => `<div>${esc(g.label)}: ${g.spells.map(n => { const k = n.toLowerCase(); const left = g.kind === 'daily' ? ` (${st.daily[k]} left)` : ''; return esc(n) + left; }).join(', ')}${g.kind === 'slots' ? ` <span class="bt-note">(${st.slots[g.level]} left)</span>` : ''}</div>`).join('')}</div>`).join(''); })()
         + (() => { const gear = (t.entry.chaosGearList || []).map(g => g.spellAction ? `${g.spellAction.name} ✦` : g.weaponAction ? `${g.weaponAction.name} ⚔` : '').filter(Boolean);
             const all = [...(t.monster.actions || []).map(a => esc(a.name)), ...gear.map(esc)];
             return all.length ? `<div class="bt-sec"><b>Actions</b> ${all.join(', ')}</div>` : ''; })();
@@ -204,7 +206,7 @@
   function rollAction(action, target, entry) {
     const { toHit, damageClauses, saveDC } = battleParseAttack(action.text || '');
     const atkMod = entry.atkMod || 0, mult = entry.dmgMult || 1;
-    const r = { name: action.name, text: action.text, source: action.source, utility: !!action.utility, saveDC, toHit: null, d20: null, total: null, ac: target.ac, outcome: 'info', clauses: [], damage: 0, needsSave: false };
+    const r = { name: action.name, text: action.text, source: action.source, useNote: action.useNote, utility: !!action.utility, saveDC, toHit: null, d20: null, total: null, ac: target.ac, outcome: 'info', clauses: [], damage: 0, needsSave: false };
     let crit = false, hit = true;
     if (toHit !== null) {
       r.d20 = rn(1, 20); crit = r.d20 === 20;
@@ -220,6 +222,38 @@
     }
     return r;
   }
+  // ---------- stat-block spellcasting ----------
+  // monster.spellcasting (parsed from the stat block, see monsterParseSpellcasting) lists spells as
+  // at-will, N/day or slot-limited. Each offensive spell becomes a real action built from the spell
+  // compendium (its own dice, damage type, save or attack roll) using the block's own save DC /
+  // spell attack bonus. Uses are tracked per token and spent when a spell is rolled.
+  function spellState(token) {
+    if (token.spellState) return token.spellState;
+    const st = { slots: {}, daily: {} };
+    (token.monster.spellcasting || []).forEach(b => b.groups.forEach(g => {
+      if (g.kind === 'slots') st.slots[g.level] = (st.slots[g.level] || 0) + (g.slots || 1);
+      if (g.kind === 'daily') g.spells.forEach(n => { st.daily[n.toLowerCase()] = g.uses; });
+    }));
+    return (token.spellState = st);
+  }
+  function crOf(m) { const t = String(m.cr || '0'); return t.includes('/') ? (+t.split('/')[0]) / (+t.split('/')[1]) : (parseFloat(t) || 0); }
+  function spellActions(token) {
+    const out = [], st = spellState(token);
+    token.spellCache = token.spellCache || {};
+    (token.monster.spellcasting || []).forEach(b => b.groups.forEach(g => g.spells.forEach(name => {
+      const key = name.toLowerCase();
+      if (g.kind === 'daily' && !(st.daily[key] > 0)) return;
+      if (g.kind === 'slots' && !(st.slots[g.level] > 0)) return;
+      let act = token.spellCache[key];
+      if (act === undefined) act = token.spellCache[key] = buildChaosSpellAction(name, 0, { toHit: b.toHit, dc: b.dc, strict: true, casterLevel: Math.ceil(crOf(token.monster)) });
+      if (!act || (act.utility && !/(saving throw|DC \d+)/.test(act.text + ' ') || act.utility && !/paraly|charm|frighten|blind|stun|restrain|incapacit|asleep|sleep|poison|prone|slow|deafen|banish|command|fear|hold|dominat|entangle|confus/i.test(act.text))) return; // only offensive spells
+      const note = g.kind === 'will' ? 'at will' : g.kind === 'daily' ? `${g.label}, ${st.daily[key] - 1} left after` : `level ${g.level} slot, ${st.slots[g.level] - 1} left after`;
+      out.push({ ...act, source: 'spell', origin: 'statblock', useNote: note, consume: () => { if (g.kind === 'daily') st.daily[key]--; if (g.kind === 'slots') st.slots[g.level]--; } });
+    })));
+    return out;
+  }
+  window.btSpellActions = spellActions;
+
   // A monster's turn against a target. Multiattack is never rolled itself: it triggers two other
   // attacks that are NOT multiattacks.
   function rollMonster(token, target) {
@@ -227,17 +261,18 @@
     // Everything the creature can do: its own attacks, plus each piece of chaos gear that grants an
     // action — a wielded weapon is a weapon attack, a learned spell is a real spell action.
     const gear = (token.entry.chaosGearList || []).map(g => g.kind === 'spell' ? g.spellAction && { ...g.spellAction, source: 'spell' } : g.kind === 'weapon' ? g.weaponAction && { ...g.weaponAction, source: 'weapon' } : null).filter(Boolean);
-    const actions = [...(m.actions || []).filter(a => isAttackish(a) || isMulti(a)), ...gear];
+    const actions = [...(m.actions || []).filter(a => isAttackish(a) || isMulti(a)), ...gear, ...spellActions(token)];
     const result = { token, target, attacks: [], multi: false, note: '' };
     if (!actions.some(a => !isMulti(a))) { result.note = 'This creature has no attack action to roll.'; return result; }
     const picked = ri(actions);
+    if (picked.consume) picked.consume();
     if (isMulti(picked)) {
       const singles = actions.filter(a => !isMulti(a) && (isAttackish(a) || a.utility));
       result.multi = true; result.multiAction = picked;
       if (!singles.length) { result.note = 'Multiattack, but no other attack to roll.'; return result; }
       const first = ri(singles), rest = singles.filter(a => a !== first);
       const second = rest.length ? ri(rest) : first;
-      [first, second].forEach(a => result.attacks.push(rollAction(a, target, token.entry)));
+      [first, second].forEach(a => { if (a.consume) a.consume(); result.attacks.push(rollAction(a, target, token.entry)); });
     } else result.attacks.push(rollAction(picked, target, token.entry));
     return result;
   }
@@ -250,7 +285,7 @@
         + (a.mult && a.mult !== 1 ? `<div class="weapon-attack-line"><span>Variant damage ×${a.mult.toFixed(2).replace(/\.?0+$/, '')}</span><span></span></div>` : '')
         + `<div class="weapon-attack-total" style="font-size:1.05rem;margin:0.3rem 0 0">Damage: <span id="btDmg-${gi}-${idx}">${a.outcome === 'save' ? (a.failed === false ? 0 : a.damage) : a.damage}</span>${a.outcome === 'save' ? ' <span class="bt-note">(if failed)</span>' : ''}</div>`
       : '';
-    return `<div class="sub"><b>${esc(a.name)}</b>${a.source === 'spell' ? ' <span class="bt-note">✦ spell (chaos gear)</span>' : a.source === 'weapon' ? ' <span class="bt-note">⚔ wielded weapon (chaos gear)</span>' : ''}<div>${head}</div>${dmg}</div>`;
+    return `<div class="sub"><b>${esc(a.name)}</b>${a.source === 'spell' ? ` <span class="bt-note">✦ spell (${a.useNote ? esc(a.useNote) : 'chaos gear'})</span>` : a.source === 'weapon' ? ' <span class="bt-note">⚔ wielded weapon (chaos gear)</span>' : ''}<div>${head}</div>${dmg}</div>`;
   }
   function popupHtml(groups) {
     let grand = 0;
@@ -354,7 +389,7 @@
     });
   };
   window.btClear = function () { bt.tokens = []; bt.selected.clear(); btRenderField(); };
-  window.btHealAll = function () { bt.tokens.forEach(t => { t.hp = t.maxHp; }); btRenderField(); };
+  window.btHealAll = function () { bt.tokens.forEach(t => { t.hp = t.maxHp; delete t.spellState; }); btRenderField(); };
   window.btOnShow = function () {
     btInit(); btRenderSide(); btRenderField();
     if (typeof loadMonsterDatabase === 'function') loadMonsterDatabase(false).then(() => btRenderSide());
