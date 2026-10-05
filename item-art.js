@@ -1,244 +1,249 @@
-// Item art: 32x32 shaded pixel icons built from three layers, in the same style as the monster tokens.
-//   1. a BASE object chosen from the item's name/type (longsword, plate helmet, potion, ring ...),
-//   2. a MATERIAL recolour (adamantine, mithril, bronze, bone, leather, silver ...),
-//   3. EFFECTS drawn on top (flames, frost, lightning, poison, holy light, shadow, blood, arcane,
-//      nature, wind, or a plain magic glimmer) with strength driven by rarity.
-// itemArtSpec(item, rarity) describes what was picked; itemArtSvg(item, px, rarity) returns the
-// <svg> or null when the item isn't something we draw (the app's older icon is used then).
-// Needs monster-art.js (window.PixelKit) loaded first. Classic script.
+// Item art engine. Every item gets a 32x32 shaded pixel icon built from three layers:
+//   1. a BASE object (item-art-weapons/armor/misc.js; chosen by item-art-rules.js from name/type),
+//   2. a MATERIAL recolour (adamantine, mithral, bone, leather, ...),
+//   3. EFFECTS - flames, ice, lightning, drips, holy rays, smoke, vines, wind, a magic circle ... - drawn as
+//      connected shapes attached to the object (never loose pixels) plus a tint and a soft glow.
+// For generated items the spec is read from the item's modifiers as well as its name, and is stored on the
+// item (item.artSpec) when it is generated so the icon stays put.
+//   itemArtSpec(item, rarity)  -> { base, material, effects:[ids] }
+//   itemArtInner / itemArtSvg  -> SVG markup used by itemPixelIcon()
+//   attachItemArt(item)        -> stores item.artSpec (call after generating an item)
+//   itemArtBaseSvg(base, {material, effects, rarity}, px) -> for design sheets
+// Needs monster-art.js (PixelKit), item-art-kit.js and the sprite files first. Classic script.
 (function () {
-  const kit = window.PixelKit;
-  if (!kit) return;
-  const { Canvas, mix, N } = kit;
-  const D = {};
-  const strip = (C, x1, y1, x2, y2, w, role, tip) => {
-    const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, px = -uy * w / 2, py = ux * w / 2;
-    const pts = [[x1 + px, y1 + py], [x2 + px, y2 + py], [x2 - px, y2 - py], [x1 - px, y1 - py]];
-    if (tip) pts.splice(2, 0, [x2 + ux * tip, y2 + uy * tip]);
-    C.p(pts, role);
-  };
-  // ---------- melee: drawn on the up-right diagonal, handle bottom-left ----------
-  D.sword = C => { strip(C, 9, 23, 25, 7, 3.4, 'a', 4); C.l(8.4, 22.4, 24.4, 6.4, 'c'); C.l(10, 22, 23, 9, 'b'); strip(C, 5.5, 19.5, 12.5, 26.5, 2, 't'); strip(C, 9, 23, 5, 27, 2, 'h'); C.e(4, 28, 2, 2, 't'); C.d(9, 23, 'g'); };
-  D.greatsword = C => { strip(C, 9, 22, 26, 5, 4.8, 'a', 5); C.l(8, 21, 25, 4, 'c'); C.l(10, 21, 24, 7, 'b'); strip(C, 4.5, 17.5, 13.5, 26.5, 2.4, 't'); strip(C, 9, 22, 4, 27, 2.4, 'h'); C.e(3.5, 28.5, 2.4, 2.4, 't'); C.d(9, 22, 'g'); };
-  D.dagger = C => { strip(C, 12, 20, 24, 8, 2.8, 'a', 3.5); C.l(11.5, 19.5, 23.5, 7.5, 'c'); strip(C, 8.5, 16.5, 15.5, 23.5, 2, 't'); strip(C, 12, 20, 8, 24, 2, 'h'); C.e(7, 25.5, 1.8, 1.8, 't'); };
-  D.axe = C => { strip(C, 7, 27, 21, 13, 2.2, 'h'); C.p([[16, 9], [22, 3], [29, 6], [29, 15], [23, 17], [20, 13]], 'a'); C.l(22, 4, 29, 8, 'c'); C.l(21, 15, 28, 14, 'b'); C.d(17, 12, 't'); };
-  D.greataxe = C => { strip(C, 5, 28, 22, 11, 2.4, 'h'); C.p([[16, 7], [22, 2], [29, 5], [29, 12], [23, 13], [20, 11]], 'a'); C.p([[14, 14], [10, 10], [7, 15], [9, 21], [15, 19]], 'a'); C.l(22, 3, 29, 7, 'c'); C.l(9, 11, 8, 18, 'c'); C.d(17, 12, 't'); C.e(4, 29, 2, 2, 't'); };
-  D.hammer = C => { strip(C, 7, 27, 23, 11, 2.2, 'h'); strip(C, 18, 5, 29, 16, 7, 'a'); C.l(19, 4.5, 29, 14.5, 'c'); C.l(20, 8, 27, 15, 'b'); C.d(23, 11, 't'); };
-  D.mace = C => { strip(C, 7, 27, 21, 13, 2.2, 'h'); C.e(24, 9, 5.5, 5.5, 'a'); [[24, 2], [24, 16], [17, 9], [31, 9], [19, 4], [29, 4], [19, 14], [29, 14]].forEach(([x, y]) => C.d(x, y, 'c')); C.e(24, 9, 2, 2, 'b'); C.d(21, 13, 't'); };
-  D.flail = C => { strip(C, 6, 28, 14, 20, 2.2, 'h'); [[16, 18], [18, 15], [20, 13]].forEach(([x, y]) => C.e(x, y, 1.2, 1.2, 'c')); C.e(25, 8, 5, 5, 'a'); [[25, 1], [25, 15], [18, 8], [32, 8], [20, 3], [30, 3], [20, 13], [30, 13]].forEach(([x, y]) => C.d(x, y, 'c')); C.d(14, 20, 't'); };
-  D.club = C => { C.p([[6, 27], [9, 30], [18, 20], [29, 10], [24, 2], [16, 5], [11, 15]], 'h'); C.d(21, 8, 'b'); C.d(18, 13, 'b'); C.d(25, 5, 'b'); C.l(8, 28, 12, 24, 'l'); };
-  D.spear = C => { strip(C, 3, 29, 23, 9, 1.8, 'h'); strip(C, 22, 10, 28, 4, 3.6, 'a', 4); C.l(21.5, 9.5, 27.5, 3.5, 'c'); C.l(18, 14, 21, 11, 'l', 2); C.d(7, 25, 'l'); };
-  D.polearm = C => { strip(C, 3, 29, 24, 8, 1.8, 'h'); C.p([[19, 12], [14, 6], [20, 3], [27, 9], [23, 13]], 'a'); C.l(15, 6, 21, 3, 'c'); strip(C, 24, 8, 29, 3, 2, 'a', 3); C.d(20, 12, 't'); };
-  D.trident = C => { strip(C, 3, 29, 21, 11, 1.8, 'h'); strip(C, 21, 11, 29, 3, 1.4, 'a', 3); strip(C, 20, 12, 24, 4, 1.4, 'a', 3); strip(C, 20, 12, 28, 8, 1.4, 'a', 3); strip(C, 17, 15, 24, 15, 1, 'a'); C.d(21, 11, 't'); };
-  D.staff = C => { strip(C, 4, 29, 24, 9, 2, 'h'); C.p([[22, 11], [24, 5], [30, 7], [28, 12], [26, 10]], 't'); C.e(26.5, 7.5, 2.4, 2.4, 'g'); C.d(26, 7, 'w'); C.d(7, 26, 'l'); C.d(11, 22, 'l'); };
-  D.wand = C => { strip(C, 8, 25, 23, 10, 1.8, 'h'); C.l(7, 26, 9, 24, 't', 2); C.e(25, 8, 2, 2, 'g'); C.d(25, 7, 'w'); C.d(23, 10, 't'); };
-  D.bow = C => { [[22, 3, 13, 5], [13, 5, 8, 11], [8, 11, 7, 17], [7, 17, 9, 23], [9, 23, 15, 28]].forEach(([a, b, c, d]) => C.l(a, b, c, d, 'h', 2)); C.l(22, 3, 15, 28, 'w'); C.l(7, 15, 9, 19, 'l', 2); strip(C, 11, 15, 27, 15, 1, 'h'); C.p([[27, 14], [30, 15], [27, 17]], 'a'); C.p([[11, 13], [9, 15], [11, 17]], 'c'); };
-  D.crossbow = C => { strip(C, 4, 21, 24, 21, 4, 'h'); strip(C, 21, 8, 21, 28, 2.4, 'h'); C.l(21, 8, 6, 20, 'w'); C.l(21, 28, 6, 22, 'w'); C.l(8, 21, 28, 21, 'b'); C.p([[27, 19], [31, 21], [27, 23]], 'a'); C.d(8, 19, 't'); };
-  D.shield = C => { C.e(16, 16, 13, 13, 'a'); C.e(16, 16, 10, 10, 'b'); C.e(16, 16, 8.5, 8.5, 'a'); C.l(16, 8, 16, 24, 'c'); C.l(8, 16, 24, 16, 'c'); C.e(16, 16, 3.2, 3.2, 't'); C.d(16, 16, 'g'); };
-  D.kiteshield = C => { C.p([[5, 4], [27, 4], [27, 15], [16, 30], [5, 15]], 'a'); C.p([[8, 7], [24, 7], [24, 15], [16, 26], [8, 15]], 'b'); C.l(16, 7, 16, 26, 'c'); C.l(8, 14, 24, 14, 'c'); C.e(16, 14, 3, 3, 't'); C.d(16, 14, 'g'); };
-  // ---------- armour ----------
-  D.helmet = C => { C.p([[7, 7], [16, 3], [25, 7], [26, 17], [24, 27], [19, 29], [13, 29], [8, 27], [6, 17]], 'a'); C.p([[7, 17], [25, 17], [24, 21], [8, 21]], 'k'); C.r(8, 18, 16, 2, 'g'); C.l(16, 3, 16, 17, 'c'); C.l(16, 21, 16, 29, 'b'); [[11, 24], [21, 24], [13, 26], [19, 26]].forEach(([x, y]) => C.d(x, y, 'k')); C.d(8, 8, 't'); C.d(24, 8, 't'); };
-  D.crown = C => { C.p([[4, 24], [4, 11], [10, 17], [16, 7], [22, 17], [28, 11], [28, 24]], 't'); C.r(4, 21, 24, 4, 'a'); C.e(16, 14, 2, 2, 'g'); C.e(8, 19, 1.4, 1.4, 'g'); C.e(24, 19, 1.4, 1.4, 'g'); C.d(4, 10, 'w'); C.d(16, 6, 'w'); C.d(28, 10, 'w'); };
-  D.chest = C => { C.p([[4, 8], [11, 5], [14, 9], [18, 9], [21, 5], [28, 8], [29, 16], [25, 17], [24, 28], [8, 28], [7, 17], [3, 16]], 'a'); C.p([[13, 5], [19, 5], [18, 10], [14, 10]], 'k'); C.l(16, 10, 16, 28, 'c'); C.l(8, 20, 24, 20, 'b'); C.l(8, 24, 24, 24, 'b'); C.e(4.5, 11, 3, 3, 'b'); C.e(27.5, 11, 3, 3, 'b'); C.d(16, 14, 'g'); C.d(16, 20, 't'); };
-  D.leather = C => { C.p([[5, 9], [12, 5], [14, 9], [18, 9], [20, 5], [27, 9], [28, 16], [24, 17], [23, 28], [9, 28], [8, 17], [4, 16]], 'a'); C.p([[13, 5], [19, 5], [18, 10], [14, 10]], 'k'); for (let y = 12; y < 27; y += 3) { C.d(14, y, 'h'); C.d(18, y, 'h'); } C.l(9, 22, 23, 22, 'h'); C.d(16, 22, 't'); C.d(9, 12, 'c'); C.d(23, 12, 'c'); };
-  D.robe = C => { C.p([[9, 4], [23, 4], [27, 12], [29, 29], [3, 29], [5, 12]], 'a'); C.p([[13, 4], [19, 4], [16, 12]], 'k'); C.l(16, 12, 16, 29, 'b'); C.r(4, 26, 24, 3, 't'); C.l(10, 17, 22, 17, 'h', 2); C.d(16, 17, 'g'); C.l(6, 14, 4, 26, 'b'); C.l(26, 14, 28, 26, 'b'); };
-  D.gauntlet = C => { C.p([[9, 29], [9, 21], [6, 14], [8, 12], [11, 15], [12, 6], [15, 6], [15, 13], [17, 4], [20, 4], [19, 13], [22, 6], [25, 7], [22, 16], [26, 14], [27, 17], [23, 24], [22, 29]], 'a'); C.r(8, 24, 15, 5, 'b'); C.l(11, 24, 21, 24, 'c'); C.d(12, 16, 'b'); C.d(16, 16, 'b'); C.d(20, 16, 'b'); C.e(15, 21, 1.6, 1.6, 'g'); };
-  D.boots = C => { C.p([[6, 5], [14, 5], [14, 20], [24, 22], [28, 26], [28, 29], [5, 29], [5, 20]], 'a'); C.r(5, 6, 10, 3, 'b'); C.l(6, 27, 28, 27, 'k'); C.l(6, 14, 14, 14, 'b'); C.d(10, 17, 't'); C.d(10, 20, 't'); C.l(16, 24, 24, 24, 'c'); C.d(9, 7, 'c'); };
-  D.cloak = C => { C.p([[8, 3], [24, 3], [28, 14], [30, 29], [16, 26], [2, 29], [4, 14]], 'a'); C.p([[10, 3], [22, 3], [16, 9]], 'b'); C.l(16, 9, 16, 26, 'b'); C.l(9, 12, 7, 27, 'b'); C.l(23, 12, 25, 27, 'b'); C.e(16, 8, 2, 2, 't'); C.d(16, 8, 'g'); };
-  // ---------- jewellery ----------
-  D.ring = C => { C.e(16, 20, 9, 9, 't'); C.e(16, 20, 6, 6, 'x'); C.e(16, 20, 8, 8, 't'); C.e(16, 20, 5.5, 5.5, 'x'); C.p([[11, 8], [21, 8], [24, 13], [16, 17], [8, 13]], 'g'); C.l(11, 8, 21, 8, 'w'); C.d(13, 11, 'w'); };
-  D.amulet = C => { C.l(8, 3, 11, 12, 'a', 1, true); C.l(11, 12, 15, 17, 'a', 1, true); C.p([[16, 15], [22, 20], [22, 27], [16, 30], [10, 27], [10, 20]], 't'); C.p([[16, 18], [20, 21], [20, 26], [16, 28], [12, 26], [12, 21]], 'g'); C.d(14, 21, 'w'); C.d(15, 21, 'w'); };
-  // ---------- consumables ----------
-  D.potion = C => { C.e(16, 21, 9, 9, 'a'); C.r(13, 7, 6, 8, 'a'); C.e(16, 21, 7, 7, 'g'); C.r(13, 8, 6, 6, 'g'); C.r(13, 4, 6, 4, 'h'); C.r(12, 7, 8, 1, 'w'); C.e(13, 18, 2, 3, 'w'); C.d(19, 25, 'w'); C.d(18, 24, 'w'); C.r(11, 14, 10, 1, 'b'); };
-  D.scroll = C => { C.p([[8, 6], [24, 6], [24, 26], [8, 26]], 'w'); C.r(5, 3, 22, 5, 'h'); C.r(5, 25, 22, 5, 'h'); C.e(5, 5.5, 2.5, 3, 'a'); C.e(27, 5.5, 2.5, 3, 'a'); C.e(5, 27.5, 2.5, 3, 'a'); C.e(27, 27.5, 2.5, 3, 'a'); [10, 13, 16, 19, 22].forEach((y, i) => C.l(10, y, i % 2 ? 20 : 22, y, 'k')); C.e(21, 22, 2, 2, 'g'); };
-  D.book = C => { C.p([[5, 4], [25, 4], [27, 6], [27, 27], [5, 27]], 'a'); C.r(5, 4, 3, 24, 'b'); C.r(26, 6, 2, 20, 'w'); C.r(11, 9, 12, 12, 't'); C.e(17, 15, 3, 3, 'g'); C.l(11, 24, 23, 24, 't'); C.r(24, 14, 4, 4, 't'); };
+  const PK = window.PixelKit; if (!PK) return;
+  const { Canvas, mix, N } = PK;
+  const SPR = window.ItemArtSprites || (window.ItemArtSprites = {});
 
-  // ---------- classification ----------
-  const ICON_BASE = { sword: 'sword', dagger: 'dagger', mace: 'mace', staff: 'staff', potion: 'potion', scroll: 'scroll', armor: 'chest', robe: 'robe', bow: 'bow', axe: 'axe', shield: 'shield', helm: 'helmet', gloves: 'gauntlet', boots: 'boots', cloak: 'cloak', ring: 'ring', amulet: 'amulet', wand: 'wand', book: 'book' };
-  function baseKind(item) {
-    const n = String(item.name || '').toLowerCase(), t = item.type, sub = item.subcategory || '';
-    const has = re => re.test(n);
-    // armour words first so "Ring Mail" is not a ring and "Hammer Shield" is not a hammer
-    if (has(/ring mail|chain ?mail|\bmail\b|breastplate|cuirass|plate armor|plate armour|\bplate\b|half plate|splint|hauberk|brigandine|scale mail|\barmou?r\b/) && !has(/helm|gauntlet|glove|boots|shield/)) return has(/leather|hide|studded|padded|gambeson|tunic|vest/) ? 'leather' : 'chest';
-    if (has(/leather|studded|padded|hide armor|gambeson|jerkin/) && t !== 'weapon' && !has(/boots|gloves|helm|cap|belt|cloak|shield/)) return 'leather';
-    if (has(/shield|buckler|aegis|\bwall\b/)) return has(/tower|kite|heater|large|great/) ? 'kiteshield' : 'shield';
-    if (has(/crown|circlet|diadem|tiara|coronet|\bhat\b/)) return 'crown';
-    if (has(/helm|helmet|\bcap\b|hood|visor|coif|casque|barbute/)) return 'helmet';
-    if (has(/gauntlet|\bglove|bracer|gloves|handwrap|mitts?\b|\bfist/)) return 'gauntlet';
-    if (has(/boots?\b|greaves|sandals|slippers|shoes|\bsabatons?\b/)) return 'boots';
-    if (has(/cloak|cape|mantle|shawl|\bshroud\b/)) return 'cloak';
-    if (has(/\brobes?\b|vestment|habit|\bgown\b/)) return 'robe';
-    if (has(/\brings?\b/) && !has(/ring mail/)) return 'ring';
-    if (has(/amulet|necklace|pendant|periapt|\btorc\b|gorget|medallion|talisman|locket|brooch|choker|\bscarab\b|\bcollar\b/)) return 'amulet';
-    if (has(/potion|elixir|philter|draught|tonic|\bvial\b|\boil of|\bantidote|\bbrew\b|\btincture/)) return 'potion';
-    if (has(/scroll|parchment/)) return 'scroll';
-    if (has(/\btome\b|\bbook\b|grimoire|codex|\bmanual\b|journal|\bspellbook\b/)) return 'book';
-    // weapons
-    if (has(/greatsword|claymore|zweihander|great sword|executioner/)) return 'greatsword';
-    if (has(/dagger|knife|dirk|stiletto|\bkris\b|shiv|kukri|\bkunai\b|\bshuriken\b|\bdart\b/)) return 'dagger';
-    if (has(/great ?axe|battle ?axe|double axe|war ?axe/)) return 'greataxe';
-    if (has(/axe\b|hatchet|tomahawk|cleaver/)) return 'axe';
-    if (has(/war ?hammer|maul|\bhammer\b|mallet|gavel/)) return 'hammer';
-    if (has(/morning ?star|\bmace\b|scepter|sceptre/)) return 'mace';
-    if (has(/flail|whip|chain/)) return 'flail';
-    if (has(/\bclub\b|cudgel|bludgeon|\bcosh\b|baton|truncheon/)) return 'club';
-    if (has(/halberd|glaive|poleaxe|pole axe|\bpike\b|guisarme|\bbill\b|voulge|naginata|\blance\b/)) return 'polearm';
-    if (has(/trident/)) return 'trident';
-    if (has(/spear|javelin|\bpilum\b/)) return 'spear';
-    if (has(/crossbow|arbalest|\bbolt\b/)) return 'crossbow';
-    if (has(/\bbow\b|longbow|shortbow|\bsling\b/)) return 'bow';
-    if (has(/\bwand\b|\brod\b|\bbaton\b/)) return 'wand';
-    if (has(/staff|quarterstaff|\bcane\b|\bcrook\b/)) return 'staff';
-    if (has(/sword|blade|scimitar|sabre|saber|rapier|cutlass|katana|falchion|\bfoil\b|longsword|shortsword|\bedge\b|brand|tongue/)) return 'sword';
-    if (t === 'weapon') {
-      // a poetically named weapon ("Moonblade", "Dawnbreaker"): look for the weapon noun in its description
-      const d = `${item.desc || ''} ${String(item.effect || '').replace(/<[^>]+>/g, ' ')}`.toLowerCase();
-      const W = [['greatsword', /greatsword|claymore/], ['dagger', /dagger|knife|dirk/], ['greataxe', /great ?axe|battle ?axe/], ['axe', /axe\b|hatchet/], ['hammer', /warhammer|hammer|maul/], ['mace', /\bmace\b|morningstar/], ['flail', /flail|whip/],
-        ['club', /\bclub\b|cudgel/], ['polearm', /halberd|glaive|\bpike\b|\blance\b/], ['trident', /trident/], ['spear', /spear|javelin/], ['crossbow', /crossbow/], ['bow', /\bbow\b|longbow|shortbow/], ['wand', /\bwand\b|\brod\b/], ['staff', /\bstaff\b|quarterstaff/], ['sword', /sword|blade|scimitar|rapier|saber|sabre/]];
-      const hit = W.find(([, re]) => re.test(d));
-      return hit ? hit[0] : 'sword';
-    }
-    if (t === 'armor') return sub === 'shield' ? 'shield' : 'chest';
-    if (item.icon && ICON_BASE[item.icon]) return ICON_BASE[item.icon];
-    if (t === 'consumable' && /potion/.test(sub)) return 'potion';
-    return null;
-  }
-
-  // ---------- materials ----------
+  // ---------- materials: a main, b shade, c light, t trim ----------
   const MAT = {
-    steel: { a: '#a9b3bf', b: '#5b6571', c: '#e8eef5', t: '#c9a84c' }, adamantine: { a: '#3d4b69', b: '#1a2236', c: '#86abea', t: '#5f86c9' },
-    mithral: { a: '#cfe4f2', b: '#7d9ab2', c: '#ffffff', t: '#e8f3ff' }, silver: { a: '#d0d7de', b: '#8791a0', c: '#ffffff', t: '#e6ebf0' },
+    steel: { a: '#a9b3bf', b: '#5b6571', c: '#e8eef5', t: '#c9a84c' }, iron: { a: '#7b838f', b: '#3f454e', c: '#b5bdc8', t: '#a98a3c' },
+    rusty: { a: '#8a5a42', b: '#4a2a1c', c: '#b98462', t: '#7a6a3a' }, silver: { a: '#d0d7de', b: '#8791a0', c: '#ffffff', t: '#e6ebf0' },
+    mithral: { a: '#cfe4f2', b: '#7d9ab2', c: '#ffffff', t: '#e8f3ff' }, adamantine: { a: '#3d4b69', b: '#1a2236', c: '#86abea', t: '#5f86c9' },
     gold: { a: '#e8c04a', b: '#946f17', c: '#fff1a8', t: '#fff1a8' }, bronze: { a: '#b8793c', b: '#6b3f17', c: '#e4a96d', t: '#d8a24a' },
-    copper: { a: '#c4703f', b: '#6e3418', c: '#eaa070', t: '#e0b070' }, obsidian: { a: '#2e2d3f', b: '#0f0f19', c: '#7a78a3', t: '#7a78a3' },
-    bone: { a: '#e6dcc0', b: '#a69b7b', c: '#fffbe9', t: '#c8bda0' }, crystal: { a: '#9fe3f2', b: '#4a9db6', c: '#ffffff', t: '#dff8ff' },
-    wood: { a: '#8a5a35', b: '#4d2f17', c: '#b88458', t: '#c9a84c' }, leather: { a: '#8c5a33', b: '#4f301a', c: '#bb8656', t: '#c9a84c' },
-    cloth: { a: '#5b4aa0', b: '#2c2358', c: '#9b8ae0', t: '#e0c060' }, scale: { a: '#4f9a5a', b: '#23552d', c: '#8fd49a', t: '#c9a84c' },
-    ruby: { a: '#c23a3a', b: '#6e1414', c: '#f08080', t: '#e8c04a' }, jade: { a: '#2f9c72', b: '#14543c', c: '#7fdcb0', t: '#e8c04a' },
-    iron: { a: '#7b838f', b: '#3f454e', c: '#b5bdc8', t: '#a98a3c' }, rusty: { a: '#8a5a42', b: '#4a2a1c', c: '#b98462', t: '#7a6a3a' },
+    copper: { a: '#c4703f', b: '#6e3418', c: '#eaa070', t: '#e0b070' }, brass: { a: '#bfa24a', b: '#6f5f22', c: '#ece08a', t: '#e8d27a' },
+    orichalcum: { a: '#d9863f', b: '#8a4217', c: '#ffc27a', t: '#ffd98a' }, obsidian: { a: '#2e2d3f', b: '#0f0f19', c: '#7a78a3', t: '#7a78a3' },
+    blacksteel: { a: '#3b3f4d', b: '#15171f', c: '#8a90a8', t: '#8a90a8' }, voidsteel: { a: '#2f2a48', b: '#100c22', c: '#8f7ad8', t: '#8f7ad8' },
+    starmetal: { a: '#a9b6d8', b: '#4c5a86', c: '#f2f6ff', t: '#cfe0ff' }, sunsteel: { a: '#f0cf6a', b: '#a8761c', c: '#fff6cc', t: '#fff0b0' },
+    celestine: { a: '#eef0ff', b: '#a8aed8', c: '#ffffff', t: '#ffe27a' }, coldforged: { a: '#8fb4d0', b: '#425f7a', c: '#e4f4ff', t: '#bfe0f5' },
+    bone: { a: '#e6dcc0', b: '#a69b7b', c: '#fffbe9', t: '#c8bda0' }, dragonbone: { a: '#dcd0b0', b: '#8f8260', c: '#fff6dc', t: '#b89a5a' },
+    crystal: { a: '#9fe3f2', b: '#4a9db6', c: '#ffffff', t: '#dff8ff' }, ruby: { a: '#c23a3a', b: '#6e1414', c: '#f08080', t: '#e8c04a' },
+    jade: { a: '#2f9c72', b: '#14543c', c: '#7fdcb0', t: '#e8c04a' }, wood: { a: '#8a5a35', b: '#4d2f17', c: '#b88458', t: '#c9a84c' },
+    oak: { a: '#9a6a3a', b: '#553317', c: '#c69458', t: '#c9a84c' }, leather: { a: '#8c5a33', b: '#4f301a', c: '#bb8656', t: '#c9a84c' },
+    hide: { a: '#7a6a4a', b: '#43391f', c: '#a8966a', t: '#b89a5a' }, cloth: { a: '#5b4aa0', b: '#2c2358', c: '#9b8ae0', t: '#e0c060' },
+    scale: { a: '#4f9a5a', b: '#23552d', c: '#8fd49a', t: '#c9a84c' }, ivory: { a: '#e8e0d0', b: '#a89f8a', c: '#ffffff', t: '#c9a84c' },
+    glass: { a: '#bfe4ee', b: '#5a8fa0', c: '#ffffff', t: '#c9a84c' }, stone: { a: '#8c8574', b: '#524d41', c: '#bdb6a2', t: '#a9a089' },
+    mushcap: { a: '#b8503c', b: '#6a2418', c: '#e8a090', t: '#f4ead0' }, apple: { a: '#c63a2e', b: '#6e1a16', c: '#f08a78', t: '#4f8a3a' },
+    cheesey: { a: '#e8bf4a', b: '#a07a1c', c: '#fbe49a', t: '#c9a84c' }, crust: { a: '#c28a4a', b: '#7a4e22', c: '#e6b878', t: '#f4e2b0' }, candy: { a: '#e0529a', b: '#8a2060', c: '#ff9ccb', t: '#6fd0f0' },
+    crimsoncloth: { a: '#9c2f3a', b: '#52121b', c: '#d8707a', t: '#e0c060' }, greencloth: { a: '#2f6f55', b: '#133a2a', c: '#6fbf9a', t: '#e0c060' },
+    bluecloth: { a: '#3a4f8a', b: '#172044', c: '#7f9ad8', t: '#e0c060' }, greycloth: { a: '#6a6a72', b: '#2f2f36', c: '#b0b0bb', t: '#e0c060' }, linen: { a: '#d8cdb0', b: '#928568', c: '#fffaf0', t: '#c9a84c' },
   };
-  function material(item, base) {
-    const n = String(item.name || '').toLowerCase();
-    const re = [['adamantine', /adamant/], ['mithral', /mithr|mithil/], ['silver', /silver/], ['gold', /\bgold|golden|aurum/], ['bronze', /bronze/], ['copper', /copper/], ['obsidian', /obsidian|voidsteel|void steel|black iron|nightsteel|umbra|shadowsteel/],
-      ['bone', /\bbone|dragonbone|tusk|ivory|\bfang|antler|horn/], ['crystal', /crystal|glass|diamond|quartz|frozen|\bice\b|glacial/], ['ruby', /ruby|crimson|blood|garnet|infernal/], ['jade', /jade|emerald|verdant|viridian/],
-      ['scale', /dragon ?scale|scale|dragonhide|drake|lizard/], ['rusty', /rusty|rusted|corroded/], ['iron', /\biron\b|dwarven|ferrous/], ['steel', /steel|tempered|\bmetal\b/]].find(([, r]) => r.test(n));
-    if (re) return re[0];
-    const wooden = ['staff', 'wand', 'bow', 'crossbow', 'club'].includes(base);
-    if (wooden) return 'wood';
-    if (['leather', 'boots', 'cloak', 'gauntlet'].includes(base)) return 'leather';
-    if (['robe', 'book', 'scroll', 'potion'].includes(base)) return base === 'robe' ? 'cloth' : base === 'scroll' ? 'bone' : base === 'potion' ? 'crystal' : 'leather';
-    if (['crown', 'ring', 'amulet'].includes(base)) return 'gold';
-    return 'steel';
+  const CLOTHS = ['cloth', 'crimsoncloth', 'greencloth', 'bluecloth', 'greycloth', 'linen'];
+  const MATERIAL_RULES = [
+    ['adamantine', /adamant/], ['mithral', /mithr|mithil/], ['orichalcum', /orichalc/], ['voidsteel', /voidsteel|void-?touched|void steel/], ['blacksteel', /blacksteel|black steel|nightsteel|gloomforged|umbral steel/],
+    ['obsidian', /obsidian/], ['starmetal', /starmetal|starforged|star-?iron|star steel/], ['sunsteel', /sunsteel|sun-?forged|sunforged/], ['celestine', /celestine|celestial steel/], ['coldforged', /cold-?forged|frost-?forged|icebound/],
+    ['silver', /silver|silvered|silverwrought/], ['gold', /\bgold|golden|gilt|aurum/], ['bronze', /bronze/], ['copper', /copper/], ['brass', /brass/],
+    ['dragonbone', /dragonbone|dragon bone/], ['bone', /\bbone|tusk|\bfang\b|antler|horn\b/], ['ivory', /ivory/], ['crystal', /crystal|diamond|quartz|glacial/], ['glass', /\bglass/], ['ruby', /ruby|garnet|infernal|crimson|sanguine/], ['jade', /jade|emerald|viridian/],
+    ['scale', /dragon ?scale|dragonhide|scale mail|\bdrake\b/], ['rusty', /rusty|rusted|corroded|cracked|dented|cast-off/], ['iron', /\biron\b|dwarven|ferrous/], ['steel', /\bsteel\b|tempered/],
+    ['oak', /oaken|\boak\b|rotwood|\bash\b|yew|wooden|\bwood\b/], ['hide', /\bhide\b|fur\b|pelt/], ['leather', /leather|studded|padded/], ['stone', /stone|marble|clay|porcelain|ceramic/],
+  ];
+  const hashOf = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+  const strip = s => String(s || '').replace(/<[^>]+>/g, ' ').toLowerCase();
+  function pickMaterial(item, base, hash) {
+    const name = strip(item.name);
+    const affixes = (item.mods || []).filter(m => m && m.type === 'Affix').map(m => strip(m.name || m.key)).join(' ');
+    const R = window.ItemArtRules, pre = R && R.material && R.material(base, name, item);
+    if (pre && typeof pre === 'object') return pre;
+    if (typeof pre === 'string' && pre[0] === '!') return pre.slice(1);
+    for (const [id, re] of MATERIAL_RULES) if (re.test(affixes + ' ' + name)) return id;
+    const def = pre || 'steel';
+    return def === 'cloth' ? CLOTHS[hash % CLOTHS.length] : def;
   }
+  const matColors = m => (typeof m === 'string' ? (MAT[m] || MAT.steel) : m);
 
   // ---------- effects ----------
-  const FX = [
-    ['fire', /flam|fire|ember|blaze|inferno|infern|burn|magma|molten|scorch|\bsun\b|phoenix|pyre|ignit|cinder|dragon/, '#ff8a2a'],
-    ['frost', /frost|\bice\b|icy|\bcold\b|winter|snow|glacier|freez|rime|chill|\bhoar/, '#8fe3ff'],
-    ['storm', /lightning|thunder|storm|shock|spark|tempest|volt|\bbolt\b|electric/, '#ffe45a'],
-    ['poison', /poison|venom|toxic|acid|viper|plague|\brot\b|serpent|spider|\bwyrm\b/, '#9be25a'],
-    ['holy', /holy|radiant|divine|celestial|angel|sacred|blessed|dawn|\blight\b|solar|sunbeam|paladin|righteous|justice|seraph/, '#fff0a0'],
-    ['shadow', /shadow|\bdark|night|umbra|\bvoid\b|vampir|necro|death|grim|soul|wraith|ghost|spectral|\bcurse|hollow|tomb|\bbane\b/, '#9a6bdc'],
-    ['blood', /\bblood|vicious|gore|sanguine|\bwound|\bbleed|carnage|slaughter|savage/, '#d93a3a'],
-    ['arcane', /arcane|\brune|runic|magic|spell|mystic|astral|psychic|mage|wizard|enchant|sorcer|eldritch|\barcana|\bmana\b|force/, '#c58cff'],
-    ['nature', /thorn|\bleaf|nature|verdant|druid|forest|\bwild|\bvine|\bbark|\bmoss|\bgrove|\bwood(?:land)?\b|\bpetal/, '#7ed67e'],
-    ['wind', /\bwind|gale|\bair\b|zephyr|\bswift|cloud|\bsky\b|feather/, '#d2f0ff'],
-  ];
+  const FX = {
+    fire: { color: '#ff8a2a', re: /flam|fire|ember|blaz|inferno|infern|burn|magma|molten|scorch|\bsun\b|phoenix|pyre|cinder|ignit|smolder|ashfall|brimstone|hellfire|pyrotech|torch|incendi|lava|volcan|furnace/ },
+    frost: { color: '#9fe8ff', re: /frost|\bice\b|icy|\bcold\b|winter|snow|glacier|freez|rime\b|rime-|chill|hoar|icebound|frozen|tundra|boreal|icicle|polar|blizzard/ },
+    storm: { color: '#ffe45a', re: /lightning|thunder|storm|shock|spark|tempest|volt|electric|fulmin|galvan/ },
+    poison: { color: '#9be25a', re: /poison|venom|toxic|viper|adder|serpent|plague|blight|spider|python|cobra|noxious/ },
+    acid: { color: '#c8e84a', re: /\bacid|corros|caustic|dissolv/ },
+    holy: { color: '#ffe9a0', re: /holy|radiant|divine|celestial|celestine|angel|sacred|bless|dawn|solar|sunbeam|paladin|righteous|justice|seraph|hallowed|sunblessed|sunward|sunlit|halo|saint|heaven|dawnbring/ },
+    shadow: { color: '#8f5fd6', re: /shadow|\bdark|night|umbra|\bvoid|gloom|dusk|abyss|vampir|wraith|ghost|spectral|hollow|tomb|grave|deathly|death|curse|\bbane\b|shade|nether|eclipse|silent scream|deathless/ },
+    necrotic: { color: '#6fcf7a', re: /necro|decay|wither|undead|lich|soulreap|soul-?eat|\brot\b|grave-?touched|unburied|reaper/ },
+    blood: { color: '#d93a3a', re: /\bblood|vicious|gore|sanguine|bleed|carnage|savage|slaughter|bloodletting|crimson|wound|life stealing|\bvein/ },
+    arcane: { color: '#b98cff', re: /arcane|\brune|runic|runescribed|runeetched|glyph|mystic|astral|psychic|\bmage|archmage|wizard|enchant|sorcer|eldritch|\bspell|force|sigil|wyrdwoven|thoughtwoven|cognizant|oracle|gravitum|gravity|ethereal|resonant|fate/ },
+    nature: { color: '#6fd06f', re: /thorn|\bleaf|nature|verdant|druid|forest|\bwild\b|wildroot|\bvine|\bbark|\bmoss|grove|woodland|bramble|rotwood|petal|flower|primal|feral/ },
+    wind: { color: '#cfeaff', re: /\bwind|gale\b|galebound|zephyr|swift|cloud|\bsky|\bair\b|breeze|gust|skyborn|racing|fleetfoot|featherfall|winged|windcaller|wind-runner/ },
+    water: { color: '#4aa8e8', re: /tide|brine|\bsea\b|ocean|deep-?sea|\bwater|\bwave|undertow|coral|aqua|anchor-?forged|kraken|drown/ },
+    sonic: { color: '#bfe4ff', re: /echo|sound|bellow|\bsonic|soundbound|chime/ },
+    luck: { color: '#ffd75e', re: /\blucky|fortune|\bluck\b|gilt-edged|gambler/ },
+  };
+  const FX_ORDER = Object.keys(FX);
   const RAR = { common: 0, uncommon: 1, rare: 2, superrare: 3, legendary: 4, celestial: 5 };
-  function effects(item, rarity) {
-    const text = `${item.name || ''} ${(item.desc || '').slice(0, 160)} ${(item.effect || '').replace(/<[^>]+>/g, ' ').slice(0, 220)}`.toLowerCase();
-    const nameOnly = String(item.name || '').toLowerCase();
-    const found = [];
-    FX.forEach(([id, re, color]) => { const inName = re.test(nameOnly), inText = re.test(text); if (inName || inText) found.push({ id, color, score: (inName ? 2 : 0) + (inText ? 1 : 0) }); });
-    found.sort((x, y) => y.score - x.score);
+  function pickEffects(item, rarity) {
+    const nameT = strip(item.name), mods = Array.isArray(item.mods) ? item.mods : [];
+    const modNames = mods.map(m => strip(m.name || String(m.key || '').replace(/^[a-z]+:/, ''))).join(' ');
+    const modText = mods.map(m => strip(m.text)).join(' '), effText = strip(item.effect).slice(0, 260), descT = strip(item.desc).slice(0, 140);
+    const sc = {};
+    FX_ORDER.forEach(id => { const re = FX[id].re; let s = 0; if (re.test(nameT)) s += 4; if (re.test(modNames)) s += 4; if (re.test(modText)) s += 2; if (re.test(effText)) s += 1.5; if (re.test(descT)) s += 0.5; if (s) sc[id] = s; });
+    const dmg = { fire: /fire damage/, frost: /cold damage/, storm: /lightning damage|thunder damage/, poison: /poison damage/, acid: /acid damage/, holy: /radiant damage/, necrotic: /necrotic damage/, arcane: /force damage|psychic damage/ };
+    Object.keys(dmg).forEach(id => { if (dmg[id].test(modText)) sc[id] = (sc[id] || 0) + 3; });
+    const list = Object.keys(sc).sort((a, b) => sc[b] - sc[a]).slice(0, 2);
     const tier = RAR[rarity || item.rarity] ?? 0;
-    const list = found.slice(0, 2);
-    if (!list.length && (tier >= 1 || /\+\d|magic|enchant/.test(text))) list.push({ id: 'magic', color: ['#9fd0ff', '#9fd0ff', '#b79aff', '#c58cff', '#ffd75e', '#fff2b0'][tier] || '#9fd0ff', score: 0 });
-    return { list, tier };
+    if (!list.length && (tier >= 1 || /\+\d/.test(nameT) || mods.length || /magic|enchant/.test(effText))) list.push(tier >= 4 ? 'luck' : 'magic');
+    return list;
   }
-  const seeded = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; };
 
-  // ---------- render ----------
-  const FIXED = { w: '#efe6d0', k: '#0e0b09', h: '#7a4a26', l: '#4f301a', r: '#b02a2a', x: null };
-  function render(item, rarity) {
+  // ---------- classification ----------
+  function baseKind(item) {
+    if (item.artSpec && item.artSpec.base && SPR[item.artSpec.base]) return item.artSpec.base;
+    const R = window.ItemArtRules, name = strip(item.name);
+    if (R) {
+      for (const [b, re, ok] of R.rules) if (SPR[b] && re.test(name) && (!ok || ok(item))) return b;
+      const f = R.fallback && R.fallback(item); if (f && SPR[f]) return f;
+    }
+    return SPR.trinket ? 'trinket' : null;
+  }
+  const LIQUID_BASES = new Set(['potion', 'elixir', 'tonic', 'vial', 'flask', 'bottle', 'decanter', 'oilflask', 'perfume', 'jug']);
+  const LIQUIDS = [[/heal|life|vital|restor|cure|regenerat|mending|revive|panacea/, '#d8343c'], [/strength|giant|growth|enlarge|might|titan|vigor/, '#e0862a'], [/speed|haste|swift|quick|agility/, '#e8e060'], [/fly|flying|levit|gaseous|feather|air\b|cloud/, '#bfe4ff'],
+    [/invisib|vanish|shadow-?step|ghost|ethereal/, '#d4e4ee'], [/fire|flame|dragon.s breath|phoenix|alchemist|brimstone|burn/, '#ff6a1a'], [/frost|cold|ice\b|chill|winter/, '#7fd0f0'], [/poison|venom|toxin|antitoxin|antidote|plague|viper/, '#7fcf3a'],
+    [/water|breath|sea\b|ocean|tide|swim/, '#3a8ae0'], [/hero|bless|hope|supreme|valor|courage|bravery|divine|holy|radiant/, '#ffd84a'], [/mind|read|comprehen|clairvoy|insight|psychic|thought|possibility|wisdom|intellect/, '#c47cf5'],
+    [/dark|night|dusk|shade|void/, '#4a3a7a'], [/climb|spider|earth|stone|clay/, '#a0723a'], [/oil|ointment|grease|slipper/, '#d8c070'], [/sharp|edge|whet/, '#c8d0dc'], [/luck|fortune|chance|fate/, '#5fe08a'], [/love|charm|bewitch|perfume|rose/, '#e87ab4'], [/spirit|whiskey|ale|wine|brandy|drink|wine/, '#c8802a']];
+  function liquidOf(item, base) {
+    if (!LIQUID_BASES.has(base)) return null;
+    const n = strip(item.name) + ' ' + strip(item.desc).slice(0, 80);
+    for (const [re, c] of LIQUIDS) if (re.test(n)) return c;
+    return ['#d8343c', '#3a8ae0', '#5fc85a', '#c47cf5', '#e8c040', '#40c8c0', '#e07ab0', '#e0862a'][hashOf(item.name) % 8];
+  }
+  window.itemArtSpec = function (item, rarity) {
+    item = item || {};
     const base = baseKind(item); if (!base) return null;
-    const matId = material(item, base), mat = MAT[matId] || MAT.steel, fx = effects(item, rarity);
-    const C = Canvas(); (D[base])(C);
-    const hueH = (() => { let h = 0; for (const ch of String(item.name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; })();
-    const potionTint = ['#d93a3a', '#3a7fd9', '#3fae5a', '#b04fd9', '#e8943a', '#37c2c2'][hueH % 6];
-    const accent = fx.list.length ? fx.list[0].color : base === 'potion' ? potionTint : ({ common: '#c9a84c', uncommon: '#4caf7d', rare: '#5b9cf6', superrare: '#c47cf5', legendary: '#e8963a', celestial: '#fff2b0' }[rarity] || '#c9a84c');
-    const colorOf = r => r === 'a' ? mat.a : r === 'b' ? mat.b : r === 'c' ? mat.c : r === 't' ? mat.t : r === 'g' ? accent : FIXED[r] || mat.a;
-    const NO = new Set(['k', 'g', 'x']);
-    const at = (x, y) => (x >= 0 && y >= 0 && x < N && y < N ? C.g[y][x] : null);
-    const cells = []; // {x,y,color,opacity}
-    const blend = fx.list.some(f => ['fire', 'frost', 'storm', 'poison', 'holy', 'shadow', 'blood', 'arcane'].includes(f.id)) ? 0.16 : 0;
+    const h = hashOf(item.name);
+    return { base, material: (item.artSpec && item.artSpec.material) || pickMaterial(item, base, h), effects: (item.artSpec && item.artSpec.effects) || pickEffects(item, rarity), liquid: (item.artSpec && item.artSpec.liquid) || liquidOf(item, base) };
+  };
+  window.attachItemArt = function (item, rarity) { const s = window.itemArtSpec({ ...item, artSpec: null }, rarity || item.rarity); if (s) item.artSpec = { base: s.base, material: s.material, effects: s.effects, liquid: s.liquid }; return item; };
+
+  // ---------- rendering ----------
+  const GEM = { common: '#c9a84c', uncommon: '#4caf7d', rare: '#5b9cf6', superrare: '#c47cf5', legendary: '#e8963a', celestial: '#fff2b0' };
+  const FIXED = { w: '#efe6d0', k: '#0e0b09', h: '#7a4a26', l: '#4f301a', r: '#b02a2a', y: '#e8c04a', p: '#d9a77f' };
+  const NOSHADE = new Set(['k', 'g', 'f', 'x']);
+  const seeded = s => { let h = hashOf(s) || 1; return () => { h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return (h % 10000) / 10000; }; };
+
+  const TINT = { fire: 0.22, frost: 0.38, storm: 0.18, poison: 0.34, acid: 0.34, holy: 0.2, shadow: 0.42, necrotic: 0.4, blood: 0.3, arcane: 0.26, nature: 0.32 };
+  function render(spec, rarity, seedKey) {
+    const C = Canvas(); (SPR[spec.base])(C);
+    const g = C.g;
+    const at = (x, y) => (x >= 0 && y >= 0 && x < N && y < N ? g[y][x] : null);
+    const mat = matColors(spec.material), tier = RAR[rarity] ?? 0;
+    const fxIds = (spec.effects || []).filter(id => FX[id] || id === 'magic');
+    const fxColor = fxIds.length ? (FX[fxIds[0]] ? FX[fxIds[0]].color : '#9fd0ff') : null;
+    const tintable = fxIds.some(id => ['fire', 'frost', 'storm', 'poison', 'acid', 'holy', 'shadow', 'necrotic', 'blood', 'arcane', 'nature'].includes(id));
+    const gemColor = spec.liquid || fxColor || GEM[rarity] || GEM.common;
+    const baseColor = r => r === 'a' ? mat.a : r === 'b' ? mat.b : r === 'c' ? mat.c : r === 't' ? mat.t : r === 'g' ? gemColor : r === 'f' ? (fxColor || mix(mat.b, mat.a, 0.3)) : FIXED[r] || mat.a;
+    const comp = (x0, y0, test, seen) => { const st = [[x0, y0]], out = []; seen[y0 * N + x0] = 1; while (st.length) { const [x, y] = st.pop(); out.push([x, y]); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = x + dx, ny = y + dy; if ((dx || dy) && nx >= 0 && ny >= 0 && nx < N && ny < N && !seen[ny * N + nx] && test(nx, ny)) { seen[ny * N + nx] = 1; st.push([nx, ny]); } } } return out; };
+    { const seen = new Uint8Array(N * N); for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (g[y][x] && !seen[y * N + x]) { const c = comp(x, y, (a, b) => !!g[b][a], seen); if (c.length < 3) c.forEach(([cx, cy]) => { g[cy][cx] = null; }); } }
+    const cells = [];
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      const r = C.g[y][x]; if (!r) continue;
-      let col = colorOf(r);
-      if (blend && (r === 'a' || r === 'c')) col = mix(col, accent, blend);
-      if (!NO.has(r)) {
+      const r = g[y][x]; if (!r) continue;
+      let col = baseColor(r);
+      if (tintable && (r === 'a' || r === 'c' || r === 't')) { const ts = TINT[fxIds.find(i => TINT[i])] || 0.2; col = mix(col, fxColor, r === 'c' ? ts * 1.6 : r === 't' ? 0.12 : ts * 0.6); }
+      if (!NOSHADE.has(r)) {
         const up = at(x, y - 1), lf = at(x - 1, y), dn = at(x, y + 1), rt = at(x + 1, y);
         const lit = up !== r || lf !== r, dark = dn !== r || rt !== r;
-        if (lit && !dark) col = mix(col, '#ffffff', 0.3); else if (dark && !lit) col = mix(col, '#000000', 0.34); else if (lit && dark) col = mix(col, '#000000', 0.08);
+        if (lit && !dark) col = mix(col, '#ffffff', 0.28); else if (dark && !lit) col = mix(col, '#000000', 0.34); else if (lit && dark) col = mix(col, '#000000', 0.06);
       }
       cells.push({ x, y, c: col });
     }
-    // distance field for glow + outline
-    const dist = Array.from({ length: N }, () => Array(N).fill(9));
-    let q = [];
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (C.g[y][x]) { dist[y][x] = 0; q.push([x, y]); }
-    for (let d = 1; d <= 4; d++) { const nq = []; q.forEach(([x, y]) => [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = x + dx, ny = y + dy; if (nx >= 0 && ny >= 0 && nx < N && ny < N && dist[ny][nx] > d) { dist[ny][nx] = d; nq.push([nx, ny]); } })); q = nq; }
-    const under = []; // glow behind the item
-    const glowStrength = fx.list.length ? Math.min(3, 1 + Math.floor(fx.tier / 2)) : (fx.tier >= 4 ? 2 : 0);
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = dist[y][x]; if (d >= 2 && d <= 1 + glowStrength) under.push({ x, y, c: accent, o: d === 2 ? 0.34 : d === 3 ? 0.2 : 0.1 }); }
-    const outline = []; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (dist[y][x] === 1) outline.push({ x, y, c: '#0d0a08' });
-    // particles
-    const rnd = seeded((item.name || '') + base), spots = [];
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (dist[y][x] >= 2 && dist[y][x] <= 4) spots.push([x, y]);
-    const part = [];
-    const take = () => spots.length ? spots.splice(Math.floor(rnd() * spots.length), 1)[0] : null;
-    const count = Math.min(9, 2 + fx.tier * 1.4) | 0;
-    (fx.list.length ? fx.list : []).forEach((f, fi) => {
-      const n = Math.max(2, Math.round(count / (fi + 1)));
-      for (let i = 0; i < n; i++) {
-        const s = take(); if (!s) break; const [x, y] = s, col = f.color;
-        if (f.id === 'fire') { part.push({ x, y, c: '#ffd34d' }); if (y > 1) part.push({ x, y: y - 1, c: '#ff8a2a' }); if (y > 2 && rnd() > 0.5) part.push({ x, y: y - 2, c: '#d93a1a' }); }
-        else if (f.id === 'frost') { part.push({ x, y, c: '#ffffff' }); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { if (dist[y + dy] && dist[y + dy][x + dx] > 1) part.push({ x: x + dx, y: y + dy, c: '#8fe3ff' }); }); }
-        else if (f.id === 'storm') { part.push({ x, y, c: '#fff6a8' }); part.push({ x: x + 1, y: y + 1, c: '#ffe45a' }); part.push({ x, y: y + 2, c: '#ffe45a' }); part.push({ x: x + 1, y: y + 3, c: '#fff6a8' }); }
-        else if (f.id === 'poison') { part.push({ x, y, c: '#9be25a' }); part.push({ x, y: y + 1, c: '#6fb83a' }); if (rnd() > 0.5) part.push({ x, y: y + 2, c: '#9be25a' }); }
-        else if (f.id === 'holy') { part.push({ x, y, c: '#ffffff' }); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => part.push({ x: x + dx, y: y + dy, c: '#ffe27a' })); }
-        else if (f.id === 'shadow') { part.push({ x, y, c: '#6a3fb0' }); part.push({ x: x + 1, y: y - 1, c: '#3d2270' }); part.push({ x: x - 1, y: y - 1, c: '#9a6bdc' }); }
-        else if (f.id === 'blood') { part.push({ x, y, c: '#d93a3a' }); part.push({ x, y: y + 1, c: '#8e1c1c' }); }
-        else if (f.id === 'arcane') { part.push({ x, y, c: '#ffffff' }); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => part.push({ x: x + dx, y: y + dy, c: '#c58cff' })); }
-        else if (f.id === 'nature') { part.push({ x, y, c: '#7ed67e' }); part.push({ x: x + 1, y, c: '#3f9a4a' }); part.push({ x, y: y + 1, c: '#3f9a4a' }); }
-        else if (f.id === 'wind') { part.push({ x, y, c: '#ffffff' }); part.push({ x: x + 1, y, c: '#d2f0ff' }); part.push({ x: x + 2, y: y + 1, c: '#d2f0ff' }); }
-        else { part.push({ x, y, c: '#ffffff' }); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => part.push({ x: x + dx, y: y + dy, c: col })); }
-      }
+    const dist = Array.from({ length: N }, () => Array(N).fill(99));
+    let q = []; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (g[y][x]) { dist[y][x] = 0; q.push([x, y]); }
+    for (let d = 1; d <= 5; d++) { const nq = []; q.forEach(([x, y]) => [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = x + dx, ny = y + dy; if (nx >= 0 && ny >= 0 && nx < N && ny < N && dist[ny][nx] > d) { dist[ny][nx] = d; nq.push([nx, ny]); } })); q = nq; }
+    const colorAt = new Map(cells.map(c => [c.y * N + c.x, c.c]));
+    const outline = [];
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (dist[y][x] === 1) {
+      let nb = null; [[0, 1], [1, 0], [-1, 0], [0, -1]].some(([dx, dy]) => { const k = (y + dy) * N + (x + dx); if (colorAt.has(k)) { nb = colorAt.get(k); return true; } return false; });
+      outline.push({ x, y, c: mix(nb || '#222222', '#050302', 0.78) });
+    }
+    // ---- effect shapes (always attached to the object) ----
+    const rnd = seeded(seedKey + spec.base), fxCells = new Map(), under = [];
+    const free = (x, y) => x >= 0 && y >= 0 && x < N && y < N && !g[y][x];
+    const putFx = (x, y, c, o) => { if (free(x, y)) fxCells.set(y * N + x, { x, y, c, o }); };
+    const edges = []; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (!g[y][x]) { let nx = 0, ny = 0, n = 0; [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { if (at(x + dx, y + dy)) { nx -= dx; ny -= dy; n++; } }); if (n) edges.push({ x, y, nx: Math.sign(nx), ny: Math.sign(ny), n }); }
+    let sx = 0, sy = 0, sn = 0; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (g[y][x]) { sx += x; sy += y; sn++; }
+    const cx0 = sn ? sx / sn : 16, cy0 = sn ? sy / sn : 16;
+    let axx = 0, axy = 0, ayy = 0; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (g[y][x]) { axx += (x - cx0) * (x - cx0); axy += (x - cx0) * (y - cy0); ayy += (y - cy0) * (y - cy0); }
+    const th = 0.5 * Math.atan2(2 * axy, axx - ayy), ax = Math.cos(th), ay = Math.sin(th);
+    // pick n spots spread evenly along the object's long axis (not weighted by perimeter, so a hilt doesn't hog them)
+    const spread = (list, n, gap) => { if (!list.length) return []; const pr = e => (e.x - cx0) * ax + (e.y - cy0) * ay; let lo = 1e9, hi = -1e9; list.forEach(e => { const v = pr(e); if (v < lo) lo = v; if (v > hi) hi = v; }); const out = []; for (let i = 0; i < n; i++) { const target = lo + (i + 0.25 + rnd() * 0.5) / n * (hi - lo); let best = null, bd = 1e9; list.forEach(e => { if (out.some(o => Math.hypot(o.x - e.x, o.y - e.y) < gap)) return; const d = Math.abs(pr(e) - target) + rnd() * 1.2; if (d < bd) { bd = d; best = e; } }); if (best) out.push(best); } return out; };
+    const count = k => Math.max(1, Math.min(7, Math.round(k + tier * 0.9)));
+    const tops = edges.filter(e => e.ny < 0), bottoms = edges.filter(e => e.ny > 0), outward = edges.filter(e => e.nx || e.ny);
+    const cellAt = new Map(cells.map(c => [c.y * N + c.x, c]));
+    const paint = (x, y, c) => { const e = cellAt.get(Math.round(y) * N + Math.round(x)); if (e) e.c = c; };
+    const spriteCells = cells.map(c => [c.x, c.y]);
+    const pickCells = (n, test) => { const pool = spriteCells.filter(([x, y]) => !test || test(x, y)); const out = []; for (let i = 0; i < n && pool.length; i++) { const k = Math.floor(rnd() * pool.length); out.push(pool.splice(k, 1)[0]); } return out; };
+    const ring1 = []; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (dist[y][x] === 1) ring1.push({ x, y });
+    const inb = (x, y) => x >= 1 && y >= 1 && x <= 30 && y <= 30;
+    const fit = (list, len, up) => { const f = list.filter(e => up ? inb(e.x, e.y - len) : inb(e.x + e.nx * len, e.y + e.ny * len)); return f.length >= 2 ? f : list; };
+    const plus = (x, y, c0, c1) => { putFx(x, y, c1); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => putFx(x + dx, y + dy, c0)); };
+    const wisp = (e, L, w0, cols, rise) => { const ph = rnd() * 6, sgn = rnd() > 0.5 ? 1 : -1; for (let i = 0; i < L; i++) { const t = i / L, x = Math.round(e.x + e.nx * i * 0.5 + Math.sin(i * 0.7 + ph) * (1 + t * 1.6) * sgn), y = Math.round(e.y + (rise ? -i * 0.95 : e.ny * i * 0.9 - i * 0.35)); const hw = Math.max(0, Math.round(w0 * (1 - t))); for (let dx = -hw; dx <= hw; dx++) putFx(x + dx, y, Math.abs(dx) === hw && hw > 0 ? cols[1] : cols[0], 1 - t * 0.35); if (hw === 0 && t < 0.9) putFx(x, y, cols[2] || cols[1], 1 - t * 0.35); } };
+    const drip = (e, pal, thick) => { const L = 2 + Math.floor(rnd() * 3) + (tier >= 3 ? 1 : 0); for (let k = 0; k < L; k++) { putFx(e.x, e.y + k, pal[1]); if (thick && k < L - 1) putFx(e.x + 1, e.y + k, pal[0]); } putFx(e.x, e.y + L, pal[2]); putFx(e.x, e.y + L + 1, pal[1]); if (thick) { putFx(e.x + 1, e.y + L, pal[1]); putFx(e.x + 1, e.y + L + 1, pal[0]); } };
+    const bubble = (e, pal) => { const cx = e.x, cy = e.y - 2; [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([dx, dy]) => putFx(cx + dx, cy + dy, dx === -1 && dy === -1 ? pal[2] : pal[1])); };
+    const FXF = {
+      fire() { const cols = ['#b22410', '#ff5a1a', '#ff9a2a', '#ffd04a', '#fff3b0']; spread(fit(tops, 5, true), count(2), 3).forEach(e => { const h = 6 + Math.floor(rnd() * 4) + tier, ph = rnd() * 6; for (let k = 0; k < h; k++) { const t = k / h, hw = t < 0.55 ? 1 : 0, sway = Math.round(Math.sin(k * 0.7 + ph) * 1.6 * t), ci = Math.min(4, Math.floor(t * 4.6)); for (let dx = -hw; dx <= hw; dx++) putFx(e.x + sway + dx, e.y - k, dx === 0 && t > 0.1 && t < 0.7 ? cols[Math.min(4, ci + 1)] : cols[ci]); } }); },
+      frost() { ring1.forEach(({ x, y }) => { if ((x * 7 + y * 3) % 5 < 2) putFx(x, y, (x + y) % 3 ? '#e4fbff' : '#a8e4fa'); }); spread(fit(outward, 3), count(1.8), 4).forEach(e => { const L = 5 + Math.floor(rnd() * 4) + (tier >= 3 ? 2 : 0), tilt = rnd() > 0.5 ? 1 : -1; let x = e.x, y = e.y; for (let k = 0; k < L; k++) { const t = k / L; putFx(x, y, t > 0.8 ? '#ffffff' : t > 0.4 ? '#d8f6ff' : '#9fdcf5'); if (t < 0.6) { const sd = e.nx && e.ny ? [e.nx, 0] : [e.ny ? 1 : 0, e.nx ? 1 : 0]; putFx(x + sd[0], y + sd[1], '#4fa8d8'); if (t < 0.3) putFx(x - sd[0], y - sd[1], '#4fa8d8'); } x += e.nx; y += e.ny; if (k % 3 === 2) { x += e.ny ? tilt : 0; y += e.nx ? tilt : 0; } } }); },
+      storm() { spread(fit(outward, 4), 2 + Math.floor(tier / 2), 7).forEach(e => { const len = 9 + Math.floor(rnd() * 4); let x = e.x, y = e.y; const px = e.ny, py = e.nx; let z = 1; for (let i = 0; i < len; i++) { putFx(x, y, '#fffbd0'); { const sd = e.nx && e.ny ? [e.nx, 0] : [e.ny ? 1 : 0, e.nx ? 1 : 0]; putFx(x + sd[0], y + sd[1], '#ffd92a'); putFx(x - sd[0], y - sd[1], '#ffd92a'); } x += e.nx; y += e.ny; if (i % 2 === 1) { x += px * z * 2; y += py * z * 2; z = -z; } if (i === 4) { let fx2 = x, fy2 = y; for (let j = 0; j < 4; j++) { fx2 += e.nx + px * z; fy2 += e.ny + py * z; putFx(fx2, fy2, '#ffe45a'); } } } }); },
+      poison() { spread(bottoms, count(1.6), 3).forEach(e => drip(e, ['#4d9a22', '#7fcf3a', '#caff7a'], true)); spread(tops, Math.max(1, Math.floor(tier / 1.5) + 1), 5).forEach(e => bubble(e, ['#2f6a12', '#8fdc4a', '#eaffb0'])); pickCells(4 + tier, (x, y) => dist[y][x] === 0).forEach(([x, y]) => paint(x, y, '#5fb82a')); },
+      acid() { spread(bottoms, count(1.6), 3).forEach(e => drip(e, ['#8aa21e', '#c8e84a', '#f6ffa0'], true)); spread(tops, 2 + Math.floor(tier / 2), 4).forEach(e => bubble(e, ['#7a8c12', '#d0ec50', '#fbffc0'])); pickCells(4 + tier, () => true).forEach(([x, y]) => paint(x, y, '#2a3008')); },
+      blood() { spread(bottoms, count(1.8), 3).forEach(e => drip(e, ['#6e0e0e', '#b32020', '#ff8a8a'], true)); pickCells(5 + tier, () => true).forEach(([x, y]) => paint(x, y, rnd() > 0.5 ? '#8a1414' : '#c42a2a')); },
+      water() { spread(bottoms, count(1.8), 3).forEach(e => drip(e, ['#1f6aa8', '#4aa8e8', '#d4f4ff'], true)); spread(tops, 1 + Math.floor(tier / 2), 5).forEach(e => bubble(e, ['#2a7ab8', '#7fc8f4', '#f0fcff'])); },
+      holy() { const rays = 6 + Math.min(4, tier); for (let i = 0; i < rays; i++) { const a = (i / rays) * Math.PI * 2 + rnd() * 0.4; let px = cx0, py = cy0; for (let k = 0; k < 80; k++) { px += Math.cos(a) * 0.5; py += Math.sin(a) * 0.5; const xx = Math.round(px), yy = Math.round(py); if (!(xx >= 0 && yy >= 0 && xx < N && yy < N)) break; if (!g[yy][xx]) { const len = 5 + Math.floor(rnd() * 4) + Math.floor(tier / 2); for (let j = 0; j < len; j++) putFx(Math.round(px + Math.cos(a) * j), Math.round(py + Math.sin(a) * j), j < 2 ? '#fffbe0' : j < 5 ? '#ffe27a' : '#ffc84a', j > 5 ? 0.75 : 1); if (i % 3 === 0 && len > 6) plus(Math.round(px + Math.cos(a) * (len + 1)), Math.round(py + Math.sin(a) * (len + 1)), '#ffe27a', '#ffffff'); break; } } } },
+      luck() { const rays = 5 + Math.min(3, tier); for (let i = 0; i < rays; i++) { const a = (i / rays) * Math.PI * 2 + rnd() * 0.5; let px = cx0, py = cy0; for (let k = 0; k < 80; k++) { px += Math.cos(a) * 0.5; py += Math.sin(a) * 0.5; const xx = Math.round(px), yy = Math.round(py); if (!(xx >= 0 && yy >= 0 && xx < N && yy < N)) break; if (!g[yy][xx]) { const len = 3 + Math.floor(rnd() * 3); for (let j = 0; j < len; j++) putFx(Math.round(px + Math.cos(a) * j), Math.round(py + Math.sin(a) * j), j % 2 ? '#7fe08a' : '#fff0a0'); plus(Math.round(px + Math.cos(a) * (len + 1)), Math.round(py + Math.sin(a) * (len + 1)), i % 2 ? '#5fd078' : '#ffd84a', '#ffffff'); break; } } } },
+      shadow() { spread(fit(edges.filter(e => e.ny >= 0 || e.nx), 6, true), count(1.8), 4).forEach(e => wisp(e, 9 + Math.floor(rnd() * 5) + tier, 2, ['#2a1650', '#6a38b8', '#8f5fd6'], true)); },
+      necrotic() { spread(fit(edges.filter(e => e.ny <= 0 || e.nx), 6, true), count(1.6), 4).forEach(e => wisp(e, 8 + Math.floor(rnd() * 5) + tier, 1, ['#2fae4a', '#7fe08a', '#d4ffd0'], true)); pickCells(4 + tier, () => true).forEach(([x, y]) => paint(x, y, '#14331c')); },
+      nature() { const used = new Set(); for (let v = 0; v < (tier >= 3 ? 2 : 1) + 1; v++) { const starts = ring1.map(c => c.y * N + c.x).filter(k => !used.has(k)); if (!starts.length) break; let cur = starts[Math.floor(rnd() * starts.length)], pdx = 1, pdy = 0; for (let s = 0; s < 16 + tier * 3; s++) { used.add(cur); const x = cur % N, y = Math.floor(cur / N); putFx(x, y, '#2f7a2f'); if (s % 3 === 2) { const out = [[1, 0], [-1, 0], [0, 1], [0, -1]].find(([dx, dy]) => free(x + dx, y + dy) && dist[y + dy] && dist[y + dy][x + dx] === 2); if (out) { putFx(x + out[0], y + out[1], '#5fbf5f'); putFx(x + out[0] * 2, y + out[1] * 2, '#9fe89f'); putFx(x + out[0] * 2 + out[1], y + out[1] * 2 + out[0], '#5fbf5f'); } } let best = null, bs = -9; [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(([dx, dy]) => { const k = (y + dy) * N + (x + dx); if (dist[y + dy] && dist[y + dy][x + dx] === 1 && !used.has(k)) { const sc = dx * pdx + dy * pdy + rnd() * 0.3; if (sc > bs) { bs = sc; best = [k, dx, dy]; } } }); if (!best) break; cur = best[0]; pdx = best[1]; pdy = best[2]; } } pickCells(4 + tier, () => true).forEach(([x, y]) => paint(x, y, rnd() > 0.5 ? '#3f7a3a' : '#6fb85f')); },
+      wind(col) { spread(fit(outward, 4), count(1.6), 6).forEach(e => { const L = 10 + Math.floor(rnd() * 4), sg = rnd() > 0.5 ? 1 : -1; for (let i = 0; i < L; i++) { const t = i / L, x = Math.round(e.x + e.nx * i * 0.8 + e.ny * Math.sin(t * 4) * 2.2 * sg), y = Math.round(e.y + e.ny * i * 0.8 + e.nx * Math.sin(t * 4) * 2.2 * sg); putFx(x, y, i < 3 ? '#ffffff' : col, 1 - t * 0.5); { const sd = e.nx && e.ny ? [e.nx, 0] : [e.ny ? 1 : 0, e.nx ? 1 : 0]; if (i < L * 0.6) putFx(x + sd[0], y + sd[1], col, 0.85); if (i < L * 0.3) putFx(x - sd[0], y - sd[1], col, 0.85); } } }); },
+      sonic() { [[12, '#d4f0ff'], [14.6, '#9fd0f0'], [17.2, '#6fa8d8']].forEach(([r, c], ri) => { if (ri > 1 + Math.floor(tier / 2)) return; [0, Math.PI].forEach(base => { for (let a = -0.75; a <= 0.75; a += 0.4 / r * 2) putFx(Math.round(16 + Math.cos(base + a) * r), Math.round(16 + Math.sin(base + a) * r), c); }); }); },
+      circle(col, runes) { const r = 14.2; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = Math.hypot(x + 0.5 - 16, y + 0.5 - 16); if (Math.abs(d - r) < 0.55) under.push({ x, y, c: col, o: 0.6 }); else if (Math.abs(d - (r - 2.4)) < 0.4 && tier >= 3) under.push({ x, y, c: col, o: 0.35 }); }
+        [[16, 1, 0, 1], [16, 30, 0, -1], [1, 16, 1, 0], [30, 16, -1, 0]].forEach(([x, y, dx, dy]) => { for (let k = 1; k <= 3; k++) under.push({ x: x + dx * k, y: y + dy * k, c: col, o: 0.6 }); });
+        if (runes) [90, 210, 330].forEach(a => { const x = Math.round(16 + Math.cos(a * Math.PI / 180) * 14.2), y = Math.round(16 + Math.sin(a * Math.PI / 180) * 14.2); [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => under.push({ x: x + dx, y: y + dy, c: '#ffffff', o: 0.85 })); }); },
+    };
+    fxIds.forEach(id => {
+      if (id === 'fire') FXF.fire(); else if (id === 'frost') FXF.frost(); else if (id === 'storm') FXF.storm();
+      else if (id === 'poison') FXF.poison(); else if (id === 'acid') FXF.acid(); else if (id === 'blood') FXF.blood(); else if (id === 'water') FXF.water();
+      else if (id === 'holy') FXF.holy(); else if (id === 'luck') FXF.luck();
+      else if (id === 'shadow') FXF.shadow(); else if (id === 'necrotic') FXF.necrotic();
+      else if (id === 'nature') FXF.nature(); else if (id === 'wind') FXF.wind('#bfe4ff'); else if (id === 'sonic') FXF.sonic();
+      else if (id === 'arcane') FXF.circle('#b98cff', true); else if (id === 'magic' && tier >= 2) FXF.circle('#9fd0ff', false);
     });
-    const kept = part.filter(p => p.x >= 0 && p.y >= 0 && p.x < N && p.y < N && !C.g[p.y][p.x]);
-    return { base, matId, fx: fx.list.map(f => f.id), under, outline, cells, kept, accent };
+    const glow = [];
+    if (fxColor && tier >= 1) { const reach = Math.min(4, 1 + Math.ceil(tier / 2)); for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = dist[y][x]; if (d >= 2 && d <= 1 + reach && !fxCells.has(y * N + x)) glow.push({ x, y, c: fxColor, o: d === 2 ? 0.3 : d === 3 ? 0.17 : 0.09 }); } }
+    // effect pieces that ended up smaller than 3 connected cells are noise: remove them
+    { const test = (x, y) => fxCells.has(y * N + x) || !!g[y][x]; const seen = new Uint8Array(N * N); for (const k of [...fxCells.keys()]) { if (seen[k]) continue; const c = comp(k % N, Math.floor(k / N), test, seen); const hasSprite = c.some(([x, y]) => g[y][x]); const fxN = c.filter(([x, y]) => fxCells.has(y * N + x)).length; if (!hasSprite && fxN < 3) c.forEach(([x, y]) => fxCells.delete(y * N + x)); } }
+    return { under: under.concat(glow), outline, cells, fx: [...fxCells.values()] };
   }
-  const rectsOf = (arr, opacity) => {
+
+  const rectsOf = arr => {
     const rows = {}; arr.forEach(c => { (rows[c.y] = rows[c.y] || []).push(c); });
     let out = '';
-    Object.keys(rows).forEach(y => { const row = rows[y].sort((a, b) => a.x - b.x); let i = 0; while (i < row.length) { let j = i + 1; while (j < row.length && row[j].x === row[j - 1].x + 1 && row[j].c === row[i].c && (row[j].o || 0) === (row[i].o || 0)) j++; const o = row[i].o; out += `<rect x="${row[i].x}" y="${y}" width="${j - i}" height="1" fill="${row[i].c}"${o != null ? ` fill-opacity="${o}"` : ''}/>`; i = j; } });
+    Object.keys(rows).forEach(y => { const row = rows[y].sort((a, b) => a.x - b.x); let i = 0; while (i < row.length) { let j = i + 1; while (j < row.length && row[j].x === row[j - 1].x + 1 && row[j].c === row[i].c && (row[j].o || 1) === (row[i].o || 1)) j++; const o = row[i].o; out += `<rect x="${row[i].x}" y="${y}" width="${j - i}" height="1" fill="${row[i].c}"${o != null && o < 1 ? ` fill-opacity="${o}"` : ''}/>`; i = j; } });
     return out;
   };
-  window.itemArtSpec = function (item, rarity) { const r = render(item, rarity); return r ? { base: r.base, material: r.matId, effects: r.fx } : null; };
-  // Returns the inner SVG markup for a 32x32 viewBox (or null if the item has no art here).
   const cache = new Map();
   window.itemArtInner = function (item, rarity) {
     item = item || {};
-    const key = `${item.name}|${item.type}|${item.subcategory || ''}|${rarity || item.rarity || ''}|${(item.desc || '').slice(0, 60)}|${String(item.effect || '').slice(0, 80)}`;
+    const key = `${item.name}|${item.type}|${item.subcategory || ''}|${rarity || item.rarity || ''}|${item.artSpec ? JSON.stringify(item.artSpec) : ''}|${(item.desc || '').slice(0, 50)}|${String(item.effect || '').slice(0, 60)}|${Array.isArray(item.mods) ? item.mods.length + (item.mods[0] ? item.mods[0].key : '') : ''}`;
     if (cache.has(key)) return cache.get(key);
-    const r = render(item, rarity);
-    const out = r ? rectsOf(r.under) + rectsOf(r.outline) + rectsOf(r.cells) + rectsOf(r.kept) : null;
-    if (cache.size > 3000) cache.clear();
-    cache.set(key, out);
-    return out;
+    const spec = window.itemArtSpec(item, rarity);
+    let out = null;
+    if (spec && SPR[spec.base]) { const r = render(spec, rarity || item.rarity, item.name || ''); out = rectsOf(r.under) + rectsOf(r.outline) + rectsOf(r.cells) + rectsOf(r.fx); }
+    if (cache.size > 4000) cache.clear();
+    cache.set(key, out); return out;
   };
-  window.itemArtSvg = function (item, px, rarity) {
-    const inner = window.itemArtInner(item, rarity); if (!inner) return null;
-    return `<svg class="pixel-svg item-pixel-icon item-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${px}" height="${px}" shape-rendering="crispEdges" style="image-rendering:pixelated;flex-shrink:0;">${inner}</svg>`;
+  window.itemArtSvg = function (item, px, rarity) { const inner = window.itemArtInner(item, rarity); return inner ? `<svg class="pixel-svg item-pixel-icon item-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${px}" height="${px}" shape-rendering="crispEdges" style="image-rendering:pixelated;flex-shrink:0;">${inner}</svg>` : null; };
+  window.itemArtBaseSvg = function (base, opts, px) {
+    opts = opts || {}; const spec = { base, material: opts.material || 'steel', effects: opts.effects || [], liquid: opts.liquid || null };
+    if (!SPR[base]) return null; const r = render(spec, opts.rarity || 'common', opts.seed || base);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${px || 96}" height="${px || 96}" shape-rendering="crispEdges">${rectsOf(r.under) + rectsOf(r.outline) + rectsOf(r.cells) + rectsOf(r.fx)}</svg>`;
   };
-  window.ITEM_ART_BASES = Object.keys(D);
+  window.ITEM_ART = { MAT, FX, SPR };
 })();
