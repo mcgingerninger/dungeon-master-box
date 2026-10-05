@@ -332,4 +332,5 @@
       + `<circle cx="16" cy="16" r="15.4" fill="none" stroke="#c9a84c" stroke-width="1"/><circle cx="16" cy="16" r="14.4" fill="none" stroke="#6b5420" stroke-width="0.6"/></svg>`;
   };
   window.MONSTER_ART_KINDS = Object.keys(D);
+  window.PixelKit = { Canvas, mix, hex, N }; // shared with item-art.js
 })();

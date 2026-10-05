@@ -4523,6 +4523,7 @@ const APP_VERSION = 'v104';
 <script src="journey-data.js"></script>
 <script src="mechanics/canonical/items.js"></script>
 <script src="monster-art.js"></script>
+<script src="item-art.js"></script>
 <script src="battlefield-tab.js"></script>
 <script>
 // mechanics/canonical/items.js (loaded just above) defines `canonicalItems` — the one-time
@@ -13238,11 +13239,16 @@ function itemPixelIcon(item, size, rarity, fillParent) {
   const frameColor = rarityColors[rarity] || rarityColors.common;
   const fxClass = isHighTier ? ` icon-fx-${rarity}` : '';
   const fxPos = isHighTier ? 'position:relative;' : '';
+  // item-art.js draws weapons, armour, jewellery and potions as shaded 32x32 pixel art (base object +
+  // material recolour + magical effects); anything it doesn't recognise keeps the older icon below.
+  const artInner = typeof itemArtInner === 'function' ? itemArtInner(item, rarity) : null;
+  const vb = artInner ? '0 0 32 32' : shape.viewBox;
+  const inner = artInner || (rects + accent + gleam);
   if (fillParent) {
-    const svg = `<svg class="pixel-svg item-pixel-icon" viewBox="${shape.viewBox}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="image-rendering:pixelated;display:block;">${rects}${accent}${gleam}</svg>`;
+    const svg = `<svg class="pixel-svg item-pixel-icon" viewBox="${vb}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges" style="image-rendering:pixelated;display:block;">${inner}</svg>`;
     return `<span class="item-icon-frame item-icon-frame-fill${fxClass}" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;box-sizing:border-box;background:${frameColor}26;border:1px solid ${frameColor};border-radius:3px;${fxPos}">${svg}</span>`;
   }
-  const svg = `<svg class="pixel-svg item-pixel-icon" viewBox="${shape.viewBox}" width="${px}" height="${px}" style="image-rendering:pixelated;flex-shrink:0;">${rects}${accent}${gleam}</svg>`;
+  const svg = `<svg class="pixel-svg item-pixel-icon" viewBox="${vb}" width="${px}" height="${px}" shape-rendering="crispEdges" style="image-rendering:pixelated;flex-shrink:0;">${inner}</svg>`;
   const pad = Math.max(2, Math.round(px * 0.14));
   const frameSize = px + pad * 2;
   return `<span class="item-icon-frame${fxClass}" style="display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:${frameSize}px;height:${frameSize}px;background:${frameColor}26;border:1px solid ${frameColor};border-radius:4px;${fxPos}">${svg}</span>`;
