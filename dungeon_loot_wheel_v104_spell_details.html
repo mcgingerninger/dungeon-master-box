@@ -3762,7 +3762,7 @@
 
 <!-- COMBAT TAB -->
 <!-- 🧪 Battle Field (test): drag monsters/players onto a field; click a monster, then a player to roll
-     the attack. All logic lives in battle-test.js and reuses the Combat tab's monster systems. -->
+     the attack. All logic lives in battlefield-tab.js and reuses the Combat tab's monster systems. -->
 <div id="tab-battletest" class="tab-content">
   <h3 style="color:var(--gold);margin-bottom:0.3rem;">🧪 Battle Field <span style="font-size:0.75rem;color:var(--text-dim);font-weight:normal;">(test)</span></h3>
   <div class="bt-hint" id="btHint"></div>
@@ -4517,7 +4517,7 @@ const APP_VERSION = 'v104';
 <script src="reference-data.js"></script>
 <script src="journey-data.js"></script>
 <script src="mechanics/canonical/items.js"></script>
-<script src="battle-test.js"></script>
+<script src="battlefield-tab.js"></script>
 <script>
 // mechanics/canonical/items.js (loaded just above) defines `canonicalItems` — the one-time
 // migration output described in docs/V2_MECHANICS_MIGRATION.md: a subset of lootData's own items,
