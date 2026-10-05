@@ -32,6 +32,8 @@
     .bt-token .disc { position:relative; width:60px; height:60px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; line-height:1;
       background:radial-gradient(circle at 35% 30%, var(--bt-hi), var(--bt-lo)); border:4px solid var(--bt-ring); box-shadow:0 3px 8px rgba(0,0,0,0.7), inset 0 0 8px rgba(0,0,0,0.5); }
     .bt-token.monster { --bt-hi:#b84444; --bt-lo:#4a1414; --bt-ring:#2b0d0d; }
+    .bt-token.monster .disc { background:#0d0a08; overflow:hidden; } .bt-token.monster .disc svg { display:block; border-radius:50%; }
+    .bt-chip .art { width:22px; height:22px; flex:0 0 auto; margin-right:0.35rem; } .bt-chip .art svg { display:block; }
     .bt-token.player { --bt-hi:#3fae78; --bt-lo:#12402a; --bt-ring:#0b2a1b; }
     .bt-token.t-uncommon .disc { border-color:#4caf7d; } .bt-token.t-rare .disc { border-color:#5b9cf6; }
     .bt-token.t-superrare .disc { border-color:#c47cf5; } .bt-token.t-legendary .disc { border-color:#e8963a; }
@@ -104,7 +106,7 @@
   window.btRenderMonsterList = function () {
     const box = document.getElementById('btMonsterList'); if (!box) return;
     const q = (document.getElementById('btMonsterSearch') || {}).value || '';
-    box.innerHTML = monsterMatches(q).map(m => `<div class="bt-chip monster" draggable="true" data-bt="monster" data-key="${esc(m.name)}"><span>${esc(m.name)}</span><small>CR ${esc(m.cr)} · AC ${esc(m.ac)}</small></div>`).join('') || '<div class="bt-note">No matches.</div>';
+    box.innerHTML = monsterMatches(q).map(m => `<div class="bt-chip monster" draggable="true" data-bt="monster" data-key="${esc(m.name)}"><span style="display:flex;align-items:center"><span class="art">${typeof monsterArtSvg === 'function' ? monsterArtSvg(m, 22, true) : ''}</span>${esc(m.name)}</span><small>CR ${esc(m.cr)} · AC ${esc(m.ac)}</small></div>`).join('') || '<div class="bt-note">No matches.</div>';
   };
   window.btAddCustomPlayer = function () {
     const name = document.getElementById('btNewName').value.trim() || 'Test player';
@@ -131,7 +133,7 @@
       const pct = Math.max(0, Math.min(100, Math.round((t.hp / Math.max(1, t.maxHp)) * 100)));
       const tier = t.entry && t.entry.variant ? t.entry.variant.tier : '';
       const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', t.hp <= 0 ? 'dead' : ''].join(' ');
-      const icon = t.kind === 'player' ? '🛡️' : monsterIcon(t.monster);
+      const icon = t.kind === 'player' ? '🛡️' : (typeof monsterArtSvg === 'function' ? monsterArtSvg(t.monster, 54, true) : monsterIcon(t.monster));
       return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><span class="ac" title="Armor Class">🛡${t.ac == null ? '—' : t.ac}</span><div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="bar"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></div></div>`;
     }).join('');
     const hint = document.getElementById('btHint');
