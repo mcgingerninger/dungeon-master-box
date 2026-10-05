@@ -7972,7 +7972,7 @@ function resolveRoll(numEnemies, minItems, maxItems) {
     const items=[];
     for(let i=0;i<count;i++){
       const rarity=pickRarity();
-      const item=resolveScrollSpell(pickItem(rarity));
+      const item=maybeGeneratedLootItem(rarity) || resolveScrollSpell(pickItem(rarity));
       // Spread the whole catalog item (like Treasure Chest/Deceased Human already do) rather than
       // hand-picking a few fields — a whitelist silently dropped mods, abilities, unlocks,
       // weight, subcategory, tags, properties and classification, so a rolled item showed (and
@@ -8940,6 +8940,8 @@ function resolveChest() {
   for (const group of shuffledGroups) {
     if (items.length >= count) break;
     const rarity = pickChestRarity();
+    const genItem = maybeGeneratedLootItem(rarity, group.types);
+    if (genItem) { usedNames.add(genItem.name); items.push({ rarity, ...genItem }); continue; }
     const pool = (lootData[rarity] || []).filter(it =>
       group.types.includes(it.type) && !usedNames.has(it.name) && !isMonsterPartItem(it)
     );
@@ -8956,6 +8958,8 @@ function resolveChest() {
   while (items.length < count && tries < 50) {
     tries++;
     const rarity = pickChestRarity();
+    const genItem2 = maybeGeneratedLootItem(rarity);
+    if (genItem2) { usedNames.add(genItem2.name); items.push({ rarity, ...genItem2 }); continue; }
     const pool = (lootData[rarity] || []).filter(it => !usedNames.has(it.name) && !isMonsterPartItem(it));
     if (!pool.length) continue;
     const raw = pool[Math.floor(Math.random() * pool.length)];
@@ -9103,6 +9107,8 @@ function pickDeceasedItem(types, usedNames) {
   while (tries < 40) {
     tries++;
     const r = pickWeightedRarity(deceasedRarity, corpseLootSettings);
+    const genItem = maybeGeneratedLootItem(r, types);
+    if (genItem) { usedNames.add(genItem.name); return { rarity: r, ...genItem }; }
     const pool = (lootData[r] || []).filter(it => types.includes(it.type) && !usedNames.has(it.name) && !isMonsterPartItem(it));
     if (!pool.length) continue;
     const raw = pool[Math.floor(Math.random() * pool.length)];
@@ -14511,6 +14517,41 @@ function pickTier(arr,r){
 // than re-listing every current and future part subcategory here.
 function isMonsterPartItem(it) { return it.type === 'craftable'; }
 // Wheel results now receive the same GP category and variable quality fields as generated items.
+// ===================== GENERATED ITEMS IN ROLLED LOOT =====================
+// Rolled loot (wheel, treasure chests, deceased humans, combat kills, bounty chests) normally draws from
+// the compendium catalog. This DM setting lets a share of those slots be freshly GENERATED items instead
+// (same builder, same Item Rules, as Store wares and Generate Item). Local to this browser.
+let lootGenChance = 25;
+try { const v = parseInt(localStorage.getItem('dmLootGenChance'), 10); if (Number.isFinite(v)) lootGenChance = Math.max(0, Math.min(100, v)); } catch (e) {}
+function setLootGenChance(v) {
+  lootGenChance = Math.max(0, Math.min(100, parseInt(v, 10) || 0));
+  try { localStorage.setItem('dmLootGenChance', String(lootGenChance)); } catch (e) {}
+  const el = document.getElementById('lootGenChanceVal'); if (el) el.textContent = lootGenChance + '%';
+}
+function generateLootItem(rarity, cats) {
+  const allowed = (cats && cats.length ? cats : ['armor', 'weapon', 'consumable', 'misc']);
+  const cat = ri(allowed), baseName = ri(GEN[cat]);
+  const tags = detectTags(baseName), { pool } = buildWeightedModPool(tags);
+  const countFn = () => ({ common: rn(1, 2), uncommon: 2, rare: rn(2, 3), superrare: 3, legendary: rn(3, 4), celestial: 4 }[rarity] || 2);
+  const built = buildItemUnderRules({ cat, rarity, baseName, weightedPool: pool, countFn, countIncludesStarting: true });
+  const r = built.rarity, mods = built.mods;
+  const { subcategory, slotSize, dmg, ac, hp, requirement, charges, armorStyle, isBodySlot } = built.stats;
+  const name = buildItemName(baseName, r, { dmg, ac, hp }, mods);
+  const paragraphs = buildDescParagraphs(baseName, cat, r, tags, mods, { dmg, ac, hp });
+  const flavor = paragraphs.map(p => p.text).join('\n\n');
+  const gp = built.gp || formatGpAmount(commercePrice(r, mods.length, 0.5));
+  const item = { name, rarity: r, cat, type: cat, subcategory, gp, dmg, ac, hp, requirement, charges, slotSize, weight: computeItemWeight({ type: cat, subcategory, name }), mods, flavor, desc: flavor, descParagraphs: paragraphs, genTags: tags, generatedLoot: true, ...(armorStyle ? { armorStyle } : {}), ...(isBodySlot !== undefined ? { isBodySlot } : {}) };
+  inferItemMetadata(item, r);
+  return item;
+}
+// Returns a generated item for this slot (with probability lootGenChance), or null to use the catalog.
+// `types` limits the categories (a chest's "Weapon" slot can only generate a weapon).
+function maybeGeneratedLootItem(rarity, types) {
+  if (!(lootGenChance > 0) || Math.random() * 100 >= lootGenChance) return null;
+  const cats = types ? ['weapon', 'armor', 'consumable', 'misc'].filter(c => types.includes(c)) : null;
+  if (types && !cats.length) return null; // e.g. a companion slot stays catalog
+  try { return generateLootItem(rarity, cats); } catch (e) { console.warn('generated loot failed', e); return null; }
+}
 function pickItem(rarity) {
   const pool=(lootData[rarity]||[]).filter(it => !isMonsterPartItem(it));
   if(!pool.length) return {name:'Nothing',desc:'',type:'misc',slotSize:1,gp:'0 gp'};
@@ -20357,6 +20398,8 @@ function rollMonsterCombatLoot(entry) {
   const usedNames = new Set();
   for (let i = 0; i < itemCount; i++) {
     const r = weightedPickFromObject(weights);
+    const genItem = maybeGeneratedLootItem(r);
+    if (genItem) { usedNames.add(genItem.name); items.push({ ...genItem, rarity: genItem.rarity, id: 'cloot' + (++monsterPartCounter), reserved: false }); continue; }
     // Excludes monster parts from the general pool — lootData[r] holds every creature's
     // premade parts mixed in with ordinary gear (see generatePremadeMonsterParts), so without
     // this an Owl kill could just as easily hand back a Water Elemental Tongue. Parts are
@@ -22594,6 +22637,8 @@ function awardChestOfRarity(rarity, count) {
   for (const group of shuffledGroups) {
     if (items.length >= count) break;
     const r = pickRarity();
+    const genItem = maybeGeneratedLootItem(r, group.types);
+    if (genItem) { usedNames.add(genItem.name); items.push({ rarity: r, ...genItem }); continue; }
     const pool = (lootData[r] || []).filter(it => group.types.includes(it.type) && !usedNames.has(it.name) && !isMonsterPartItem(it));
     if (pool.length) { const raw = ri(pool); const item = resolveScrollSpell(raw); usedNames.add(raw.name); items.push({ rarity: r, ...item }); }
   }
@@ -22601,6 +22646,8 @@ function awardChestOfRarity(rarity, count) {
   while (items.length < count && tries < 50) {
     tries++;
     const r = pickRarity();
+    const genItem2 = maybeGeneratedLootItem(r);
+    if (genItem2) { usedNames.add(genItem2.name); items.push({ rarity: r, ...genItem2 }); continue; }
     const pool = (lootData[r] || []).filter(it => !usedNames.has(it.name) && !isMonsterPartItem(it));
     if (!pool.length) continue;
     const raw = ri(pool); const item = resolveScrollSpell(raw); usedNames.add(raw.name); items.push({ rarity: r, ...item });
@@ -23870,6 +23917,9 @@ function renderItemRulesPanel() {
   const wEntries = Object.entries(cfg.weights[grp] || {}).filter(([k]) => !q || k.toLowerCase().includes(q));
   const groupBtns = ITEM_RULE_WEIGHT_GROUPS.map(([g, label]) => `<button class="dmcontrols-subtab-btn${g === grp ? ' active' : ''}" onclick="itemRulesUi.group='${g}';renderItemRulesPanel()">${e(label)}</button>`).join('');
   wrap.innerHTML = `
+    <h4 class="ir-sec">Rolled loot</h4>
+    <div class="ir-card"><div class="ir-head"><label><strong>Generated items in rolled loot</strong> <input type="range" min="0" max="100" value="${lootGenChance}" oninput="setLootGenChance(this.value)"> <span id="lootGenChanceVal">${lootGenChance}%</span></label></div>
+      <div class="ir-desc">Share of rolled-loot slots (Roll Loot wheel, treasure chests, deceased humans, combat kills, bounty chests) filled with a freshly generated item instead of a compendium item. 0% = compendium only. Generated loot follows the same rules below. Saved in this browser.</div></div>
     <h4 class="ir-sec">Rules (enforced on every source)</h4>${rulesHtml}
     <h4 class="ir-sec">Rarity bands &amp; gp price bands</h4>
     <p class="ir-desc">An item's total weight picks its rarity band; where it sits inside the band picks its gp inside that rarity's price band. No price may ever exceed 100,000 gp.</p>

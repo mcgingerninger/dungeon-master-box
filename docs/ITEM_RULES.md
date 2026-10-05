@@ -67,7 +67,7 @@ materials are exempt from the rarity/price rules only (`isValueExempt`).
 - **Default catalog** was fixed by `scripts/enforce-item-rules.js`: 375 catalog items + 5 NPC weapons had attack modifiers converted
   to damage-only, 58 items moved to the tier their weight earns (or because they exceeded the modifier cap), 1,027 items repriced;
   1,249 / 1,249 items now pass. Saved copies in a player's save follow their catalog twin on load, including the new tier.
-- **Rolled loot** (wheel, chests, corpses, combat) draws from the catalog and so inherits the fix.
+- **Rolled loot** (wheel, chests, corpses, combat, bounty chests) draws from the catalog and so inherits the fix. A DM setting (DM Controls → ⚖ Item Rules → *Rolled loot*, default 25 %) makes that share of slots a freshly **generated** item instead, built by the same rule-enforcing builder as Store wares; 0 % keeps loot catalog-only.
 - **Fleshmancer limbs** re-roll their effects until they pass the rules, then take rarity and price from weight.
   Monster-part **grafts** use their own effect table; its entries were converted to damage-only and every roll tested passes the rules,
   but their rarity comes from the source part, not from weight.
