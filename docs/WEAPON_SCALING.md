@@ -27,3 +27,8 @@ grade, buff, attackBonus }` or "+N to spell attack rolls" in the effect text ove
 numbers show in the tooltip and are appended to the cast message when the staff is equipped.
 
 Tooltips, loot cards and the attack popup all read the same functions. Tests: `game-engine.test.js`.
+
+## Every stat is shown
+
+A weapon scales with all six abilities. A stat the weapon has no real affinity for is rank **E** (×0.1) rather than missing, so a plain
+club still lists INT E. Hover tooltips and the attack popup always show all six grades (STR · DEX · CON · INT · WIS · CHA).

@@ -1507,7 +1507,18 @@ export function normalizeScaling(raw) {
 function scalingStatsByStrength(scaling) {
   return SCALING_STATS.filter(s => scaling[s]).sort((a, b) => SCALING_GRADE_MULT[scaling[b]] - SCALING_GRADE_MULT[scaling[a]]);
 }
+// Every weapon scales with every ability: a stat the weapon has no real affinity for is simply rank E
+// (a greatclub still has INT scaling, it is just E). Filling the gaps here means tooltips, the attack
+// popup and the damage maths all see all six.
+export function withAllScalingStats(scaling) {
+  const out = { ...scaling };
+  SCALING_STATS.forEach(s => { if (!out[s]) out[s] = 'E'; });
+  return out;
+}
 export function inferWeaponScaling(item, rarity) {
+  return withAllScalingStats(inferWeaponScalingRaw(item, rarity));
+}
+function inferWeaponScalingRaw(item, rarity) {
   const authored = normalizeScaling(item && item.scaling);
   if (Object.keys(authored).length) return authored;
   const r = rarity || (item && item.rarity) || 'common';

@@ -683,15 +683,17 @@ describe('weapon stat scaling', () => {
   const mods = { str: 3, dex: 1, con: 0, int: -1, wis: 0, cha: 0 };
   const w = (name, extra = {}) => ({ name, type: 'weapon', slotSize: 1, ...extra });
 
+  // Every weapon scales with all six stats; the ones it has no affinity for are rank E.
+  const full = o => ({ str: 'E', dex: 'E', con: 'E', int: 'E', wis: 'E', cha: 'E', ...o });
   test('defaults come from the weapon kind, found by name keywords (not just the breadcrumb)', () => {
     assert.equal(GE.weaponScalingKind(w('Oaken Handaxe')), 'axe');
     assert.equal(GE.weaponScalingKind(w('Iron Warhammer')), 'hammer');
     assert.equal(GE.weaponScalingKind(w('Kukri of the Verdant')), 'dagger');
     assert.equal(GE.weaponScalingKind(w('Steel Quarterstaff')), 'quarterstaff');
     assert.equal(GE.weaponScalingKind(w('Thunderbolt Mace')), 'hammer'); // "bolt" in a name is not a bow
-    assert.deepEqual(GE.inferWeaponScaling(w('Iron Longsword')), { str: 'B', dex: 'D' });
-    assert.deepEqual(GE.inferWeaponScaling(w('Mithral Dagger')), { dex: 'B', str: 'D' });
-    assert.deepEqual(GE.inferWeaponScaling(w('Shortbow')), { dex: 'A', str: 'E' });
+    assert.deepEqual(GE.inferWeaponScaling(w('Iron Longsword')), full({ str: 'B', dex: 'D' }));
+    assert.deepEqual(GE.inferWeaponScaling(w('Mithral Dagger')), full({ dex: 'B', str: 'D' }));
+    assert.deepEqual(GE.inferWeaponScaling(w('Shortbow')), full({ dex: 'A', str: 'E' }));
   });
 
   test('a named unique falls back to the weapon its description names, then to hands', () => {
@@ -701,14 +703,14 @@ describe('weapon stat scaling', () => {
   });
 
   test('rarity lifts grades: Super Rare the main stat, Legendary/Celestial the best two', () => {
-    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'superrare'), { str: 'S', dex: 'E' });
-    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'legendary'), { str: 'S', dex: 'D' });
-    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'rare'), { str: 'A', dex: 'E' });
+    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'superrare'), full({ str: 'S', dex: 'E' }));
+    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'legendary'), full({ str: 'S', dex: 'D' }));
+    assert.deepEqual(GE.inferWeaponScaling(w('Greataxe'), 'rare'), full({ str: 'A', dex: 'E' }));
   });
 
   test('authored scaling wins, and invalid entries are dropped', () => {
     const s = GE.inferWeaponScaling(w('Longsword', { scaling: { str: 'a', int: 'S', cha: 'Z', luck: 'S' } }), 'legendary');
-    assert.deepEqual(s, { str: 'A', int: 'S' });
+    assert.deepEqual(s, full({ str: 'A', int: 'S' }));
   });
 
   test('a finesse weapon is at least DEX B', () => {
@@ -867,4 +869,11 @@ describe('generated-item effects reach the character sheet', () => {
     const d = GE.extractStatDeltasFromText('+2 Initiative. +1 Spell Save DC. +30 Fly Speed (feet). +50 Carrying Capacity (lbs).');
     assert.deepEqual(d.map(x => x.stat), ['Initiative', 'Spell Save DC', 'Fly Speed (feet)', 'Carrying Capacity (lbs)']);
   });
+});
+
+test('a plain club still has INT scaling, at rank E, and it adds a little damage', () => {
+  const sc = GE.inferWeaponScaling({ name: 'Large Club', type: 'weapon' });
+  assert.equal(sc.int, 'E');
+  assert.deepEqual(Object.keys(sc).sort(), ['cha', 'con', 'dex', 'int', 'str', 'wis']);
+  assert.equal(GE.computeScalingDamage(sc, { str: 0, dex: 0, con: 0, int: 5, wis: 0, cha: 0 }).parts.find(p => p.stat === 'int').grade, 'E');
 });
