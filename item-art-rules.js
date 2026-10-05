@@ -12,7 +12,14 @@
   add('bedroll', /bedroll/);
   add('horseshoe', /horseshoe/);
   add('shackles', /shackles|manacles|handcuffs/);
-  add('tower', /tower|fortress/);
+  add('tower', /\btower\b(?! shield)|fortress/);
+  add('charm', /lock of hair/);
+  add('medallion', /holy symbol/);
+  add('fan', /wind fan|\bfan\b/);
+  add('bandage', /evidence cloth/);
+  add('lute', /\blyre\b|\bharp\b/);
+  add('sack', /tanglefoot bag/);
+  add('cup', /\bcup\b/);
   add('ingot', /beeswax/);
   add('chalk', /sealing wax/);
   add('sash', /scarf|scrap of foreign cloth/, it => !/head/i.test(it.name));
@@ -72,8 +79,8 @@
   add('sling', /\bsling\b/);
   add('quiver', /quiver/);
   add('arrow', /arrow of slaying/);
-  add('arrows', /arrows?\b|ammunition/);
-  add('bolts', /\bbolts?\b/);
+  add('arrows', /\barrows?\b|ammunition/, it => it.type !== 'document' && !/record/i.test(it.name));
+  add('bolts', /\bbolts?\b/, it => !/wand|lightning/i.test(it.name));
   add('dart', /\bdart\b/);
   add('shuriken', /shuriken/);
   add('stake', /wooden stake|\bstake\b/);
@@ -97,8 +104,28 @@
   add('wand', /\bwand\b/);
   add('longsword', /longsword|long sword|holy avenger|vorpal|nine lives stealer|defender|luck blade|sun blade/);
   add('shortsword', /shortsword|short sword|twin shortswords/);
-  add('sword', /\bsword\b|blade|dancing sword|brand\b|tongue\b|sword of/);
+  add('sword', /\bsword\b|dancing sword|sword of/);
+  add(['sword', 'longsword', 'sabre', 'falchion', 'sword'], /blade|brand\b|tongue\b|edge\b|reckoning|answer|last word|grudge/);
 
+  // ---- head nouns that must win over material/armour words elsewhere in the name ("Plate Greaves", "Ring of Mind Shielding") ----
+  add('beltpouch', /belt pouch/);
+  add('bracers', /bracers?\b/);
+  add('gauntlet', /gauntlets?\b/);
+  add('greaves', /greaves/);
+  add('wingedboots', /winged boots|boots of (striding|speed|levitation)/);
+  add('skates', /skates/);
+  add('sandals', /sandals/);
+  add('slippers', /slippers|socks/);
+  add('boots', /\bboots?\b/);
+  add('signetring', /signet|seal-ring|sealring/);
+  add('bandring', /wedding band|brass ring/);
+  add('ring', /\brings?\b(?! mail)/);
+  add('brooch', /brooch|buckle|clasp/);
+  add('amulet', /amulet|pendant|talisman|scarab/);
+  add('necklace', /necklace/);
+  add('belt', /\bbelt\b/);
+  add('breastplate', /breastplate|cuirass/);
+  add('leather', /leather armor of|leather armor\b/, it => !/studded/i.test(it.name));
   // ---- armour & worn ----
   add('towershield', /tower shield/);
   add('buckler', /buckler/);
@@ -263,7 +290,7 @@
   add('tally', /tally/);
   add('quill', /quill/);
   // ---- food ----
-  add('ration', /ration|dried fruit|jerky|hardtack/);
+  add('ration', /ration|jerky|hardtack/);
   add('mushroom', /mushroom/);
   add('fruit', /fruit|apple/);
   add('cheese', /cheese/);

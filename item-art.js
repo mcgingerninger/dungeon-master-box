@@ -89,8 +89,9 @@
     FX_ORDER.forEach(id => { const re = FX[id].re; let s = 0; if (re.test(nameT)) s += 4; if (re.test(modNames)) s += 4; if (re.test(modText)) s += 2; if (re.test(effText)) s += 1.5; if (re.test(descT)) s += 0.5; if (s) sc[id] = s; });
     const dmg = { fire: /fire damage/, frost: /cold damage/, storm: /lightning damage|thunder damage/, poison: /poison damage/, acid: /acid damage/, holy: /radiant damage/, necrotic: /necrotic damage/, arcane: /force damage|psychic damage/ };
     Object.keys(dmg).forEach(id => { if (dmg[id].test(modText)) sc[id] = (sc[id] || 0) + 3; });
-    const list = Object.keys(sc).sort((a, b) => sc[b] - sc[a]).slice(0, 2);
     const tier = RAR[rarity || item.rarity] ?? 0;
+    const need = (mods.length || tier >= 2) ? 2 : 3.5;
+    const list = Object.keys(sc).filter(id => sc[id] >= need).sort((a, b) => sc[b] - sc[a]).slice(0, 2);
     if (!list.length && (tier >= 1 || /\+\d/.test(nameT) || mods.length || /magic|enchant/.test(effText))) list.push(tier >= 4 ? 'luck' : 'magic');
     return list;
   }
@@ -188,6 +189,7 @@
     const wisp = (e, L, w0, cols, rise) => { const ph = rnd() * 6, sgn = rnd() > 0.5 ? 1 : -1; for (let i = 0; i < L; i++) { const t = i / L, x = Math.round(e.x + e.nx * i * 0.5 + Math.sin(i * 0.7 + ph) * (1 + t * 1.6) * sgn), y = Math.round(e.y + (rise ? -i * 0.95 : e.ny * i * 0.9 - i * 0.35)); const hw = Math.max(0, Math.round(w0 * (1 - t))); for (let dx = -hw; dx <= hw; dx++) putFx(x + dx, y, Math.abs(dx) === hw && hw > 0 ? cols[1] : cols[0], 1 - t * 0.35); if (hw === 0 && t < 0.9) putFx(x, y, cols[2] || cols[1], 1 - t * 0.35); } };
     const drip = (e, pal, thick) => { const L = 2 + Math.floor(rnd() * 3) + (tier >= 3 ? 1 : 0); for (let k = 0; k < L; k++) { putFx(e.x, e.y + k, pal[1]); if (thick && k < L - 1) putFx(e.x + 1, e.y + k, pal[0]); } putFx(e.x, e.y + L, pal[2]); putFx(e.x, e.y + L + 1, pal[1]); if (thick) { putFx(e.x + 1, e.y + L, pal[1]); putFx(e.x + 1, e.y + L + 1, pal[0]); } };
     const bubble = (e, pal) => { const cx = e.x, cy = e.y - 2; [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([dx, dy]) => putFx(cx + dx, cy + dy, dx === -1 && dy === -1 ? pal[2] : pal[1])); };
+    const noCircle = LIQUID_BASES.has(spec.base) || /^(scroll|ration|mushroom|fruit|cheese|candy|bread|salve|herbs|dust|bead)$/.test(spec.base);
     const FXF = {
       fire() { const cols = ['#b22410', '#ff5a1a', '#ff9a2a', '#ffd04a', '#fff3b0']; spread(fit(tops, 5, true), count(2), 3).forEach(e => { const h = 6 + Math.floor(rnd() * 4) + tier, ph = rnd() * 6; for (let k = 0; k < h; k++) { const t = k / h, hw = t < 0.55 ? 1 : 0, sway = Math.round(Math.sin(k * 0.7 + ph) * 1.6 * t), ci = Math.min(4, Math.floor(t * 4.6)); for (let dx = -hw; dx <= hw; dx++) putFx(e.x + sway + dx, e.y - k, dx === 0 && t > 0.1 && t < 0.7 ? cols[Math.min(4, ci + 1)] : cols[ci]); } }); },
       frost() { ring1.forEach(({ x, y }) => { if ((x * 7 + y * 3) % 5 < 2) putFx(x, y, (x + y) % 3 ? '#e4fbff' : '#a8e4fa'); }); spread(fit(outward, 3), count(1.8), 4).forEach(e => { const L = 5 + Math.floor(rnd() * 4) + (tier >= 3 ? 2 : 0), tilt = rnd() > 0.5 ? 1 : -1; let x = e.x, y = e.y; for (let k = 0; k < L; k++) { const t = k / L; putFx(x, y, t > 0.8 ? '#ffffff' : t > 0.4 ? '#d8f6ff' : '#9fdcf5'); if (t < 0.6) { const sd = e.nx && e.ny ? [e.nx, 0] : [e.ny ? 1 : 0, e.nx ? 1 : 0]; putFx(x + sd[0], y + sd[1], '#4fa8d8'); if (t < 0.3) putFx(x - sd[0], y - sd[1], '#4fa8d8'); } x += e.nx; y += e.ny; if (k % 3 === 2) { x += e.ny ? tilt : 0; y += e.nx ? tilt : 0; } } }); },
@@ -213,7 +215,7 @@
       else if (id === 'holy') FXF.holy(); else if (id === 'luck') FXF.luck();
       else if (id === 'shadow') FXF.shadow(); else if (id === 'necrotic') FXF.necrotic();
       else if (id === 'nature') FXF.nature(); else if (id === 'wind') FXF.wind('#bfe4ff'); else if (id === 'sonic') FXF.sonic();
-      else if (id === 'arcane') FXF.circle('#b98cff', true); else if (id === 'magic' && tier >= 2) FXF.circle('#9fd0ff', false);
+      else if (id === 'arcane') { if (!noCircle) FXF.circle('#b98cff', true); } else if (id === 'magic' && tier >= 2) { if (!noCircle) FXF.circle('#9fd0ff', false); }
     });
     const glow = [];
     if (fxColor && tier >= 1) { const reach = Math.min(4, 1 + Math.ceil(tier / 2)); for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = dist[y][x]; if (d >= 2 && d <= 1 + reach && !fxCells.has(y * N + x)) glow.push({ x, y, c: fxColor, o: d === 2 ? 0.3 : d === 3 ? 0.17 : 0.09 }); } }
