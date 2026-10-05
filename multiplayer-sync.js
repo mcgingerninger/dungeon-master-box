@@ -624,13 +624,14 @@ function injectStyles() {
   style.textContent = `
     body.role-player [onclick="showTab('spin',this)"],
     body.role-player [onclick="showTab('combat',this)"],
+    body.role-player [onclick="showTab('battletest',this)"],
     body.role-player [onclick="showTab('players',this)"],
     body.role-player [onclick="showTab('compendium',this)"],
     body.role-player [onclick="showTab('journey',this)"],
     body.role-player [onclick="showTab('puzzles',this)"],
     body.role-player [onclick="showTab('dmcontrols',this)"],
     body.role-player [onclick="showTab('mapbuilder',this)"] { display: none !important; }
-    body.role-player #tab-spin, body.role-player #tab-combat,
+    body.role-player #tab-spin, body.role-player #tab-combat, body.role-player #tab-battletest,
     body.role-player #tab-players, body.role-player #tab-compendium,
     body.role-player #tab-journey, body.role-player #tab-puzzles,
     body.role-player #tab-dmcontrols, body.role-player #tab-mapbuilder { display: none !important; }

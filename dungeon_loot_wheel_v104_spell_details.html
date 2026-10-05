@@ -2694,6 +2694,7 @@
   <button class="tab-btn" onclick="showTab('inventory',this)">🎒 Inventory</button>
   <button class="tab-btn" onclick="showTab('compendium',this)">📚 Compendium</button>
   <button class="tab-btn" onclick="showTab('combat',this)">⚔ Combat</button>
+  <button class="tab-btn" onclick="showTab('battletest',this)">🧪 Battle Field</button>
   <button class="tab-btn" onclick="showTab('players',this)">👥 Players</button>
   <button class="tab-btn" onclick="showTab('store',this)">🛒 Store</button>
   <button class="tab-btn" onclick="showTab('journey',this)">🧭 Journey</button>
@@ -3760,6 +3761,24 @@
 </div>
 
 <!-- COMBAT TAB -->
+<!-- 🧪 Battle Field (test): drag monsters/players onto a field; click a monster, then a player to roll
+     the attack. All logic lives in battle-test.js and reuses the Combat tab's monster systems. -->
+<div id="tab-battletest" class="tab-content">
+  <h3 style="color:var(--gold);margin-bottom:0.3rem;">🧪 Battle Field <span style="font-size:0.75rem;color:var(--text-dim);font-weight:normal;">(test)</span></h3>
+  <div class="bt-hint" id="btHint"></div>
+  <div class="bt-bar"><button class="action-btn" onclick="btHealAll()">❤ Heal all</button><button class="action-btn" onclick="btClear()">🗑 Clear field</button></div>
+  <div class="bt-wrap">
+    <div class="bt-side" id="btSide"></div>
+    <div class="bt-field" id="btField"></div>
+  </div>
+</div>
+<div id="btAttackModal" class="edit-modal-overlay" onclick="if(event.target===this) btClosePopup()">
+  <div class="edit-modal" style="width:min(560px,100%);">
+    <div class="edit-modal-header"><h3 id="btAttackTitle">⚔ Attack</h3><button class="edit-modal-close" onclick="btClosePopup()">×</button></div>
+    <div class="edit-modal-body" id="btAttackBody"></div>
+  </div>
+</div>
+
 <div id="tab-combat" class="tab-content">
   <div class="combat-layout">
     <div class="combat-subtabs">
@@ -4498,6 +4517,7 @@ const APP_VERSION = 'v104';
 <script src="reference-data.js"></script>
 <script src="journey-data.js"></script>
 <script src="mechanics/canonical/items.js"></script>
+<script src="battle-test.js"></script>
 <script>
 // mechanics/canonical/items.js (loaded just above) defines `canonicalItems` — the one-time
 // migration output described in docs/V2_MECHANICS_MIGRATION.md: a subset of lootData's own items,
@@ -7176,6 +7196,7 @@ function showTab(tab, btn) {
   // showCompendiumSub) — re-entering the tab just re-initializes whichever sub-panel was
   // last active instead of always resetting to Items.
   if (tab === 'compendium') initCompendiumSub(activeCompendiumSub);
+  if (tab === 'battletest' && typeof btOnShow === 'function') btOnShow();
   if (tab === 'combat') { loadMonsterDatabase(false).then(renderCombatPicker); renderCombatRoster(); renderCombatLog(); renderCombatLootSettings(); renderPendingAttacksPanel(); renderCombatBattleMap(); }
   if (tab === 'store') { renderStoreTab(); renderInventoryGrid(); }
   if (tab === 'players' && typeof renderPlayersTab === 'function') renderPlayersTab();
