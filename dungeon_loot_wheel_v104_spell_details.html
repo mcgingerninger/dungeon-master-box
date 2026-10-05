@@ -3766,7 +3766,12 @@
 <div id="tab-battletest" class="tab-content">
   <h3 style="color:var(--gold);margin-bottom:0.3rem;">🧪 Battle Field <span style="font-size:0.75rem;color:var(--text-dim);font-weight:normal;">(test)</span></h3>
   <div class="bt-hint" id="btHint"></div>
-  <div class="bt-bar"><button class="action-btn" onclick="btHealAll()">❤ Heal all</button><button class="action-btn" onclick="btClear()">🗑 Clear field</button></div>
+  <div class="bt-bar bt-sliders">
+    <label>Variant chance: <input type="range" id="btVariantChance" min="0" max="100" value="15" oninput="document.getElementById('btVariantChanceVal').textContent=this.value+'%'"> <span id="btVariantChanceVal">15%</span></label>
+    <label>Chaos: <input type="range" id="btChaosChance" min="0" max="100" value="10" oninput="document.getElementById('btChaosChanceVal').textContent=this.value+'%'"> <span id="btChaosChanceVal">10%</span></label>
+    <span class="bt-note">Applies to monsters dropped from now on — or press Reroll.</span>
+  </div>
+  <div class="bt-bar"><button class="action-btn" onclick="btRerollAll()">🎲 Reroll modifiers on field</button><button class="action-btn" onclick="btHealAll()">❤ Heal all</button><button class="action-btn" onclick="btClear()">🗑 Clear field</button></div>
   <div class="bt-wrap">
     <div class="bt-side" id="btSide"></div>
     <div class="bt-field" id="btField"></div>
@@ -19527,11 +19532,12 @@ function combineStatLines(lines) {
   });
   return combined;
 }
-function buildBattleEntry(monster) {
+function buildBattleEntry(monster, opts) {
   const hpRoll = rollMonsterHP(monster);
   const baseAC = parseInt(monster.ac, 10);
-  const variantChance = parseInt(document.getElementById('battleVariantChance')?.value, 10) || 0;
-  const chaosChance = parseInt(document.getElementById('battleChaosChance')?.value, 10) || 0;
+  // opts lets the Battle Field tab use its own sliders instead of the Combat tab's
+  const variantChance = opts && opts.variantChance != null ? opts.variantChance : (parseInt(document.getElementById('battleVariantChance')?.value, 10) || 0);
+  const chaosChance = opts && opts.chaosChance != null ? opts.chaosChance : (parseInt(document.getElementById('battleChaosChance')?.value, 10) || 0);
   const roll = () => Math.random() * 100 < variantChance;
   const variant = roll() ? pickMonsterVariant() : null;
   const baseTier = variant ? variant.tier : 'common';
