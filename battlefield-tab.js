@@ -28,18 +28,27 @@
       background-color:#1c1712; background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px); background-size:48px 48px; }
     .bt-field.over { border-color:var(--gold); }
     .bt-empty { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-dim); text-align:center; padding:2rem; pointer-events:none; }
-    .bt-token { position:absolute; width:64px; transform:translate(-50%,-50%); text-align:center; cursor:pointer; user-select:none; touch-action:none; }
-    .bt-token .disc { width:54px; height:54px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.05rem; color:#fff; border:3px solid #000; box-shadow:0 2px 6px rgba(0,0,0,0.6); }
-    .bt-token.monster .disc { background:#8a2a2a; }
-    .bt-token.player .disc { background:#2a7a52; }
-    .bt-token.selected .disc { border-color:var(--gold-bright); box-shadow:0 0 0 3px var(--gold), 0 0 14px var(--gold); }
-    .bt-token.target-ready.player .disc { box-shadow:0 0 0 3px #e8d060, 0 0 12px #e8d060; }
-    .bt-token.dead { opacity:0.4; filter:grayscale(1); }
-    .bt-token .nm { font-size:0.7rem; color:var(--text); text-shadow:0 1px 2px #000; line-height:1.05; margin-top:2px; max-height:2.2em; overflow:hidden; }
-    .bt-token .bar { height:5px; background:#000; margin:2px 6px 0; border:1px solid #000; }
-    .bt-token .bar i { display:block; height:100%; background:#4caf7d; }
-    .bt-token .x { position:absolute; top:-4px; right:2px; display:none; background:#000; color:#fff; border:none; font-size:0.7rem; line-height:1; width:16px; height:16px; cursor:pointer; padding:0; }
+    .bt-token { position:absolute; width:120px; transform:translate(-50%,-34px); text-align:center; cursor:pointer; user-select:none; touch-action:none; }
+    .bt-token .disc { position:relative; width:60px; height:60px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; line-height:1;
+      background:radial-gradient(circle at 35% 30%, var(--bt-hi), var(--bt-lo)); border:4px solid var(--bt-ring); box-shadow:0 3px 8px rgba(0,0,0,0.7), inset 0 0 8px rgba(0,0,0,0.5); }
+    .bt-token.monster { --bt-hi:#b84444; --bt-lo:#4a1414; --bt-ring:#2b0d0d; }
+    .bt-token.player { --bt-hi:#3fae78; --bt-lo:#12402a; --bt-ring:#0b2a1b; }
+    .bt-token.t-uncommon .disc { border-color:#4caf7d; } .bt-token.t-rare .disc { border-color:#5b9cf6; }
+    .bt-token.t-superrare .disc { border-color:#c47cf5; } .bt-token.t-legendary .disc { border-color:#e8963a; }
+    .bt-token.selected .disc { box-shadow:0 0 0 3px var(--gold), 0 0 16px var(--gold); }
+    .bt-token.target-ready.player .disc { box-shadow:0 0 0 3px #e8d060, 0 0 14px #e8d060; animation:btPulse 1.2s infinite; }
+    @keyframes btPulse { 50% { box-shadow:0 0 0 5px #e8d060, 0 0 20px #e8d060; } }
+    .bt-token.dead { opacity:0.45; filter:grayscale(1); }
+    .bt-token .lbl { display:inline-block; max-width:116px; margin-top:4px; padding:1px 7px; background:rgba(10,8,6,0.82); border:1px solid var(--border); border-radius:9px; font-size:0.72rem; color:var(--text); line-height:1.25; }
+    .bt-token .bar { position:relative; height:14px; width:84px; margin:3px auto 0; background:#000; border:1px solid #000; border-radius:6px; overflow:hidden; }
+    .bt-token .bar i { position:absolute; inset:0 auto 0 0; background:#4caf7d; }
+    .bt-token .bar span { position:relative; display:block; font-size:0.62rem; line-height:14px; color:#fff; text-shadow:0 0 2px #000; }
+    .bt-token .ac { position:absolute; top:-2px; left:14px; min-width:20px; padding:0 3px; font-size:0.65rem; background:#1a1a22; border:1px solid #888; border-radius:8px; color:#dfe6ff; line-height:15px; }
+    .bt-token .x { position:absolute; top:-4px; right:14px; display:none; background:#000; color:#fff; border:1px solid #888; border-radius:50%; font-size:0.7rem; line-height:1; width:18px; height:18px; cursor:pointer; padding:0; }
     .bt-token:hover .x { display:block; }
+    .bt-sec { margin-top:0.35rem; padding-top:0.3rem; border-top:1px solid var(--border); font-size:0.8rem; }
+    .bt-sec b { color:var(--gold); }
+    .bt-pos { color:#4caf7d; } .bt-neg { color:#e05252; }
     .bt-hint { color:var(--text-dim); font-size:0.85rem; margin:0.2rem 0 0.5rem; }
     .bt-hint b { color:var(--gold); }
     .bt-bar { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.4rem; align-items:center; }
@@ -120,8 +129,10 @@
     const ready = [...bt.selected].length > 0;
     f.innerHTML = (bt.tokens.length ? '' : '<div class="bt-empty">Drag monsters and players from the left onto the field.</div>') + bt.tokens.map(t => {
       const pct = Math.max(0, Math.min(100, Math.round((t.hp / Math.max(1, t.maxHp)) * 100)));
-      const cls = ['bt-token', t.kind, bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', t.hp <= 0 ? 'dead' : ''].join(' ');
-      return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><div class="disc">${esc(t.name.replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?')}</div><div class="nm">${esc(t.name)}</div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+      const tier = t.entry && t.entry.variant ? t.entry.variant.tier : '';
+      const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', t.hp <= 0 ? 'dead' : ''].join(' ');
+      const icon = t.kind === 'player' ? '🛡️' : monsterIcon(t.monster);
+      return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><span class="ac" title="Armor Class">🛡${t.ac == null ? '—' : t.ac}</span><div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="bar"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></div></div>`;
     }).join('');
     const hint = document.getElementById('btHint');
     if (hint) hint.innerHTML = bt.selected.size
@@ -129,12 +140,53 @@
       : '<b>Left-click</b> a monster to select it, <b>right-click</b> monsters to select several, then <b>left-click a player</b> to roll the attack. Hover a token for its info.';
   };
 
+
+  // ---------- token look ----------
+  const TYPE_ICONS = [[/dragon|drake|wyrm/i, '🐉'], [/undead|skeleton|zombie|ghoul|wight|wraith|vampire|lich/i, '💀'], [/fiend|devil|demon/i, '😈'], [/celestial|angel/i, '👼'],
+    [/elemental/i, '🌪️'], [/fey|sprite|pixie/i, '🧚'], [/giant|ogre|troll/i, '🪨'], [/ooze|slime|jelly/i, '🟢'], [/plant|treant|myconid/i, '🌿'], [/construct|golem/i, '⚙️'],
+    [/aberration|beholder|mind flayer|illithid/i, '👁️'], [/beast|wolf|bear|boar|cat|lion|tiger|snake|spider|rat|bat|bird|hawk|eagle|crocodile|shark|ape|dog/i, '🐺'], [/monstrosity|chimera|griffon|hydra|owlbear|wyvern|manticore/i, '🦂'], [/humanoid|human|elf|dwarf|orc|goblin|gnoll|kobold|bandit|cultist|guard/i, '🧍']];
+  function monsterIcon(m) { const hay = `${m.type || ''} ${m.name || ''}`; const hit = TYPE_ICONS.find(([re]) => re.test(hay)); return hit ? hit[1] : '👹'; }
+
+  // ---------- everything the creature was rolled with ----------
+  const pctDelta = (mult) => { const d = Math.round((mult - 1) * 100); return d === 0 ? '' : (d > 0 ? '+' : '') + d + '%'; };
+  const signed = n => (n > 0 ? '+' : '') + n;
+  const cls = n => (n > 0 ? 'bt-pos' : n < 0 ? 'bt-neg' : '');
+  function modifiersHtml(t) {
+    const e = t.entry, v = e.variant, out = [];
+    const base = parseInt(t.monster.ac, 10);
+    if (v) {
+      const bits = [];
+      if (v.hpMult !== 1) bits.push(`<span class="${cls(v.hpMult - 1)}">HP ${pctDelta(v.hpMult)}</span>`);
+      if (v.acDelta) bits.push(`<span class="${cls(v.acDelta)}">AC ${signed(v.acDelta)}</span>`);
+      if (v.atkDelta) bits.push(`<span class="${cls(v.atkDelta)}">attacks ${signed(v.atkDelta)} to hit</span>`);
+      if (v.dmgMult !== 1) bits.push(`<span class="${cls(v.dmgMult - 1)}">damage ${pctDelta(v.dmgMult)}</span>`);
+      out.push(`<div class="bt-sec"><b>Variant — ${esc(v.label)}</b> <span style="color:${(typeof rarityColors !== 'undefined' && rarityColors[v.tier]) || '#aaa'}">(${esc(v.tier)})</span><div>${bits.join(' · ') || 'no stat change'}</div></div>`);
+    }
+    (e.traits || []).forEach(tr => {
+      const lines = (tr.lines || []).map(l => `<span class="${l.positive ? 'bt-pos' : 'bt-neg'}">${esc(l.text)}</span>`).join(', ');
+      const desc = (typeof GEN !== 'undefined' && GEN.effectDescriptions && GEN.effectDescriptions[tr.name]) || '';
+      out.push(`<div class="bt-sec"><b>Trait — ${esc(tr.name)}</b><div>${lines || '<span class="bt-note">no stat lines</span>'}</div>${desc ? `<div class="bt-note">${esc(desc)}</div>` : ''}</div>`);
+    });
+    if ((e.statLines || []).length) out.push(`<div class="bt-sec"><b>Net stat changes</b><div>${e.statLines.map(l => `<span class="${l.positive ? 'bt-pos' : 'bt-neg'}">${esc(l.text)}</span>`).join(', ')}</div></div>`);
+    (e.chaosGearList || []).forEach(g => out.push(`<div class="bt-sec"><b>Chaos gear (${esc(g.rarity)})</b><div>${esc(String(g.label).replace(/<[^>]+>/g, ''))}</div></div>`));
+    const nums = [];
+    if (Number.isFinite(base) && e.ac != null && e.ac !== base) nums.push(`AC ${base} → <b>${e.ac}</b>`);
+    if (e.hpRoll && e.hpRoll.dice) nums.push(`HP rolled ${esc(e.hpRoll.dice)} = ${e.hpRoll.total}${e.hp !== e.hpRoll.total ? ` → <b>${e.maxHp}</b> with modifiers` : ''}`);
+    if (e.atkMod) nums.push(`attack rolls ${signed(e.atkMod)}`);
+    if (e.dmgMult && e.dmgMult !== 1) nums.push(`damage ×${e.dmgMult.toFixed(2).replace(/\.?0+$/, '')}`);
+    out.push(`<div class="bt-sec"><b>Rolled stats</b><div>❤ ${t.hp}/${t.maxHp} HP · 🛡 AC ${t.ac == null ? '—' : t.ac}${nums.length ? '<br>' + nums.join(' · ') : ''}</div></div>`);
+    if (!v && !(e.traits || []).length && !(e.chaosGearList || []).length) out.push('<div class="bt-sec bt-note">No variant, traits or chaos gear — a plain creature.</div>');
+    return out.join('');
+  }
+
   // ---------- hover info ----------
   function showTip(evt, t) {
     const tt = document.getElementById('itemTooltip'); if (!tt) return;
     if (t.kind === 'monster') {
-      tt.innerHTML = buildMonsterTooltipHtml(t.monster) + `<div class="tt-classification">❤ ${t.hp}/${t.maxHp} HP · 🛡 AC ${t.ac == null ? '—' : t.ac}${t.entry.atkMod ? ` · atk ${fmt(t.entry.atkMod)}` : ''}</div>${
-        (t.monster.actions || []).length ? `<div class="tt-classification">Actions: ${(t.monster.actions || []).map(a => esc(a.name)).join(', ')}</div>` : ''}`;
+      tt.innerHTML = `<div class="tt-header" style="margin-bottom:0.3rem">${esc(t.name)}</div>`
+        + buildMonsterTooltipHtml(t.monster).replace(/<div class="tt-header"[\s\S]*?<\/div>/, '')
+        + modifiersHtml(t)
+        + ((t.monster.actions || []).length ? `<div class="bt-sec"><b>Actions</b> ${(t.monster.actions || []).map(a => esc(a.name)).join(', ')}</div>` : '');
     } else {
       tt.innerHTML = `<div class="tt-header">${esc(t.name)}</div><div class="tt-rarity">Player</div><div class="tt-stats"><span>🛡 AC ${t.ac}</span><span>❤ ${t.hp}/${t.maxHp}</span></div>`;
     }
