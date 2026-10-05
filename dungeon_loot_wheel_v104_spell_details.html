@@ -19409,6 +19409,29 @@ function rollChaosGearRarity(chaosChance, monsterTierIdx = 0) {
 function monsterHasWeaponAttack(monster) {
   return !!(monster && (monster.actions || []).some(a => /weapon attack/i.test(a.text || '')));
 }
+// A chaos "learned to cast X" spell becomes a real action: if the spell exists in the spell
+// compendium its own damage dice, damage type and save/attack are used (a Fireball is a Dexterity
+// save for 8d6 fire, not a generic bolt); otherwise (or for a utility spell) it falls back to a
+// generic bolt / a plain description. The creature's spell attack bonus and save DC scale with the
+// gear's rarity.
+function buildChaosSpellAction(spellName, idx) {
+  const toHit = 4 + idx * 2, dc = 8 + toHit;
+  const raw = (window.SpellCompendiumAPI && SpellCompendiumAPI.find && SpellCompendiumAPI.find(spellName)) || null;
+  const generic = { name: spellName, isSpell: true, text: `Ranged Spell Attack: +${toHit} to hit, range 60 ft., one target. Hit: ${CHAOS_SPELL_DAMAGE_DICE[idx]} force damage.` };
+  if (!raw) return generic;
+  const json = JSON.stringify(raw.entries || []);
+  const dm = /\{@(?:damage|dice) ([^}|]+)/.exec(json);
+  const dice = dm ? dm[1].replace(/\s+/g, '') : null;
+  const type = (raw.damageInflict && raw.damageInflict[0]) || '';
+  const save = raw.savingThrow && raw.savingThrow[0] ? String(raw.savingThrow[0]) : '';
+  const range = (raw.rangeLabel || '').replace(/\s+/g, ' ').replace(/\.$/, '');
+  const desc = spellCleanTags(spellFlattenEntries(raw.entries)).replace(/\s+/g, ' ').slice(0, 260);
+  const base = { name: spellName, isSpell: true, spellLevel: Number(raw.level ?? 0) };
+  if (dice && raw.spellAttack && raw.spellAttack[0]) return { ...base, text: `${raw.spellAttack[0] === 'M' ? 'Melee' : 'Ranged'} Spell Attack: +${toHit} to hit${range ? ', ' + range : ''}. Hit: (${dice}) ${type} damage.` };
+  if (dice && save) return { ...base, text: `${range ? range + '. ' : ''}Each target makes a DC ${dc} ${spellCap(save)} saving throw, taking (${dice}) ${type} damage on a failed save, or half as much on a success.` };
+  if (dice) return { ...base, text: `${range ? range + '. ' : ''}(${dice}) ${type} damage.` };
+  return { ...base, text: `Casts ${spellName}${save ? ` (DC ${dc} ${spellCap(save)} save)` : ''}: ${desc}`, utility: true };
+}
 function rollChaosGear(chaosChance, monsterTierIdx = 0, monster = null) {
   const kinds = ['armor', 'spell'];
   if (monsterHasWeaponAttack(monster)) kinds.push('weapon');
@@ -19418,7 +19441,11 @@ function rollChaosGear(chaosChance, monsterTierIdx = 0, monster = null) {
   if (kind === 'weapon') {
     const name = ri(CHAOS_WEAPON_NAMES);
     const dice = CHAOS_WEAPON_DICE[rarity];
-    return { kind, rarity, name, dice, label: `Wielding <strong>${escapeHtml(name)}</strong> — adds <strong>${dice}</strong> damage to hits.` };
+    // Also usable as an attack of its own (the Battle Field tab rolls it as a separate action): it
+    // swings at the best to-hit the creature already has with a weapon.
+    const best = (monster && monster.actions || []).filter(a => /weapon attack/i.test(a.text || '')).map(a => battleParseAttack(a.text).toHit).filter(n => n !== null);
+    const weaponAction = { name: name.replace(/^an? /, '').replace(/^./, c => c.toUpperCase()), isChaosWeapon: true, text: `Melee Weapon Attack: ${fmtMod(best.length ? Math.max(...best) : 4 + idx * 2)} to hit, reach 5 ft., one target. Hit: ${dice} damage.` };
+    return { kind, rarity, name, dice, weaponAction, label: `Wielding <strong>${escapeHtml(name)}</strong> — adds <strong>${dice}</strong> damage to hits.` };
   }
   if (kind === 'armor') {
     const name = ri(CHAOS_ARMOR_NAMES);
@@ -19426,7 +19453,7 @@ function rollChaosGear(chaosChance, monsterTierIdx = 0, monster = null) {
     return { kind, rarity, name, acBonus, label: `Wearing <strong>${escapeHtml(name)}</strong> — <strong>+${acBonus} AC</strong>.` };
   }
   const spellName = ri((BAL.powerTiers && BAL.powerTiers[rarity]) || GEN.powers);
-  const spellAction = { name: spellName, text: `Ranged Spell Attack: +${4 + idx * 2} to hit, range 60 ft., one target. Hit: ${CHAOS_SPELL_DAMAGE_DICE[idx]} force damage.` };
+  const spellAction = buildChaosSpellAction(spellName, idx);
   return { kind, rarity, name: spellName, spellAction, label: `Has somehow learned to cast <strong>${escapeHtml(spellName)}</strong>.` };
 }
 

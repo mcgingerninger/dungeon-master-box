@@ -186,7 +186,9 @@
       tt.innerHTML = `<div class="tt-header" style="margin-bottom:0.3rem">${esc(t.name)}</div>`
         + buildMonsterTooltipHtml(t.monster).replace(/<div class="tt-header"[\s\S]*?<\/div>/, '')
         + modifiersHtml(t)
-        + ((t.monster.actions || []).length ? `<div class="bt-sec"><b>Actions</b> ${(t.monster.actions || []).map(a => esc(a.name)).join(', ')}</div>` : '');
+        + (() => { const gear = (t.entry.chaosGearList || []).map(g => g.spellAction ? `${g.spellAction.name} ✦` : g.weaponAction ? `${g.weaponAction.name} ⚔` : '').filter(Boolean);
+            const all = [...(t.monster.actions || []).map(a => esc(a.name)), ...gear.map(esc)];
+            return all.length ? `<div class="bt-sec"><b>Actions</b> ${all.join(', ')}</div>` : ''; })();
     } else {
       tt.innerHTML = `<div class="tt-header">${esc(t.name)}</div><div class="tt-rarity">Player</div><div class="tt-stats"><span>🛡 AC ${t.ac}</span><span>❤ ${t.hp}/${t.maxHp}</span></div>`;
     }
@@ -202,7 +204,7 @@
   function rollAction(action, target, entry) {
     const { toHit, damageClauses, saveDC } = battleParseAttack(action.text || '');
     const atkMod = entry.atkMod || 0, mult = entry.dmgMult || 1;
-    const r = { name: action.name, text: action.text, saveDC, toHit: null, d20: null, total: null, ac: target.ac, outcome: 'info', clauses: [], damage: 0, needsSave: false };
+    const r = { name: action.name, text: action.text, source: action.source, utility: !!action.utility, saveDC, toHit: null, d20: null, total: null, ac: target.ac, outcome: 'info', clauses: [], damage: 0, needsSave: false };
     let crit = false, hit = true;
     if (toHit !== null) {
       r.d20 = rn(1, 20); crit = r.d20 === 20;
@@ -221,12 +223,16 @@
   // A monster's turn against a target. Multiattack is never rolled itself: it triggers two other
   // attacks that are NOT multiattacks.
   function rollMonster(token, target) {
-    const m = token.monster, actions = (m.actions || []).filter(a => isAttackish(a) || isMulti(a));
+    const m = token.monster;
+    // Everything the creature can do: its own attacks, plus each piece of chaos gear that grants an
+    // action — a wielded weapon is a weapon attack, a learned spell is a real spell action.
+    const gear = (token.entry.chaosGearList || []).map(g => g.kind === 'spell' ? g.spellAction && { ...g.spellAction, source: 'spell' } : g.kind === 'weapon' ? g.weaponAction && { ...g.weaponAction, source: 'weapon' } : null).filter(Boolean);
+    const actions = [...(m.actions || []).filter(a => isAttackish(a) || isMulti(a)), ...gear];
     const result = { token, target, attacks: [], multi: false, note: '' };
     if (!actions.some(a => !isMulti(a))) { result.note = 'This creature has no attack action to roll.'; return result; }
     const picked = ri(actions);
     if (isMulti(picked)) {
-      const singles = actions.filter(a => !isMulti(a) && isAttackish(a));
+      const singles = actions.filter(a => !isMulti(a) && (isAttackish(a) || a.utility));
       result.multi = true; result.multiAction = picked;
       if (!singles.length) { result.note = 'Multiattack, but no other attack to roll.'; return result; }
       const first = ri(singles), rest = singles.filter(a => a !== first);
@@ -238,13 +244,13 @@
   function attackHtml(a, idx, gi) {
     const head = a.toHit !== null
       ? `d20 <b>${a.d20}</b> ${fmt(a.toHit)} = <b>${a.total}</b> vs AC ${a.ac} → <span class="bt-${a.outcome === 'fumble' ? 'miss' : a.outcome}">${{ crit: 'Critical hit!', hit: 'Hit', miss: 'Miss', fumble: 'Critical miss' }[a.outcome]}</span>`
-      : a.saveDC !== null ? `Target makes a <b>DC ${a.saveDC}</b> save <label class="bt-note"><input type="checkbox" checked onchange="btToggleSave(${gi},${idx},this.checked)"> failed</label>` : '<span class="bt-note">No attack roll — read the effect.</span>';
+      : a.saveDC !== null ? `Target makes a <b>DC ${a.saveDC}</b> save <label class="bt-note"><input type="checkbox" checked onchange="btToggleSave(${gi},${idx},this.checked)"> failed</label>` : `<span class="bt-note">${a.utility ? esc(a.text) : 'No attack roll — read the effect.'}</span>`;
     const dmg = a.clauses.length
       ? a.clauses.map(c => `<div class="weapon-attack-line"><span>${esc(c.dice)}${c.type ? ' ' + esc(c.type) : ''}${a.outcome === 'crit' ? ' (doubled)' : ''}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? (c.roll.mod > 0 ? ' + ' : ' − ') + Math.abs(c.roll.mod) : ''} = <b>${c.roll.total}</b></span></div>`).join('')
         + (a.mult && a.mult !== 1 ? `<div class="weapon-attack-line"><span>Variant damage ×${a.mult.toFixed(2).replace(/\.?0+$/, '')}</span><span></span></div>` : '')
         + `<div class="weapon-attack-total" style="font-size:1.05rem;margin:0.3rem 0 0">Damage: <span id="btDmg-${gi}-${idx}">${a.outcome === 'save' ? (a.failed === false ? 0 : a.damage) : a.damage}</span>${a.outcome === 'save' ? ' <span class="bt-note">(if failed)</span>' : ''}</div>`
       : '';
-    return `<div class="sub"><b>${esc(a.name)}</b><div>${head}</div>${dmg}</div>`;
+    return `<div class="sub"><b>${esc(a.name)}</b>${a.source === 'spell' ? ' <span class="bt-note">✦ spell (chaos gear)</span>' : a.source === 'weapon' ? ' <span class="bt-note">⚔ wielded weapon (chaos gear)</span>' : ''}<div>${head}</div>${dmg}</div>`;
   }
   function popupHtml(groups) {
     let grand = 0;
