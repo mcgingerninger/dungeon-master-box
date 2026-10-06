@@ -32,3 +32,35 @@ Tooltips, loot cards and the attack popup all read the same functions. Tests: `g
 
 A weapon scales with all six abilities. A stat the weapon has no real affinity for is rank **E** (×0.1) rather than missing, so a plain
 club still lists INT E. Hover tooltips and the attack popup always show all six grades (STR · DEX · CON · INT · WIS · CHA).
+
+## Armor scaling (AC)
+
+Every armor piece carries the same six letter grades, and they add to **AC** instead of damage: grade multiplier × stat modifier,
+the best-graded stat at its signed value and the rest only adding, rounded. Only the **best grade per stat across everything worn**
+counts, so a DEX A gauntlet lifts heavy armor's DEX but a full set never stacks the same modifier twice.
+
+| Kind | Default grades |
+|---|---|
+| Light body armor | DEX A |
+| Medium body armor | DEX C · STR D · CON D |
+| Heavy body armor | STR C · CON D · DEX E |
+| Shield | STR C · CON D |
+| Helm | CON C · WIS D |
+| Gauntlets / bracers | DEX C · STR D |
+| Boots / greaves | DEX C · CON D |
+| Cloak | DEX D · CHA D |
+| Belt | CON C · STR D |
+
+No body armor counts as DEX A (10 + Dex, as before). Rarity lifts grades exactly like weapons (Super Rare +1 on the main stat, Legendary/Celestial
++1 on the best two); `item.scaling` authors them; armor made for casters adds its casting stat at C. This replaces the old flat rule (light = full Dex,
+medium = Dex capped at +2, heavy = none): the character sheet lists "Armor scaling (…)" as an AC source and the tooltip shows
+"your AC bonus +N". Code: `inferArmorScaling`, `computeArmorScalingAc`, `armorPieceKind` in `game-engine.js`.
+
+## Spell focus on every magical item
+
+Staves, wands and rods already had a focus (above). Every other magical item (rings, cloaks, amulets, armor, trinkets — anything not
+common-and-mundane, or with spell/charge/attunement text) now has one too: a casting stat (from its attunement classes or keywords) and a grade
+one step below a real focus (Common/Uncommon D, Rare C, Super Rare B, Legendary/Celestial A), shown as "✦ Focus" on its tooltip.
+A focus only **adds** when its item casts spells or deals damage (`itemFocusActive`); otherwise the tooltip says there is nothing to boost.
+When active it adds scaled stat modifier to **spell damage** and half of it to the **spell save DC** of every spell you cast
+(`computeSpellFocusBonus`, `computeSpellFocusDc`); a staff's attack/both buffs are unchanged. Code: `inferItemSpellFocus`, `isMagicalItem`.

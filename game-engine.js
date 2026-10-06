@@ -803,10 +803,11 @@ export function describeStatSources(sources) {
 // — both cases keep today's behavior (full, uncapped Dex mod) rather than assuming a weight class.
 export function collectEquippedAcBreakdown(slots, resolveItem) {
   let base = 10, baseSource = null, bodyArmorStyle = null;
-  const flatSources = [];
+  const flatSources = [], armorPieces = [];
   uniqueEquippedSlotEntries(slots).forEach(([slotId, key]) => {
     const entry = resolveItem(key);
     if (!entry) return;
+    if (slotId === 'armor' || entry.item.type === 'armor' || (entry.item.__canonical && entry.item.__canonical.armor)) armorPieces.push({ item: entry.item, rarity: entry.rarity || entry.item.rarity });
     if (entry.item.__canonical) {
       const contribution = canonicalAcContribution(entry.item.__canonical);
       if (!contribution) return;
@@ -827,7 +828,7 @@ export function collectEquippedAcBreakdown(slots, resolveItem) {
     const m = /^([+-]\d+)$/.exec(raw);
     if (m) flatSources.push({ itemName: entry.item.name, amount: parseInt(m[1], 10) });
   });
-  return { base, baseSource, flatSources, bodyArmorStyle };
+  return { base, baseSource, flatSources, bodyArmorStyle, armorPieces };
 }
 // Standard 5e Dex-mod-by-armor-weight rule, never previously applied live (armorType/addsDexMod/
 // dexModCap were computed by migrateArmor and stored on every canonical armor item, but nothing in
@@ -891,9 +892,10 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   });
   const acField = collectEquippedAcBreakdown(slots, resolveItem);
   const dex = abilities.dex;
-  const effectiveDexMod = effectiveDexModForArmorStyle(acField.bodyArmorStyle, dex.mod);
+  const armorScaling = computeArmorScalingAc(acField.armorPieces, Object.fromEntries(SCALING_STATS.map(k => [k, abilities[k].mod])));
+  const effectiveDexMod = armorScaling.total;
   const baseSourceEntry = acField.baseSource ? [{ itemName: acField.baseSource, amount: acField.base - 10, isBaseOverride: true }] : [];
-  const viaDex = dex.modDelta ? dex.sources.map(s => ({ itemName: s.itemName, amount: s.amount, viaAbility: 'Dexterity' })) : [];
+  const viaDex = armorScaling.total ? [{ itemName: 'Armor scaling (' + formatScaling(armorScaling.scaling).split(' · ').slice(0, 3).join(' · ') + ')', amount: armorScaling.total }] : [];
   const acFlatTotal = sumBreakdown(acField.flatSources);
   // Text-driven "+N Armor Class" sources -- e.g. a named trait like Vanguard, or a DM-attached
   // modifier -- layer on top of the item's own .ac field the same way a temporary buff already
@@ -1624,6 +1626,110 @@ export function computeSpellFocusBonus(focus, mods) {
   return { damage: Math.round(scaled / 2), attack: Math.ceil(focus.attackBonus / 2) };
 }
 
+
+// ---- Armor scaling -----------------------------------------------------------------------------
+// Armor carries the same letter grades per stat as a weapon, and they add to AC instead of damage:
+// the bonus is grade-multiplier x stat modifier (the best-graded stat counts at its signed value, the
+// rest only add), summed over every equipped armor piece's BEST grade per stat — so a gauntlet with
+// DEX A improves heavy armor's DEX, but ten pieces never stack the same modifier ten times.
+// This replaces the old hard-coded "light = full Dex, medium = Dex capped at +2, heavy = none":
+// light armor is DEX A, medium DEX C (a +4 Dex still gives +2), heavy STR C with DEX E. No body armor at
+// all counts as DEX A (unarmored: 10 + Dex, as before). An authored `item.scaling` always wins.
+export const ARMOR_SCALING_BY_KIND = {
+  light:   { dex: 'A' },
+  medium:  { dex: 'C', str: 'D', con: 'D' },
+  heavy:   { str: 'C', con: 'D', dex: 'E' },
+  shield:  { str: 'C', con: 'D' },
+  helm:    { con: 'C', wis: 'D' },
+  gloves:  { dex: 'C', str: 'D' },
+  boots:   { dex: 'C', con: 'D' },
+  cloak:   { dex: 'D', cha: 'D' },
+  belt:    { con: 'C', str: 'D' },
+  other:   { con: 'D' },
+};
+const BODY_STYLE_RULES = [
+  [/half.?plate|breastplate|scale mail|chain shirt|hide|brigandine|lamellar|cuirass/, 'medium'],
+  [/plate|splint|chain mail|ring mail|full harness|\bharness\b/, 'heavy'],
+  [/padded|leather|studded|robe|vestment|cloth|silk|gambeson|jerkin|tunic|garb/, 'light'],
+];
+export function armorPieceKind(item) {
+  const n = String((item && item.name) || '').toLowerCase();
+  const sub = String((item && item.subcategory) || '').toLowerCase();
+  const style = String((item && (item.armorStyle || (item.__canonical && item.__canonical.armor && item.__canonical.armor.armorType))) || '').toLowerCase();
+  if (/shield|buckler/.test(n) || sub === 'offhand') return 'shield';
+  if (/helm|helmet|\bcap\b|coif|crown|circlet|hood|visor|mask|\bhat\b/.test(n) || sub === 'head' || sub === 'facewear') return 'helm';
+  if (/gauntlet|glove|bracer|vambrace|mitt/.test(n) || sub === 'handwear') return 'gloves';
+  if (/boot|greave|shoe|sandal|sabaton|legging|\bleg guards?\b/.test(n) || sub === 'boots' || sub === 'leggings') return 'boots';
+  if (/cloak|cape|mantle|shawl/.test(n) || sub === 'cloak') return 'cloak';
+  if (/\bbelt\b|girdle|sash|\bwaist/.test(n) || sub === 'belt') return 'belt';
+  if (['light', 'medium', 'heavy'].includes(style)) return style;
+  for (const [re, kind] of BODY_STYLE_RULES) if (re.test(n)) return kind;
+  return sub === 'chest' || /armor|mail|plate|harness|vest|robe/.test(n) ? 'light' : 'other';
+}
+const CASTER_ARMOR = /attunement[^.]*\b(wizard|sorcerer|warlock|cleric|druid|bard|paladin|ranger|artificer|monk)\b|\bspellcast|spell attack|cantrip|\bcast\b/i;
+export function inferArmorScaling(item, rarity) {
+  const authored = normalizeScaling(item && item.scaling);
+  if (Object.keys(authored).length) return withAllScalingStats(authored);
+  const r = rarity || (item && item.rarity) || 'common';
+  const scaling = { ...ARMOR_SCALING_BY_KIND[armorPieceKind(item)] };
+  // Magical armor made for casters leans on the caster's stat as well.
+  const text = ((item && item.effect) || '') + ' ' + ((item && item.desc) || '');
+  if (CASTER_ARMOR.test(text)) { const st = inferFocusStat(item); if (!scaling[st] || gradeIdx(scaling[st]) < gradeIdx('C')) scaling[st] = 'C'; }
+  const order = scalingStatsByStrength(scaling);
+  const steps = (r === 'superrare' || r === 'legendary' || r === 'celestial') ? 1 : 0;
+  if (steps) order.slice(0, r === 'superrare' ? 1 : 2).forEach(st => { scaling[st] = boostGrade(scaling[st], steps); });
+  return withAllScalingStats(scaling);
+}
+// pieces: [{ item, rarity }] of everything equipped that is armor. -> { scaling (merged), total, parts }
+export function computeArmorScalingAc(pieces, mods) {
+  const merged = {};
+  const hasBody = (pieces || []).some(p => ['light', 'medium', 'heavy'].includes(armorPieceKind(p.item)));
+  const sources = (pieces || []).map(p => inferArmorScaling(p.item, p.rarity));
+  if (!hasBody) sources.push({ dex: 'A' });   // unarmored: 10 + Dex
+  sources.forEach(sc => SCALING_STATS.forEach(st => { if (sc[st] && (!merged[st] || gradeIdx(sc[st]) > gradeIdx(merged[st]))) merged[st] = sc[st]; }));
+  const scaling = withAllScalingStats(merged);
+  const r = computeScalingDamage(scaling, mods);
+  return { scaling, total: r.total, parts: r.parts };
+}
+
+// ---- Spell focus on any magical item ------------------------------------------------------------
+// Staves, wands and rods already carry a focus (above). Every other magical item — rings, cloaks,
+// amulets, armor, trinkets — gets one too: a casting stat and a grade (one lower than a real focus),
+// shown on its tooltip. A focus only ADDS when its item casts spells or deals damage
+// (itemFocusActive); for a plain ring of protection it is shown but idle.
+const MAGIC_TEXT = /\bcast(?:s|ing)?\b|spell|cantrip|charges?\b|attunement|magical?\b|radiant|necrotic|psychic|force damage|fire damage|cold damage|lightning|thunder|poison damage|acid damage/i;
+const NOT_MAGICAL_TYPES = new Set(['consumable', 'craftable', 'document', 'chest', 'monsterpart', 'companion']);
+export function isMagicalItem(item) {
+  if (!item || NOT_MAGICAL_TYPES.has(item.type)) return false;
+  if (item.type === 'weapon') return isSpellFocusWeapon(item);
+  if (item.spellFocus && typeof item.spellFocus === 'object') return true;
+  const rarity = item.rarity || 'common';
+  const text = (item.effect || '') + ' ' + (Array.isArray(item.mods) ? item.mods.map(m => m.text || '').join(' ') : '');
+  return (rarity !== 'common') || (Array.isArray(item.mods) && item.mods.length > 0) || MAGIC_TEXT.test(text);
+}
+export function itemFocusActive(item) {
+  if (!item) return false;
+  if (item.type === 'weapon') return isSpellFocusWeapon(item);
+  const text = (item.effect || '') + ' ' + (Array.isArray(item.mods) ? item.mods.map(m => (m.type || '') + ' ' + (m.text || '')).join(' ') : '');
+  return /\bcast(?:s|ing)?\b|spell|cantrip|grants the ability to cast|spell attack|spell save|\d+d\d+\s+(?:fire|cold|lightning|thunder|poison|acid|necrotic|radiant|psychic|force)\s+damage/i.test(text);
+}
+const NON_FOCUS_GRADE = { common: 'D', uncommon: 'D', rare: 'C', superrare: 'B', legendary: 'A', celestial: 'A' };
+// A staff/wand's own focus, else the casting-stat focus of any other magical item, else null.
+export function inferItemSpellFocus(item, rarity) {
+  const own = inferSpellFocus(item, rarity);
+  if (own) return own;
+  if (!isMagicalItem(item)) return null;
+  const r = rarity || item.rarity || 'common';
+  const authored = (item.spellFocus && typeof item.spellFocus === 'object') ? item.spellFocus : {};
+  const stat = SCALING_STATS.includes(authored.stat) ? authored.stat : inferFocusStat(item);
+  const grade = SCALING_GRADE_MULT[authored.grade] != null ? authored.grade : (NON_FOCUS_GRADE[r] || 'D');
+  return { stat, grade, buff: 'damage', attackBonus: 0 };
+}
+// Spell save DC that a focus adds: half of the scaled stat modifier (rounded), never negative.
+export function computeSpellFocusDc(focus, mods) {
+  if (!focus) return 0;
+  return Math.max(0, Math.round(SCALING_GRADE_MULT[focus.grade] * ((mods && mods[focus.stat]) || 0) / 2));
+}
 
 // ===================== WEAPON PROFICIENCY =====================
 // A weapon attack only adds the proficiency bonus if the character is PROFICIENT with that weapon.

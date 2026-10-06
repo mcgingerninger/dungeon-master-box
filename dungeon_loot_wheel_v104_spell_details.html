@@ -5403,6 +5403,7 @@ function resolveSpellCast(name, slotLevel) {
   // -- attack roll / save DC --
   const focusAtk = focuses.reduce((n, f) => n + f.bonus.attack, 0);
   const focusDmg = focuses.reduce((n, f) => n + f.bonus.damage, 0);
+  const focusDc = focuses.reduce((n, f) => n + (f.bonus.dc || 0), 0);
   if (isAttack) {
     r.d20 = rn(1, 20);
     r.isCrit = r.d20 === 20; r.isFumble = r.d20 === 1;
@@ -5411,7 +5412,7 @@ function resolveSpellCast(name, slotLevel) {
     r.attackKind = raw.spellAttack[0] === 'M' ? 'Melee' : 'Ranged';
   }
   const dcGear = (sheet.otherStats && sheet.otherStats['Spell Save DC'] && sheet.otherStats['Spell Save DC'].total) || 0;
-  if (saveKey) { r.saveStat = saveKey; r.dc = 8 + castMod + dcGear; r.halfOnSave = /half as much damage|half damage/i.test(plain); }
+  if (saveKey) { r.saveStat = saveKey; r.dc = 8 + castMod + dcGear + focusDc; r.halfOnSave = /half as much damage|half damage/i.test(plain); }
   // -- damage / healing --
   if (baseDice && (r.isHealing || r.damageType || /damage/i.test(plain))) {
     const crit = !!r.isCrit;
@@ -5437,7 +5438,7 @@ function resolveSpellCast(name, slotLevel) {
   r.sources.cast = attackTipBlock(`${L[cast.stat]} casting modifier ${fmtMod(castMod)}`, castLines);
   r.sources.focus = attackTipBlock('Spell focus bonus', focuses.length ? focuses.map(f => `<b>${escapeHtml(f.item.name)}</b>: ${escapeHtml(spellFocusBonusText(f.focus, f.bonus))} (${L[f.focus.stat]} ${f.focus.grade} focus)`) : ['No equipped staff or wand is adding to spells.']);
   r.sources.atkinfo = attackTipBlock('Spell attack roll', ['d20 plus any bonus from an equipped spell-focus staff or wand.', 'Ability modifiers never add to hitting — only to damage and save DCs.']);
-  if (r.dc != null) r.sources.dc = attackTipBlock(`Save DC ${r.dc}`, [`8 + your ${L[cast.stat]} casting modifier (${fmtMod(castMod)})${dcGear ? ` ${fmtMod(dcGear)} from gear (Spell Save DC)` : ''}.`, 'No proficiency bonus is added.']);
+  if (r.dc != null) r.sources.dc = attackTipBlock(`Save DC ${r.dc}`, [`8 + your ${L[cast.stat]} casting modifier (${fmtMod(castMod)})${dcGear ? ` ${fmtMod(dcGear)} from gear (Spell Save DC)` : ''}${focusDc ? ` ${fmtMod(focusDc)} from your scaling spell focus` : ''}.`, 'No proficiency bonus is added.']);
   if (r.slotLevel) r.sources.slot = attackTipBlock(`Level ${r.slotLevel} slot`, [`${escapeHtml(name)} is a level ${level} spell. ${r.slotLevel > level ? `Casting it with a level ${r.slotLevel} slot adds ${r.extraDice || 'its higher-level benefit'}.` : 'Cast at its own level.'}`]);
   if (r.baseDice) r.sources.dice = attackTipBlock(`Damage dice ${r.baseDice}${r.count > 1 ? ' × ' + r.count : ''}`, [`From the ${escapeHtml(name)} spell’s own description.`, r.cantripNote || '', r.count > 1 ? `${r.count} ${r.projectile}s (${extraLevels ? 'including one more per slot level above ' + level : 'base number'}).` : '', 'Doubled on a critical hit.']);
   if (r.extraRoll) r.sources.extra = attackTipBlock(`Higher-slot dice ${r.extraDice}`, [`Using a level ${r.slotLevel} slot on a level ${level} spell adds ${up[3].replace(/\s+/g, '')} per level above (${extraLevels} level${extraLevels > 1 ? 's' : ''}).`]);
@@ -8237,9 +8238,10 @@ function buildInspectMeta(it, fieldsToHide, revealed, sourceKey) {
   }
   if (it.type === 'weapon') {
     tags += `<span class="meta-tag scaling">Scales: ${formatScaling(inferWeaponScaling(it, it.rarity))}</span>`;
-    const focusMeta = inferSpellFocus(it, it.rarity);
-    if (focusMeta) tags += `<span class="meta-tag scaling">✦ Focus: ${SCALING_STAT_LABEL[focusMeta.stat]} ${focusMeta.grade}</span>`;
   }
+  if (it.type === 'armor') tags += `<span class="meta-tag scaling">Scales AC: ${formatScaling(inferArmorScaling(it, it.rarity))}</span>`;
+  { const focusMeta = inferItemSpellFocus(it, it.rarity);
+    if (focusMeta) tags += `<span class="meta-tag scaling">✦ Focus: ${SCALING_STAT_LABEL[focusMeta.stat]} ${focusMeta.grade}</span>`; }
   if (it.ac) {
     if (fieldsToHide.includes('ac') && !revealed.has('ac')) {
       tags += inspectField('ac', it.ac, it.rarity, sourceKey, false);
@@ -15721,7 +15723,8 @@ function getTokenSlotType(entry) {
 function getItemEffectText(item) {
   // Always returns plain text — callers (token previews, tooltips) escapeHtml() this,
   // so any <strong>/<em> markup baked into .effect or mod text must come out first.
-  if (item.effect) return stripModTags(item.effect);
+  // Armor AC now comes from armor scaling (game-engine.js, armor scaling) rather than a flat Dex rule.
+  if (item.effect) { const t = stripModTags(item.effect); return item.type === 'armor' ? t.replace(/\bAC (\d+) \+ Dexterity modifier(?: \(max \d+\))?/gi, 'AC $1 + armor scaling (see Scales)') : t; }
   if (item.mods && item.mods.length) return stripModTags(item.mods.map(m => m.text).join(' '));
   if (item.desc) return item.desc;
   return 'No effect text recorded.';
@@ -17939,36 +17942,49 @@ function spellFocusBonusText(focus, bonus) {
   const bits = [];
   if (bonus.damage) bits.push(`+${bonus.damage} spell damage`);
   if (bonus.attack) bits.push(`+${bonus.attack} spell attack`);
+  if (bonus.dc) bits.push(`+${bonus.dc} save DC`);
   return bits.length ? bits.join(' · ') : (focus.buff === 'attack' || focus.buff === 'both' ? '+0 spell attack' : '+0 spell damage');
 }
 function weaponScalingTooltipHtml(item, rarity) {
-  if (!item || item.type !== 'weapon') return '';
-  const scaling = inferWeaponScaling(item, rarity);
+  if (!item) return '';
   let mods = null;
   try { mods = currentAbilityMods(); } catch (e) { mods = null; }
-  const chips = scalingEntries(scaling).map(e => `<span class="tt-scale-chip tt-grade-${e.grade}">${e.label} <b>${e.grade}</b></span>`).join('');
-  const dmg = mods ? `<span class="tt-scale-bonus">your damage bonus ${fmtMod(computeScalingDamage(scaling, mods).total)}</span>` : '';
-  let html = `<div class="tt-scaling"><span class="tt-scale-label">Scales</span>${chips}${dmg}</div>`;
-  const focus = inferSpellFocus(item, rarity);
+  let html = '';
+  const chipsOf = sc => scalingEntries(sc).map(e => `<span class="tt-scale-chip tt-grade-${e.grade}">${e.label} <b>${e.grade}</b></span>`).join('');
+  if (item.type === 'weapon') {
+    const scaling = inferWeaponScaling(item, rarity);
+    const dmg = mods ? `<span class="tt-scale-bonus">your damage bonus ${fmtMod(computeScalingDamage(scaling, mods).total)}</span>` : '';
+    html += `<div class="tt-scaling"><span class="tt-scale-label">Scales</span>${chipsOf(scaling)}${dmg}</div>`;
+  } else if (item.type === 'armor') {
+    const scaling = inferArmorScaling(item, rarity);
+    const ac = mods ? `<span class="tt-scale-bonus">your AC bonus ${fmtMod(computeScalingDamage(scaling, mods).total)}</span>` : '<span class="tt-scale-bonus">adds to AC</span>';
+    html += `<div class="tt-scaling"><span class="tt-scale-label">Scales</span>${chipsOf(scaling)}${ac}</div>`;
+  }
+  const focus = inferItemSpellFocus(item, rarity);
   if (focus) {
+    const active = itemFocusActive(item);
     const fb = mods ? computeSpellFocusBonus(focus, mods) : { damage: 0, attack: 0 };
     const kind = focus.buff === 'both' ? 'spell damage + attack' : focus.buff === 'attack' ? 'spell attack' : 'spell damage';
-    html += `<div class="tt-scaling"><span class="tt-scale-label">✦ Focus</span><span class="tt-scale-chip tt-grade-${focus.grade}">${SCALING_STAT_LABEL[focus.stat]} <b>${focus.grade}</b></span><span class="tt-scale-bonus">${kind}${mods ? ' · ' + spellFocusBonusText(focus, fb) : ''}</span></div>`;
+    const dcTxt = mods ? computeSpellFocusDc(focus, mods) : 0;
+    const detail = active
+      ? `${kind} + save DC${mods ? ' · ' + spellFocusBonusText(focus, { ...fb, dc: dcTxt }) : ''}`
+      : 'no spells or damage on this item to boost';
+    html += `<div class="tt-scaling"><span class="tt-scale-label">✦ Focus</span><span class="tt-scale-chip tt-grade-${focus.grade}">${SCALING_STAT_LABEL[focus.stat]} <b>${focus.grade}</b></span><span class="tt-scale-bonus">${detail}</span></div>`;
   }
   return html;
 }
-// What equipped staves/wands add to a spell cast right now. -> [{ item, focus, bonus:{damage,attack} }]
+// What equipped staves, wands and other spell-casting magical items add to a spell cast right now. -> [{ item, focus, bonus:{damage,attack} }]
 function equippedSpellFocusBonuses(mods) {
   buildTokenIndex();
   const out = [];
   Object.keys(SLOT_CATEGORY).forEach(slotId => {
     const key = playerSlots[slotId];
     const entry = key && TOKEN_INDEX[key];
-    if (!entry || entry.item.type !== 'weapon') return;
-    const focus = inferSpellFocus(entry.item, entry.rarity);
+    if (!entry || !itemFocusActive(entry.item)) return;
+    const focus = inferItemSpellFocus(entry.item, entry.rarity);
     if (!focus) return;
-    const bonus = computeSpellFocusBonus(focus, mods);
-    if (bonus.damage || bonus.attack) out.push({ item: entry.item, focus, bonus });
+    const bonus = { ...computeSpellFocusBonus(focus, mods), dc: computeSpellFocusDc(focus, mods) };
+    if (bonus.damage || bonus.attack || bonus.dc) out.push({ item: entry.item, focus, bonus });
   });
   return out;
 }

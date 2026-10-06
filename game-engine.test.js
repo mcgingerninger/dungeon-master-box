@@ -157,7 +157,7 @@ describe('computeCharacterSheetFor / collectEquippedAcBreakdown: Dex-mod cap by 
   });
   test('no armorStyle field (existing/not-yet-rebalanced item): unchanged prior behavior, full uncapped Dex', () => {
     const slots = { armor: 'chestKey' };
-    const items = { chestKey: { item: { name: 'Old-Style Plate', ac: '18' } } };
+    const items = { chestKey: { item: { name: 'Old-Style Gear', ac: '18' } } };
     const sheet = GE.computeCharacterSheetFor(highDexScores, 1, [], [], slots, k => items[k], 10, 30);
     assert.equal(sheet.ac.total, 18 + 4); // no cap applied -- field absent, not zero
   });
@@ -264,7 +264,7 @@ describe('migrated-item bridge: computeCharacterSheetFor reads a canonical `pass
     // if the bridge read both the old text AND the new structured facet, this would double-count.
     const items = { chestKey: { item: { name: 'Test Plate', ac: '16', effect: '+4 Strength', __canonical: { armor: { baseAC: 16 }, passive: [{ stat: 'str', value: 2 }] } } } };
     const sheet = GE.computeCharacterSheetFor({ str: 14, dex: 10 }, 1, [], [], slots, k => items[k], 10, 30);
-    assert.equal(sheet.ac.total, 16);
+    assert.equal(sheet.ac.total, 18); // 16 base + 2 from heavy armor's STR C scaling (STR mod +3, x0.5)
     assert.equal(sheet.abilities.str.total, 16); // +2 from canonical passive, not +4 from the stale .effect text
   });
 });
@@ -876,4 +876,69 @@ test('a plain club still has INT scaling, at rank E, and it adds a little damage
   assert.equal(sc.int, 'E');
   assert.deepEqual(Object.keys(sc).sort(), ['cha', 'con', 'dex', 'int', 'str', 'wis']);
   assert.equal(GE.computeScalingDamage(sc, { str: 0, dex: 0, con: 0, int: 5, wis: 0, cha: 0 }).parts.find(p => p.stat === 'int').grade, 'E');
+});
+
+describe('armor scaling (grades per stat that add to AC) and spell focus on any magical item', () => {
+  const armor = (name, extra) => ({ name, type: 'armor', ...extra });
+  test('every armor piece gets grades for all six stats, by kind', () => {
+    const light = GE.inferArmorScaling(armor('Studded Leather Armor'));
+    assert.equal(GE.armorPieceKind(armor('Studded Leather Armor')), 'light');
+    assert.equal(light.dex, 'A'); assert.equal(Object.keys(light).length, 6);
+    assert.deepEqual([GE.armorPieceKind(armor('Breastplate')), GE.armorPieceKind(armor('Plate Armor')), GE.armorPieceKind(armor('Tower Shield')), GE.armorPieceKind(armor('Iron Helm')),
+      GE.armorPieceKind(armor('Leather Gauntlets')), GE.armorPieceKind(armor('Traveler\'s Boots')), GE.armorPieceKind(armor('Cloak of Elvenkind'))], ['medium', 'heavy', 'shield', 'helm', 'gloves', 'boots', 'cloak']);
+    assert.equal(GE.inferArmorScaling(armor('Plate Armor')).str, 'C');
+    assert.equal(GE.inferArmorScaling(armor('Iron Helm')).con, 'C');
+  });
+  test('rarity lifts armor grades, authored scaling wins, caster armor leans on its casting stat', () => {
+    assert.equal(GE.inferArmorScaling(armor('Leather Armor'), 'superrare').dex, 'S');
+    assert.equal(GE.inferArmorScaling(armor('Plate Armor'), 'legendary').str, 'B');
+    assert.deepEqual(GE.inferArmorScaling(armor('Odd Armor', { scaling: { int: 'A' } })).int, 'A');
+    const robe = armor('Robe of the Archmage', { effect: 'AC 15. Requires attunement by a wizard.' });
+    assert.equal(GE.inferArmorScaling(robe).int, 'C');
+  });
+  test('AC bonus: best grade per stat across the worn set, no stacking of the same modifier', () => {
+    const mods = { str: 3, dex: 4, con: 0, int: 0, wis: 0, cha: 0 };
+    const leather = { item: armor('Leather Armor'), rarity: 'common' }, gaunt = { item: armor('Leather Gauntlets'), rarity: 'common' }, boots = { item: armor('Leather Boots'), rarity: 'common' };
+    assert.equal(GE.computeArmorScalingAc([leather], mods).total, 4);            // DEX A x4
+    assert.equal(GE.computeArmorScalingAc([leather, gaunt, boots], mods).total, 5);   // DEX counted once (A); the gauntlets' STR D adds 0.25 x 3 -> 4.75 rounds to 5
+    assert.equal(GE.computeArmorScalingAc([{ item: armor('Plate Armor'), rarity: 'common' }], mods).total, 2);   // STR C: 0.5 x 3, DEX E adds 0.4
+    assert.equal(GE.computeArmorScalingAc([], mods).total, 4);                  // unarmored: Dex A
+    assert.equal(GE.computeArmorScalingAc([{ item: armor('Plate Armor'), rarity: 'common' }, { item: armor('Gauntlets of Ogre Power', { scaling: { dex: 'S' } }), rarity: 'common' }], mods).total, 7); // DEX S x4 = 5, plus STR C 0.5 x 3 = 1.5 -> 6.5 rounds to 7
+  });
+  test('the sheet uses armor scaling for AC and lists it as a source', () => {
+    const slots = { armor: 'a' }; const items = { a: { item: armor('Plate Armor', { ac: '18' }), rarity: 'common' } };
+    const sheet = GE.computeCharacterSheetFor({ str: 16, dex: 10 }, 1, [], [], slots, k => items[k], 10, 30);
+    assert.equal(sheet.ac.total, 18 + 2);
+    assert.ok(sheet.ac.sources.some(s => /Armor scaling/.test(s.itemName)));
+  });
+  test('any magical item has a spell focus; it only adds when the item casts or deals damage', () => {
+    const ring = { name: 'Ring of Warmth', type: 'misc', rarity: 'rare', effect: 'Resistance to cold damage. Requires attunement.' };
+    const cloak = { name: 'Cloak of Arachnida', type: 'misc', rarity: 'superrare', effect: 'Cast Web (DC 13) once per day. Requires attunement.' };
+    const rope = { name: 'Hemp Rope', type: 'misc', rarity: 'common', effect: '50 feet of rope.' };
+    assert.equal(GE.inferItemSpellFocus(rope), null);
+    assert.equal(GE.isMagicalItem({ name: 'Healing Potion', type: 'consumable', rarity: 'rare' }), false);
+    assert.equal(GE.inferItemSpellFocus(ring).grade, 'C');
+    assert.equal(GE.itemFocusActive(ring), false);
+    assert.equal(GE.itemFocusActive(cloak), true);
+    assert.equal(GE.inferItemSpellFocus(cloak).grade, 'B');
+    // a staff keeps its own focus
+    const staff = { name: 'Staff of Healing', type: 'weapon', rarity: 'rare', effect: '10 charges. Cure Wounds (1). Requires attunement by a cleric or druid.' };
+    assert.deepEqual(GE.inferItemSpellFocus(staff), GE.inferSpellFocus(staff));
+  });
+  test('focus adds half its scaled stat modifier to the spell save DC, never below zero', () => {
+    assert.equal(GE.computeSpellFocusDc({ stat: 'int', grade: 'A', buff: 'damage', attackBonus: 0 }, { int: 4 }), 2);
+    assert.equal(GE.computeSpellFocusDc({ stat: 'int', grade: 'S', buff: 'damage', attackBonus: 0 }, { int: 4 }), 3);
+    assert.equal(GE.computeSpellFocusDc({ stat: 'int', grade: 'A', buff: 'damage', attackBonus: 0 }, { int: -3 }), 0);
+    assert.equal(GE.computeSpellFocusDc(null, { int: 4 }), 0);
+  });
+  test('every armor and magical item in the real catalog resolves to valid grades', async () => {
+    const fs = await import('node:fs');
+    const lootData = new Function(fs.readFileSync(new URL('./loot-data.js', import.meta.url), 'utf8') + '; return lootData')();
+    let armors = 0, focuses = 0;
+    for (const [rarity, items] of Object.entries(lootData)) for (const item of items) {
+      if (item.type === 'armor') { armors++; const s = GE.inferArmorScaling(item, rarity); assert.equal(Object.keys(s).length, 6, item.name); Object.values(s).forEach(g => assert.ok(GE.SCALING_GRADE_MULT[g], item.name)); }
+      const f = GE.inferItemSpellFocus(item, rarity); if (f) { focuses++; assert.ok(GE.SCALING_STATS.includes(f.stat) && GE.SCALING_GRADE_MULT[f.grade], item.name); }
+    }
+    assert.ok(armors > 250 && focuses > 400);
+  });
 });
