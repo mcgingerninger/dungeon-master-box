@@ -291,15 +291,52 @@
         + (a.mult && a.mult !== 1 ? `<div class="weapon-attack-line"><span>Variant damage ×${a.mult.toFixed(2).replace(/\.?0+$/, '')}</span><span></span></div>` : '')
         + `<div class="weapon-attack-total" style="font-size:1.05rem;margin:0.3rem 0 0">Damage: <span id="btDmg-${gi}-${idx}">${a.outcome === 'save' ? (a.failed === false ? 0 : a.damage) : a.damage}</span>${a.outcome === 'save' ? ' <span class="bt-note">(if failed)</span>' : ''}</div>`
       : '';
-    return `<div class="sub"><b>${esc(a.name)}</b>${a.source === 'spell' ? ` <span class="bt-note">✦ spell (${a.useNote ? esc(a.useNote) : 'chaos gear'})</span>` : a.source === 'weapon' ? ' <span class="bt-note">⚔ wielded weapon (chaos gear)</span>' : ''}<div>${head}</div>${dmg}</div>`;
+    const narr = window.AttackNarrator ? `<div class="an-tools"><button class="action-btn" onclick="btDescribe(${gi},${idx})">📖 Describe</button><span id="btNarrBtns-${gi}-${idx}"></span></div><div id="btNarr-${gi}-${idx}">${a.narr && a.narr.open ? narrHtml(gi, idx, a) : ''}</div>` : '';
+    return `<div class="sub"><b>${esc(a.name)}</b>${a.source === 'spell' ? ` <span class="bt-note">✦ spell (${a.useNote ? esc(a.useNote) : 'chaos gear'})</span>` : a.source === 'weapon' ? ' <span class="bt-note">⚔ wielded weapon (chaos gear)</span>' : ''}<div>${head}</div>${dmg}${narr}</div>`;
   }
+  // ---------- narration (attack-narrator.js) ----------
+  // Turns a rolled attack into a few short, DM-readable paragraphs: what it looks like, what a hit
+  // does, how it misses, plus the real rolled outcome. Everything is deterministic per (attack, take).
+  function narrCtx(gi, a, detail) {
+    const g = bt.last.groups[gi], t = g.token, m = t.monster;
+    const gear = (t.entry.chaosGearList || []).find(x => (x.weaponAction && x.weaponAction.name === a.name) || (x.spellAction && x.spellAction.name === a.name));
+    return {
+      attacker: { name: m.name, type: m.type, size: m.size, cr: m.cr, str: m.str, dex: m.dex, traits: m.traits },
+      entry: t.entry, target: { name: g.target.name },
+      result: { outcome: a.outcome, damage: a.damage, failed: a.failed },
+      weapon: gear && gear.kind === 'weapon' ? { name: gear.name, rarity: gear.rarity } : null,
+      detail: detail || 'standard', variant: (a.narr && a.narr.take) || 0, seed: t.id || 0,
+    };
+  }
+  function narrHtml(gi, idx, a) {
+    try {
+      const r = window.AttackNarrator.describe({ name: a.name, text: a.text, source: a.source, isSpell: a.source === 'spell' }, narrCtx(gi, a, a.narr.detail));
+      return r.html + `<div class="an-tools"><button class="action-btn" onclick="btDescribeTake(${gi},${idx})">🔄 Another take</button><button class="action-btn" onclick="btDescribeDetail(${gi},${idx})">${a.narr.detail === 'full' ? '➖ Shorter' : '➕ Full detail'}</button><button class="action-btn" onclick="btDescribeCopy(${gi},${idx})">📋 Copy</button></div>`;
+    } catch (e) { return `<div class="bt-note">Could not describe this attack.</div>`; }
+  }
+  const narrRefresh = (gi, i) => { const a = bt.last.groups[gi].attacks[i], el = document.getElementById(`btNarr-${gi}-${i}`); if (el) el.innerHTML = a.narr && a.narr.open ? narrHtml(gi, i, a) : ''; };
+  window.btDescribe = function (gi, i) { const a = bt.last.groups[gi].attacks[i]; a.narr = a.narr || { open: false, take: 0, detail: 'standard' }; a.narr.open = !a.narr.open; narrRefresh(gi, i); };
+  window.btDescribeTake = function (gi, i) { const a = bt.last.groups[gi].attacks[i]; a.narr.take++; narrRefresh(gi, i); };
+  window.btDescribeDetail = function (gi, i) { const a = bt.last.groups[gi].attacks[i]; a.narr.detail = a.narr.detail === 'full' ? 'standard' : 'full'; narrRefresh(gi, i); };
+  window.btDescribeCopy = function (gi, i) {
+    const a = bt.last.groups[gi].attacks[i];
+    const r = window.AttackNarrator.describe({ name: a.name, text: a.text, source: a.source, isSpell: a.source === 'spell' }, narrCtx(gi, a, a.narr.detail));
+    if (navigator.clipboard) navigator.clipboard.writeText(r.text).catch(() => {});
+  };
+  window.btDescribeTurn = function (gi) {
+    const el = document.getElementById('btTurn-' + gi); if (!el) return;
+    if (el.innerHTML) { el.innerHTML = ''; return; }
+    const g = bt.last.groups[gi];
+    const seq = window.AttackNarrator.describeSequence(g.attacks.map((a, i) => ({ attack: { name: a.name, text: a.text, source: a.source, isSpell: a.source === 'spell' }, ctx: narrCtx(gi, a, 'brief') })), { seed: g.token.id || 0 });
+    el.innerHTML = `<div class="an-narr"><div class="an-head"><b>${esc(seq.title)}</b></div><div>${esc(seq.text)}</div></div>`;
+  };
   function popupHtml(groups) {
     let grand = 0;
     const body = groups.map((g, gi) => {
       const sub = g.attacks.reduce((n, a) => n + (a.outcome === 'save' && a.failed === false ? 0 : a.damage), 0);
       grand += sub;
       return `<div class="bt-atk"><h5>${esc(g.token.name)} → ${esc(g.target.name)}</h5>
-        ${g.multi ? `<div class="bt-note">Multiattack — rolling two other attacks (never another Multiattack).</div>` : ''}
+        ${g.multi ? `<div class="bt-note">Multiattack — rolling two other attacks (never another Multiattack).</div>${window.AttackNarrator ? `<div class="an-tools"><button class="action-btn" onclick="btDescribeTurn(${gi})">📖 Describe the whole turn</button></div><div id="btTurn-${gi}"></div>` : ''}` : ''}
         ${g.note ? `<div class="bt-note">${esc(g.note)}</div>` : ''}
         ${g.attacks.map((a, i) => attackHtml(a, i, gi)).join('')}
         <div class="weapon-attack-line" style="margin-top:0.3rem"><span>Subtotal</span><span id="btSub-${gi}">${sub}</span></div></div>`;
@@ -321,7 +358,7 @@
     const el = document.getElementById('btGrand'); if (el) el.textContent = grand;
     bt.last.total = grand;
   }
-  window.btToggleSave = function (gi, i, ok) { bt.last.groups[gi].attacks[i].failed = ok; recalc(); };
+  window.btToggleSave = function (gi, i, ok) { const a = bt.last.groups[gi].attacks[i]; a.failed = ok; recalc(); if (a.narr && a.narr.open) narrRefresh(gi, i); };
   function open(groups, targetToken, applied) {
     bt.last = { groups, targetToken, total: 0, applied: !!applied, monsters: groups.map(g => g.token) };
     document.getElementById('btAttackBody').innerHTML = popupHtml(groups);

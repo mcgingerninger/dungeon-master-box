@@ -4533,6 +4533,13 @@ const APP_VERSION = 'v104';
 <script src="item-art-parts.js"></script>
 <script src="item-art-rules.js"></script>
 <script src="item-art.js"></script>
+<script src="attack-narrator-elements.js"></script>
+<script src="attack-narrator-moves.js"></script>
+<script src="attack-narrator-magic.js"></script>
+<script src="attack-narrator-effects.js"></script>
+<script src="attack-narrator-lexicon.js"></script>
+<script src="attack-narrator-spells.js"></script>
+<script src="attack-narrator.js"></script>
 <script src="battlefield-tab.js"></script>
 <script>
 // mechanics/canonical/items.js (loaded just above) defines `canonicalItems` — the one-time
@@ -19185,9 +19192,24 @@ function monsterAbilityBlockHtml(m) {
 // same mechanism/tooltip Combat's own action-name hover already uses, see its own comment),
 // so a DM browsing the Compendium sees the exact same structured to-hit/damage/save-DC/
 // recharge breakdown Combat shows mid-fight, not just the plain stat-block paragraph.
-function monsterActionsHtml(list, label) {
+function monsterActionsHtml(list, label, mi, key) {
   if (!list || !list.length) return '';
-  return `<div class="ic-mod-group"><div class="ic-mod-label">${escapeHtml(label)}</div>${list.map(a => `<div class="ic-mod-entry">${battleActionNameHtml(a.name, a.text, a.recharge)}. ${escapeHtml(a.text).replace(/\n/g,'<br>')}</div>`).join('')}</div>`;
+  const canNarrate = window.AttackNarrator && mi != null && key;
+  return `<div class="ic-mod-group"><div class="ic-mod-label">${escapeHtml(label)}</div>${list.map((a, ai) => `<div class="ic-mod-entry">${battleActionNameHtml(a.name, a.text, a.recharge)}. ${escapeHtml(a.text).replace(/\n/g,'<br>')}${canNarrate ? ` <button class="action-btn" style="font-size:.7rem;padding:.05rem .4rem" title="Describe what this attack looks like" onclick="monsterDescribeAction(${mi},'${key}',${ai},this)">📖</button><div class="an-slot"></div>` : ''}</div>`).join('')}</div>`;
+}
+// Narrates one stat-block action for the DM (attack-narrator.js); click again to hide, hold the
+// button for another take by clicking after it is open.
+function monsterDescribeAction(mi, key, ai, btn) {
+  const m = monsterDatabase[mi], a = m && m[key] && m[key][ai]; if (!a || !window.AttackNarrator) return;
+  const slot = btn.parentNode.querySelector('.an-slot'); if (!slot) return;
+  btn._take = slot.innerHTML ? (btn._take || 0) + 1 : 0;
+  const r = window.AttackNarrator.describe(a, { attacker: { name: m.name, type: m.type, size: m.size, cr: m.cr, str: m.str, dex: m.dex, traits: m.traits }, detail: 'full', variant: btn._take, seed: mi });
+  let seq = '';
+  if (/^multiattack/i.test(a.name || '') && m.actions) {
+    const used = m.actions.filter(x => x !== a && !/^multiattack/i.test(x.name) && new RegExp('\\b' + x.name.replace(/\s*\(.*$/, '').toLowerCase().replace(/s$/, '').replace(/[^a-z ]/g, '') + 's?\\b', 'i').test(a.text)).slice(0, 3);
+    if (used.length) seq = window.AttackNarrator.describeSequence(used.map(x => ({ attack: x, ctx: { attacker: { name: m.name, type: m.type, size: m.size, cr: m.cr, str: m.str, dex: m.dex, traits: m.traits } } })), { seed: mi + btn._take }).text;
+  }
+  slot.innerHTML = r.html + (seq ? `<div class="an-narr"><b>As it plays out.</b> ${escapeHtml(seq)}</div>` : '') + '<div class="an-tools"><button class="action-btn" onclick="this.closest(\'.an-slot\').parentNode.querySelector(\'button\').click()">🔄 Another take</button><button class="action-btn" onclick="this.closest(\'.an-slot\').innerHTML=\'\'">Hide</button></div>';
 }
 // Every premade monster part (see generatePremadeMonsterParts) is tagged with the exact
 // monster it came from (item.sourceMonster) and lives in lootData at that monster's own
@@ -19230,10 +19252,10 @@ function showMonsterDetail(i) {
   ];
   const actionsHtml = [
     monsterActionsHtml(m.traits, 'Traits'),
-    monsterActionsHtml(m.actions, 'Actions'),
-    monsterActionsHtml(m.bonusActions, 'Bonus Actions'),
-    monsterActionsHtml(m.reactions, 'Reactions'),
-    monsterActionsHtml(m.legendary, 'Legendary Actions'),
+    monsterActionsHtml(m.actions, 'Actions', i, 'actions'),
+    monsterActionsHtml(m.bonusActions, 'Bonus Actions', i, 'bonusActions'),
+    monsterActionsHtml(m.reactions, 'Reactions', i, 'reactions'),
+    monsterActionsHtml(m.legendary, 'Legendary Actions', i, 'legendary'),
   ].join('');
   // m.desc is a homebrew-only field (see CUSTOM_MONSTERS) — official 5etools stat blocks never
   // carry prose flavor text, so this simply renders nothing for any of those.
