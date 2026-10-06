@@ -80,7 +80,7 @@ test('material comes from affix names (adamantine plate helmet)', () => {
 });
 
 test('rendered icons never contain floating fragments (sprites or effects)', () => {
-  const effects = ['fire', 'frost', 'storm', 'poison', 'acid', 'holy', 'shadow', 'necrotic', 'blood', 'arcane', 'nature', 'wind', 'water', 'sonic', 'luck', 'magic'];
+  const effects = ['fire', 'frost', 'storm', 'poison', 'acid', 'holy', 'shadow', 'necrotic', 'blood', 'arcane', 'nature', 'wind', 'water', 'sonic', 'luck', 'soul', 'prism', 'gravity', 'spore', 'time', 'magic'];
   const parse = svg => { const g = Array.from({ length: N }, () => Array(N).fill(false)); for (const m of svg.matchAll(/<rect ([^>]*)\/>/g)) { const a = Object.fromEntries([...m[1].matchAll(/([a-z-]+)="([^"]*)"/g)].map(q => [q[1], q[2]])); if (a['fill-opacity'] && +a['fill-opacity'] < 0.6) continue; for (let i = 0; i < +a.width; i++) g[+a.y][+a.x + i] = true; } return g; };
   for (const base of ['longsword', 'dagger', 'greataxe', 'wand', 'platehelm', 'ring', 'cat', 'heartstone', 'potion', 'staffcrystal', 'tome']) for (const fx of effects) for (const rarity of ['rare', 'legendary']) {
     const svg = win.itemArtBaseSvg(base, { material: 'steel', effects: [fx], rarity }, 32); assert.ok(svg, `${base}+${fx}`);
@@ -98,4 +98,14 @@ test('explicit artSpec on an item wins', () => {
 test('every item gets art', () => {
   for (const name of ['', 'Zzyzx', 'Item 12', 'The Unnamed']) for (const type of ['weapon', 'armor', 'consumable', 'misc', 'companion', 'limb', 'document', 'treasure', 'questitem'])
     assert.ok(win.itemArtInner({ name, type }, 'common'), `no art for "${name}" (${type})`);
+});
+
+test('new affix materials and enchantments get their own colours and effects', () => {
+  const spec = n => win.itemArtSpec({ name: n, type: 'weapon', rarity: 'rare' });
+  for (const [n, m] of [['Moonsilver Longsword', 'moonsilver'], ['Bloodsteel Greataxe', 'bloodsteel'], ['Wraithsteel Rapier', 'wraithsteel'], ['Hellforged Warhammer', 'hellforged'],
+    ['Shatterglass Dagger', 'shatterglass'], ['Coldiron Mace', 'coldiron'], ['Heartwood Quarterstaff', 'heartwood'], ['Ironwood Longbow', 'ironwood'], ['Elven Shortsword', 'elven'],
+    ['Dwarven Battleaxe', 'dwarven'], ['Meteoric Spear', 'starmetal']]) assert.equal(spec(n).material, m, n);
+  for (const [n, fx] of [['Soulreaver Greatsword', 'soul'], ['Prismatic Longsword', 'prism'], ['Gravitic Maul', 'gravity'], ['Sporing Flail', 'spore'], ['Temporal Rapier', 'time'], ['Hellforged Warhammer', 'fire']])
+    assert.ok(spec(n).effects.includes(fx), `${n} -> ${fx}`);
+  for (const m of ['moonsilver', 'bloodsteel', 'wraithsteel', 'hellforged', 'shatterglass', 'coldiron', 'heartwood', 'ironwood', 'elven', 'dwarven']) assert.ok(win.ITEM_ART.MAT[m], m);
 });

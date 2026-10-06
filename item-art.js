@@ -35,13 +35,18 @@
     glass: { a: '#bfe4ee', b: '#5a8fa0', c: '#ffffff', t: '#c9a84c' }, stone: { a: '#8c8574', b: '#524d41', c: '#bdb6a2', t: '#a9a089' },
     mushcap: { a: '#b8503c', b: '#6a2418', c: '#e8a090', t: '#f4ead0' }, apple: { a: '#c63a2e', b: '#6e1a16', c: '#f08a78', t: '#4f8a3a' },
     cheesey: { a: '#e8bf4a', b: '#a07a1c', c: '#fbe49a', t: '#c9a84c' }, crust: { a: '#c28a4a', b: '#7a4e22', c: '#e6b878', t: '#f4e2b0' }, candy: { a: '#e0529a', b: '#8a2060', c: '#ff9ccb', t: '#6fd0f0' },
+    ironwood: { a: '#6a4a30', b: '#33200f', c: '#a07850', t: '#b89a5a' }, heartwood: { a: '#a8503a', b: '#5a2216', c: '#d98a70', t: '#e8c880' },
+    coldiron: { a: '#6f7d8a', b: '#343e48', c: '#aebdc9', t: '#8fa6b8' }, moonsilver: { a: '#c8d8f0', b: '#6e84ac', c: '#ffffff', t: '#e8f0ff' },
+    bloodsteel: { a: '#8f3a44', b: '#42121a', c: '#d98a92', t: '#c84a58' }, wraithsteel: { a: '#9fb4b0', b: '#4a5c5a', c: '#e2f4f0', t: '#bfe6df' },
+    hellforged: { a: '#4a2a2a', b: '#1a0c0c', c: '#c8503a', t: '#ff7a3a' }, shatterglass: { a: '#7fd0d8', b: '#2c6a78', c: '#f0ffff', t: '#c8f4ff' },
+    elven: { a: '#d4e0b8', b: '#7e9068', c: '#fbfff0', t: '#e8d28a' }, dwarven: { a: '#8a7458', b: '#463a2a', c: '#c0aa88', t: '#d0a84a' },
     crimsoncloth: { a: '#9c2f3a', b: '#52121b', c: '#d8707a', t: '#e0c060' }, greencloth: { a: '#2f6f55', b: '#133a2a', c: '#6fbf9a', t: '#e0c060' },
     bluecloth: { a: '#3a4f8a', b: '#172044', c: '#7f9ad8', t: '#e0c060' }, greycloth: { a: '#6a6a72', b: '#2f2f36', c: '#b0b0bb', t: '#e0c060' }, linen: { a: '#d8cdb0', b: '#928568', c: '#fffaf0', t: '#c9a84c' },
   };
   const CLOTHS = ['cloth', 'crimsoncloth', 'greencloth', 'bluecloth', 'greycloth', 'linen'];
   const MATERIAL_RULES = [
-    ['adamantine', /adamant/], ['mithral', /mithr|mithil/], ['orichalcum', /orichalc/], ['voidsteel', /voidsteel|void-?touched|void steel/], ['blacksteel', /blacksteel|black steel|nightsteel|gloomforged|umbral steel/],
-    ['obsidian', /obsidian/], ['starmetal', /starmetal|starforged|star-?iron|star steel/], ['sunsteel', /sunsteel|sun-?forged|sunforged/], ['celestine', /celestine|celestial steel/], ['coldforged', /cold-?forged|frost-?forged|icebound/],
+    ['adamantine', /adamant/], ['mithral', /mithr|mithil/], ['moonsilver', /moonsilver|moon-silver/], ['bloodsteel', /bloodsteel|blood steel/], ['wraithsteel', /wraithsteel|wraith steel/], ['hellforged', /hellforged|hell-forged|infernal steel/], ['shatterglass', /shatterglass|shatter-glass/], ['orichalcum', /orichalc/], ['voidsteel', /voidsteel|void-?touched|void steel/], ['blacksteel', /blacksteel|black steel|nightsteel|gloomforged|umbral steel/],
+    ['obsidian', /obsidian/], ['starmetal', /starmetal|starforged|star-?iron|star steel|meteoric/], ['sunsteel', /sunsteel|sun-?forged|sunforged/], ['celestine', /celestine|celestial steel/], ['coldforged', /cold-?forged|frost-?forged|icebound/], ['coldiron', /coldiron|cold iron/], ['heartwood', /heartwood/], ['ironwood', /ironwood/], ['elven', /\belven\b|elvish/], ['dwarven', /\bdwarven\b|dwarf-forged/],
     ['silver', /silver|silvered|silverwrought/], ['gold', /\bgold|golden|gilt|aurum/], ['bronze', /bronze/], ['copper', /copper/], ['brass', /brass/],
     ['dragonbone', /dragonbone|dragon bone/], ['bone', /\bbone|tusk|\bfang\b|antler|horn\b/], ['ivory', /ivory/], ['crystal', /crystal|diamond|quartz|glacial/], ['glass', /\bglass/], ['ruby', /ruby|garnet|infernal|crimson|sanguine/], ['jade', /jade|emerald|viridian/],
     ['scale', /dragon ?scale|dragonhide|scale mail|\bdrake\b/], ['rusty', /rusty|rusted|corroded|cracked|dented|cast-off/], ['iron', /\biron\b|dwarven|ferrous/], ['steel', /\bsteel\b|tempered/],
@@ -63,20 +68,25 @@
 
   // ---------- effects ----------
   const FX = {
-    fire: { color: '#ff8a2a', re: /flam|fire|ember|blaz|inferno|infern|burn|magma|molten|scorch|\bsun\b|phoenix|pyre|cinder|ignit|smolder|ashfall|brimstone|hellfire|pyrotech|torch|incendi|lava|volcan|furnace/ },
+    fire: { color: '#ff8a2a', re: /flam|fire|ember|blaz|inferno|infern|burn|magma|molten|scorch|\bsun\b|phoenix|pyre|cinder|ignit|smolder|ashfall|brimstone|hellfire|pyrotech|torch|incendi|lava|volcan|furnace|hellforged|searing/ },
     frost: { color: '#9fe8ff', re: /frost|\bice\b|icy|\bcold\b|winter|snow|glacier|freez|rime\b|rime-|chill|hoar|icebound|frozen|tundra|boreal|icicle|polar|blizzard/ },
     storm: { color: '#ffe45a', re: /lightning|thunder|storm|shock|spark|tempest|volt|electric|fulmin|galvan/ },
     poison: { color: '#9be25a', re: /poison|venom|toxic|viper|adder|serpent|plague|blight|spider|python|cobra|noxious/ },
     acid: { color: '#c8e84a', re: /\bacid|corros|caustic|dissolv/ },
     holy: { color: '#ffe9a0', re: /holy|radiant|divine|celestial|celestine|angel|sacred|bless|dawn|solar|sunbeam|paladin|righteous|justice|seraph|hallowed|sunblessed|sunward|sunlit|halo|saint|heaven|dawnbring/ },
     shadow: { color: '#8f5fd6', re: /shadow|\bdark|night|umbra|\bvoid|gloom|dusk|abyss|vampir|wraith|ghost|spectral|hollow|tomb|grave|deathly|death|curse|\bbane\b|shade|nether|eclipse|silent scream|deathless/ },
-    necrotic: { color: '#6fcf7a', re: /necro|decay|wither|undead|lich|soulreap|soul-?eat|\brot\b|grave-?touched|unburied|reaper/ },
+    necrotic: { color: '#6fcf7a', re: /necro|decay|wither|wasting|undead|lich|soulreap|soul-?eat|\brot\b|grave-?touched|unburied|reaper/ },
     blood: { color: '#d93a3a', re: /\bblood|vicious|gore|sanguine|bleed|carnage|savage|slaughter|bloodletting|crimson|wound|life stealing|\bvein/ },
-    arcane: { color: '#b98cff', re: /arcane|\brune|runic|runescribed|runeetched|glyph|mystic|astral|psychic|\bmage|archmage|wizard|enchant|sorcer|eldritch|\bspell|force|sigil|wyrdwoven|thoughtwoven|cognizant|oracle|gravitum|gravity|ethereal|resonant|fate/ },
+    arcane: { color: '#b98cff', re: /arcane|\brune|runic|runescribed|runeetched|glyph|mystic|astral|psychic|\bmage|archmage|wizard|enchant|sorcer|eldritch|\bspell|force|sigil|wyrdwoven|thoughtwoven|cognizant|oracle|gravitum|gravity|ethereal|resonant|fate|mindrend|\bimpact\b/ },
     nature: { color: '#6fd06f', re: /thorn|\bleaf|nature|verdant|druid|forest|\bwild\b|wildroot|\bvine|\bbark|\bmoss|grove|woodland|bramble|rotwood|petal|flower|primal|feral/ },
     wind: { color: '#cfeaff', re: /\bwind|gale\b|galebound|zephyr|swift|cloud|\bsky|\bair\b|breeze|gust|skyborn|racing|fleetfoot|featherfall|winged|windcaller|wind-runner/ },
-    water: { color: '#4aa8e8', re: /tide|brine|\bsea\b|ocean|deep-?sea|\bwater|\bwave|undertow|coral|aqua|anchor-?forged|kraken|drown/ },
+    water: { color: '#4aa8e8', re: /tide|tidal|brine|\bsea\b|ocean|deep-?sea|\bwater|\bwave|undertow|coral|aqua|anchor-?forged|kraken|drown/ },
     sonic: { color: '#bfe4ff', re: /echo|sound|bellow|\bsonic|soundbound|chime/ },
+    soul: { color: '#7fe8f0', re: /\bsoul(?!-?(?:eat|reap))|soulreaver|\bspirit|banshee|psychopomp/ },
+    prism: { color: '#ff9ad8', re: /prism|rainbow|iridescen|chromatic|opalescen/ },
+    gravity: { color: '#8f80ff', re: /gravit(?!um)|singularity|event horizon|collapsar/ },
+    spore: { color: '#b8c860', re: /spore|sporing|fungal|fungus|mycel|mildew|puffball/ },
+    time: { color: '#e8d890', re: /temporal|chrono|\btime\b|hourglass|timeless|aeon|epoch|stasis/ },
     luck: { color: '#ffd75e', re: /\blucky|fortune|\bluck\b|gilt-edged|gambler/ },
   };
   const FX_ORDER = Object.keys(FX);
@@ -87,7 +97,7 @@
     const modText = mods.map(m => strip(m.text)).join(' '), effText = strip(item.effect).slice(0, 260), descT = strip(item.desc).slice(0, 140);
     const sc = {};
     FX_ORDER.forEach(id => { const re = FX[id].re; let s = 0; if (re.test(nameT)) s += 4; if (re.test(modNames)) s += 4; if (re.test(modText)) s += 2; if (re.test(effText)) s += 1.5; if (re.test(descT)) s += 0.5; if (s) sc[id] = s; });
-    const dmg = { fire: /fire damage/, frost: /cold damage/, storm: /lightning damage|thunder damage/, poison: /poison damage/, acid: /acid damage/, holy: /radiant damage/, necrotic: /necrotic damage/, arcane: /force damage|psychic damage/ };
+    const dmg = { sonic: /thunder damage/, fire: /fire damage/, frost: /cold damage/, storm: /lightning damage|thunder damage/, poison: /poison damage/, acid: /acid damage/, holy: /radiant damage/, necrotic: /necrotic damage/, arcane: /force damage|psychic damage/ };
     Object.keys(dmg).forEach(id => { if (dmg[id].test(modText)) sc[id] = (sc[id] || 0) + 3; });
     const tier = RAR[rarity || item.rarity] ?? 0;
     const need = (mods.length || tier >= 2) ? 2 : 3.5;
@@ -131,7 +141,7 @@
   const NOSHADE = new Set(['k', 'g', 'f', 'x']);
   const seeded = s => { let h = hashOf(s) || 1; return () => { h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return (h % 10000) / 10000; }; };
 
-  const TINT = { fire: 0.22, frost: 0.38, storm: 0.18, poison: 0.34, acid: 0.34, holy: 0.2, shadow: 0.42, necrotic: 0.4, blood: 0.3, arcane: 0.26, nature: 0.32 };
+  const TINT = { soul: 0.3, spore: 0.28, fire: 0.22, frost: 0.38, storm: 0.18, poison: 0.34, acid: 0.34, holy: 0.2, shadow: 0.42, necrotic: 0.4, blood: 0.3, arcane: 0.26, nature: 0.32 };
   function render(spec, rarity, seedKey) {
     const C = Canvas(); (SPR[spec.base])(C);
     const g = C.g;
@@ -139,7 +149,7 @@
     const mat = matColors(spec.material), tier = RAR[rarity] ?? 0;
     const fxIds = (spec.effects || []).filter(id => FX[id] || id === 'magic');
     const fxColor = fxIds.length ? (FX[fxIds[0]] ? FX[fxIds[0]].color : (GEM[rarity] || '#9fd0ff')) : null;
-    const tintable = fxIds.some(id => ['fire', 'frost', 'storm', 'poison', 'acid', 'holy', 'shadow', 'necrotic', 'blood', 'arcane', 'nature'].includes(id));
+    const tintable = fxIds.some(id => ['soul', 'spore', 'fire', 'frost', 'storm', 'poison', 'acid', 'holy', 'shadow', 'necrotic', 'blood', 'arcane', 'nature'].includes(id));
     const gemColor = spec.liquid || fxColor || GEM[rarity] || GEM.common;
     const baseColor = r => r === 'a' ? mat.a : r === 'b' ? mat.b : r === 'c' ? mat.c : r === 't' ? mat.t : r === 'g' ? gemColor : r === 'f' ? (fxColor || mix(mat.b, mat.a, 0.3)) : FIXED[r] || mat.a;
     const comp = (x0, y0, test, seen) => { const st = [[x0, y0]], out = []; seen[y0 * N + x0] = 1; while (st.length) { const [x, y] = st.pop(); out.push([x, y]); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = x + dx, ny = y + dy; if ((dx || dy) && nx >= 0 && ny >= 0 && nx < N && ny < N && !seen[ny * N + nx] && test(nx, ny)) { seen[ny * N + nx] = 1; st.push([nx, ny]); } } } return out; };
@@ -207,6 +217,11 @@
       wind(col) { spread(fit(outward, 4), count(1.6), 6).forEach(e => { const L = 10 + Math.floor(rnd() * 4), sg = rnd() > 0.5 ? 1 : -1; for (let i = 0; i < L; i++) { const t = i / L, x = Math.round(e.x + e.nx * i * 0.8 + e.ny * Math.sin(t * 4) * 2.2 * sg), y = Math.round(e.y + e.ny * i * 0.8 + e.nx * Math.sin(t * 4) * 2.2 * sg); putFx(x, y, i < 3 ? '#ffffff' : col, 1 - t * 0.5); { const sd = e.nx && e.ny ? [e.nx, 0] : [e.ny ? 1 : 0, e.nx ? 1 : 0]; if (i < L * 0.6) putFx(x + sd[0], y + sd[1], col, 0.85); if (i < L * 0.3) putFx(x - sd[0], y - sd[1], col, 0.85); } } }); },
       magic() { if (tier < 3) return; const n = tier >= 5 ? 4 : tier >= 4 ? 3 : 2; spread(fit(outward, 4), n, 6).forEach((e, i) => { const len = 2 + (i % 2); for (let j = 0; j < len; j++) putFx(e.x + e.nx * j, e.y + e.ny * j, j ? '#ffffff' : spark); plus(e.x + e.nx * (len + 1), e.y + e.ny * (len + 1), spark, '#ffffff'); }); },
       sonic() { [[12, '#d4f0ff'], [14.6, '#9fd0f0'], [17.2, '#6fa8d8']].forEach(([r, c], ri) => { if (ri > 1 + Math.floor(tier / 2)) return; [0, Math.PI].forEach(base => { for (let a = -0.75; a <= 0.75; a += 0.4 / r * 2) putFx(Math.round(16 + Math.cos(base + a) * r), Math.round(16 + Math.sin(base + a) * r), c); }); }); },
+      soul() { spread(fit(edges.filter(e => e.ny <= 0 || e.nx), 6, true), count(1.6), 4).forEach(e => wisp(e, 9 + Math.floor(rnd() * 5) + tier, 1, ['#1a5a74', '#5fc8d8', '#d4faff'], true)); pickCells(3 + tier, () => true).forEach(([x, y]) => paint(x, y, '#2a8090')); },
+      prism() { const cols = ['#ff5a7a', '#ffb04a', '#fff06a', '#6ae08a', '#5ab8ff', '#b080ff']; spread(fit(outward, 4), Math.min(6, 3 + Math.floor(tier / 1.5)), 5).forEach((e, i) => { const c = cols[(i + Math.floor(rnd() * 6)) % 6]; plus(e.x + e.nx * 2, e.y + e.ny * 2, c, '#ffffff'); for (let k = 0; k < 2; k++) putFx(e.x + e.nx * (k === 0 ? 1 : 3), e.y + e.ny * (k === 0 ? 1 : 3), c); }); pickCells(4 + tier, () => true).forEach(([x, y], i) => paint(x, y, cols[i % 6])); },
+      gravity() { for (let a = 0; a < 360; a += 5) { if ((a % 60) > 38) continue; const r = a < 180 ? 13 : 14.6; const x = Math.round(16 + Math.cos(a * Math.PI / 180) * r), y = Math.round(16 + Math.sin(a * Math.PI / 180) * r); if (free(x, y)) under.push({ x, y, c: a % 120 < 60 ? '#6a58d8' : '#b9a8ff', o: 0.55 }); } spread(fit(outward, 4), 2 + Math.floor(tier / 2), 5).forEach(e => { for (let i = 1; i <= 5; i++) putFx(e.x + e.nx * i, e.y + e.ny * i, i % 2 ? '#b9a8ff' : '#6a58d8', 1 - i * 0.12); }); },
+      spore() { spread(fit(tops.concat(outward), 4), 2 + Math.floor(tier / 2), 5).forEach(e => { const c = ['#a8c060', '#e8f0b0']; plus(e.x + e.nx * 2, e.y + e.ny * 2 - 1, c[0], c[1]); putFx(e.x + e.nx * 4, e.y + e.ny * 4 - 2, c[0]); putFx(e.x + e.nx * 4 + 1, e.y + e.ny * 4 - 2, c[1]); putFx(e.x + e.nx * 4, e.y + e.ny * 4 - 3, c[0]); }); pickCells(4 + tier, () => true).forEach(([x, y]) => paint(x, y, '#6a7a2a')); },
+      time() { [[13.6, '#e8d890'], [15.2, '#a8903a']].forEach(([r, c], ri) => { if (ri && tier < 2) return; for (let a = 0; a < 360; a += 3) { if (ri === 0 && a % 30 < 4) continue; const x = Math.round(16 + Math.cos(a * Math.PI / 180) * r), y = Math.round(16 + Math.sin(a * Math.PI / 180) * r); if (free(x, y)) under.push({ x, y, c, o: ri ? 0.55 : 0.8 }); } }); [0, 90, 180, 270].forEach(a => { for (let k = 1; k <= 3; k++) { const x = Math.round(16 + Math.cos(a * Math.PI / 180) * (14.6 + k - 0.5)), y = Math.round(16 + Math.sin(a * Math.PI / 180) * (14.6 + k - 0.5)); if (free(x, y)) under.push({ x, y, c: '#e8d890', o: 0.9 }); } }); },
       circle(col, runes) { const r = 14.2; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = Math.hypot(x + 0.5 - 16, y + 0.5 - 16); if (Math.abs(d - r) < 0.55) under.push({ x, y, c: col, o: 0.6 }); else if (Math.abs(d - (r - 2.4)) < 0.4 && tier >= 3) under.push({ x, y, c: col, o: 0.35 }); }
         [[16, 1, 0, 1], [16, 30, 0, -1], [1, 16, 1, 0], [30, 16, -1, 0]].forEach(([x, y, dx, dy]) => { for (let k = 1; k <= 3; k++) under.push({ x: x + dx * k, y: y + dy * k, c: col, o: 0.6 }); });
         if (runes) [90, 210, 330].forEach(a => { const x = Math.round(16 + Math.cos(a * Math.PI / 180) * 14.2), y = Math.round(16 + Math.sin(a * Math.PI / 180) * 14.2); [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => under.push({ x: x + dx, y: y + dy, c: '#ffffff', o: 0.85 })); }); },
@@ -216,6 +231,7 @@
       else if (id === 'poison') FXF.poison(); else if (id === 'acid') FXF.acid(); else if (id === 'blood') FXF.blood(); else if (id === 'water') FXF.water();
       else if (id === 'holy') FXF.holy(); else if (id === 'luck') FXF.luck();
       else if (id === 'shadow') FXF.shadow(); else if (id === 'necrotic') FXF.necrotic();
+      else if (id === 'soul') FXF.soul(); else if (id === 'prism') FXF.prism(); else if (id === 'gravity') FXF.gravity(); else if (id === 'spore') FXF.spore(); else if (id === 'time') FXF.time();
       else if (id === 'nature') FXF.nature(); else if (id === 'wind') FXF.wind('#bfe4ff'); else if (id === 'sonic') FXF.sonic();
       else if (id === 'arcane') { if (!noCircle) FXF.circle('#b98cff', true); } else if (id === 'magic') FXF.magic();
     });

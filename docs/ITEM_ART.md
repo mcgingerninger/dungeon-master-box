@@ -100,3 +100,7 @@ Add `S.myThing = C => { ... }` in the matching `item-art-*.js`, then a rule in `
 `b` dark, `c` light, `t` trim, `h` wood/grip, `l` dark leather, `f` fuller/emissive channel, `g` gem/liquid/glow,
 `w` white/parchment, `k` black, `r` red, `y` gold, `p` skin, `x` erase. `item-art.test.js` checks that every
 rule resolves to a drawn sprite.
+
+## Affix materials and effects
+
+Weapon affixes (`item-affixes.js`, see `WEAPON_MODIFIERS.md`) have their own art. New materials (`MAT` / `MATERIAL_RULES`): moonsilver, bloodsteel, wraithsteel, hellforged, shatterglass, coldiron, heartwood, ironwood, elven, dwarven (and "Meteoric" maps to starmetal). New effects (`FX` / `FXF`): `soul` (pale cyan wisps), `prism` (rainbow glints and colour bands), `gravity` (dashed pull rings and streaks), `spore` (spore puffs, olive tint) and `time` (a ticking ring). Existing effect words also pick up the new names (Hellforged / Searing → fire, Wasting → necrotic, Tidal → water, Mindrending / Impact → arcane, Thundering → storm and sonic from its thunder damage text).

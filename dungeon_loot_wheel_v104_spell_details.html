@@ -4526,6 +4526,7 @@ const APP_VERSION = 'v104';
 <script src="journey-data.js"></script>
 <script src="mechanics/canonical/items.js"></script>
 <script src="monster-art.js"></script>
+<script src="item-affixes.js"></script>
 <script src="item-art-kit.js"></script>
 <script src="item-art-weapons.js"></script>
 <script src="item-art-armor.js"></script>
@@ -10066,6 +10067,14 @@ const ITEM_AFFIXES = [
   { name: 'Wise', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Wisdom.` },
   { name: 'Charismatic', appliesTo: ['weapon','armor'], minRarity: 'common', text: m => `+${m} Charisma.` },
 ];
+// More materials, enchantments, slayers and stat prefixes live in item-affixes.js (with the weapon classes
+// that decide which base weapons they fit, and a description line for every affix).
+if (window.ItemAffixData) ITEM_AFFIXES.push(...window.ItemAffixData.affixes);
+// Only one material and one slayer type per item (a Bronze Steel Longsword makes no sense).
+const AFFIX_EXCLUSIVE_GROUPS = [
+  new Set(['Rusty','Iron','Steel','Silvered','Mithral','Adamantine','Dragonbone','Voidsteel','Bronze','Bone','Obsidian','Ironwood','Heartwood','Dwarven','Elven','Coldiron','Meteoric','Moonsilver','Sunsteel','Bloodsteel','Blacksteel','Hellforged','Shatterglass','Orichalcum','Wraithsteel','Celestine']),
+  new Set(['Beastbane','Plantbane','Oozebane','Giantbane','Undeadbane','Constructbane','Aberrationbane','Elementalbane','Fiendbane','Dragonbane']),
+];
 // How many affixes a generated weapon/armor item rolls, by rarity -- deliberately modest (the
 // existing buff/debuff/power/trait system already adds its own modifiers on top of these; this
 // isn't meant to replace that, just give the base item's own name real mechanical teeth).
@@ -10114,12 +10123,13 @@ function rollPotionStatusEffect(rarity) {
   const magnitude = MANGLER_RARITY_MAGNITUDE[rarity] || 1;
   return { type: 'Potion Status', key: 'potionstatus:' + picked.name, name: picked.name, text: picked.text(magnitude) };
 }
-function rollItemAffixes(cat, rarity) {
+function rollItemAffixes(cat, rarity, baseName) {
   if (cat !== 'weapon' && cat !== 'armor') return [];
   const rarityIdx = BAL.rarityOrder.indexOf(rarity);
   const pool = ITEM_AFFIXES.filter(a => a.appliesTo.includes(cat)
     && BAL.rarityOrder.indexOf(a.minRarity) <= rarityIdx
-    && (!a.maxRarity || BAL.rarityOrder.indexOf(a.maxRarity) >= rarityIdx));
+    && (!a.maxRarity || BAL.rarityOrder.indexOf(a.maxRarity) >= rarityIdx)
+    && (!window.ItemAffixData || ItemAffixData.affixFits(a, baseName)));
   const [lo, hi] = AFFIX_COUNT_BY_RARITY[rarity] || [0,1];
   const count = rn(lo, hi);
   const magnitude = MANGLER_RARITY_MAGNITUDE[rarity] || 1;
@@ -10130,6 +10140,7 @@ function rollItemAffixes(cat, rarity) {
     attempts++;
     const affix = ri(pool);
     if (usedNames.has(affix.name)) continue;
+    if (AFFIX_EXCLUSIVE_GROUPS.some(g => g.has(affix.name) && picked.some(p => g.has(p.name)))) continue;
     usedNames.add(affix.name);
     picked.push({ type: 'Affix', key: 'affix:' + affix.name, name: affix.name, prefix: true, text: affix.text(magnitude) });
   }
@@ -10719,7 +10730,7 @@ function buildItemUnderRules({ cat, rarity, baseName, weightedPool, countFn, cou
   const capRule = cfg && (cfg.rules || []).find(r => r.id === 'max-modifiers-by-rarity' && r.enabled);
   const attempt = bump => {
     const stats = rollItemStats(cat, rarity, baseName);
-    const affixMods = rollItemAffixes(cat, rarity);
+    const affixMods = rollItemAffixes(cat, rarity, baseName);
     const potionStatus = stats.subcategory === 'potion' ? rollPotionStatusEffect(rarity) : null;
     const starting = potionStatus ? [...affixMods, potionStatus] : affixMods;
     let goal = countFn() + bump + (countIncludesStarting ? 0 : starting.length);
@@ -11011,6 +11022,15 @@ function buildDescParagraphs(baseName, cat, rarity, tags, mods, stats) {
   const tagLines = tags.flatMap(t => (DESC.tagPhysical || {})[t] || []);
   const physText = tagLines.length ? `${appearance} ${ri(tagLines)}` : appearance;
   paragraphs.push({ kind: 'appearance', label: 'Appearance', text: physText });
+
+  // ── P1b: what its material / enchantment prefixes look like (item-affixes.js) ──
+  if (window.ItemAffixData && (cat === 'weapon' || cat === 'armor')) {
+    const lines = mods.filter(m => m.prefix).slice(0, 3).map(m => {
+      const lk = ItemAffixData.looks[m.name]; const pool = lk && (cat === 'armor' ? lk.armor : lk.weapon);
+      return pool && pool.length ? ri(pool).replace(/\{w\}/g, lowerName) : null;
+    }).filter(Boolean);
+    if (lines.length) paragraphs.push({ kind: 'mod', label: '', text: lines.join(' ') });
+  }
 
   // ── P2: Mod-driven behavior paragraph ──
   // Pick based on the primary modifier type of the item

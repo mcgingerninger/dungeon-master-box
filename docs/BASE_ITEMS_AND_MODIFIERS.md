@@ -1,5 +1,7 @@
 # Base weapons, base armor and their modifiers — where we are
 
+> Update: the weapon affix pool grew from 27 to 101 (more materials, enchantments, slayers and stat prefixes, with weapon-class filters and descriptions). The tables below are the earlier snapshot; the current pool, counts and weights are in [WEAPON_MODIFIERS.md](WEAPON_MODIFIERS.md).
+
 A snapshot of everything a weapon or armor piece is built from and what can be applied on top of it, taken from the live data (`WEAPON_BASE_TYPES`, `ARMOR_BASE_TYPES`, `ITEM_AFFIXES`, `MATERIAL_MODIFIERS`, `MONSTER_PART_EFFECT_POOL`). **ATTACK** marks anything that changes an attack (to-hit) roll, since to-hit modifiers are the thing under review.
 
 - **31 base weapon types**, **26 base armor pieces**, **37 prefix affixes**, **4 materials**, **85 monster-part effects** that can land on a weapon or armor.

@@ -92,6 +92,20 @@ export const AFFIX_WEIGHTS = {
   Runic: 2, Ancient: 4, Sharp: 1, Heavy: 0.5, Balanced: 2, Flaming: 2, Frost: 2.5, Shocking: 2, Venomous: 2.5,
   Radiant: 3, Vicious: 2.5, Masterful: 5, Vampiric: 4, Sturdy: 1.5, Warded: 2, Padded: 1, Silent: 1,
   Reflective: 1.5, Grounded: 0.8, Mighty: 1, Nimble: 1, Hardy: 1, Brilliant: 1, Wise: 1, Charismatic: 1,
+  // item-affixes.js — materials
+  Bronze: 0.3, Bone: 0.5, Obsidian: 1, Ironwood: 1.2, Heartwood: 1.5, Dwarven: 1.2, Elven: 1.2, Coldiron: 1.2, Meteoric: 2.4,
+  Moonsilver: 2.4, Sunsteel: 2.4, Bloodsteel: 2.4, Blacksteel: 2, Hellforged: 2.4, Shatterglass: 2, Orichalcum: 3, Wraithsteel: 3.5, Celestine: 3,
+  // enchantments: damage types and combat tricks
+  Thundering: 2, Corrosive: 2, Impact: 2, Wasting: 3, Mindrending: 3, Searing: 2.5, Sporing: 2, Prismatic: 4.5,
+  Barbed: 1, Cleaving: 1.5, Brutal: 2, Crushing: 1.5, Dueling: 1.5, Tactical: 1.5, Tidal: 1.5, Gale: 2, Dazzling: 2, Rending: 2.5,
+  Seeking: 1.5, Returning: 1.5, Parrying: 1.5, Quickdraw: 0.8, Hushed: 1, Luminous: 0.5, Sundering: 2, Reaching: 2, Quaking: 2.5,
+  Berserking: 2.5, Hungering: 2, Lucky: 2, Executing: 3.5, Gravitic: 3, Soulreaver: 3.5, Temporal: 4,
+  // slayers
+  Beastbane: 1.2, Plantbane: 1.2, Oozebane: 1.2, Giantbane: 1.2, Undeadbane: 1.2, Constructbane: 1.2,
+  Aberrationbane: 2, Elementalbane: 2, Fiendbane: 2, Dragonbane: 2,
+  // stat prefixes
+  Swift: 0.4, Hale: 0.5, Vigilant: 0.4, Watchful: 0.4, Lurking: 0.4, Fearsome: 0.4, Persuasive: 0.4, Brawny: 0.4,
+  Agile: 0.4, Learned: 0.4, Wayfaring: 0.4, Restorative: 0.3,
 };
 
 // Weight a temporary (not permanent) effect keeps: base, +per extra daily use, +by duration.
