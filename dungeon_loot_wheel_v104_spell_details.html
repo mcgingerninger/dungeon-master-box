@@ -4504,6 +4504,9 @@
   // doubling that bulk work for a purely-browsable catalog wasn't worth the risk.
   import { buildMonsterPartMaterial, buildMonsterPartWondrous } from './mechanics/engine/items/monster-parts.js';
   Object.assign(window, GameEngine, { buildMonsterPartMaterial, buildMonsterPartWondrous });
+  // Attack margin system (docs/ATTACK_MARGIN.md): M = d20 + mods - AC picks a tier, damage percent and effects.
+  import * as AttackMarginEngine from './mechanics/engine/combat/attack-margin.js';
+  window.AttackMargin = AttackMarginEngine;
   // Item Rules (docs/ITEM_RULES.md): modifier weights decide rarity + gp, and a shared rule set
   // (no attack-roll modifiers, no only-bad items, modifier cap, ...) is enforced on every item
   // source. Classic code reaches the engine through window.ItemRules at generation time.
@@ -4541,6 +4544,7 @@ const APP_VERSION = 'v104';
 <script src="attack-narrator-lexicon.js"></script>
 <script src="attack-narrator-spells.js"></script>
 <script src="attack-narrator.js"></script>
+<script src="attack-margin-ui.js"></script>
 <script src="battlefield-tab.js"></script>
 <script>
 // mechanics/canonical/items.js (loaded just above) defines `canonicalItems` — the one-time
@@ -17195,7 +17199,47 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   const bonusDiceTotal = bonusRolls.reduce((sum, c) => sum + c.roll.total, 0);
   const dmgTotal = dmgResult ? dmgResult.total + scaled.total + dmgBonus + bonusDiceTotal : null;
   const sources = buildAttackSources(item, rarity, sheet, { prof, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
-  return { dmgRaw, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: profApplied, profProficient: prof.proficient, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
+  return { classes: (window.AttackMargin ? AttackMargin.attackClassesOf(item.name, { heavy: isTwoHandedWeapon(item) }) : []), toHitMod: profApplied + atkBonus, dmgRaw, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: profApplied, profProficient: prof.proficient, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
+}
+function isTwoHandedWeapon(item) { return !!(item && (item.subcategory === 'twohanded' || (Array.isArray(item.classification) && item.classification.includes('Two-Handed')))); }
+// ---- Attack margin (docs/ATTACK_MARGIN.md): M = d20 + attack mods - defender AC picks a tier -> damage % + effects ----
+let _activeAttackRoll = null;
+function lastTargetAc() { try { const v = parseInt(localStorage.getItem('dmLastTargetAc'), 10); return Number.isFinite(v) ? v : null; } catch (e) { return null; } }
+// Fills roll.margin / roll.effects / roll.finalDamage for a given target AC (null = unknown yet).
+function applyAttackMargin(roll, ac) {
+  roll.ac = ac;
+  if (!window.AttackMargin || ac == null || Number.isNaN(ac)) { roll.margin = null; roll.effects = []; roll.finalDamage = null; return roll; }
+  roll.margin = AttackMargin.resolveAttack({ d20: roll.d20, toHit: roll.toHitMod || 0, ac });
+  roll.effects = AttackMargin.suggestEffects(roll.margin, roll.classes || []);
+  roll.finalDamage = roll.dmgTotal != null ? AttackMargin.scaleDamage(roll.dmgTotal, roll.margin) : null;
+  return roll;
+}
+// Shows a roll in the weapon attack popup; `note` is extra HTML under it; `askAc` shows the target AC box.
+function showAttackRoll(roll, title, note, askAc) {
+  _activeAttackRoll = roll; roll._note = note || ''; roll._askAc = !!askAc;
+  if (askAc && roll.ac === undefined) applyAttackMargin(roll, lastTargetAc());
+  const titleEl = document.getElementById('weaponAttackTitle'); if (titleEl && title) titleEl.textContent = title;
+  renderActiveAttackRoll();
+  document.getElementById('weaponAttackModal')?.classList.add('open');
+}
+function renderActiveAttackRoll() {
+  const roll = _activeAttackRoll, bodyEl = document.getElementById('weaponAttackBody'); if (!roll || !bodyEl) return;
+  if (window.AttackMarginUI) AttackMarginUI.bind(roll, renderActiveAttackRoll);
+  bodyEl.innerHTML = weaponAttackRollHtml(roll) + (roll._note || '');
+}
+function setAttackTargetAc(v) {
+  const roll = _activeAttackRoll; if (!roll) return;
+  const ac = String(v).trim() === '' ? null : parseInt(v, 10);
+  try { if (ac != null && !Number.isNaN(ac)) localStorage.setItem('dmLastTargetAc', String(ac)); } catch (e) {}
+  applyAttackMargin(roll, ac); renderActiveAttackRoll();
+  const inp = document.getElementById('atkTargetAc'); if (inp) inp.focus();
+}
+function attackMarginSectionHtml(roll) {
+  if (!roll._askAc || !window.AttackMargin) return '';
+  const box = `<div class="am-ac"><label for="atkTargetAc">Target AC</label><input id="atkTargetAc" type="number" min="0" max="40" value="${roll.ac == null ? '' : roll.ac}" onchange="setAttackTargetAc(this.value)" onkeyup="if(event.key==='Enter')setAttackTargetAc(this.value)"></div>`;
+  if (!roll.margin) return box + '<p class="sheet-chip-empty">Enter the target’s AC to see the degree of hit (M = d20 + attack mods − AC), the damage and the effects it earns.</p>';
+  const dmg = roll.dmgTotal != null ? `<div class="am-calc">Damage ${roll.dmgTotal}${roll.margin.dmgPct !== 100 && roll.margin.hit ? ` × ${roll.margin.dmgPct}%` : ''} → <b>${roll.finalDamage}</b></div>` : '';
+  return box + AttackMarginUI.html(roll, dmg);
 }
 function weaponAttackRollHtml(roll) {
   _attackRollSources = roll.sources || {};
@@ -17205,6 +17249,7 @@ function weaponAttackRollHtml(roll) {
     <div class="weapon-attack-line"><span>${S('prof', roll.profProficient === false ? 'Proficiency bonus (not proficient)' : 'Proficiency bonus')}</span><span>${fmtMod(roll.profBonus)}</span></div>
     ${roll.atkBonus ? `<div class="weapon-attack-line"><span>${S('atk', 'Weapon attack bonus')}</span><span>${fmtMod(roll.atkBonus)}</span></div>` : ''}
     <div class="weapon-attack-total">To Hit: ${roll.toHitTotal}</div>
+    ${attackMarginSectionHtml(roll)}
     ${roll.dmgResult ? `
       <div class="weapon-attack-line"><span>${S('dmgDice', `Damage dice (${escapeHtml(roll.dmgRaw)}${roll.isCrit ? ', doubled' : ''})`)}</span><span>${roll.dmgResult.rolls.join(' + ')}${roll.dmgResult.mod ? ' ' + fmtMod(roll.dmgResult.mod) : ''}</span></div>
       ${roll.scalingParts
@@ -17212,7 +17257,7 @@ function weaponAttackRollHtml(roll) {
         : `<div class="weapon-attack-line"><span>${S('strmod', roll.abilityLabel + ' modifier')}</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
       ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>${S('dmg', 'Weapon damage bonus')}</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
       ${roll.bonusRolls.map((c, i) => `<div class="weapon-attack-line"><span>${S('bonus' + i, `Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})`)}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
-      <div class="weapon-attack-total">Damage: ${roll.dmgTotal}</div>
+      <div class="weapon-attack-total">Damage: ${roll.margin && roll.finalDamage != null ? `${roll.finalDamage} <span class="sheet-chip-empty">(${roll.dmgTotal} × ${roll.margin.dmgPct}%)</span>` : roll.dmgTotal}</div>
     ` : `<p class="sheet-chip-empty">This weapon's damage dice aren't set on the item (edit it to add one, e.g. "1d8") — showing the attack roll only.</p>`}
   `;
 }
@@ -17226,12 +17271,7 @@ function rollEquippedWeaponAttack(slotId) {
   if (!entry) { flashInvMessage('No weapon equipped there.', true); return; }
   const sheet = computeCharacterSheet();
   const roll = computeWeaponAttackRoll(entry.item, sheet, entry.rarity);
-  const titleEl = document.getElementById('weaponAttackTitle');
-  if (titleEl) titleEl.textContent = `⚔ Attack with ${entry.item.name}`;
-  const bodyEl = document.getElementById('weaponAttackBody');
-  if (bodyEl) bodyEl.innerHTML = weaponAttackRollHtml(roll);
-  const modal = document.getElementById('weaponAttackModal');
-  if (modal) modal.classList.add('open');
+  showAttackRoll(roll, `⚔ Attack with ${entry.item.name}`, '', true);
 }
 function closeWeaponAttackPopup() {
   const modal = document.getElementById('weaponAttackModal');
@@ -17272,19 +17312,14 @@ function computeUnarmedAttackRoll(sheet) {
   const toHitTotal = d20 + sheet.profBonus + atkBonus;
   const dmgResult = battleRollDamage(dice, isCrit);
   const dmgTotal = dmgResult ? dmgResult.total + strMod + dmgBonus : null;
-  return { dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { strmod: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (damage only)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet, null)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
+  return { classes: (window.AttackMargin ? AttackMargin.attackClassesOf('Unarmed Strike', { unarmed: true }) : []), toHitMod: sheet.profBonus + atkBonus, dmgRaw: dice, abilityMod: strMod, abilityLabel: 'STR', profBonus: sheet.profBonus, atkBonus, dmgBonus, bonusRolls: [], sources: { strmod: attackTipBlock('STR modifier ' + fmtMod(strMod) + ' (damage only)', abilitySourceLines('str', sheet)), prof: attackTipBlock('Proficiency bonus ' + fmtMod(sheet.profBonus), proficiencySourceLines(sheet, null)), atk: attackTipBlock('Unarmed attack bonus ' + fmtMod(atkBonus), ['From equipped gear whose text boosts unarmed strikes.']), dmg: attackTipBlock('Unarmed damage bonus ' + fmtMod(dmgBonus), ['From equipped gear whose text boosts unarmed strikes (a grafted limb, for example).']), dmgDice: attackTipBlock('Damage dice ' + dice, ['Unarmed strikes deal 1d6 unless equipped gear changes the die.']) }, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal };
 }
 // The ability bar's always-present "Unarmed" icon — unlike rollEquippedWeaponAttack this never
 // needs an equipped weapon (that's the whole point), so it has no "nothing equipped there" guard.
 function rollUnarmedAttack() {
   const sheet = computeCharacterSheet();
   const roll = computeUnarmedAttackRoll(sheet);
-  const titleEl = document.getElementById('weaponAttackTitle');
-  if (titleEl) titleEl.textContent = `👊 Unarmed Strike`;
-  const bodyEl = document.getElementById('weaponAttackBody');
-  if (bodyEl) bodyEl.innerHTML = weaponAttackRollHtml(roll);
-  const modal = document.getElementById('weaponAttackModal');
-  if (modal) modal.classList.add('open');
+  showAttackRoll(roll, `👊 Unarmed Strike`, '', true);
 }
 
 // ===================== DICE ROLLER =====================
@@ -20701,10 +20736,14 @@ function resolveBattleAttack(entry) {
 
   if (toHit !== null) {
     const effToHit = toHit + atkMod;
-    const isCrit = d20 === 20;
-    const isFumble = d20 === 1;
     const total = d20 + effToHit;
-    const hit = !isFumble && (isCrit || total >= targetAC);
+    // Degree of hit (docs/ATTACK_MARGIN.md): M = d20 + attack mods - AC picks the tier; falls back to the flat rule without the engine.
+    const margin = window.AttackMargin ? AttackMargin.resolveAttack({ d20, toHit: effToHit, ac: targetAC }) : null;
+    const isCrit = margin ? margin.crit : d20 === 20;
+    const isFumble = margin ? margin.fumble : d20 === 1;
+    const hit = margin ? margin.hit : (!isFumble && (isCrit || total >= targetAC));
+    const classes = window.AttackMargin ? AttackMargin.attackClassesOf(action.name || '') : [];
+    const effects = margin ? AttackMargin.suggestEffects(margin, classes) : [];
     let dmgText = '';
     if (hit && damageClauses.length) {
       // Roll EVERY damage clause the action's text carries (a multi-damage-type attack like
@@ -20729,7 +20768,10 @@ function resolveBattleAttack(entry) {
           const rollsText = `${c.roll.rolls.join('+')}${c.roll.mod ? (c.roll.mod > 0 ? '+' + c.roll.mod : c.roll.mod) : ''}`;
           return c.type ? `${rollsText} ${escapeHtml(c.type)}` : rollsText;
         }).join(' + ');
-        dmgText = ` for <strong>${scaledTotal}</strong> damage (${clauseBreakdown}${scaleNote}${weaponNote})`;
+        const preMargin = scaledTotal;
+        if (margin) scaledTotal = AttackMargin.scaleDamage(scaledTotal, margin);
+        const marginNote = margin && margin.dmgPct !== 100 ? `, ${preMargin} × ${margin.dmgPct}% ${margin.label.toLowerCase()}` : '';
+        dmgText = ` for <strong>${scaledTotal}</strong> damage (${clauseBreakdown}${scaleNote}${weaponNote}${marginNote})`;
         // Fire-and-forget: rollAllBattleAttacks() resolves a whole roster in one tight loop
         // before a single render, so awaiting this per-creature would serialize N network
         // round-trips. The exact resulting HP isn't authoritative until the live roster
@@ -20740,10 +20782,12 @@ function resolveBattleAttack(entry) {
       }
     }
     const cls = isFumble ? 'miss' : isCrit ? 'crit' : hit ? 'hit' : 'miss';
-    const title = (isFumble ? 'Critical Miss' : isCrit ? 'Critical Hit!' : hit ? 'Hit' : 'Miss');
+    const label = margin ? margin.label : (hit ? 'Hit' : 'Miss');
+    const title = isFumble ? 'Critical Miss' : isCrit ? `Critical Hit! (${label})` : label;
+    const effText = effects.length ? ` ${isFumble ? 'Mishap' : 'Effects'}: ${effects.map(e => `<strong>${escapeHtml(e.name)}</strong> (${escapeHtml(e.text)})`).join('; ')}` : '';
     result = {
       cls, title, isLegendary: !!action.isLegendaryAction,
-      detail: `<strong>${escapeHtml(name)}</strong> uses ${battleActionNameHtml(action.name, action.text, action.recharge)} — rolled <strong>${d20}</strong> + ${effToHit} = <strong>${total}</strong> vs ${targetDesc}. ${hit ? ('Hit' + dmgText + '.') : 'Missed.'}`,
+      detail: `<strong>${escapeHtml(name)}</strong> uses ${battleActionNameHtml(action.name, action.text, action.recharge)} — rolled <strong>${d20}</strong> + ${effToHit} = <strong>${total}</strong> vs ${targetDesc}${margin ? ` (M ${margin.margin >= 0 ? '+' : ''}${margin.margin})` : ''}. ${hit ? (label + dmgText + '.') : (isFumble ? 'Fumble.' : 'Missed.')}${effText}`,
     };
   } else {
     const eff = battleEffectivenessLabel(d20);
@@ -21193,6 +21237,22 @@ window.applyIncomingAttackRequests = function (list) {
 // — whose lookups used strict === against the numeric r.id, so neither button could ever find its
 // own request either, even once bug (1) was fixed. Together these meant a player's submitted
 // attack was completely inert from the DM's side no matter what they clicked.
+function pendingMargin(req) {
+  // Resolved once per request against the monster's CURRENT AC, so the DM's effect picks survive re-renders.
+  const a = req.attackData || {};
+  const entry = battleRoster.find(e => e.uid === a.monsterUid);
+  const targetAc = entry ? (entry.ac !== null && entry.ac !== undefined ? entry.ac : entry.monster.ac) : null;
+  if (targetAc == null || !window.AttackMargin) return { targetAc, entry, m: null };
+  if (!req._m || req._m.ac !== targetAc) {
+    const d20 = a.d20 != null ? a.d20 : (a.isCrit ? 20 : a.isFumble ? 1 : 10);
+    const toHit = (a.toHitTotal || 0) - d20;
+    const classes = AttackMargin.attackClassesOf(a.weaponName || '');
+    const margin = AttackMargin.resolveAttack({ d20, toHit, ac: targetAc });
+    req._m = { ac: targetAc, d20, toHit, classes, margin, effects: AttackMargin.suggestEffects(margin, classes), finalDamage: a.dmgTotal != null ? AttackMargin.scaleDamage(a.dmgTotal, margin) : null };
+  }
+  if (window.AttackMarginUI) AttackMarginUI.bind(req._m, renderPendingAttacksPanel);
+  return { targetAc, entry, m: req._m };
+}
 function renderPendingAttacksPanel() {
   const wrap = document.getElementById('pendingAttacksPanel');
   if (!wrap) return;
@@ -21201,16 +21261,15 @@ function renderPendingAttacksPanel() {
     <div class="players-section-title">⚔ Pending Player Attacks</div>
     ${pendingAttackRequests.map(req => {
       const a = req.attackData || {};
-      const entry = battleRoster.find(e => e.uid === a.monsterUid);
-      const targetAc = entry ? (entry.ac !== null && entry.ac !== undefined ? entry.ac : entry.monster.ac) : null;
-      // A natural 1 always misses and a natural 20 always hits, same 5e rule
-      // resolveBattleAttack already applies to a monster's own attacks — this preview used to
-      // ignore isFumble/isCrit entirely and judge purely off the total vs AC.
-      const wouldHit = targetAc != null && !a.isFumble && (a.isCrit || a.toHitTotal >= targetAc);
+      const { targetAc, m } = pendingMargin(req);
+      const detail = targetAc == null
+        ? `To Hit: ${a.toHitTotal} — that monster is no longer in your roster${a.dmgTotal != null ? ` · Damage: ${a.dmgTotal}` : ''}`
+        : `To Hit: ${a.toHitTotal} vs AC ${targetAc}${a.dmgTotal != null ? ` · Damage: ${a.dmgTotal}${m && m.margin.hit && m.margin.dmgPct !== 100 ? ` × ${m.margin.dmgPct}% → <b>${m.finalDamage}</b>` : m && !m.margin.hit ? ' → 0' : ''}` : ' · no damage dice recorded'}`;
       return `<div class="pending-attack-row">
         <div class="pending-attack-info">
           <strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)}${a.isCrit ? ' <span class="weapon-attack-crit">(CRIT)</span>' : a.isFumble ? ' <span class="weapon-attack-fumble">(FUMBLE)</span>' : ''}
-          <div class="pending-attack-detail">To Hit: ${a.toHitTotal}${targetAc != null ? ` vs AC ${targetAc} — ${wouldHit ? '✓ hits' : '✗ misses'}` : ' — that monster is no longer in your roster'}${a.dmgTotal != null ? ` · Damage: ${a.dmgTotal}` : ' · no damage dice recorded'}</div>
+          <div class="pending-attack-detail">${detail}</div>
+          ${m ? AttackMarginUI.html({ ...m, ac: m.ac, _amId: m._amId }) : ''}
         </div>
         <div class="pending-attack-actions">
           <button class="loot-save-btn" onclick="applyPendingAttackRequest(${req.id})">✓ Apply</button>
@@ -21223,28 +21282,28 @@ function renderPendingAttacksPanel() {
 // Only place battleRoster HP/defeated ever changes from a player-submitted attack — resolves
 // hit/miss against the monster's OWN current AC at the moment the DM clicks Apply (not whatever
 // it was when the player rolled, in case something changed it in between) before touching HP.
+// The degree of hit (margin, docs/ATTACK_MARGIN.md) scales the damage; the effects the DM picked go in the log.
 function applyPendingAttackRequest(reqId) {
   const req = pendingAttackRequests.find(r => r.id === reqId);
   if (!req) return;
   const a = req.attackData || {};
-  const entry = battleRoster.find(e => e.uid === a.monsterUid);
+  const { targetAc, entry, m } = pendingMargin(req);
   if (entry) {
-    const targetAc = entry.ac !== null && entry.ac !== undefined ? entry.ac : entry.monster.ac;
-    // Was purely `a.toHitTotal >= targetAc`, ignoring isFumble/isCrit — meaning a real natural
-    // 1 could still land as a "hit" (docking HP) whenever the flat total happened to clear AC
-    // anyway, while the log simultaneously labeled it "Player Fumble", and a real natural 20
-    // against a high-AC target could show "Player Critical Hit!" while dealing zero damage.
-    // Mirrors resolveBattleAttack's own monster-attack rule exactly.
-    const hit = !a.isFumble && (a.isCrit || a.toHitTotal >= targetAc);
-    if (hit && a.dmgTotal != null && !entry.defeated) {
-      entry.hp = Math.max(0, entry.hp - a.dmgTotal);
+    const margin = m && m.margin;
+    // fallback (no margin engine): the old flat rule — a natural 1 misses, a natural 20 hits, otherwise total vs AC
+    const hit = margin ? margin.hit : (!a.isFumble && (a.isCrit || a.toHitTotal >= targetAc));
+    const dmg = hit && a.dmgTotal != null ? (m ? m.finalDamage : a.dmgTotal) : null;
+    if (hit && dmg != null && !entry.defeated) {
+      entry.hp = Math.max(0, entry.hp - dmg);
       if (entry.hp <= 0) entry.defeated = true;
     }
-    const cls = a.isFumble ? 'miss' : a.isCrit ? 'crit' : hit ? 'hit' : 'miss';
-    const title = a.isFumble ? 'Player Fumble' : a.isCrit ? 'Player Critical Hit!' : hit ? 'Player Hit' : 'Player Miss';
+    const cls = a.isFumble || (margin && margin.fumble) ? 'miss' : a.isCrit ? 'crit' : hit ? 'hit' : 'miss';
+    const label = margin ? margin.label : (hit ? 'Hit' : 'Miss');
+    const title = margin && margin.fumble ? 'Player Fumble' : a.isCrit && hit ? `Player Critical Hit! (${label})` : hit ? `Player ${label}` : `Player ${label}`;
+    const effects = m && m.effects.length ? ` Effects: ${m.effects.map(e => `<strong>${escapeHtml(e.name)}</strong> (${escapeHtml(e.text)})`).join('; ')}` : '';
     battleLog.push({
       cls, title,
-      detail: `<strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)} — rolled <strong>${a.toHitTotal}</strong> vs AC ${targetAc}. ${hit ? `Hit${a.dmgTotal != null ? ` for <strong>${a.dmgTotal}</strong> damage` : ''}.` : 'Missed.'}`,
+      detail: `<strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)} — rolled <strong>${a.toHitTotal}</strong> vs AC ${targetAc}${margin ? ` (M ${margin.margin >= 0 ? '+' : ''}${margin.margin})` : ''}. ${hit ? `${label}${dmg != null ? ` for <strong>${dmg}</strong> damage` : ''}.` : (margin && margin.fumble ? 'Fumble.' : 'Missed.')}${effects}`,
     });
     if (battleLog.length > 50) battleLog = battleLog.slice(-50);
     renderCombatRoster();
@@ -21349,11 +21408,7 @@ function openBattlefieldAttackPicker(monsterUid) {
   const sheet = computeCharacterSheet();
   const roll = computeWeaponAttackRoll(entry.item, sheet, entry.rarity);
   const monsterName = monster.displayName || monster.monster.name;
-  const titleEl = document.getElementById('weaponAttackTitle');
-  if (titleEl) titleEl.textContent = `⚔ Attack ${monsterName} with ${entry.item.name}`;
-  const bodyEl = document.getElementById('weaponAttackBody');
-  if (bodyEl) bodyEl.innerHTML = weaponAttackRollHtml(roll) + '<p class="sheet-chip-empty">Sent to your DM to apply.</p>';
-  document.getElementById('weaponAttackModal')?.classList.add('open');
+  showAttackRoll(roll, `⚔ Attack ${monsterName} with ${entry.item.name}`, '<p class="sheet-chip-empty">Sent to your DM, who knows the target’s AC and applies the degree of hit.</p>', false);
   if (typeof window.submitBattlefieldAttack !== 'function') return;
   window.submitBattlefieldAttack({
     monsterUid, monsterName, weaponName: entry.item.name,

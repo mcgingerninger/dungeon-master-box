@@ -214,17 +214,28 @@
     const atkMod = entry.atkMod || 0, mult = entry.dmgMult || 1;
     const r = { name: action.name, text: action.text, source: action.source, useNote: action.useNote, utility: !!action.utility, saveDC, toHit: null, d20: null, total: null, ac: target.ac, outcome: 'info', clauses: [], damage: 0, needsSave: false };
     let crit = false, hit = true;
+    const AM = window.AttackMargin;
     if (toHit !== null) {
       r.d20 = rn(1, 20); crit = r.d20 === 20;
       r.toHit = toHit + atkMod; r.total = r.d20 + r.toHit;
-      hit = r.d20 !== 1 && (crit || r.total >= target.ac);
-      r.outcome = r.d20 === 1 ? 'fumble' : crit ? 'crit' : hit ? 'hit' : 'miss';
+      if (AM) {
+        // Degree of hit (docs/ATTACK_MARGIN.md): M = d20 + attack mods - AC -> tier -> damage % and effects.
+        r.margin = AM.resolveAttack({ d20: r.d20, toHit: r.toHit, ac: target.ac });
+        r.classes = AM.attackClassesOf(action.name || '');
+        r.effects = AM.suggestEffects(r.margin, r.classes);
+        hit = r.margin.hit; crit = r.margin.crit;
+        r.outcome = r.margin.fumble ? 'fumble' : crit ? 'crit' : hit ? 'hit' : 'miss';
+      } else {
+        hit = r.d20 !== 1 && (crit || r.total >= target.ac);
+        r.outcome = r.d20 === 1 ? 'fumble' : crit ? 'crit' : hit ? 'hit' : 'miss';
+      }
     } else if (saveDC !== null) { r.needsSave = true; r.outcome = 'save'; }
     if (hit && damageClauses.length) {
       r.clauses = damageClauses.map(c => ({ type: c.type, dice: c.dice, roll: battleRollDamage(c.dice, crit) })).filter(c => c.roll);
       const base = r.clauses.reduce((n, c) => n + c.roll.total, 0);
       r.damage = r.clauses.length ? Math.max(1, Math.round(base * mult)) : 0;
       r.mult = mult;
+      if (r.margin && r.clauses.length) { r.preMargin = r.damage; r.damage = AM.scaleDamage(r.damage, r.margin); }
     }
     return r;
   }
@@ -284,7 +295,10 @@
   }
   function attackHtml(a, idx, gi) {
     const head = a.toHit !== null
-      ? `d20 <b>${a.d20}</b> ${fmt(a.toHit)} = <b>${a.total}</b> vs AC ${a.ac} → <span class="bt-${a.outcome === 'fumble' ? 'miss' : a.outcome}">${{ crit: 'Critical hit!', hit: 'Hit', miss: 'Miss', fumble: 'Critical miss' }[a.outcome]}</span>`
+      ? (a.margin && window.AttackMarginUI
+          ? (AttackMarginUI.bind(a, () => { document.getElementById('btAttackBody').innerHTML = popupHtml(bt.last.groups); recalc(); }),
+             `d20 <b>${a.d20}</b> ${fmt(a.toHit)} = <b>${a.total}</b> vs AC ${a.ac}` + AttackMarginUI.html(a, a.preMargin != null && a.margin.dmgPct !== 100 ? `<div class="am-calc">Damage ${a.preMargin} × ${a.margin.dmgPct}% → <b>${a.damage}</b></div>` : ''))
+          : `d20 <b>${a.d20}</b> ${fmt(a.toHit)} = <b>${a.total}</b> vs AC ${a.ac} → <span class="bt-${a.outcome === 'fumble' ? 'miss' : a.outcome}">${{ crit: 'Critical hit!', hit: 'Hit', miss: 'Miss', fumble: 'Critical miss' }[a.outcome]}</span>`)
       : a.saveDC !== null ? `Target makes a <b>DC ${a.saveDC}</b> save <label class="bt-note"><input type="checkbox" checked onchange="btToggleSave(${gi},${idx},this.checked)"> failed</label>` : `<span class="bt-note">${a.utility ? esc(a.text) : 'No attack roll — read the effect.'}</span>`;
     const dmg = a.clauses.length
       ? a.clauses.map(c => `<div class="weapon-attack-line"><span>${esc(c.dice)}${c.type ? ' ' + esc(c.type) : ''}${a.outcome === 'crit' ? ' (doubled)' : ''}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? (c.roll.mod > 0 ? ' + ' : ' − ') + Math.abs(c.roll.mod) : ''} = <b>${c.roll.total}</b></span></div>`).join('')
