@@ -2249,6 +2249,8 @@
   .item-tooltip.tt-sheet { position:fixed; left:0 !important; right:0; bottom:0; top:auto !important; max-width:none; max-height:68vh; overflow-y:auto; -webkit-overflow-scrolling:touch; pointer-events:auto; z-index:9000; border-width:2px 0 0; border-radius:14px 14px 0 0; padding:1rem 1rem calc(.8rem + env(safe-area-inset-bottom)); font-size:.95rem; box-shadow:0 -8px 30px rgba(0,0,0,.7); overscroll-behavior:contain; }
   .tt-actions { position:sticky; bottom:-.8rem; display:flex; gap:.6rem; margin:.7rem -1rem -.8rem; padding:.6rem 1rem calc(.6rem + env(safe-area-inset-bottom)); background:var(--surface2); border-top:1px solid var(--border); }
   .tt-actions button { flex:1; min-height:44px; font-size:1rem; background:var(--surface); color:var(--gold); border:1px solid var(--gold); border-radius:6px; }
+  .inv-item { position:relative; }
+  .inv-qty { position:absolute; right:2px; bottom:1px; font:700 .62rem/1 'Share Tech Mono',monospace; color:#fff; background:rgba(0,0,0,.75); padding:1px 3px; border-radius:3px; pointer-events:none; }
   .tt-hint { margin-top:.4rem; padding-top:.3rem; border-top:1px dashed var(--border); font-size:.68rem; color:var(--text-dim); text-align:center; }
   /* Wild Magic table */
   @media (max-width:700px) {
@@ -4586,6 +4588,7 @@ const APP_VERSION = 'v104';
 <script src="monster-art.js"></script>
 <script src="item-affixes.js"></script>
 <script src="wild-magic-data.js"></script>
+<script src="ammo-data.js"></script>
 <script src="item-examine.js"></script>
 <script src="player-status.js"></script>
 <script src="item-art-kit.js"></script>
@@ -4653,7 +4656,7 @@ const ITEM_SUBCATEGORIES = {
   armor: ['head','facewear','chest','cloak','belt','boots','leggings','handwear','offhand'],
   weapon: ['onehanded','twohanded'],
   consumable: ['potion','scroll','food','throwable'],
-  misc: ['ring','amulet','charm','commonMisc','rareMisc','wondrousMisc'],
+  misc: ['ring','amulet','charm','commonMisc','rareMisc','wondrousMisc','ammo'],
   // Fleshmancer-grafted body parts get their own top-level type instead of living under misc.
   limb: ['arm','hand','leg','foot','eye','ear','finger','heart','tongue'],
   // Mounts and pets both equip to the single Mount/Pet slot — see SUBCATEGORY_TO_SLOT_CATEGORY.
@@ -4665,7 +4668,7 @@ const SUBCATEGORY_LABELS = {
   boots:'Boots', leggings:'Leggings', handwear:'Hand Wear', offhand:'Off-Hand',
   onehanded:'One-Handed', twohanded:'Two-Handed',
   potion:'Potion', scroll:'Scroll', food:'Food', throwable:'Throwable',
-  ring:'Ring', amulet:'Amulet', charm:'Charm / Misc',
+  ring:'Ring', amulet:'Amulet', charm:'Charm / Misc', ammo:'Ammunition',
   commonMisc:'Common Misc', rareMisc:'Rare Misc', wondrousMisc:'Wondrous Misc',
   arm:'Arm', hand:'Hand', leg:'Leg', foot:'Foot', eye:'Eye', ear:'Ear',
   finger:'Finger', heart:'Heart', tongue:'Tongue',
@@ -4681,7 +4684,7 @@ const SUBCATEGORY_SLOT_SIZE = {
   head:1, facewear:1, chest:2, cloak:1, belt:1, boots:1, leggings:1, handwear:1, offhand:2,
   onehanded:1, twohanded:2,
   potion:1, scroll:1, food:1, throwable:1,
-  ring:1, amulet:1, charm:1, commonMisc:1, rareMisc:1, wondrousMisc:1,
+  ring:1, amulet:1, charm:1, commonMisc:1, rareMisc:1, wondrousMisc:1, ammo:1,
   pet:1, mount:1,
   arm:2, hand:1, leg:2, foot:1, eye:1, ear:1, finger:1, heart:1, tongue:1,
   // Raw crafting materials (see MONSTER_PARTS) — small enough to always be 1 slot.
@@ -4698,7 +4701,7 @@ const SUBCATEGORY_TO_SLOT_CATEGORY = {
   boots:'boots', leggings:'leggings', handwear:'handwear', offhand:'offhand',
   onehanded:'weapon', twohanded:'weapon',
   potion:'charm', scroll:'charm', food:'charm', throwable:'charm',
-  ring:'ring', amulet:'amulet', charm:'charm', commonMisc:'charm', rareMisc:'charm', wondrousMisc:'charm',
+  ring:'ring', amulet:'amulet', charm:'charm', commonMisc:'charm', rareMisc:'charm', wondrousMisc:'charm', ammo:'charm',
   // All grafted-limb subcategories share the single generic 'limb' slot category, so any
   // body part can go in any of the 5 limb slots — the slots don't care what kind of limb.
   arm:'limb', hand:'limb', leg:'limb', foot:'limb', eye:'limb',
@@ -4855,7 +4858,7 @@ const WEIGHT_RANGE_BY_SUBCATEGORY = {
   boots:[1,4], leggings:[2,8], handwear:[0.5,2], offhand:[4,12],
   onehanded:[1,8], twohanded:[6,20],
   potion:[0.5,1.5], scroll:[0.02,0.1], food:[0.3,3], throwable:[0.5,2],
-  ring:[0.05,0.3], amulet:[0.2,1], charm:[0.1,2], commonMisc:[0.1,2], rareMisc:[0.1,2.5], wondrousMisc:[0.1,3],
+  ring:[0.05,0.3], ammo:[0.05,0.08], amulet:[0.2,1], charm:[0.1,2], commonMisc:[0.1,2], rareMisc:[0.1,2.5], wondrousMisc:[0.1,3],
   pet:[0,0], mount:[0,0],
   arm:[4,15], hand:[1,4], leg:[5,18], foot:[1,4],
   eye:[0.1,1], ear:[0.1,1], finger:[0.1,0.5], heart:[0.3,1.5], tongue:[0.2,1],
@@ -7251,6 +7254,8 @@ function inferItemMetadata(item, rarity){
 // always ready by the time this runs. Nothing else in this file reads lootData at the top level
 // (verified before making this change), so this is the only ordering change Phase 1 required.
 document.addEventListener('DOMContentLoaded', () => {
+  // Arrows and bolts live in the catalog (Compendium / Token Library) but stay out of the random item pools.
+  if (window.AmmoData && !lootData.common.some(i => i.subcategory === 'ammo')) AmmoData.items.forEach(it => lootData[it.rarity].push(JSON.parse(JSON.stringify(it))));
   Object.entries(lootData).forEach(([r, arr]) => arr.forEach(item => inferItemMetadata(item, r)));
   // NPC signature weapons (see NPC_WEAPONS in npc-data.js) register after the pass above, not
   // before -- they're already fully classified by registerNpcWeapons itself, so running them
@@ -11604,9 +11609,7 @@ function lootItemDirectly(item, btn, preferEquip) {
     if (btn) { btn.textContent = '✓ Attached'; btn.disabled = true; btn.classList.add('saved'); }
     return { item: saved, placed: true, viaFallback: false, equipped: true };
   }
-  const w = Math.min(3, Math.max(1, saved.slotSize || 1));
-  const spot = findFirstOpenInventorySpot(w);
-  if (spot && placeNewInventoryItem(key, spot.row, spot.col)) {
+  if (placeInFirstSpotOrStack(key, saved.bundleQty)) {
     renderInventoryGrid();
     if (btn) { btn.textContent = '✓ Looted'; btn.disabled = true; btn.classList.add('saved'); }
     return { item: saved, placed: true, viaFallback: false };
@@ -11664,9 +11667,7 @@ function moveRecentlyLootedToInventory(idx) {
   buildTokenIndex();
   const entry = TOKEN_INDEX[key];
   if (!entry) { recentlyLooted.splice(idx, 1); renderRecentlyLootedGrid(); return; }
-  const w = Math.min(3, Math.max(1, entry.item.slotSize || 1));
-  const spot = findFirstOpenInventorySpot(w);
-  if (spot && placeNewInventoryItem(key, spot.row, spot.col)) {
+  if (placeInFirstSpotOrStack(key, entry.item.bundleQty)) {
     recentlyLooted.splice(idx, 1);
     renderInventoryGrid();
     renderRecentlyLootedGrid();
@@ -13389,6 +13390,11 @@ const MERCHANTS = {
       { name:'Iron Mace', desc:'A blunt, heavy head on an oak haft.', gp:'10 gp', effect:'Simple, sturdy, effective.', icon:'mace', type:'weapon', dmg:'1d6', stock:8 },
       { name:'Studded Leather Armor', desc:'Leather reinforced with rivets.', gp:'45 gp', effect:'Light armor, doesn\'t restrict movement.', icon:'armor', type:'armor', ac:'12', stock:5 },
       { name:'Chainmail', desc:'Interlocking iron rings, oiled against rust.', gp:'75 gp', effect:'Heavy armor, solid protection.', icon:'armor', type:'armor', ac:'16', stock:3 },
+      // Ammunition is sold in bundles: the price is for the whole bundle, and they go into one stackable pile.
+      { name:'Arrow', subcategory:'ammo', buyQty:20, desc:'Straight ash shafts with iron heads and goose-feather fletching.', gp:'1 gp', effect:'Ammunition for bows: spends one arrow per shot.', icon:'arrow', type:'misc', ammoKind:'arrow', ammo:{ kind:'arrow', flat:0, dice:[], atk:0, riders:[], save:null }, weight:0.05, stock:60 },
+      { name:'Bolt', subcategory:'ammo', buyQty:20, desc:'Short, stout iron-headed bolts with leather fletching.', gp:'1 gp', effect:'Ammunition for crossbows: spends one bolt per shot.', icon:'bolt', type:'misc', ammoKind:'bolt', ammo:{ kind:'bolt', flat:0, dice:[], atk:0, riders:[], save:null }, weight:0.075, stock:60 },
+      { name:'Steel Arrow', subcategory:'ammo', buyQty:10, desc:'Hardened steel heads that bite deeper.', gp:'8 gp', effect:'Ammunition for bows: spends one arrow per shot. On a hit: +1 damage.', icon:'arrow', type:'misc', ammoKind:'arrow', ammo:{ kind:'arrow', flat:1, dice:[], atk:0, riders:[], save:null }, weight:0.05, stock:30 },
+      { name:'Steel Bolt', subcategory:'ammo', buyQty:10, desc:'Hardened steel heads that bite deeper.', gp:'8 gp', effect:'Ammunition for crossbows: spends one bolt per shot. On a hit: +1 damage.', icon:'bolt', type:'misc', ammoKind:'bolt', ammo:{ kind:'bolt', flat:1, dice:[], atk:0, riders:[], save:null }, weight:0.075, stock:30 },
     ],
   },
   mage: {
@@ -13691,8 +13697,8 @@ function storeStapleCardHtml(staple, merchantKey, idx) {
       <div class="store-card-compact-top">
         <div class="flesh-icon-box">${icon}</div>
         <div class="store-card-compact-info">
-          <div class="store-card-name">${escapeHtml(staple.name)}</div>
-          <div class="store-card-rarity">${SUBCATEGORY_LABELS[subcategory] || ''}</div>
+          <div class="store-card-name">${escapeHtml(staple.name)}${staple.buyQty ? ' ×' + staple.buyQty : ''}</div>
+          <div class="store-card-rarity">${SUBCATEGORY_LABELS[staple.subcategory || subcategory] || ''}</div>
         </div>
         <div class="store-card-compact-buy">
           <div class="store-card-gp">💰 ${escapeHtml(staple.gp)}</div>
@@ -13962,7 +13968,7 @@ function merchantTradeDescription(merchantKey) {
 // it into the Token Library either way, then tries to find it a spot in the REAL inventory
 // grid (same findFirstOpenInventorySpot/placeNewInventoryItem pattern moveRecentlyLootedToInventory
 // uses), falling back to Token-Library-only with a clear message if the grid's genuinely full.
-function placeItemIntoInventory(item) {
+function placeItemIntoInventory(item, qty) {
   if (!item) return { item: null, placed: false };
   const saved = { ...item, id: Date.now() + Math.random() };
   // { ...item } is a SHALLOW copy — an array field (like abilities below) would otherwise stay
@@ -13977,9 +13983,7 @@ function placeItemIntoInventory(item) {
   if (typeof renderSavedItems === 'function') renderSavedItems();
   buildTokenIndex();
   const key = 'gen:' + saved.id;
-  const w = Math.min(3, Math.max(1, saved.slotSize || 1));
-  const spot = findFirstOpenInventorySpot(w);
-  const placed = !!(spot && placeNewInventoryItem(key, spot.row, spot.col));
+  const placed = placeInFirstSpotOrStack(key, qty != null ? qty : saved.bundleQty);
   if (placed) renderInventoryGrid();
   return { item: saved, placed };
 }
@@ -14025,7 +14029,7 @@ async function buyStapleItem(evt, merchantKey, idx) {
   const type = staple.type || 'misc';
   // Same canonical fields as every other item in the project: subcategory (derived from
   // the name, same as everywhere else) drives slotSize instead of a hardcoded 1.
-  const subcategory = classifySubcategory(staple.name, type, 'common');
+  const subcategory = staple.subcategory || classifySubcategory(staple.name, type, 'common');
   const slotSize = SUBCATEGORY_SLOT_SIZE[subcategory] || 1;
   const item = {
     name: staple.name, rarity: 'common', cat: type, type, subcategory,
@@ -14035,8 +14039,13 @@ async function buyStapleItem(evt, merchantKey, idx) {
     desc: staple.desc, flavor: staple.desc + (staple.effect ? '\n\n' + staple.effect : ''),
     tags: [], effect: staple.effect,
   };
+  // A bundle (e.g. 20 arrows for 1 gp): the saved item prices ONE piece, the staple prices the bundle.
+  if (staple.buyQty) {
+    Object.assign(item, { gp: formatGpAmount(price / staple.buyQty).replace(/\s*gp$/i, '') + ' gp', stackMax: staple.stackMax || 999, ammoKind: staple.ammoKind, ammo: staple.ammo, icon: staple.icon });
+    if (staple.weight != null) item.weight = staple.weight;
+  }
   if (stock) stock[idx]--;
-  const { placed } = placeItemIntoInventory(item);
+  const { placed } = placeItemIntoInventory(item, staple.buyQty || undefined);
   renderStoreTab();
   flashStoreBuyMessage(placed
     ? `${staple.name} purchased for ${staple.gp} and added to your inventory.`
@@ -14110,9 +14119,10 @@ function getMerchantTill(key) { return key ? (merchantTills[key] || (merchantTil
 // WITHOUT deleting it — used when staging something for sale, since it can still be pulled
 // back out of the till before the sale is confirmed. A token that's neither placed nor
 // equipped (just sitting unplaced in the Token Library) has nothing to unplace.
+let merchantTillQty = {};   // key -> pieces staged for sale (stackable items)
 function unplaceTokenIfPlaced(key) {
   const placementId = Object.keys(inventoryPlacements).find(pid => inventoryPlacements[pid].key === key);
-  if (placementId) { removeFromInventory(placementId); return; }
+  if (placementId) { const q = placementQty(inventoryPlacements[placementId]); if (q > 1) merchantTillQty[key] = q; removeFromInventory(placementId); return; }
   const slotId = Object.keys(playerSlots).find(id => playerSlots[id] === key);
   if (slotId) unequipSlot(slotId);
 }
@@ -14175,7 +14185,8 @@ function renderMerchantTill() {
   const cards = till.map(key => {
     const entry = TOKEN_INDEX[key];
     if (!entry) return '';
-    const value = gpToNumber(entry.item.gp);
+    const tq = merchantTillQty[key] || 1;
+    const value = gpToNumber(entry.item.gp) * tq;
     total += value;
     const safeKey = key.replace(/'/g, "\\'");
     return `
@@ -14184,7 +14195,7 @@ function renderMerchantTill() {
            onmouseenter="showTokenTooltip(event,'${safeKey}')"
            onmousemove="moveTokenTooltip(event)"
            onmouseleave="hideTokenTooltip()">
-        <div class="token-card-head">${itemPixelIcon(entry.item, 30, entry.rarity)}<div class="token-card-name">${escapeHtml(entry.item.name)}</div></div>
+        <div class="token-card-head">${itemPixelIcon(entry.item, 30, entry.rarity)}<div class="token-card-name">${escapeHtml(entry.item.name)}${tq > 1 ? ' ×' + tq : ''}</div></div>
         <div class="token-card-rarity">${rarityNames[entry.rarity] || entry.rarity}</div>
         <div class="token-card-effect">💰 ${formatGpAmount(value)} — right-click to take back</div>
       </div>
@@ -14206,9 +14217,8 @@ function handleTillCardRightClick(evt, key) {
   if (!TOKEN_INDEX[key]) buildTokenIndex();
   const entry = TOKEN_INDEX[key];
   if (entry) {
-    const w = Math.min(3, Math.max(1, entry.item.slotSize || 1));
-    const spot = findFirstOpenInventorySpot(w);
-    if (spot) placeNewInventoryItem(key, spot.row, spot.col);
+    placeInFirstSpotOrStack(key, merchantTillQty[key]);
+    delete merchantTillQty[key];
   }
   renderInventoryGrid();
   renderTraderSellTokenGrid();
@@ -14226,8 +14236,9 @@ function sellMerchantTill() {
   till.forEach(key => {
     const entry = TOKEN_INDEX[key];
     if (!entry) return;
-    total += gpToNumber(entry.item.gp);
-    count++;
+    total += gpToNumber(entry.item.gp) * (merchantTillQty[key] || 1);
+    count += merchantTillQty[key] || 1;
+    delete merchantTillQty[key];
     removeTokenEverywhere(key);
   });
   merchantTills[currentMerchant] = [];
@@ -14617,7 +14628,8 @@ function pickTier(arr,r){
 // loot-data.js item (confirmed directly, not assumed) — it's exclusively how a generated
 // monster part is tagged, both modes — so checking `type` alone is both correct and simpler
 // than re-listing every current and future part subcategory here.
-function isMonsterPartItem(it) { return it.type === 'craftable'; }
+// Also keeps ammunition (catalog-only; it drops as a bundle through maybeAmmoLootItem) out of the normal item pools.
+function isMonsterPartItem(it) { return it.type === 'craftable' || it.subcategory === 'ammo'; }
 // Wheel results now receive the same GP category and variable quality fields as generated items.
 // ===================== GENERATED ITEMS IN ROLLED LOOT =====================
 // Rolled loot (wheel, treasure chests, deceased humans, combat kills, bounty chests) normally draws from
@@ -14648,7 +14660,20 @@ function generateLootItem(rarity, cats) {
 }
 // Returns a generated item for this slot (with probability lootGenChance), or null to use the catalog.
 // `types` limits the categories (a chest's "Weapon" slot can only generate a weapon).
+// A bundle of arrows or bolts (a few percent of the slots that could hold a weapon or a trinket).
+let ammoLootChance = 8;
+function maybeAmmoLootItem(rarity, types) {
+  if (!window.AmmoData || Math.random() * 100 >= ammoLootChance) return null;
+  if (types && !types.some(t => t === 'weapon' || t === 'misc')) return null;
+  const r = rarity === 'superrare' ? 'rare' : rarity;
+  const pool = AmmoData.byRarity(r); if (!pool.length) return null;
+  const base = pool[Math.floor(Math.random() * pool.length)];
+  const item = JSON.parse(JSON.stringify(base)); item.bundleQty = AmmoData.rollBundle(base);
+  inferItemMetadata(item, rarity);
+  return item;
+}
 function maybeGeneratedLootItem(rarity, types) {
+  const ammoDrop = maybeAmmoLootItem(rarity, types); if (ammoDrop) return ammoDrop;
   if (!(lootGenChance > 0) || Math.random() * 100 >= lootGenChance) return null;
   const cats = types ? ['weapon', 'armor', 'consumable', 'misc'].filter(c => types.includes(c)) : null;
   if (types && !cats.length) return null; // e.g. a companion slot stays catalog
@@ -15702,6 +15727,8 @@ function inferSlotType(item) {
   // (see classifySubcategory/inferItemMetadata), which maps directly to a slot category.
   // Only items that somehow lack one fall through to the legacy name-sniffing below —
   // EXCEPT 'chest', which gets a second look first (see the comment just below it).
+  // Wands, rods and staves are held implements, whatever their subcategory says (many are catalogued as misc trinkets).
+  if (item.subcategory !== 'ammo' && item.type !== 'armor' && /\b(wand|rod|staff|scepter|sceptre)\b/i.test(item.name || '') && !/\b(case|holder|display|rack|bag)\b/i.test(item.name || '')) return 'weapon';
   if (item.subcategory && SUBCATEGORY_TO_SLOT_CATEGORY[item.subcategory] && item.subcategory !== 'chest') {
     return SUBCATEGORY_TO_SLOT_CATEGORY[item.subcategory];
   }
@@ -16092,6 +16119,7 @@ function equipTokenToFirstOpenSlot(key) {
   if (!TOKEN_INDEX[key]) buildTokenIndex();
   const entry = TOKEN_INDEX[key];
   if (!entry) return false;
+  if (itemStackMax(entry.item) > 1) return false;   // ammunition is never worn
   const category = getTokenSlotType(entry);
   const targetSlotId = Object.keys(SLOT_CATEGORY).find(id => SLOT_CATEGORY[id] === category && !playerSlots[id]);
   if (!targetSlotId) return false;
@@ -16287,16 +16315,102 @@ function flashInvCellInvalid(row, col) {
 
 // Places an already-resolved key at (row, col) as a brand-new placement — shared by both
 // a fresh library token drop and an equipped-slot item being dragged back into storage.
-function placeNewInventoryItem(key, row, col) {
+// ---------- Stackable items (arrows, bolts: up to 999 per stack) ----------
+// A placement may carry `qty` (missing = 1). Items stack when they share a name and rarity, so ammunition from loot, the
+// store and the Token Library all merge into the same pile no matter which saved copy it came from.
+function itemStackMax(item) { return window.AmmoData ? AmmoData.stackMaxOf(item) : ((item && item.stackMax) || 1); }
+function placementQty(p) { return Math.max(1, (p && p.qty) || 1); }
+function defaultStackQty(item) { return Math.max(1, item.bundleQty || (item.bundle ? item.bundle[0] : 1)); }
+function findStackPlacement(entry, exceptId) {
+  const max = itemStackMax(entry.item);
+  return Object.keys(inventoryPlacements).find(pid => {
+    if (pid === exceptId) return false;
+    const p = inventoryPlacements[pid], e = TOKEN_INDEX[p.key];
+    return e && e.item.name === entry.item.name && e.rarity === entry.rarity && placementQty(p) < max;
+  });
+}
+// Pours qty into existing stacks of the same item; returns whatever did not fit.
+function addToInventoryStacks(key, qty) {
+  const entry = TOKEN_INDEX[key]; if (!entry) return qty;
+  const max = itemStackMax(entry.item); let left = qty, pid;
+  while (left > 0 && (pid = findStackPlacement(entry))) {
+    const p = inventoryPlacements[pid], add = Math.min(max - placementQty(p), left);
+    p.qty = placementQty(p) + add; left -= add;
+  }
+  return left;
+}
+function inventoryTotalOf(item, rarity) {
+  return Object.values(inventoryPlacements).reduce((n, p) => { const e = TOKEN_INDEX[p.key]; return n + (e && e.item.name === item.name && (!rarity || e.rarity === rarity) ? placementQty(p) : 0); }, 0);
+}
+// Spends n pieces from the stacks of an item (smallest stack first). Returns how many were actually spent.
+function spendInventoryStack(item, rarity, n) {
+  let left = n;
+  const pids = Object.keys(inventoryPlacements).filter(pid => { const e = TOKEN_INDEX[inventoryPlacements[pid].key]; return e && e.item.name === item.name && (!rarity || e.rarity === rarity); })
+    .sort((a, b) => placementQty(inventoryPlacements[a]) - placementQty(inventoryPlacements[b]));
+  for (const pid of pids) {
+    if (left <= 0) break;
+    const p = inventoryPlacements[pid], take = Math.min(left, placementQty(p));
+    left -= take;
+    if (take >= placementQty(p)) { for (let c = p.col; c < p.col + p.w; c++) inventoryGrid[p.row][c] = null; delete inventoryPlacements[pid]; } else p.qty = placementQty(p) - take;
+  }
+  renderInventoryGrid();
+  return n - left;
+}
+function placeNewInventoryItem(key, row, col, qty) {
   if (!TOKEN_INDEX[key]) buildTokenIndex();
   const entry = TOKEN_INDEX[key];
   if (!entry) return false;
+  const max = itemStackMax(entry.item);
+  let q = 1;
+  if (max > 1) {
+    q = Math.min(max, qty != null ? qty : defaultStackQty(entry.item));
+    q = addToInventoryStacks(key, q);
+    if (q <= 0) return true;   // it all fit into stacks that already exist
+  }
   const w = Math.min(3, Math.max(1, entry.item.slotSize || 1));
   if (!invCanPlaceAt(row, col, w)) { flashInvCellInvalid(row, col); return false; }
   const placementId = 'inv' + (++inventoryPlacementCounter);
   inventoryPlacements[placementId] = { key, row, col, w };
+  if (max > 1) inventoryPlacements[placementId].qty = q;
   for (let c = col; c < col + w; c++) inventoryGrid[row][c] = placementId;
   return true;
+}
+// First open spot, or an existing stack to merge into when the grid is full. Used by loot / store / pickup paths.
+function placeInFirstSpotOrStack(key, qty) {
+  if (!TOKEN_INDEX[key]) buildTokenIndex();
+  const entry = TOKEN_INDEX[key]; if (!entry) return false;
+  const w = Math.min(3, Math.max(1, entry.item.slotSize || 1));
+  if (itemStackMax(entry.item) > 1 && findStackPlacement(entry)) return placeNewInventoryItem(key, 0, 0, qty);
+  const spot = findFirstOpenInventorySpot(w);
+  return !!(spot && placeNewInventoryItem(key, spot.row, spot.col, qty));
+}
+// Dropping one stack onto another of the same item merges them (up to the stack limit).
+function inventoryStackDrop(evt, dstId) {
+  const raw = getDragPayload(evt); if (!raw) return;
+  const dst = inventoryPlacements[dstId], dstEntry = dst && TOKEN_INDEX[dst.key]; if (!dstEntry) return;
+  const max = itemStackMax(dstEntry.item);
+  if (raw.indexOf('invplace:') === 0) {
+    const srcId = raw.slice('invplace:'.length), src = inventoryPlacements[srcId], se = src && TOKEN_INDEX[src.key];
+    if (!se || srcId === dstId || se.item.name !== dstEntry.item.name || se.rarity !== dstEntry.rarity) return;   // not the same item: not a drop target
+    evt.preventDefault(); evt.stopPropagation();
+    const move = Math.min(max - placementQty(dst), placementQty(src));
+    if (move <= 0) { flashInvMessage(`That stack of ${dstEntry.item.name} is full (${max}).`, true); return; }
+    dst.qty = placementQty(dst) + move;
+    if (move >= placementQty(src)) { for (let c = src.col; c < src.col + src.w; c++) inventoryGrid[src.row][c] = null; delete inventoryPlacements[srcId]; } else src.qty = placementQty(src) - move;
+    deferPostDragRender(renderInventoryGrid);
+  }
+}
+// Splits off part of a stack into a new placement (right-click a stack > Split).
+function splitInventoryStack(placementId, n) {
+  const p = inventoryPlacements[placementId]; if (!p || placementQty(p) < 2) return;
+  const take = Math.max(1, Math.min(placementQty(p) - 1, n));
+  const spot = findFirstOpenInventorySpot(p.w);
+  if (!spot) { flashInvMessage('No free slot to split into.', true); return; }
+  const id = 'inv' + (++inventoryPlacementCounter);
+  inventoryPlacements[id] = { key: p.key, row: spot.row, col: spot.col, w: p.w, qty: take };
+  for (let c = spot.col; c < spot.col + p.w; c++) inventoryGrid[spot.row][c] = id;
+  p.qty = placementQty(p) - take;
+  renderInventoryGrid();
 }
 
 // Handles three kinds of drops onto a grid cell: a fresh token dragged in from the library
@@ -16428,6 +16542,12 @@ function inventoryItemContextMenu(evt, placementId) {
   // A lootable Chest has no body slot to equip into (see chestRarity below), so it's checked
   // first and handled entirely separately from the equip path.
   if (entry.item.chestRarity) { openChestItem(entry, p.key); return; }
+  if (itemStackMax(entry.item) > 1) {
+    const q = placementQty(p);
+    if (q > 1) splitInventoryStack(placementId, Math.floor(q / 2));
+    flashInvMessage(`${entry.item.name} ×${q}: ammunition is spent automatically when you fire a ${entry.item.ammoKind === 'bolt' ? 'crossbow' : 'bow'}${q > 1 ? ' (right-click split the stack in half)' : ''}.`);
+    return;
+  }
   if (equipTokenToFirstOpenSlot(p.key)) {
     removeFromInventory(placementId);
     flashInvMessage(`${entry.item.name} equipped.`);
@@ -16555,6 +16675,9 @@ function buildInventoryGridHtml(idPrefix, dimFilter, storeContext) {
           ? (entry ? itemPixelIcon(entry.item, null, rarity, true) : '')
           : `${entry ? itemPixelIcon(entry.item, 22, rarity) : ''}<span class="inv-item-name">${escapeHtml(name)}</span>`;
         const dimmed = entry && dimFilter && !dimFilter(entry.item, rarity);
+        const qty = placementQty(p), stackable = entry && itemStackMax(entry.item) > 1;
+        const qtyBadge = stackable && qty > 1 ? `<span class="inv-qty">${qty}</span>` : '';
+        const stackDrop = stackable ? ` ondragover="slotDragOver(event)" ondrop="inventoryStackDrop(event,'${placementId}')"` : '';
         // Deliberately NOT a drop target — only genuinely empty cells (below) accept
         // drops, so there's never any ambiguity about two different items overlapping.
         // Repositioning onto a spot that overlaps the item's OWN old footprint still
@@ -16569,11 +16692,11 @@ function buildInventoryGridHtml(idPrefix, dimFilter, storeContext) {
         // shouldn't silently equip it instead.
         const dblClickAttr = storeContext ? '' : ` ondblclick="inventoryItemContextMenu(event,'${placementId}')"`;
         html += `<div class="inv-item ${rarity}${wide ? ' inv-item-fill' : ''}${dimmed ? ' inv-item-dimmed' : ''}" id="${idPrefix}inv-cell-${row}-${col}" style="width:${p.w * 44 + (p.w - 1) * 3}px" draggable="true"
-          ondragstart="inventoryItemDragStart(event,'${placementId}')"
+          ondragstart="inventoryItemDragStart(event,'${placementId}')"${stackDrop}
           oncontextmenu="${contextMenuFn}(event,'${placementId}')"${dblClickAttr}
           onmouseenter="showTokenTooltip(event,'${safeKey}')"
           onmousemove="moveTokenTooltip(event)"
-          onmouseleave="hideTokenTooltip()">${body}</div>`;
+          onmouseleave="hideTokenTooltip()">${body}${qtyBadge}</div>`;
         col += p.w;
       } else {
         html += `<div class="inv-cell" id="${idPrefix}inv-cell-${row}-${col}" ondragover="slotDragOver(event)" ondrop="inventoryCellDrop(event,${row},${col})"></div>`;
@@ -16652,8 +16775,9 @@ function updateInventorySummary() {
   Object.values(inventoryPlacements).forEach(p => {
     const entry = TOKEN_INDEX[p.key];
     if (entry) {
-      totalGp += gpToNumber(entry.item.gp);
-      totalWeight += entry.item.weight != null ? entry.item.weight : computeItemWeight(entry.item);
+      const qn = placementQty(p);
+      totalGp += gpToNumber(entry.item.gp) * qn;
+      totalWeight += (entry.item.weight != null ? entry.item.weight : computeItemWeight(entry.item)) * qn;
     }
     slotsUsed += p.w;
   });
@@ -16791,9 +16915,8 @@ function deleteLoadout(id) {
 // A fixed catalog of D&D 5e-flavored starting-equipment kits, one per class/archetype.
 // STARTING_GEAR_ITEMS holds each unique piece of gear once (shared by every class that
 // grants it, e.g. Explorer's Pack or Dagger); CLASS_STARTING_LOADOUTS just lists which of
-// those items a given class starts with. Ammo/thrown-weapon stacks (arrows, javelins, darts)
-// are bundled into a single named item rather than N separate tiles, same idea as how packs
-// bundle a dozen small items into one — keeps a starting kit from eating half the grid.
+// those items a given class starts with. Arrows and bolts are real stackable ammunition (one tile, many pieces);
+// thrown-weapon sets (javelins, darts) are still bundled into one named item rather than N separate tiles.
 const STARTING_GEAR_ITEMS = {
   "Longsword": { type:"weapon", dmg:"1d8", gp:"15 gp", desc:"A straight double-edged blade about a yard long.", effect:"Versatile (1d10)." },
   "Shield": { type:"armor", ac:"+2", gp:"10 gp", desc:"A sturdy wood-and-metal shield strapped to the forearm.", effect:"+2 AC." },
@@ -16809,11 +16932,13 @@ const STARTING_GEAR_ITEMS = {
   "Shortsword": { type:"weapon", dmg:"1d6", gp:"10 gp", desc:"A short, balanced blade suited to quick strikes.", effect:"Finesse, light." },
   "Dagger": { type:"weapon", dmg:"1d4", gp:"2 gp", desc:"A short double-edged blade with a simple crossguard.", effect:"Finesse, light, thrown (range 20/60)." },
   "Daggers (2)": { type:"weapon", dmg:"1d4", gp:"4 gp", desc:"A pair of short double-edged blades.", effect:"Finesse, light, thrown (range 20/60)." },
-  "Shortbow & 20 Arrows": { type:"weapon", dmg:"1d6", gp:"25 gp", desc:"A short recurve bow, strung and ready, with a quiver of 20 arrows.", effect:"Ammunition (range 80/320), two-handed." },
+  "Shortbow": { type:"weapon", dmg:"1d6", gp:"25 gp", desc:"A short recurve bow, strung and ready. Arrows are carried separately.", effect:"Ammunition (range 80/320), two-handed. Uses arrows." },
+  "Arrows (20)": { type:"misc", ammoKind:"arrow", qty:20, gp:"0.1 gp", desc:"Straight ash shafts with iron heads and goose-feather fletching.", effect:"Ammunition for bows: spends one arrow per shot." },
+  "Bolts (20)": { type:"misc", ammoKind:"bolt", qty:20, gp:"0.1 gp", desc:"Short, stout iron-headed bolts with leather fletching.", effect:"Ammunition for crossbows: spends one bolt per shot." },
   "Leather Armor": { type:"armor", ac:"11", gp:"10 gp", desc:"A suit of stiff, boiled leather.", effect:"AC 11 + Dex modifier." },
   "Thieves' Tools": { type:"misc", gp:"25 gp", desc:"A small pouch of lockpicks, files, and mirrors on a rod." },
   "Burglar's Pack": { type:"misc", gp:"16 gp", desc:"Backpack, ball bearings, 10 ft of string, a bell, candles, a crowbar, a hammer, pitons, a hooded lantern, oil, rations, a tinderbox, and waterskin." },
-  "Longbow & 20 Arrows": { type:"weapon", dmg:"1d8", gp:"50 gp", desc:"A tall, powerful bow, strung and ready, with a quiver of 20 arrows.", effect:"Ammunition (range 150/600), heavy, two-handed." },
+  "Longbow": { type:"weapon", dmg:"1d8", gp:"50 gp", desc:"A tall, powerful bow, strung and ready. Arrows are carried separately.", effect:"Ammunition (range 150/600), heavy, two-handed. Uses arrows." },
   "Hunting Trap": { type:"misc", gp:"5 gp", desc:"A steel jaw trap set to snap shut on a pressure plate." },
   "Holy Symbol": { type:"misc", gp:"5 gp", desc:"An emblem of your deity, worn or carried as a focus for divine magic." },
   "Mace": { type:"weapon", dmg:"1d6", gp:"5 gp", desc:"A heavy metal head mounted on a wooden haft." },
@@ -16825,7 +16950,7 @@ const STARTING_GEAR_ITEMS = {
   "Component Pouch": { type:"misc", gp:"25 gp", desc:"A small watertight leather pouch stocked with the material components spellcasting consumes." },
   "Scholar's Pack": { type:"misc", gp:"40 gp", desc:"Backpack, a book of lore, ink, an ink pen, parchment, a small bag of sand, and a small knife." },
   "Ink & Parchment": { type:"misc", gp:"12 gp", desc:"A vial of ink, a quill pen, and several sheets of parchment." },
-  "Light Crossbow & 20 Bolts": { type:"weapon", dmg:"1d8", gp:"25 gp", desc:"A compact crossbow with a hand crank, and a case of 20 bolts.", effect:"Ammunition (range 80/320), two-handed, loading." },
+  "Light Crossbow": { type:"weapon", dmg:"1d8", gp:"25 gp", desc:"A compact crossbow with a hand crank. Bolts are carried separately.", effect:"Ammunition (range 80/320), two-handed, loading. Uses bolts." },
   "Arcane Focus": { type:"misc", gp:"10 gp", desc:"A crystal, orb, wand, or rod that channels arcane spellcasting energy." },
   "Sickle": { type:"weapon", dmg:"1d4", gp:"1 gp", desc:"A curved single-edged blade on a short handle.", effect:"Light." },
   "Druidic Focus": { type:"misc", gp:"10 gp", desc:"A sprig of mistletoe, a totem, or a carved wooden staff used to channel primal magic." },
@@ -16851,23 +16976,23 @@ const STARTING_GEAR_ITEMS = {
 const CLASS_STARTING_LOADOUTS = [
   { name:"Fighter", items:["Longsword","Shield","Chain Shirt","Javelins (2)","Explorer's Pack"] },
   { name:"Barbarian", items:["Greataxe","Handaxes (2)","Hide Armor","Explorer's Pack","Hunting Knife"] },
-  { name:"Rogue", items:["Shortsword","Dagger","Shortbow & 20 Arrows","Leather Armor","Thieves' Tools","Burglar's Pack"] },
-  { name:"Ranger", items:["Longbow & 20 Arrows","Shortsword","Dagger","Leather Armor","Explorer's Pack","Hunting Trap"] },
+  { name:"Rogue", items:["Shortsword","Dagger","Shortbow","Arrows (20)","Leather Armor","Thieves' Tools","Burglar's Pack"] },
+  { name:"Ranger", items:["Longbow","Arrows (20)","Shortsword","Dagger","Leather Armor","Explorer's Pack","Hunting Trap"] },
   { name:"Paladin", items:["Longsword","Shield","Chain Shirt","Javelins (3)","Holy Symbol","Explorer's Pack"] },
   { name:"Cleric", items:["Mace","Shield","Scale Mail","Holy Symbol","Healer's Kit","Priest's Pack"] },
   { name:"Wizard", items:["Quarterstaff","Dagger","Spellbook","Component Pouch","Scholar's Pack","Ink & Parchment"] },
-  { name:"Sorcerer", items:["Light Crossbow & 20 Bolts","Daggers (2)","Component Pouch","Arcane Focus","Explorer's Pack"] },
-  { name:"Warlock", items:["Light Crossbow & 20 Bolts","Dagger","Leather Armor","Arcane Focus","Scholar's Pack"] },
+  { name:"Sorcerer", items:["Light Crossbow","Bolts (20)","Daggers (2)","Component Pouch","Arcane Focus","Explorer's Pack"] },
+  { name:"Warlock", items:["Light Crossbow","Bolts (20)","Dagger","Leather Armor","Arcane Focus","Scholar's Pack"] },
   { name:"Druid", items:["Quarterstaff","Wooden Shield","Sickle","Hide Armor","Druidic Focus","Explorer's Pack"] },
   { name:"Monk", items:["Quarterstaff","Darts (4)","Simple Robes","Herbalism Kit","Explorer's Pack"] },
   { name:"Bard", items:["Rapier","Dagger","Leather Armor","Musical Instrument","Entertainer's Pack"] },
-  { name:"Artificer", items:["Light Hammer","Light Crossbow & 20 Bolts","Studded Leather","Tinker's Tools","Thieves' Tools"] },
+  { name:"Artificer", items:["Light Hammer","Light Crossbow","Bolts (20)","Studded Leather","Tinker's Tools","Thieves' Tools"] },
   { name:"Knight", items:["Longsword","Shield","Chain Shirt","Javelins (3)","Riding Saddle","Bedroll"] },
-  { name:"Archer", items:["Longbow & 20 Arrows","Shortsword","Leather Armor","Quiver","Hunting Knife"] },
-  { name:"Battle Mage", items:["Quarterstaff","Light Crossbow & 20 Bolts","Leather Armor","Arcane Focus","Component Pouch"] },
+  { name:"Archer", items:["Longbow","Arrows (20)","Shortsword","Leather Armor","Quiver","Hunting Knife"] },
+  { name:"Battle Mage", items:["Quarterstaff","Light Crossbow","Bolts (20)","Leather Armor","Arcane Focus","Component Pouch"] },
   { name:"Healer", items:["Mace","Shield","Leather Armor","Healer's Kit","Holy Symbol","Healing Poultices (2)"] },
-  { name:"Scout", items:["Shortsword","Shortbow & 20 Arrows","Leather Armor","Climbing Kit","Hunting Knife"] },
-  { name:"Alchemist", items:["Light Crossbow & 20 Bolts","Dagger","Leather Armor","Alchemist's Supplies","Empty Vials (2)"] },
+  { name:"Scout", items:["Shortsword","Shortbow","Arrows (20)","Leather Armor","Climbing Kit","Hunting Knife"] },
+  { name:"Alchemist", items:["Light Crossbow","Bolts (20)","Dagger","Leather Armor","Alchemist's Supplies","Empty Vials (2)"] },
   { name:"Adventurer", items:["Shortsword","Shield","Leather Armor","Dagger","Rope (50 ft.)","Bedroll","Flint & Steel","Explorer's Pack"] },
 ];
 // Same construction buyStapleItem uses (subcategory/slotSize/weight derived the same way
@@ -16880,12 +17005,15 @@ function applyClassStartingGear() {
   const loadout = CLASS_STARTING_LOADOUTS.find(c => c.name === className);
   if (!loadout) { if (msgEl) msgEl.textContent = 'Pick a class first.'; return; }
   let overflowCount = 0;
-  loadout.items.forEach(itemName => {
-    const base = STARTING_GEAR_ITEMS[itemName];
+  loadout.items.forEach(listName => {
+    let itemName = listName;
+    const base = STARTING_GEAR_ITEMS[listName];
     if (!base) return;
     const type = base.type;
-    const subcategory = classifySubcategory(itemName, type, 'common');
+    const isAmmoKit = !!base.ammoKind;
+    const subcategory = isAmmoKit ? 'ammo' : classifySubcategory(itemName, type, 'common');
     const slotSize = SUBCATEGORY_SLOT_SIZE[subcategory] || 1;
+    if (isAmmoKit) itemName = base.ammoKind === 'bolt' ? 'Bolt' : 'Arrow';   // stacks with every other arrow / bolt
     const item = {
       name: itemName, rarity: 'common', cat: type, type, subcategory,
       gp: base.gp || '', dmg: base.dmg || '', ac: base.ac || '', hp: base.hp || '', requirement: '',
@@ -16894,7 +17022,8 @@ function applyClassStartingGear() {
       desc: base.desc, flavor: base.desc + (base.effect ? '\n\n' + base.effect : ''),
       tags: [], effect: base.effect || '',
     };
-    const { placed } = placeItemIntoInventory(item);
+    if (isAmmoKit) Object.assign(item, { icon: base.ammoKind, stackMax: 999, ammoKind: base.ammoKind, ammo: { kind: base.ammoKind, flat: 0, dice: [], atk: 0, riders: [], save: null }, weight: base.ammoKind === 'bolt' ? 0.075 : 0.05 });
+    const { placed } = placeItemIntoInventory(item, base.qty);
     if (!placed) overflowCount++;
   });
   updateCharacterField('characterClass', className);
@@ -17244,7 +17373,7 @@ function currentAbilityMods(sheet) {
 // Weapon stat scaling (game-engine.js, "WEAPON STAT SCALING"): to-hit is still a plain ability
 // check (the better of STR/DEX among the stats this weapon grades C or better), but DAMAGE adds
 // grade-multiplier x stat-modifier for every stat the weapon scales with.
-function computeWeaponAttackRoll(item, sheet, rarity) {
+function computeWeaponAttackRollBase(item, sheet, rarity) {
   const bridged = item.__canonical ? canonicalWeaponAttackData(item.__canonical) : null;
   const dmgRaw = bridged ? bridged.damageDice : String(item.dmg || '').trim();
   const dmgMatch = dmgRaw.match(/^(\d+)d(\d+)([+-]\d+)?$/i);
@@ -17270,6 +17399,69 @@ function computeWeaponAttackRoll(item, sheet, rarity) {
   const dmgTotal = dmgResult ? dmgResult.total + scaled.total + dmgBonus + bonusDiceTotal : null;
   const sources = buildAttackSources(item, rarity, sheet, { prof, scaling, dmgRaw, atkBonus, dmgBonus, bonusRolls, scalingParts: scaled.parts, scalingTotal: scaled.total });
   return { classes: (window.AttackMargin ? AttackMargin.attackClassesOf(item.name, { heavy: isTwoHandedWeapon(item) }) : []), toHitMod: profApplied + atkBonus, dmgRaw, scalingParts: scaled.parts, scalingTotal: scaled.total, profBonus: profApplied, profProficient: prof.proficient, atkBonus, dmgBonus, bonusRolls, d20, isCrit, isFumble, toHitTotal, dmgResult, dmgTotal, sources };
+}
+// ---- Ammunition: bows take arrows, crossbows take bolts; every shot spends one from the inventory ----
+const AMMO_RARITY_ORDER = ['common', 'uncommon', 'rare', 'superrare', 'legendary', 'celestial'];
+let ammoPreference = {};   // kind -> 'Name|rarity' chosen in the attack popup (default: the plainest stack, so rare ammo is never wasted by accident)
+function availableAmmoFor(weaponItem) {
+  const kind = window.AmmoData ? AmmoData.kindFor(weaponItem) : null;
+  if (!kind) return { kind: null, stacks: [] };
+  buildTokenIndex();
+  const map = {};
+  Object.values(inventoryPlacements).forEach(p => {
+    const e = TOKEN_INDEX[p.key];
+    if (!e || !(e.item.ammoKind === kind || (e.item.ammo && e.item.ammo.kind === kind))) return;
+    const id = e.item.name + '|' + e.rarity;
+    (map[id] = map[id] || { id, item: e.item, rarity: e.rarity, qty: 0 }).qty += placementQty(p);
+  });
+  const stacks = Object.values(map).sort((a, b) => AMMO_RARITY_ORDER.indexOf(a.rarity) - AMMO_RARITY_ORDER.indexOf(b.rarity) || a.item.name.localeCompare(b.item.name));
+  return { kind, stacks };
+}
+function pickAmmo(info) { return info.stacks.find(x => x.id === ammoPreference[info.kind]) || info.stacks[0] || null; }
+function setAmmoPreference(kind, id) { ammoPreference[kind] = id; if (_activeAttackRoll && _activeAttackRoll.ammoKind === kind) { _activeAttackRoll.ammoPref = id; renderActiveAttackRoll(); } }
+// Rolls a weapon attack, spending the ammunition it needs. Returns null (and says why) if the launcher has nothing to fire.
+function rollWeaponWithAmmo(item, sheet, rarity) {
+  const info = availableAmmoFor(item);
+  let ammo = null;
+  if (info.kind) {
+    ammo = pickAmmo(info);
+    if (!ammo) { flashInvMessage(`No ${info.kind}s for your ${item.name} — buy or loot some first.`, true); return null; }
+  }
+  const roll = computeWeaponAttackRoll(item, sheet, rarity, ammo ? { ammo } : null);
+  if (info.kind) { roll.ammoKind = info.kind; roll.ammoStacks = info.stacks.map(x => ({ id: x.id, name: x.item.name, qty: x.qty - (x.id === ammo.id ? 1 : 0) })); roll.ammoPref = ammo.id; }
+  if (ammo) spendInventoryStack(ammo.item, ammo.rarity, 1);
+  return roll;
+}
+function computeWeaponAttackRoll(item, sheet, rarity, opts) {
+  const roll = computeWeaponAttackRollBase(item, sheet, rarity);
+  const ammo = opts && opts.ammo;
+  if (!ammo || !window.AmmoData) return roll;
+  const st = AmmoData.stats(ammo.item);
+  roll.ammo = { name: ammo.item.name, rarity: ammo.rarity, flat: st.flat, atk: st.atk, riders: st.riders, save: st.save, dice: [], conditional: [] };
+  if (st.atk) { roll.toHitMod += st.atk; roll.toHitTotal += st.atk; }
+  let add = st.flat;
+  st.dice.forEach(d => {
+    const r = battleRollDamage(d.dice, roll.isCrit); if (!r) return;
+    if (d.versus) roll.ammo.conditional.push({ ...d, roll: r });          // only against that kind of creature: the DM / player applies it
+    else { roll.ammo.dice.push({ ...d, roll: r }); add += r.total; }
+  });
+  if (roll.dmgTotal != null) roll.dmgTotal += add;
+  roll.ammoDamage = add;
+  return roll;
+}
+function ammoRollHtml(roll) {
+  if (!roll.ammoKind) return '';
+  const a = roll.ammo, rows = [];
+  if (a) {
+    rows.push(`<div class="weapon-attack-line"><span>🏹 Fired ${escapeHtml(a.name)}</span><span>${a.atk ? fmtMod(a.atk) + ' to hit' : ''}${a.flat ? ' ' + fmtMod(a.flat) + ' dmg' : ''}</span></div>`);
+    a.dice.forEach(d => rows.push(`<div class="weapon-attack-line"><span>${escapeHtml(d.type)} ammunition dice (${escapeHtml(d.dice)}${roll.isCrit ? ', doubled' : ''})</span><span>${d.roll.rolls.join(' + ')}</span></div>`));
+    a.conditional.forEach(d => rows.push(`<div class="weapon-attack-line"><span>Only vs ${escapeHtml(d.versus)}s: +${escapeHtml(d.dice)} ${escapeHtml(d.type)}</span><span>${d.roll.total} <span class="sheet-chip-empty">(not in the total)</span></span></div>`));
+    a.riders.forEach(r => rows.push(`<p class="sheet-chip-empty">${escapeHtml(r)}</p>`));
+    if (a.save) rows.push(`<p class="sheet-chip-empty">${escapeHtml(a.save.stat)} save DC ${a.save.dc} for the rider above.</p>`);
+  }
+  const opts = (roll.ammoStacks || []).map(x => `<option value="${escapeHtml(x.id)}"${x.id === roll.ammoPref ? ' selected' : ''}>${escapeHtml(x.name)} (${x.qty} left)</option>`).join('');
+  rows.push(`<div class="weapon-attack-line"><span>Next shot uses</span><span><select onchange="setAmmoPreference('${roll.ammoKind}', this.value)">${opts}</select></span></div>`);
+  return rows.join('');
 }
 function isTwoHandedWeapon(item) { return !!(item && (item.subcategory === 'twohanded' || (Array.isArray(item.classification) && item.classification.includes('Two-Handed')))); }
 // ---- Attack margin (docs/ATTACK_MARGIN.md): M = d20 + attack mods - defender AC picks a tier -> damage % + effects ----
@@ -17327,6 +17519,7 @@ function weaponAttackRollHtml(roll) {
         : `<div class="weapon-attack-line"><span>${S('strmod', roll.abilityLabel + ' modifier')}</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
       ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>${S('dmg', 'Weapon damage bonus')}</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
       ${roll.bonusRolls.map((c, i) => `<div class="weapon-attack-line"><span>${S('bonus' + i, `Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})`)}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
+      ${ammoRollHtml(roll)}
       <div class="weapon-attack-total">Damage: ${roll.margin && roll.finalDamage != null ? `${roll.finalDamage} <span class="sheet-chip-empty">(${roll.dmgTotal} × ${roll.margin.dmgPct}%)</span>` : roll.dmgTotal}</div>
     ` : `<p class="sheet-chip-empty">This weapon's damage dice aren't set on the item (edit it to add one, e.g. "1d8") — showing the attack roll only.</p>`}
   `;
@@ -17340,7 +17533,8 @@ function rollEquippedWeaponAttack(slotId) {
   const entry = key && TOKEN_INDEX[key];
   if (!entry) { flashInvMessage('No weapon equipped there.', true); return; }
   const sheet = computeCharacterSheet();
-  const roll = computeWeaponAttackRoll(entry.item, sheet, entry.rarity);
+  const roll = rollWeaponWithAmmo(entry.item, sheet, entry.rarity);
+  if (!roll) return;
   showAttackRoll(roll, `⚔ Attack with ${entry.item.name}`, '', true);
 }
 function closeWeaponAttackPopup() {
@@ -21554,7 +21748,8 @@ function openBattlefieldAttackPicker(monsterUid) {
   const monster = battlefieldRoster.find(e => e.uid === monsterUid);
   if (!monster) return;
   const sheet = computeCharacterSheet();
-  const roll = computeWeaponAttackRoll(entry.item, sheet, entry.rarity);
+  const roll = rollWeaponWithAmmo(entry.item, sheet, entry.rarity);
+  if (!roll) return;
   const monsterName = monster.displayName || monster.monster.name;
   showAttackRoll(roll, `⚔ Attack ${monsterName} with ${entry.item.name}`, '<p class="sheet-chip-empty">Sent to your DM, who knows the target’s AC and applies the degree of hit.</p>', false);
   if (typeof window.submitBattlefieldAttack !== 'function') return;
@@ -21747,7 +21942,7 @@ function buildForeignInventoryGridHtml(grid, placements, savedGeneratedItems) {
         const body = wide
           ? (entry ? itemPixelIcon(entry.item, null, rarity, true) : '')
           : `${entry ? itemPixelIcon(entry.item, 22, rarity) : ''}<span class="inv-item-name">${escapeHtml(name)}</span>`;
-        html += `<div class="inv-item foreign-takeable ${rarity}${wide ? ' inv-item-fill' : ''}" style="width:${p.w * 44 + (p.w - 1) * 3}px" ${entry ? itemHoverAttrs(entry.item, rarity) : `title="${escapeHtml(name)}"`} onclick="dmTakeViewedPlayerInventoryItem('${String(placementId).replace(/'/g, "\\'")}')">${body}</div>`;
+        html += `<div class="inv-item foreign-takeable ${rarity}${wide ? ' inv-item-fill' : ''}" style="width:${p.w * 44 + (p.w - 1) * 3}px" ${entry ? itemHoverAttrs(entry.item, rarity) : `title="${escapeHtml(name)}"`} onclick="dmTakeViewedPlayerInventoryItem('${String(placementId).replace(/'/g, "\\'")}')">${body}${p.qty > 1 ? `<span class="inv-qty">${p.qty}</span>` : ''}</div>`;
         col += p.w;
       } else {
         html += `<div class="inv-cell"></div>`;
