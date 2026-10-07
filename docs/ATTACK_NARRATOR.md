@@ -24,12 +24,13 @@ frightening, fire-breathing thing gets one small bullet per effect.
 | `attack-narrator-magic.js` | Area and magic deliveries (breath, cone, gaze, ray, orb, burst, wave, spray, cloud, aura, hex, drain, entangle, summon) and the stat-block ability archetypes (shapechange, teleport, charm, haste, defense, heal, leadership, terrain...). |
 | `attack-narrator-effects.js` | ~30 conditions and riders (prone, grappled, frightened, poisoned, paralyzed, swallowed, push/pull, disease, curse, silence...) with a feel line and a one-line rule each, area shapes, damage tiers, party-level HP benchmarks, lethality text, creature sizes, families, roles, weapon rarity auras, crowd reaction beats. |
 | `attack-narrator-lexicon.js` | Name → move rules (what a "Rending Bite" or a "Cloud Morningstar" is), weapon part names, body parts, irregular verbs. |
+| `attack-narrator-plain.js` | The plain-language layer: loaded after the data files, it rewrites the move, wound, condition and lethality wording in place to short, everyday sentences ("The Behir bites Ralph's thigh, leaving a deep puncture."). Extra scene-setting only appears with **Full detail**. Spell-specific hand-written lines are left as they were. |
 | `attack-narrator-spells.js` | About 170 hand-written spells, spell kinds for the rest (heal, ward, shapeshift, summon, detect, charm, curse, dispel, movement, illusion, creation, weather, light, darkness, buff, divine, cantrip) and school fallbacks. |
 | `attack-narrator.js` | The engine: parser, move chooser, grammar (pronouns, verb agreement, a/an), composer, public API. |
 | `attack-narrator.test.js` | Tests. |
 
 Scripts load in this order (classic scripts sharing `window.AttackNarratorData`): elements → moves → magic →
-effects → lexicon → spells → engine. The engine injects its own small stylesheet (`an-narr`, `an-chip`, ...).
+effects → lexicon → spells → plain → engine. The engine injects its own small stylesheet (`an-narr`, `an-chip`, ...).
 
 ## API
 

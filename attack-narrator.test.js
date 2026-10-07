@@ -9,7 +9,7 @@ import vm from 'node:vm';
 const root = new URL('.', import.meta.url).pathname;
 const win = {};
 const ctx = vm.createContext({ window: win, console, Math, Array, Object, String, Number, Set, Map, JSON, RegExp, Date });
-for (const f of ['attack-narrator-elements.js', 'attack-narrator-moves.js', 'attack-narrator-magic.js', 'attack-narrator-effects.js', 'attack-narrator-lexicon.js', 'attack-narrator-spells.js', 'attack-narrator.js'])
+for (const f of ['attack-narrator-elements.js', 'attack-narrator-moves.js', 'attack-narrator-magic.js', 'attack-narrator-effects.js', 'attack-narrator-lexicon.js', 'attack-narrator-spells.js', 'attack-narrator-plain.js', 'attack-narrator.js'])
   vm.runInContext(fs.readFileSync(root + f, 'utf8'), ctx, { filename: f });
 const AN = win.AttackNarrator;
 
@@ -98,7 +98,7 @@ test('the description follows the mechanics', () => {
   assert.match(flat(fire), /sixty-foot cone/); assert.match(flat(cold), /fifteen-foot cone/);
   assert.equal(AN.describe(f('Maul').attack, f('Maul').ctx).move, 'hammer');
   assert.equal(AN.describe(f('Rock').attack, f('Rock').ctx).move, 'thrown');
-  assert.match(flat(AN.describe(f('Rock').attack, f('Rock').ctx)), /boulder/);
+  assert.match(flat(AN.describe(f('Rock').attack, f('Rock').ctx)), /boulder|rock/);
   assert.equal(AN.describe(f('Longsword').attack, f('Longsword').ctx).lethality.total, 8);
   assert.equal(AN.describe(f('Defensive Rebuke').attack, f('Defensive Rebuke').ctx).move, 'strike');
   assert.equal(AN.describe(f('Call to Attack').attack, f('Call to Attack').ctx).move, 'utility');

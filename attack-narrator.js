@@ -312,7 +312,9 @@
     const role = chooseRole(p, att, famId, spellSpec, moveId);
     const roleInfo = D.ROLES[role] || D.ROLES.brute;
     const pron = fam.pronoun === 'they' || ctx.pronouns === 'they' ? 'they' : (ctx.pronouns === 'it' ? 'it' : (fam.pronoun || 'it'));
-    const subj = ctx.subject || (role === 'caster' && famId === 'humanoid' ? pick(['the caster', 'the spellcaster', 'the mage', 'the practitioner'], 'subj') : pick(fam.nouns, 'subj'));
+    // plain wording: call the attacker by its own name when it has one ("the Behir"), else "the creature"
+    const namedSubj = att.name && !ctx.weapon ? (/^(?:the|a|an)\s/i.test(att.name) ? att.name : 'the ' + att.name) : null;
+    const subj = ctx.subject || namedSubj || (role === 'caster' && famId === 'humanoid' ? pick(['the caster', 'the spellcaster'], 'subj') : pick(fam.nouns, 'subj'));
     const sing = pron === 'they' ? { they: 'they', their: 'their', aThem: 'them', themself: 'themself' } : { they: 'it', their: 'its', aThem: 'it', themself: 'itself' };
     const tgtName = ctx.target && ctx.target.name ? ctx.target.name : 'the target';
     const condEl = (p.conditions.map(c => D.COND_ELEMENT[c.id]).find(Boolean)) || null;
@@ -589,16 +591,16 @@
     if (cx.fam.air && cx.rng() < 0.3) extras.push(cx.pick(cx.fam.air, 'air'));
     if (ctx.weapon && ctx.weapon.rarity && D.AURAS[ctx.weapon.rarity] && D.AURAS[ctx.weapon.rarity].length) extras.push(cx.pick(D.AURAS[ctx.weapon.rarity], 'aura'));
     if (attack_isMagicWeapon(p, ctx)) extras.push(cx.pick(D.AURAS.rare, 'aura2'));
-    const maxExtra = detail === 'brief' ? 0 : detail === 'full' ? 2 : 1;
+    const maxExtra = detail === 'full' ? 1 : 0;   // extra scene-setting only on request (Full detail)
     wind = [wind].concat(extras.slice(0, maxExtra).map(x => polish(expand(x, cx)))).join(' ');
     add(labels.windup || (spellSpec ? 'The casting' : area || single ? 'Telegraph' : 'Wind-up'), wind, 'windup');
 
     // 2. the attack -----------------------------------------------------------
     let motion = T(cx, cx.pick(spec.motion || [], 'motion'));
-    if (magicalEl && attackRoll && !spellSpec && moveId !== 'ray' && moveId !== 'orb' && cx.rng() < 0.8) motion += ' ' + T(cx, cx.pick(['{Sub} wreathes the attack: {glow}, with {sound}.', 'The strike is wrapped in {sub}; {glow}.', 'As it lands, {glow}, and there is {sound}.'], 'flour'));
+    if (magicalEl && attackRoll && !spellSpec && moveId !== 'ray' && moveId !== 'orb' && detail === 'full' && cx.rng() < 0.8) motion += ' ' + T(cx, cx.pick(['{Sub} wreathes the attack: {glow}, with {sound}.', 'The strike is wrapped in {sub}; {glow}.', 'As it lands, {glow}, and there is {sound}.'], 'flour'));
     if (p.area || (spellSpec && spellSpec.shape)) {
       const sc = areaScale(p, spellSpec);
-      if (sc && (area || spellSpec) && cx.rng() < 0.8) motion += ' ' + areaSentence(p, spellSpec, sc);
+      if (sc && (area || spellSpec) && detail === 'full' && cx.rng() < 0.8) motion += ' ' + areaSentence(p, spellSpec, sc);
     }
     add(labels.motion || (spellSpec ? 'The spell' : area || single ? 'The attack' : 'The attack'), motion, 'motion');
 
@@ -616,7 +618,7 @@
     if (!cx.noDmg) { const gp = E && (E.physical && (move && move.group === 'natural') ? E.gearNatural : E.gear); if (gp && cx.rng() < (cx.tier >= 2 ? 0.55 : 0.3)) hitExtras.push(cx.pick(gp, 'gear')); }
     if (!cx.noDmg && E && E.residue && cx.rng() < 0.3) hitExtras.push(cx.pick(E.residue, 'residue'));
     if (!cx.noDmg && D.TYPE_FLAIR[cx.famId] && cx.rng() < 0.2) hitExtras.push(cx.pick((['Tiny', 'Small', 'Medium'].includes(cx.size) && D.TYPE_FLAIR_SMALL[cx.famId]) || D.TYPE_FLAIR[cx.famId], 'typeflair'));
-    const maxHit = detail === 'brief' ? 0 : detail === 'full' ? 2 : 1;
+    const maxHit = detail === 'full' ? 1 : 0;
     hit = [hit].concat(hitExtras.slice(0, maxHit).map(x => polish(expand(x, cx)))).join(' ');
     if (!effectOnly) add(area ? 'Caught in it' : single ? 'On a failed save' : 'On a hit', hit, 'hit');
 
