@@ -435,6 +435,8 @@
   .loot-item:last-child { border-bottom: none; }
 
   .rarity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .loot-rarity-col { display:flex; flex-direction:column; align-items:flex-start; gap:0.3rem; }
+  .loot-item-art { line-height:0; }
   .rarity-label { font-size: 0.75rem; font-family: 'Share Tech Mono', monospace; padding-top: 2px; }
 
   .loot-item-text .item-name { font-weight: 600; }
@@ -8358,7 +8360,7 @@ function renderResults() {
       ${result.items.map((it,ii)=>`
         <div class="loot-item ${it.rarity}" ${resultItemTooltipAttrs('roll', result.enemy-1, ii)}>
           <div class="rarity-dot"></div>
-          <span class="rarity-label">[${rarityNames[it.rarity]}]</span>
+          <div class="loot-rarity-col"><span class="rarity-label">[${rarityNames[it.rarity]}]</span><div class="loot-item-art">${itemPixelIcon(it, 52, it.rarity)}</div></div>
           <div class="loot-item-text">
             ${renderItemWithInspection(it, inspectMode, `roll-${result.enemy}-${ii}`)}
             ${saveBtnHtml(ii)}
@@ -9105,7 +9107,7 @@ function renderChestResults() {
       ${chest.items.map((it,ii) => `
         <div class="loot-item ${it.rarity}" ${resultItemTooltipAttrs('chest', chest.id-1, ii)}>
           <div class="rarity-dot"></div>
-          <span class="rarity-label">[${rarityNames[it.rarity]}]</span>
+          <div class="loot-rarity-col"><span class="rarity-label">[${rarityNames[it.rarity]}]</span><div class="loot-item-art">${itemPixelIcon(it, 52, it.rarity)}</div></div>
           <div class="loot-item-text">
             ${renderItemWithInspection(it, inspectMode, `chest-${chest.id}-${ii}`)}
             <span class="loot-item-actions">
@@ -9254,7 +9256,7 @@ function renderDeceasedResults() {
       ${body.items.map((it, ii) => `
         <div class="loot-item ${it.rarity}" ${resultItemTooltipAttrs('deceased', body.id - 1, ii)}>
           <div class="rarity-dot"></div>
-          <span class="rarity-label">[${rarityNames[it.rarity]}]</span>
+          <div class="loot-rarity-col"><span class="rarity-label">[${rarityNames[it.rarity]}]</span><div class="loot-item-art">${itemPixelIcon(it, 52, it.rarity)}</div></div>
           <div class="loot-item-text">
             ${renderItemWithInspection(it, inspectMode, `deceased-${body.id}-${ii}`)}
             <span class="loot-item-actions">
@@ -11088,16 +11090,19 @@ function buildDescParagraphs(baseName, cat, rarity, tags, mods, stats) {
       return resolveTokens(val, depth + 1);
     });
   }
-  const appearance = resolveTokens(rawAppearance);
+  // Descriptions stay short: a generated item gets at most a few sentences (what it looks like, what its material looks like,
+  // what it does), never a paragraph per modifier.
+  const firstSentence = t => { const m = String(t || '').trim().match(/^[\s\S]*?[.!?](?=\s|$)/); return m ? m[0].trim() : String(t || '').trim(); };
+  const appearance = firstSentence(resolveTokens(rawAppearance));
 
   // Tag-driven physical detail
   const tagLines = tags.flatMap(t => (DESC.tagPhysical || {})[t] || []);
-  const physText = tagLines.length ? `${appearance} ${ri(tagLines)}` : appearance;
+  const physText = tagLines.length && Math.random() < 0.4 ? `${appearance} ${firstSentence(ri(tagLines))}` : appearance;
   paragraphs.push({ kind: 'appearance', label: 'Appearance', text: physText });
 
   // ── P1b: what its material / enchantment prefixes look like (item-affixes.js) ──
   if (window.ItemAffixData && (cat === 'weapon' || cat === 'armor')) {
-    const lines = mods.filter(m => m.prefix).slice(0, 3).map(m => {
+    const lines = mods.filter(m => m.prefix).slice(0, 1).map(m => {
       const lk = ItemAffixData.looks[m.name]; const pool = lk && (cat === 'armor' ? lk.armor : lk.weapon);
       return pool && pool.length ? ri(pool).replace(/\{w\}/g, lowerName) : null;
     }).filter(Boolean);
@@ -11111,7 +11116,7 @@ function buildDescParagraphs(baseName, cat, rarity, tags, mods, stats) {
 
   if (primaryModType && DESC.modEffect && DESC.modEffect[primaryModType]) {
     const modPool = DESC.modEffect[primaryModType];
-    paragraphs.push({ kind: 'mod', label: '', text: ri(modPool) });
+    paragraphs.push({ kind: 'mod', label: '', text: firstSentence(ri(modPool)) });
   }
 
   // ── Final: Closing sentence ──
@@ -11126,7 +11131,8 @@ function buildDescParagraphs(baseName, cat, rarity, tags, mods, stats) {
     const closingPool = DESC.closing[rarity] || DESC.closing.common;
     closingText = ri(closingPool);
   }
-  paragraphs.push({ kind: 'closing', label: '', text: closingText });
+  // A closing line only for the top tiers, and only its first sentence.
+  if (rarity === 'legendary' || rarity === 'celestial') paragraphs.push({ kind: 'closing', label: '', text: firstSentence(closingText) });
 
   return paragraphs;
 }
