@@ -1,0 +1,251 @@
+/* ==========================================================================================================
+   RETRO DUNGEON THEME
+   A pixel-art skin for the whole app, matching the token art: hard pixel edges, a chunky stone-and-torchlight palette,
+   pixel fonts, bevelled stone buttons, brick walls. It is a pure override layer loaded AFTER the app's own <style>, so
+   deleting the <link> restores the old look. No markup or script depends on it.
+   Fonts (SIL Open Font License): VT323 (body), Silkscreen (labels, buttons), Press Start 2P (titles). In fonts/.
+   Art: retro/*.svg (brick wall, stone panel speckle, animated torch, bone divider, sword cursor, favicon).
+   ========================================================================================================== */
+
+/* ---- fonts: the app asks for 'Crimson Text' and 'Share Tech Mono' everywhere, so those names are pointed at the pixel
+        fonts. Every inline style and class gets the new look without being touched. ---- */
+@font-face { font-family: 'Crimson Text'; font-style: normal; font-weight: 100 900; src: url('fonts/VT323.ttf') format('truetype'); size-adjust: 118%; }
+@font-face { font-family: 'Crimson Text'; font-style: italic; font-weight: 100 900; src: url('fonts/VT323.ttf') format('truetype'); size-adjust: 118%; }
+@font-face { font-family: 'Share Tech Mono'; font-style: normal; font-weight: 100 900; src: url('fonts/VT323.ttf') format('truetype'); size-adjust: 112%; }
+@font-face { font-family: 'Press Start 2P'; font-style: normal; font-weight: 400; src: url('fonts/PressStart2P.ttf') format('truetype'); }
+@font-face { font-family: 'Silkscreen'; font-style: normal; font-weight: 400; src: url('fonts/Silkscreen-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Silkscreen'; font-style: normal; font-weight: 700; src: url('fonts/Silkscreen-Bold.ttf') format('truetype'); }
+
+:root {
+  --bg: #0a080b;
+  --surface: #1a1612;
+  --surface2: #261f18;
+  --border: #54432a;
+  --gold: #e0a43c;
+  --gold-bright: #ffd470;
+  --text: #ece0c4;
+  --text-dim: #a1906c;
+  --danger: #e8584a;
+  --ember: #ff8a2b;
+  --stone-hi: #6b5a3a;
+  --stone-lo: #120e0a;
+  --f-title: 'Press Start 2P', monospace;
+  --f-label: 'Silkscreen', 'Press Start 2P', monospace;
+  /* a pixel frame: black outline, then the panel, then an inner highlight and shade */
+  --frame: 0 0 0 2px #000, 4px 4px 0 2px rgba(0, 0, 0, .75), inset 0 0 0 2px rgba(0, 0, 0, .55), inset 2px 2px 0 rgba(255, 224, 160, .07), inset -2px -2px 0 rgba(0, 0, 0, .35);
+  --bevel: inset 2px 2px 0 var(--stone-hi), inset -2px -2px 0 var(--stone-lo);
+}
+
+html { font-size: 17px; -webkit-font-smoothing: none; font-smooth: never; }
+* { -webkit-font-smoothing: none; }
+svg, canvas, img { image-rendering: pixelated; }
+
+/* ---- the wall behind everything, lit by two torches ---- */
+body {
+  background-color: #0b090c;
+  background-image: url('retro/wall.svg');
+  background-size: 128px 96px;
+  image-rendering: pixelated;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  letter-spacing: .01em;
+  cursor: url('retro/cursor.svg') 0 0, auto;
+}
+body::before {          /* dark vignette so the content area reads against the bricks */
+  content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 35%, rgba(10, 8, 11, .35) 0%, rgba(10, 8, 11, .72) 62%, rgba(4, 3, 5, .94) 100%);
+}
+body::after {           /* torchlight flicker from the top corners */
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(circle at 4% 0%, rgba(255, 138, 43, .20), transparent 34%),
+    radial-gradient(circle at 96% 0%, rgba(255, 138, 43, .20), transparent 34%);
+  animation: rtFlicker 2.4s steps(6) infinite;
+}
+@keyframes rtFlicker { 0% { opacity: .85 } 20% { opacity: 1 } 40% { opacity: .75 } 60% { opacity: .95 } 80% { opacity: .8 } 100% { opacity: .9 } }
+a, button, [onclick], select, summary, label, .tab-btn, [class*="btn"], .inv-item, .doll-slot { cursor: url('retro/cursor.svg') 0 0, pointer; }
+::selection { background: var(--ember); color: #000; }
+
+/* ---- title ---- */
+h1 {
+  font-family: var(--f-title); font-weight: 400; font-size: 1.9rem; letter-spacing: .08em; line-height: 1.3;
+  color: var(--gold-bright);
+  text-shadow: 3px 3px 0 #5a2a06, 6px 6px 0 #000, 0 0 24px rgba(255, 138, 43, .45);
+  padding: 2rem 1rem .6rem; position: relative;
+}
+h1::before, h1::after {   /* animated torches either side of the title */
+  content: ''; position: absolute; top: 50%; width: 96px; height: 96px; margin-top: -40px;
+  background: url('retro/torch.svg') 0 0 / 192px 96px no-repeat; image-rendering: pixelated;
+  animation: rtTorch .5s steps(1) infinite;
+}
+h1::before { left: calc(50% - min(44vw, 420px)); }
+h1::after { right: calc(50% - min(44vw, 420px)); transform: scaleX(-1); }
+@keyframes rtTorch { 0% { background-position: 0 0 } 50% { background-position: -96px 0 } }
+.subtitle {
+  font-family: var(--f-label); font-style: normal; letter-spacing: .12em; font-size: .78rem; text-transform: uppercase; color: var(--text-dim);
+  padding-bottom: 26px; margin-bottom: 1rem; position: relative;
+}
+.subtitle::after { content: ''; position: absolute; left: 50%; bottom: 4px; width: min(420px, 80vw); height: 16px; transform: translateX(-50%); background: url('retro/divider.svg') center / auto 16px repeat-x; image-rendering: pixelated; opacity: .9; }
+h2, h3, h4 { font-family: var(--f-label); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-shadow: 2px 2px 0 #000; }
+h3 { font-size: 1rem; }
+h2 { font-size: 1.2rem; }
+em, i, .item-desc, [style*="italic"] { font-style: normal !important; }
+
+/* ---- tabs: stone door plaques ---- */
+.tab-btn, .compendium-subtab-btn, .combat-subtab-btn, .dmcontrols-subtab-btn, .reference-subtab-btn, .store-merchant-btn, .puzzle-cat-btn, .spin-mode-btn {
+  font-family: var(--f-label); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; line-height: 1.2;
+  background: linear-gradient(#2c251c, #1a150f); color: #b9a67c;
+  border: 2px solid #000; border-radius: 0; padding: .55rem 1rem;
+  box-shadow: var(--bevel), 0 3px 0 #000; text-shadow: 1px 1px 0 #000;
+  transition: none; position: relative;
+}
+.tab-btn:hover, .compendium-subtab-btn:hover, .combat-subtab-btn:hover, .dmcontrols-subtab-btn:hover, .reference-subtab-btn:hover, .store-merchant-btn:hover, .puzzle-cat-btn:hover, .spin-mode-btn:hover {
+  color: var(--gold-bright); border-color: #000; background: linear-gradient(#3a2f20, #231b12); transform: translateY(-1px);
+}
+.tab-btn.active, .compendium-subtab-btn.active, .combat-subtab-btn.active, .dmcontrols-subtab-btn.active, .reference-subtab-btn.active, .store-merchant-btn.active, .puzzle-cat-btn.active, .spin-mode-btn.active {
+  color: #1a0f00; background: linear-gradient(#ffd470, #e0a43c 55%, #b9791d); border-color: #000;
+  box-shadow: inset 2px 2px 0 #fff0b8, inset -2px -2px 0 #8a5410, 0 0 0 2px #000, 0 0 16px rgba(255, 138, 43, .55); text-shadow: 1px 1px 0 rgba(255, 240, 184, .6);
+  transform: translateY(2px);
+}
+.tabs { gap: .7rem; row-gap: .9rem; }
+
+/* ---- buttons: bevelled stone / brass ---- */
+button, .action-btn, .ic-action-btn, .loot-save-btn, .combat-roll-btn, .sheet-attack-btn, .edit-save-btn, .mapbuilder-tool-btn, .mapbuilder-prop-btn,
+.deck-draw-btn, .gambling-action-btn, .roulette-outside-btn, .poker-hold-btn, .hp-nudge-btn, .mapbuilder-eraser-btn {
+  font-family: var(--f-label); letter-spacing: .04em; border-radius: 0;
+}
+.action-btn, .ic-action-btn, .loot-save-btn, .combat-roll-btn, .sheet-attack-btn, .mapbuilder-tool-btn, .mapbuilder-prop-btn, .deck-draw-btn, .gambling-action-btn, .roulette-outside-btn, .poker-hold-btn, .mapbuilder-eraser-btn, .power-picker-option {
+  background: linear-gradient(#352c20, #211a12); color: #cdbb90; border: 2px solid #000;
+  box-shadow: var(--bevel), 0 2px 0 #000; text-shadow: 1px 1px 0 #000; font-size: .72rem; text-transform: uppercase; line-height: 1.25; padding: .4rem .75rem;
+  transition: none;
+}
+.action-btn:hover, .ic-action-btn:hover, .loot-save-btn:hover, .combat-roll-btn:hover, .sheet-attack-btn:hover, .mapbuilder-tool-btn:hover, .mapbuilder-prop-btn:hover, .deck-draw-btn:hover, .gambling-action-btn:hover, .roulette-outside-btn:hover, .poker-hold-btn:hover, .power-picker-option:hover {
+  color: var(--gold-bright); border-color: #000; background: linear-gradient(#43382a, #2a2116);
+  box-shadow: var(--bevel), 0 2px 0 #000, 0 0 10px rgba(255, 138, 43, .35);
+}
+.action-btn:active, .ic-action-btn:active, .loot-save-btn:active, .combat-roll-btn:active, .sheet-attack-btn:active, .edit-save-btn:active {
+  transform: translateY(2px); box-shadow: inset 2px 2px 0 var(--stone-lo), inset -2px -2px 0 var(--stone-hi); }
+.loot-save-btn.saved { color: #7fe3a3; background: linear-gradient(#1f3a2a, #12251a); }
+.edit-save-btn, .spin-btn {
+  background: linear-gradient(#ffd470, #e0a43c 55%, #b9791d); color: #1a0f00; border: 2px solid #000; border-radius: 0;
+  box-shadow: inset 2px 2px 0 #fff0b8, inset -2px -2px 0 #8a5410, 0 3px 0 #000; font-family: var(--f-title); font-size: .9rem; letter-spacing: .08em;
+  text-shadow: 1px 1px 0 rgba(255, 240, 184, .55); text-transform: uppercase;
+}
+.spin-btn { font-size: 1.05rem; padding: 1.05rem 1rem; }
+.spin-btn:hover:not(:disabled) { box-shadow: inset 2px 2px 0 #fff0b8, inset -2px -2px 0 #8a5410, 0 3px 0 #000, 0 0 22px rgba(255, 138, 43, .7); transform: translateY(-1px); }
+.spin-btn:active:not(:disabled) { transform: translateY(2px); }
+.spin-btn-hint { font-family: var(--f-label); font-size: .6rem; text-transform: uppercase; letter-spacing: .08em; }
+
+/* ---- inputs: dug into the stone ---- */
+input, select, textarea, .sheet-field input[type=text], .sheet-field input[type=number], .edit-modal-body input, .edit-modal-body textarea, .edit-modal-body select, .effects-search, .gambling-bet-input {
+  background: #0d0a08; color: var(--text); border: 2px solid #000; border-radius: 0;
+  box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 rgba(255, 224, 160, .08); font-family: 'Share Tech Mono', monospace; font-size: 1.05rem;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--ember); box-shadow: inset 2px 2px 0 #000, 0 0 0 2px var(--ember); }
+input[type=checkbox], input[type=radio] { accent-color: var(--gold); }
+input[type=range] { accent-color: var(--ember); }
+select option { background: #15110d; }
+
+/* ---- panels: framed stone slabs ---- */
+details.collapsible, .items-panel, .edit-modal, .ir-card, .trap-card, .cult-card, .npc-card, .ref-card, .inv-summary-bar, .dm-roster-bar, .deck-of-many-things-panel, .elder-runes-panel,
+.geomorph-card, .mapbuilder-battlemap-card, .mapbuilder-map-card, .mapbuilder-toolbar, .mapbuilder-props-panel, .mapbuilder-new-form, .limbs-panel, .loadouts-panel, .riddle-card,
+.combat-card, .players-detail, .players-list-row, .combat-log, .journey-setting-card, .journey-person-card, .active-effects-panel, .enemy-result, .chance-card, .store-card, .bounty-card,
+.effects-card, .mw-card, .mp-parttype-card, .unlock-item-card, .sheet-ability-box, .spellbook-slot-box, .pending-attack-row, .combat-settings, .spells-controls, .spell-detail, .flesh-confirm-box,
+.gambling-host-picker, .journey-log-entry, .token-card, .inv-grid-wrap, .rl-item, .ae-row, .interactions-item-row, .gen-list-row, .trait-row, .control-row, .results-panel, .total-bar, .equip-ac-readout, .inv-remove-zone, .inv-refill-zone, .combat-picker-results, .bt-side, .journey-stage, .rl-cell, .npc-card-secret, .inspect-toggle-row {
+  background-color: var(--surface); background-image: url('retro/panel.svg'); background-size: 64px 64px; border-radius: 0;
+  box-shadow: var(--frame);
+}
+.rl-cell, .inv-remove-zone, .inv-refill-zone { box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 rgba(255, 224, 160, .08); background-color: #0f0c09; }
+.combat-suggested-chip, .add-btn, .generate-btn { font-family: var(--f-label); font-size: .7rem; text-transform: uppercase; background: linear-gradient(#352c20, #211a12); color: #cdbb90; border: 2px solid #000; box-shadow: var(--bevel), 0 2px 0 #000; }
+.combat-suggested-chip:hover, .add-btn:hover, .generate-btn:hover { color: var(--gold-bright); }
+.generate-btn { background: linear-gradient(#ffd470, #e0a43c 55%, #b9791d); color: #1a0f00; box-shadow: inset 2px 2px 0 #fff0b8, inset -2px -2px 0 #8a5410, 0 3px 0 #000; }
+details.collapsible > summary, .collapsible > summary { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .06em; font-size: .85rem; }
+.edit-modal { box-shadow: 0 0 0 2px #000, 0 0 0 6px var(--gold), 0 0 0 8px #000, 10px 10px 0 8px rgba(0, 0, 0, .6); }
+.edit-modal-overlay { background: rgba(4, 3, 6, .8) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="2" height="2" fill="%23000" fill-opacity=".28"/><rect x="2" y="2" width="2" height="2" fill="%23000" fill-opacity=".28"/></svg>'); }
+.edit-modal-header, .edit-modal-actions { border-color: #000; background: rgba(0, 0, 0, .25); }
+.edit-modal-header h3 { font-family: var(--f-title); font-size: .85rem; line-height: 1.4; color: var(--gold-bright); }
+.edit-modal-close { font-family: var(--f-label); }
+.enemy-result, .chance-card, .store-card { padding: .85rem; }
+.items-panel, .active-effects-panel { padding: 1rem; }
+
+/* ---- items: square gems, framed tiles ---- */
+.rarity-dot { border-radius: 0; width: 10px; height: 10px; transform: rotate(45deg); box-shadow: 0 0 0 1px #000; margin-top: 7px; }
+.loot-item { border-bottom: 2px dashed rgba(84, 67, 42, .55); padding: .55rem 0; }
+.loot-item .item-name { font-family: var(--f-label); font-size: .95rem; letter-spacing: .03em; text-shadow: 1px 1px 0 #000; }
+.rarity-label { font-family: var(--f-label); font-size: .6rem; letter-spacing: .06em; text-transform: uppercase; text-shadow: 1px 1px 0 #000; }
+.loot-item-art > * { filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .6)); }
+.meta-tag, .tt-stats span, .tt-scale-chip, .sheet-chip, .ps-chip, .ex-chip { border-radius: 0 !important; border-width: 2px !important; border-color: #000 !important; background: rgba(0, 0, 0, .45); box-shadow: inset 1px 1px 0 rgba(255, 224, 160, .12); font-family: var(--f-label); font-size: .62rem; text-transform: uppercase; letter-spacing: .04em; }
+.inv-cell { background: #0f0c09; border: 2px solid #000; border-radius: 0; box-shadow: inset 2px 2px 0 #000, inset -2px -2px 0 rgba(255, 224, 160, .07); }
+.inv-item, .doll-slot { border-radius: 0; border-width: 2px; border-color: #000; box-shadow: inset 2px 2px 0 rgba(255, 224, 160, .14), inset -2px -2px 0 rgba(0, 0, 0, .45); }
+.doll-slot { background: #120e0a; border-style: solid !important; border-color: #000 !important; }
+.doll-slot.limb { border-color: #4a1f1f !important; }
+.doll-slot.filled { box-shadow: inset 2px 2px 0 rgba(255, 224, 160, .2), inset -2px -2px 0 rgba(0, 0, 0, .5), 0 0 0 2px var(--gold); }
+.ability-btn { border-radius: 0; border: 2px solid #000; background: linear-gradient(#2c251c, #1a150f); box-shadow: var(--bevel); }
+.sheet-ability-box { padding: .5rem; }
+
+/* ---- tooltips ---- */
+.item-tooltip { border: 2px solid #000; border-radius: 0; background-color: #1d1812; background-image: url('retro/panel.svg'); box-shadow: 0 0 0 2px var(--gold), 0 0 0 4px #000, 6px 6px 0 4px rgba(0, 0, 0, .6); font-size: 1.05rem; }
+.tt-header { font-family: var(--f-label); font-size: .95rem; text-shadow: 2px 2px 0 #000; letter-spacing: .03em; }
+.tt-rarity { font-family: var(--f-label); font-size: .6rem; }
+.item-tooltip.tt-sheet { border-radius: 0; }
+.tt-actions button { border-radius: 0; font-family: var(--f-label); }
+
+/* ---- dividers and rules ---- */
+hr { border: none; height: 8px; background: url('retro/divider.svg') center / auto 8px repeat-x; image-rendering: pixelated; opacity: .8; margin: 1rem 0; }
+.players-section-title, .section-title { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .08em; text-shadow: 2px 2px 0 #000; }
+
+/* ---- floating buttons ---- */
+.dice-roller-fab, .simulate-day-fab { border-radius: 0 !important; border: 2px solid #000 !important; box-shadow: var(--bevel), 0 0 0 2px var(--gold), 4px 4px 0 2px rgba(0, 0, 0, .7) !important; background: linear-gradient(#352c20, #211a12) !important; }
+.dice-roller-fab:hover, .simulate-day-fab:hover { transform: translateY(-2px); }
+
+/* ---- tables ---- */
+table { border-collapse: separate; border-spacing: 0; }
+th { font-family: var(--f-label); text-transform: uppercase; font-size: .66rem; letter-spacing: .05em; background: #120e0a; color: var(--gold); }
+td, th { border-color: #000; }
+tbody tr:hover td { background: rgba(224, 164, 60, .09); }
+
+/* ---- progress bars / sliders ---- */
+progress, .hp-bar, .combat-hp-slider { border-radius: 0; }
+.inv-weight-bar, #invWeightBarOuter { border-radius: 0; border: 2px solid #000; background: #0d0a08; box-shadow: inset 2px 2px 0 #000; }
+#invWeightBarInner { border-radius: 0; }
+
+/* ---- scrollbars ---- */
+* { scrollbar-width: thin; scrollbar-color: #7a6238 #0d0a08; }
+::-webkit-scrollbar { width: 14px; height: 14px; }
+::-webkit-scrollbar-track { background: #0d0a08; border-left: 2px solid #000; }
+::-webkit-scrollbar-thumb { background: #7a6238; border: 2px solid #000; box-shadow: inset 2px 2px 0 #b8964f, inset -2px -2px 0 #4a3a1e; }
+::-webkit-scrollbar-thumb:hover { background: #a07f3e; }
+::-webkit-scrollbar-corner { background: #0d0a08; }
+
+/* ---- status panel, examine, attack chooser and other newer parts pick up the same frame ---- */
+.ps-sec, .ex-sec, .ps-card, .attack-chooser, .am-box, .wm-result { border-radius: 0 !important; border-width: 2px; border-color: #000; box-shadow: inset 2px 2px 0 rgba(255, 224, 160, .1), inset -2px -2px 0 rgba(0, 0, 0, .4); }
+.ac-opt, .ps-tag { border-radius: 0; border-width: 2px; }
+.ps-sec > summary, .ex-sec > summary { font-family: var(--f-label); text-transform: uppercase; font-size: .72rem; letter-spacing: .05em; }
+
+/* ---- Battle Field / map: square tokens' labels, framed field ---- */
+.bt-field { border: 2px solid #000; box-shadow: var(--frame); }
+.bt-token .lbl, .bt-token .ac, .bt-token .lv { border-radius: 0; border-width: 2px; font-family: var(--f-label); font-size: .55rem; text-transform: uppercase; }
+.bt-token .bar { border-radius: 0; border: 2px solid #000; }
+.bt-chip { border-radius: 0; border-width: 2px; border-color: #000; box-shadow: var(--bevel); }
+
+/* ---- generic safety net: nothing keeps soft rounded corners ---- */
+[class*="card"], [class*="panel"], [class*="btn"], [class*="chip"], [class*="tag"], [class*="row"], [class*="box"], [class*="bar"], input, select, textarea, details, summary { border-radius: 0 !important; }
+
+/* ---- small screens: keep the torches off the title and tighten the type ---- */
+@media (max-width: 760px) {
+  html { font-size: 16px; }
+  h1 { font-size: 1.05rem; padding: 3.4rem .6rem .4rem; letter-spacing: .04em; }
+  h1::before, h1::after { display: none; }
+  .subtitle { font-size: .62rem; letter-spacing: .06em; padding-bottom: 22px; }
+  .tabs { gap: .45rem; row-gap: .55rem; }
+  .tab-btn, .compendium-subtab-btn, .combat-subtab-btn, .dmcontrols-subtab-btn, .reference-subtab-btn, .store-merchant-btn, .puzzle-cat-btn, .spin-mode-btn { font-size: .6rem; letter-spacing: .02em; padding: .45rem .5rem; }
+  .inv-summary-bar { gap: .3rem .9rem !important; padding: .5rem .7rem !important; }
+  .loot-item .item-name { font-size: .78rem; }
+  .spin-btn { font-size: .85rem; }
+}
+@media (prefers-reduced-motion: reduce) { body::after, h1::before, h1::after { animation: none; } }
+@media print { body, body::before, body::after { background: #fff !important; } }
+
+/* long generated names wrap instead of running off the card */
+.loot-item .item-name, .item-card .ic-name, .token-card-name, .store-card-name { overflow-wrap: anywhere; word-break: normal; }
+.loot-item .item-name { font-size: .85rem; line-height: 1.35; }
