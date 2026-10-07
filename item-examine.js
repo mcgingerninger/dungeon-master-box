@@ -23,7 +23,8 @@
     + '.ex-note{color:var(--text-dim,#aaa);font-size:.78rem}.ex-mod{margin:.25rem 0;padding-left:.5rem;border-left:2px solid var(--border,#444)}.ex-mod b{color:var(--gold,#c9a227)}'
     + '.ex-eff{display:flex;flex-wrap:wrap;gap:.3rem;margin:.25rem 0}.ex-eff span{font-size:.74rem;padding:.05rem .4rem;border:1px solid var(--border,#444);border-radius:3px}'
     + '.ex-eff.major span{color:#e8963a;border-color:#e8963a}.ex-eff.minor span{color:#7fd0f0;border-color:#7fd0f0}'
-    + '.ex-hint{position:fixed;bottom:0;left:0;right:0}';
+    + '.ex-hint{position:fixed;bottom:0;left:0;right:0}'
+    + '@media (max-width:700px){.ex-head{flex-wrap:wrap;gap:.5rem}.ex-head h2{font-size:1.1rem;overflow-wrap:anywhere}.ex-sec>summary{min-height:44px;display:flex;align-items:center}.ex-body{padding:.2rem .6rem .7rem;font-size:.92rem;overflow-x:auto}.ex-table{display:block;overflow-x:auto;white-space:nowrap}.ex-table td,.ex-table th{padding:.35rem .5rem}}';
   if (typeof document !== 'undefined' && document.head && !document.getElementById('exStyle')) { const st = document.createElement('style'); st.id = 'exStyle'; st.textContent = CSS; document.head.appendChild(st); }
 
   const sec = (title, body, open) => (body ? `<details class="ex-sec"${open === false ? '' : ' open'}><summary>${title}</summary><div class="ex-body">${body}</div></details>` : '');
@@ -165,7 +166,7 @@
     const modal = document.getElementById('itemExamineModal'); if (!modal) return;
     document.getElementById('itemExamineBody').innerHTML = examineHtml(item, rarity, key);
     modal.classList.add('open');
-    if (typeof hideTokenTooltip === 'function') hideTokenTooltip();
+    if (typeof hideTokenTooltip === 'function') hideTokenTooltip(true);
   }
   function close() { document.getElementById('itemExamineModal')?.classList.remove('open'); }
 

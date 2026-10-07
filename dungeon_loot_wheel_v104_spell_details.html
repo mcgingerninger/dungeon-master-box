@@ -2245,8 +2245,21 @@
   .tt-rarity { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
   /* Hoverable source lines in the attack popup */
   .attack-src { border-bottom:1px dotted var(--gold); cursor:help; }
+  .item-tooltip { max-width:min(320px, calc(100vw - 16px)); }
+  .item-tooltip.tt-sheet { position:fixed; left:0 !important; right:0; bottom:0; top:auto !important; max-width:none; max-height:68vh; overflow-y:auto; -webkit-overflow-scrolling:touch; pointer-events:auto; z-index:9000; border-width:2px 0 0; border-radius:14px 14px 0 0; padding:1rem 1rem calc(.8rem + env(safe-area-inset-bottom)); font-size:.95rem; box-shadow:0 -8px 30px rgba(0,0,0,.7); overscroll-behavior:contain; }
+  .tt-actions { position:sticky; bottom:-.8rem; display:flex; gap:.6rem; margin:.7rem -1rem -.8rem; padding:.6rem 1rem calc(.6rem + env(safe-area-inset-bottom)); background:var(--surface2); border-top:1px solid var(--border); }
+  .tt-actions button { flex:1; min-height:44px; font-size:1rem; background:var(--surface); color:var(--gold); border:1px solid var(--gold); border-radius:6px; }
   .tt-hint { margin-top:.4rem; padding-top:.3rem; border-top:1px dashed var(--border); font-size:.68rem; color:var(--text-dim); text-align:center; }
   /* Wild Magic table */
+  @media (max-width:700px) {
+    .edit-modal-overlay { padding:0; align-items:flex-end; }
+    .edit-modal { width:100%; max-height:94vh; border-width:2px 0 0; }
+    .edit-modal input, .edit-modal select, .edit-modal textarea { font-size:16px; }
+    .wm-row { flex-direction:column; gap:.1rem; }
+    .am-box { font-size:.95rem; } .am-eff select { max-width:100%; width:100%; min-height:40px; font-size:16px; }
+    .am-ac input { width:6rem; font-size:16px; min-height:40px; }
+    .active-effects-panel { max-height:none; flex-basis:100%; min-width:0; }
+  }
   .wm-result { margin:.7rem 0; padding:.6rem .8rem; border-left:3px solid var(--gold); background:rgba(201,162,39,.08); min-height:2.4rem; font-size:.95rem; }
   .wm-result b.wm-n { font-family:monospace; color:var(--gold); margin-right:.5rem; }
   .wm-kind { font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; padding:.05rem .4rem; border:1px solid var(--border); border-radius:3px; margin-left:.4rem; }
@@ -4278,6 +4291,11 @@
       </div>
     </div>
 
+    <div class="active-effects-panel player-status-panel">
+      <h3>🧍 Player Status</h3>
+      <div id="playerStatusPanel"></div>
+    </div>
+
     <div class="active-effects-panel">
       <h3>⚡ Active Effects</h3>
       <div id="activeEffectsList"></div>
@@ -4541,6 +4559,9 @@
   // Attack margin system (docs/ATTACK_MARGIN.md): M = d20 + mods - AC picks a tier, damage percent and effects.
   import * as AttackMarginEngine from './mechanics/engine/combat/attack-margin.js';
   window.AttackMargin = AttackMarginEngine;
+  // Player Status (docs/PLAYER_STATUS.md): everything active on a character right now.
+  import * as PlayerStatusEngine from './mechanics/engine/character/player-status.js';
+  window.PlayerStatus = PlayerStatusEngine;
   // Item Rules (docs/ITEM_RULES.md): modifier weights decide rarity + gp, and a shared rule set
   // (no attack-roll modifiers, no only-bad items, modifier cap, ...) is enforced on every item
   // source. Classic code reaches the engine through window.ItemRules at generation time.
@@ -4566,6 +4587,7 @@ const APP_VERSION = 'v104';
 <script src="item-affixes.js"></script>
 <script src="wild-magic-data.js"></script>
 <script src="item-examine.js"></script>
+<script src="player-status.js"></script>
 <script src="item-art-kit.js"></script>
 <script src="item-art-weapons.js"></script>
 <script src="item-art-armor.js"></script>
@@ -14373,6 +14395,7 @@ setInterval(() => {
     if (typeof updateInventorySummary === 'function') updateInventorySummary();
   } else if (typeof renderActiveEffectsDisplay === 'function') {
     renderActiveEffectsDisplay();
+    if (window.PlayerStatusUI) PlayerStatusUI.tick(document.getElementById('playerStatusPanel'));
   }
   // The ability bar's own cooldown badge (see renderAbilityBar) needs the same live per-second
   // countdown, and needs to un-gray the button the instant its timer actually expires — every
@@ -17947,6 +17970,21 @@ function formatRemainingTime(ms) {
 function renderActiveEffects() {
   if (typeof scheduleSave === 'function') scheduleSave();
   renderActiveEffectsDisplay();
+  renderPlayerStatus();
+}
+// Player Status panel (see player-status.js + mechanics/engine/character/player-status.js). Built from the same
+// inputs the character sheet uses, so the two always agree.
+function buildStatusFor(state, resolveFn) {
+  const sheet = computeCharacterSheetFor(state.characterAbilityScores || { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, state.characterLevel || 1, state.skillProficiencies || [], state.saveProficiencies || [], state.playerSlots || {}, resolveFn, state.characterMaxHp != null ? state.characterMaxHp : 10, state.characterSpeed, [...(state.activeTimedEffects || []), ...featEffectEntries(state.feats), ...achievedUnlockEffectEntries(state.achievedUnlocks, key => { const r = resolveFn(key); return r && r.item; })]);
+  return PlayerStatus.buildPlayerStatus({ sheet, slots: state.playerSlots || {}, resolveItem: resolveFn, timedEffects: state.activeTimedEffects || [], feats: featEffectEntries(state.feats), unlocks: achievedUnlockEffectEntries(state.achievedUnlocks, key => { const r = resolveFn(key); return r && r.item; }), now: Date.now() });
+}
+function renderPlayerStatus() {
+  const el = document.getElementById('playerStatusPanel');
+  if (!el || !window.PlayerStatus || !window.PlayerStatusUI) return;
+  try {
+    const st = buildStatusFor({ characterAbilityScores, characterLevel, skillProficiencies, saveProficiencies, playerSlots, characterMaxHp, characterSpeed, activeTimedEffects, feats, achievedUnlocks }, key => TOKEN_INDEX[key]);
+    PlayerStatusUI.mount(el, st, { id: 'me' });
+  } catch (e) { console.warn('player status', e); }
 }
 function renderActiveEffectsDisplay() {
   const container = document.getElementById('activeEffectsList');
@@ -18225,13 +18263,31 @@ function showTokenTooltip(evt, key) {
   if (!tt) return;
   _hoverItem = { item: entry.item, rarity: entry.rarity, key };
   tt.innerHTML = buildTooltipHtml(entry);
+  decorateTooltipSheet(tt, true);
   tt.style.display = 'block';
   moveTokenTooltip(evt);
 }
 
+// Touch devices have no hover, so the same popup becomes a bottom sheet: it appears on tap, stays until the player
+// closes it (Close button, tapping outside it, or Escape), can be scrolled, and carries an Examine button.
+function ttSheetMode() { try { return window.matchMedia('(hover: none)').matches; } catch (e) { return false; } }
+function decorateTooltipSheet(tt, isItem) {
+  const sheet = ttSheetMode();
+  tt.classList.toggle('tt-sheet', sheet);
+  if (!sheet) return;
+  const hint = tt.querySelector('.tt-hint'); if (hint) hint.remove();
+  tt.insertAdjacentHTML('beforeend', `<div class="tt-actions">${isItem ? '<button type="button" onclick="examineHoveredItem(); hideTokenTooltip(true)">🔍 Examine</button>' : ''}<button type="button" onclick="hideTokenTooltip(true)">Close</button></div>`);
+  tt.scrollTop = 0;
+}
+document.addEventListener('pointerdown', e => {
+  const tt = document.getElementById('itemTooltip');
+  if (tt && tt.classList.contains('tt-sheet') && tt.style.display === 'block' && !tt.contains(e.target)) hideTokenTooltip(true);
+}, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideTokenTooltip(true); });
 function moveTokenTooltip(evt) {
   const tt = document.getElementById('itemTooltip');
   if (!tt || tt.style.display !== 'block') return;
+  if (tt.classList.contains('tt-sheet')) { tt.style.left = ''; tt.style.top = ''; return; }
   const pad = 18;
   let x = evt.clientX + pad;
   let y = evt.clientY + pad;
@@ -18242,9 +18298,13 @@ function moveTokenTooltip(evt) {
   tt.style.top = Math.max(4, y) + 'px';
 }
 
-function hideTokenTooltip() {
+function hideTokenTooltip(force) {
   const tt = document.getElementById('itemTooltip');
-  if (tt) tt.style.display = 'none';
+  if (!tt) return;
+  // In bottom-sheet mode the popup only closes on purpose (force === true), not on a stray mouseleave/scroll/click.
+  if (force !== true && tt.classList.contains('tt-sheet') && tt.style.display === 'block') return;
+  tt.style.display = 'none';
+  tt.classList.remove('tt-sheet');
 }
 // The tooltip is only ever positioned/hidden by mouseenter/mousemove/mouseleave on the card
 // that's showing it — but starting a native HTML5 drag near the top of a scrollable panel and
@@ -18286,6 +18346,7 @@ function showRawItemTooltip(evt, item, rarity) {
   if (!tt) return;
   _hoverItem = { item, rarity, key: null };
   tt.innerHTML = buildTooltipHtml({ item, rarity });
+  decorateTooltipSheet(tt, true);
   tt.style.display = 'block';
   moveTokenTooltip(evt);
 }
@@ -22340,6 +22401,10 @@ function renderPlayersTab() {
         </div>
       </div>
       <details class="collapsible" open>
+        <summary>🧍 Player Status</summary>
+        <div class="collapsible-body"><div id="playersStatusSection"></div></div>
+      </details>
+      <details class="collapsible" open>
         <summary>🧾 Character Sheet</summary>
         <div class="collapsible-body"><div id="playersSheetSection"></div></div>
       </details>
@@ -22376,6 +22441,11 @@ function renderPlayersTab() {
 
   const unlocksEl = document.getElementById('playersUnlocksSection');
   if (unlocksEl) unlocksEl.innerHTML = buildPlayerUnlocksHtml(viewedPlayerUid, s);
+
+  const statusEl = document.getElementById('playersStatusSection');
+  if (statusEl && window.PlayerStatus && window.PlayerStatusUI) {
+    try { PlayerStatusUI.mount(statusEl, buildStatusFor(s, key => resolveForeignItem(key, s.savedGeneratedItems)), { id: 'dm' }); } catch (e) { console.warn('player status', e); }
+  }
 
   const foreignSlots = s.playerSlots || {};
   const equipEl = document.getElementById('playersEquipDoll');
