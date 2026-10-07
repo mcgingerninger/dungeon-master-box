@@ -77,7 +77,7 @@
     spray: { windup: ['{Subj} {v:open} {their} {limb}.'], motion: ['{Subj} {v:spray} {stuff} over the area.'], effect: ['Everything in the {shape} is sprayed.'], fail: ['{Tgt} is sprayed, leaving {wound}.'], miss: ['{Tgt} jumps clear of most of it.'], crit: ['It hits at full strength.'], fumble: ['It dribbles out.'] },
     cloud: { windup: ['{Subj} {v:release} a puff of {stuff}.'], motion: ['A cloud of {stuff} spreads out in {areaPhrase}.'], effect: ['Anyone inside breathes it in.'], fail: ['{Tgt} breathes it in, leaving {wound}.'], miss: ['{Tgt} holds {tThey} breath and gets clear.'], crit: ['The cloud is thick and strong.'], fumble: ['The cloud thins out quickly.'] },
     aura: { windup: ['{Subj} {v:stand} still and {v:project} {their} presence.'], motion: ['Dread spreads out from {subj} in {areaPhrase}.'], effect: ['Everyone nearby feels it.'], fail: ['{Tgt} feels it take hold.'], miss: ['{Tgt} holds firm.'], crit: ['It hits everyone hard.'], fumble: ['It fades away.'] },
-    hex: { windup: ['{Subj} {v:speak} a few words at {tgt}.'], motion: ['{Subj} {v:cast} {sub} on {tgt}.'], effect: ['The effect takes hold of the target.'], fail: ['{Tgt} feels it take hold.'], miss: ['{Tgt} shakes it off.'], crit: ['It takes hold completely.'], fumble: ['It fizzles out.'] },
+    hex: { windup: ['{Subj} {v:speak} a few words at {tgt}.'], motion: ['{Subj} {v:cast} the spell on {tgt}.'], effect: ['The effect takes hold of the target.'], fail: ['{Tgt} feels it take hold.'], miss: ['{Tgt} shakes it off.'], crit: ['It takes hold completely.'], fumble: ['It fizzles out.'] },
     drain: { windup: ['{Subj} {v:reach} for {tgt}.'], motion: ['{Subj} {v:touch} {tgt} and {v:drain} {them}.'], hit: ['{Subj} {v:drain} {tgtPoss} {part}, leaving {wound}.'], miss: ['{Tgt} pulls away.'], crit: ['It drains a great deal.'], fumble: ['The drain fails.'] },
     entangle: { windup: ['{Subj} {v:send} {stuff} toward {tgt}.'], motion: ['{Subj} {v:reach} for {tgt} with {stuff}.'], effect: ['The {stuff} spreads over the area.'], fail: ['{Tgt} is caught and held.'], miss: ['{Tgt} slips free.'], crit: ['It holds tight.'], fumble: ['It tangles itself up.'] },
     summon: { windup: ['{Subj} {v:call} for help.'], motion: ['Reinforcements appear.'], effect: ['They join the fight.'], fail: ['They attack {tgt}.'], miss: ['They spread out.'], crit: ['More arrive than expected.'], fumble: ['Nothing answers.'] },
@@ -136,7 +136,7 @@
     charmed: ['{Tgt} suddenly sees the attacker as a friend.'], poisoned: ['{Tgt} feels sick and weak.'], blinded: ['{Tgt} can\'t see.'], deafened: ['{Tgt} can\'t hear.'],
     restrained: ['{Tgt} is held in place and can\'t move.'], grappled: ['{Tgt} is grabbed and held.'], prone: ['{Tgt} is knocked to the ground.'], push: ['{Tgt} is shoved back.'], pull: ['{Tgt} is pulled closer.'],
     swallowed: ['{Tgt} is swallowed whole.'], engulfed: ['{Tgt} is wrapped up inside the creature.'], sleep: ['{Tgt} falls asleep.'], petrified: ['{Tgt} turns to stone.'], incapacitated: ['{Tgt} can\'t take actions.'],
-    slowed: ['{Tgt} is slowed down.'], exhaustion: ['{Tgt} feels weak and tired.'], drain: ['{Tgt} feels something vital drained away.'], heal: ['The attacker heals as it hits.'], disease: ['{Tgt} falls ill.'],
+    slowed: ['{Tgt} is slowed down.'], exhaustion: ['{Tgt} feels weak and tired.'], drain: ['{Tgt} feels something vital drained away.'], heal: ['The healing takes effect.'], disease: ['{Tgt} falls ill.'],
     curse: ['{Tgt} is cursed.'], burning: ['{Tgt} catches fire.'], frozen: ['{Tgt} is slowed by ice.'], disarm: ['{Tgt} drops their weapon.'], banish: ['{Tgt} vanishes from the fight.'], silenced: ['{Tgt} can\'t speak or cast.'],
     confused: ['{Tgt} is confused and acts at random.'], invisible_target: ['{Tgt} is lit up and easy to see.'], teleported: ['{Tgt} is teleported away.'], drown: ['{Tgt} can\'t breathe.'], bleed: ['{Tgt} keeps bleeding.'],
   };
@@ -155,4 +155,54 @@
   D.NO_DAMAGE = Object.assign(D.NO_DAMAGE || {}, {
     hit: ['It lands.', 'It connects.'], fail: ['{Tgt} fails to resist it.', 'It takes hold of {tgt}.'], resist: ['{Tgt} resists it.', '{Tgt} shakes it off.'], area: ['Everyone who fails to resist is affected.', 'Anyone who fails to resist feels it take hold.'],
   });
+
+  // ---------------------------------------------------------------- spells
+  // Attack spells keep their delivery (ray, orb, cone...), element and area; the hand-written purple lines are dropped so the
+  // plain move wording applies, with a one-line "casts X" lead-in. Non-attacking spells get one plain line of their own.
+  const titleCase = n => n.replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/'S\b/g, "'s");
+  Object.keys(D.SPELLS || {}).forEach(name => {
+    const sp = D.SPELLS[name], nice = titleCase(name);
+    if (sp.kind === 'utility') {
+      delete sp.windup; delete sp.motion; delete sp.effect;
+      sp.lines = [`{Subj} {v:cast} ${nice}.`];
+    } else {
+      ['windup', 'motion', 'effect', 'fail', 'resist', 'miss', 'crit', 'fumble', 'hit'].forEach(k => { delete sp[k]; });
+      sp.windup = [`{Subj} {v:cast} ${nice}.`];
+    }
+  });
+  const KIND = {
+    heal: [['{Subj} {v:touch} the wounded and {v:heal} them.'], ['The wounds close and the pain eases.'], 'A healing effect: say who is healed and that they feel better.'],
+    ward: [['{Subj} {v:put} up a protective ward.'], ['A faint shimmer surrounds the target and blows slide off it.'], 'A protective effect: say who is protected and from what.'],
+    shift: [['{Subj} {v:change} shape.'], ['The new form takes over in a moment.'], 'A transformation: say what the new form is.'],
+    summon: [['{Subj} {v:call} something forth.'], ['It appears and takes its place beside the caster.'], 'A conjured effect: say where it appears.'],
+    minor: [['{Subj} {v:cast} a small spell.'], ['It works quickly and quietly.'], 'A cantrip: keep it short.'],
+    dispel: [['{Subj} {v:break} the magic.'], ['The magic fades away.'], 'An unbinding effect: say what stops working.'],
+    detect: [['{Subj} {v:search} with magic.'], ['The caster learns something.'], 'An information effect: give the answer plainly.'],
+    curse: [['{Subj} {v:lay} a curse.'], ['A cold feeling settles on the target.'], 'A death or curse effect: say what the target feels.'],
+    charm: [['{Subj} {v:speak} a word of power.'], ['The target\'s mind gives way.'], 'A mind effect: say how the target acts now.'],
+    move: [['{Subj} {v:move} by magic.'], ['The caster is somewhere new.'], 'A movement effect: say where the caster ends up.'],
+    illusion: [['{Subj} {v:create} an illusion.'], ['It looks real until someone looks closely.'], 'An illusion: describe it as if it were real.'],
+    create: [['{Subj} {v:shape} the world with magic.'], ['The new thing appears and stays.'], 'A creation effect: say what appears and where.'],
+    weather: [['{Subj} {v:call} on the weather.'], ['The air and sky change.'], 'A weather effect: say what changes.'],
+    light: [['{Subj} {v:conjure} light.'], ['The area is lit up.'], 'A light effect: say what can be seen now.'],
+    darkness: [['{Subj} {v:conjure} darkness.'], ['The area goes dark.'], 'A darkness effect: say what can no longer be seen.'],
+    buff: [['{Subj} {v:empower} the target.'], ['The target is stronger and faster for a while.'], 'A buff: say who gets it and what it does.'],
+    divine: [['{Subj} {v:speak} a word of great power.'], ['The effect takes hold everywhere at once.'], 'A high-level spell: pause before you say what happens.'],
+  };
+  (D.SPELL_KINDS || []).forEach(k => { const x = KIND[k.id]; if (x) { k.windup = x[0]; k.effect = x[1]; k.tip = x[2]; } });
+  const SCHOOL = {
+    abjuration: ['{Subj} {v:put} up a protective ward.', 'A protective effect: say who is protected.'], conjuration: ['{Subj} {v:call} something forth.', 'A conjured effect: say where it appears.'],
+    divination: ['{Subj} {v:search} with magic and {v:learn} something.', 'An information effect: give the answer plainly.'], enchantment: ['{Subj} {v:work} magic on the target\'s mind.', 'A mind effect: say how the target acts now.'],
+    evocation: ['{Subj} {v:unleash} {sub}.', 'An energy effect: say what it hits.'], illusion: ['{Subj} {v:create} an illusion.', 'An illusion: describe it as if it were real.'],
+    necromancy: ['{Subj} {v:call} on death magic.', 'A death effect: say what the target feels.'], transmutation: ['{Subj} {v:change} something with magic.', 'A change effect: say what it becomes.'],
+  };
+  Object.keys(SCHOOL).forEach(id => { if (D.SPELL_SCHOOLS && D.SPELL_SCHOOLS[id]) { D.SPELL_SCHOOLS[id].lines = [SCHOOL[id][0]]; D.SPELL_SCHOOLS[id].tip = SCHOOL[id][1]; } });
+  // stat-block abilities (shapechange, teleport, haste ...)
+  const UTIL = {
+    shapechange: ['{Subj} {v:change} shape.'], teleport: ['{Subj} {v:teleport} away and {v:reappear} somewhere else.'], invisible: ['{Subj} {v:vanish} from sight.'], charm: ['{Subj} {v:try} to win the target over.'],
+    summon: ['{Subj} {v:call} for help and reinforcements arrive.'], enlarge: ['{Subj} {v:grow} larger.'], haste: ['{Subj} {v:speed} up.'], defense: ['{Subj} {v:brace} for the next hit.'], heal: ['{Subj} {v:recover} some health.'],
+    detect: ['{Subj} {v:sense} what is nearby.'], leadership: ['{Subj} {v:rally} nearby allies.'], terrain: ['{Subj} {v:change} the ground around it.'], curse: ['{Subj} {v:lay} a curse on the target.'], break: ['{Subj} {v:break} the magic.'],
+    escape: ['{Subj} {v:slip} away.'], generic: ['{Subj} {v:use} the ability.'],
+  };
+  (D.UTILITY || []).forEach(u => { if (UTIL[u.id]) u.lines = UTIL[u.id]; });
 })();
