@@ -801,6 +801,37 @@ export function describeStatSources(sources) {
 // below) or a legacy item's own `armorStyle` field (added going forward — see loot-data.js's armor
 // rebalance). null when no body armor is equipped, or an equipped legacy item predates that field
 // — both cases keep today's behavior (full, uncapped Dex mod) rather than assuming a weight class.
+// ---- Armor AC sanity ----------------------------------------------------------------------------
+// Body armor REPLACES the unarmoured base of 10, so its number must be above 10 or wearing it makes you worse off. Many catalogue and
+// generated pieces were authored with values of 5-10 (a leather armor "AC 6"), and helmets with body-armor-sized numbers (a helm "AC 13").
+// These helpers give every piece a believable value from what it IS (name) and how rare it is, and never LOWER an authored value.
+export const BODY_ARMOR_BASE_AC = [
+  [/half[- ]?plate/, 15], [/\bplate\b|plate armor|full plate/, 18], [/splint/, 17], [/chain ?mail|hauberk/, 16], [/ring ?mail/, 14], [/scale/, 14],
+  [/breastplate|cuirass|brigandine|lamellar/, 14], [/chain shirt|chain/, 13], [/studded/, 12], [/hide/, 12], [/padded|gambeson|quilted/, 11], [/leather|jerkin|vest|tunic|coat/, 11],
+  [/robe|vestment|cassock/, 11],
+];
+export const BODY_RARITY_AC_BONUS = { common: 0, uncommon: 1, rare: 2, superrare: 3, legendary: 4, celestial: 5 };
+export const ACCESSORY_BASE_AC = [[/great helm|war helm|full helm/, 2], [/helm|helmet|cap\b|crown|circlet|coif|diadem|tiara/, 1], [/bracer|vambrace/, 2], [/gauntlet|glove/, 1], [/greave/, 2], [/boot|sandal/, 1], [/cloak|cape|mantle/, 1], [/belt|girdle|sash/, 1]];
+export const ACCESSORY_RARITY_AC_BONUS = { common: 0, uncommon: 0, rare: 0, superrare: 1, legendary: 1, celestial: 2 };
+export function isShieldName(name) { return /\b(shield|buckler)\b/i.test(name || ''); }
+function tableValue(table, name) { const n = String(name || '').toLowerCase(); const hit = table.find(([re]) => re.test(n)); return hit ? hit[1] : null; }
+export function bodyArmorBaseFromName(name) { return tableValue(BODY_ARMOR_BASE_AC, name); }
+export function normalizedBodyArmorAc(item, rarity) {
+  const raw = parseInt(String((item && item.ac) == null ? '' : item.ac).trim(), 10);
+  const base = bodyArmorBaseFromName(item && item.name);
+  const r = rarity || (item && item.rarity) || 'common';
+  const b = base != null ? base : 11;
+  // An authored value of 11 or more stays exactly as written (anything above 10 is a real improvement on no armor); a value of 10 or
+  // less (a leather armor "AC 6") would make the wearer WORSE off, so it is rebuilt from the piece's name and rarity.
+  if (Number.isFinite(raw) && raw >= 11) return raw;
+  return b + (BODY_RARITY_AC_BONUS[r] || 0);
+}
+// A non-body piece (helm, bracers, boots ...) adds a small flat bonus; a bare number on it is NOT a base value.
+export function normalizedAccessoryAc(item, rarity) {
+  const base = tableValue(ACCESSORY_BASE_AC, item && item.name);
+  const r = rarity || (item && item.rarity) || 'common';
+  return (base != null ? base : 1) + (ACCESSORY_RARITY_AC_BONUS[r] || 0);
+}
 export function collectEquippedAcBreakdown(slots, resolveItem) {
   let base = 10, baseSource = null, bodyArmorStyle = null;
   const flatSources = [], armorPieces = [];
@@ -811,20 +842,22 @@ export function collectEquippedAcBreakdown(slots, resolveItem) {
     if (entry.item.__canonical) {
       const contribution = canonicalAcContribution(entry.item.__canonical);
       if (!contribution) return;
-      if (contribution.replaceBase != null) {
-        base = contribution.replaceBase; baseSource = entry.item.name;
+      if (contribution.replaceBase != null && slotId === 'armor' && !isShieldName(entry.item.name)) {
+        base = normalizedBodyArmorAc({ name: entry.item.name, ac: String(contribution.replaceBase) }, entry.rarity || entry.item.rarity); baseSource = entry.item.name;
         bodyArmorStyle = entry.item.__canonical.armor.armorType || null;
       }
+      else if (contribution.replaceBase != null) flatSources.push({ itemName: entry.item.name, amount: normalizedAccessoryAc(entry.item, entry.rarity) });
       else flatSources.push({ itemName: entry.item.name, amount: contribution.flatAmount });
       return;
     }
     const raw = String(entry.item.ac || '').trim();
     if (!raw) return;
-    if (slotId === 'armor' && /^\d+$/.test(raw)) {
-      base = parseInt(raw, 10); baseSource = entry.item.name;
+    if (slotId === 'armor' && /^\d+$/.test(raw) && !isShieldName(entry.item.name)) {
+      base = normalizedBodyArmorAc(entry.item, entry.rarity); baseSource = entry.item.name;
       bodyArmorStyle = entry.item.armorStyle || null;
       return;
     }
+    if (/^\d+$/.test(raw)) { flatSources.push({ itemName: entry.item.name, amount: normalizedAccessoryAc(entry.item, entry.rarity) }); return; }
     const m = /^([+-]\d+)$/.exec(raw);
     if (m) flatSources.push({ itemName: entry.item.name, amount: parseInt(m[1], 10) });
   });

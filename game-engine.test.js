@@ -942,3 +942,26 @@ describe('armor scaling (grades per stat that add to AC) and spell focus on any 
     assert.ok(armors > 250 && focuses > 400);
   });
 });
+
+describe('armor AC sanity (item audit): armor must do what its card says when worn', () => {
+  test('body armor authored below 11 is rebuilt from its name and rarity, never lower than no armor', () => {
+    assert.equal(GE.normalizedBodyArmorAc({ name: 'Worn Leather Armor', ac: '6' }, 'common'), 11);
+    assert.equal(GE.normalizedBodyArmorAc({ name: 'Iron Plate Armor', ac: '8' }, 'rare'), 20);
+    assert.equal(GE.normalizedBodyArmorAc({ name: 'Mystery Armor', ac: '5' }, 'uncommon'), 12);
+    assert.equal(GE.normalizedBodyArmorAc({ name: 'Vanguard\'s Plate', ac: '13' }, 'rare'), 13); // already believable: untouched
+  });
+  test('equipping low-numbered body armor now raises AC (it used to lower it)', () => {
+    const items = { k: { item: { name: 'Worn Leather Armor', ac: '6' }, rarity: 'common' } };
+    const sheet = GE.computeCharacterSheetFor({ dex: 10 }, 1, [], [], { armor: 'k' }, key => items[key], 10, 30);
+    assert.ok(sheet.ac.total >= 11);
+  });
+  test('a helmet with a body-armor-sized number is a small flat bonus, not "AC 13 that does nothing"', () => {
+    const items = { h: { item: { name: 'Dread Helm', ac: '13' }, rarity: 'uncommon' } };
+    const sheet = GE.computeCharacterSheetFor({ dex: 10 }, 1, [], [], { helmet: 'h' }, key => items[key], 10, 30);
+    assert.equal(sheet.ac.total, 11);
+  });
+  test('a shield or buckler is never mistaken for body armor', () => {
+    assert.equal(GE.isShieldName('Steel Buckler of the Tide'), true);
+    assert.equal(GE.isShieldName('Chain Mail'), false);
+  });
+});
