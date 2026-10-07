@@ -249,3 +249,27 @@ progress, .hp-bar, .combat-hp-slider { border-radius: 0; }
 /* long generated names wrap instead of running off the card */
 .loot-item .item-name, .item-card .ic-name, .token-card-name, .store-card-name { overflow-wrap: anywhere; word-break: normal; }
 .loot-item .item-name { font-size: .85rem; line-height: 1.35; }
+
+/* ---- store: the merchant's stall banner, framed like a shop window ---- */
+.store-stall { display: block; width: min(100%, 384px); margin: .5rem 0 .7rem; border: 2px solid #000; box-shadow: 0 0 0 2px var(--gold), 0 0 0 4px #000, 4px 4px 0 4px rgba(0, 0, 0, .6); line-height: 0; background: #0e0b0c; }
+.store-stall svg { width: 100%; height: auto; display: block; }
+.store-merchant-portrait { background: radial-gradient(circle at 50% 40%, rgba(255, 138, 43, .16), rgba(0, 0, 0, .35)); border: 2px solid #000; box-shadow: inset 2px 2px 0 rgba(255, 224, 160, .1); }
+.store-merchant-btn { display: flex; align-items: center; justify-content: space-between; gap: .6rem; text-align: left; }
+.store-merchant-btn.active .store-merchant-portrait { box-shadow: inset 0 0 0 2px var(--gold), 0 0 14px rgba(255, 138, 43, .5); }
+.trader-sell-zone { border: 2px dashed var(--gold) !important; background: #0f0c09 url('retro/till.svg') 12px center / 36px 36px no-repeat !important; padding-left: 60px !important; font-family: var(--f-label); text-transform: uppercase; font-size: .7rem; letter-spacing: .05em; box-shadow: inset 2px 2px 0 #000; }
+.merchant-till-panel { border: 2px solid #000 !important; box-shadow: var(--frame); background-color: var(--surface) !important; background-image: url('retro/panel.svg'); }
+.merchant-till-head { font-family: var(--f-label) !important; text-transform: uppercase; }
+
+/* ---- map builder + battle maps: pixel-sharp rendering and a stone tray for the palette ---- */
+#mapBuilderCanvasSvg, #combatBattleMapCanvasSvg, #battlefieldMapCanvasSvg { shape-rendering: crispEdges; image-rendering: pixelated; box-shadow: var(--frame); }
+.mapbuilder-tool-btn { width: 34px; height: 34px; padding: 0; border: 2px solid #000 !important; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, .22), inset -2px -2px 0 rgba(0, 0, 0, .45), 0 2px 0 #000 !important; image-rendering: pixelated; }
+.mapbuilder-tool-btn.active { box-shadow: inset 0 0 0 2px #fff0b8, 0 0 0 2px var(--gold), 0 0 12px rgba(255, 138, 43, .6) !important; }
+.mapbuilder-prop-btn { border: 2px solid #000 !important; }
+.interactions-check-group-label { font-family: var(--f-label); text-transform: uppercase; font-size: .62rem; letter-spacing: .06em; color: var(--gold); }
+
+/* ---- journey: the stage is a framed viewport ---- */
+.journey-stage { border: 2px solid #000; box-shadow: 0 0 0 2px var(--gold), 0 0 0 4px #000, 6px 6px 0 4px rgba(0, 0, 0, .6); image-rendering: pixelated; overflow: hidden; }
+.journey-scene { image-rendering: pixelated; shape-rendering: crispEdges; }
+.journey-setting-icon { border: 2px solid #000; box-shadow: inset 0 0 0 1px rgba(255, 224, 160, .15); overflow: hidden; }
+.journey-setting-card.active { box-shadow: var(--frame), 0 0 0 4px var(--gold), 0 0 16px rgba(255, 138, 43, .5); }
+.journey-overlay-layer { filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .7)); }
