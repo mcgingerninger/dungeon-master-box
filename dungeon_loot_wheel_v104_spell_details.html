@@ -2245,6 +2245,18 @@
   .tt-rarity { font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
   /* Hoverable source lines in the attack popup */
   .attack-src { border-bottom:1px dotted var(--gold); cursor:help; }
+  .tt-hint { margin-top:.4rem; padding-top:.3rem; border-top:1px dashed var(--border); font-size:.68rem; color:var(--text-dim); text-align:center; }
+  /* Wild Magic table */
+  .wm-result { margin:.7rem 0; padding:.6rem .8rem; border-left:3px solid var(--gold); background:rgba(201,162,39,.08); min-height:2.4rem; font-size:.95rem; }
+  .wm-result b.wm-n { font-family:monospace; color:var(--gold); margin-right:.5rem; }
+  .wm-kind { font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; padding:.05rem .4rem; border:1px solid var(--border); border-radius:3px; margin-left:.4rem; }
+  .wm-kind.good { color:#6fd07f; border-color:#6fd07f; } .wm-kind.bad { color:#e8963a; border-color:#e8963a; } .wm-kind.danger { color:#e06060; border-color:#e06060; } .wm-kind.fun,.wm-kind.odd { color:#7fd0f0; border-color:#7fd0f0; }
+  .wm-history { font-size:.78rem; color:var(--text-dim); margin-bottom:.5rem; }
+  .wm-table-wrap summary { cursor:pointer; margin:.4rem 0; color:var(--gold); }
+  .wm-row { display:flex; gap:.6rem; padding:.2rem .3rem; border-bottom:1px solid var(--border); font-size:.82rem; }
+  .wm-row.hit { background:rgba(201,162,39,.15); }
+  .wm-row .wm-num { font-family:monospace; min-width:3.4rem; color:var(--gold); }
+  .ref-link.ref-table { cursor:pointer; }
   /* Weapon scaling chips (tooltip + loot cards) */
   .tt-scaling { display:flex; flex-wrap:wrap; align-items:center; gap:0.35rem; margin-bottom:0.4rem; }
   .tt-scale-label { font-size:0.72rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; }
@@ -3693,6 +3705,13 @@
 <!-- Weapon attack roll result — the Inventory tab's "⚔ Attack" button has no monster to
      resolve a hit/miss against, so this is a self-contained roll breakdown, not a combat
      resolution. Reuses the same generic modal look as editItemModal/powerPickerModal above. -->
+<!-- Examine: everything about one item (opened with I while hovering an item, Shift+click, or the 🔍 on a Compendium row) — item-examine.js -->
+<div id="itemExamineModal" class="edit-modal-overlay" onclick="if(event.target===this) closeItemExamine()">
+  <div class="edit-modal" style="width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;">
+    <div class="edit-modal-header"><h3>🔍 Examine</h3><button class="edit-modal-close" onclick="closeItemExamine()">×</button></div>
+    <div class="edit-modal-body" id="itemExamineBody" style="overflow:auto;"></div>
+  </div>
+</div>
 <div id="weaponAttackModal" class="edit-modal-overlay" onclick="if(event.target===this) closeWeaponAttackPopup()">
   <div class="edit-modal" style="width:min(420px,100%);">
     <div class="edit-modal-header"><h3 id="weaponAttackTitle">⚔ Attack</h3><button class="edit-modal-close" onclick="closeWeaponAttackPopup()">×</button></div>
@@ -4474,6 +4493,21 @@
       <div class="dice-tray" id="diceTray"></div>
       <button class="generate-btn" id="diceRollBtn" onclick="rollDiceTray()" disabled>🎲 Roll All</button>
       <div class="dice-results" id="diceResults"></div>
+      <button class="dice-tray-clear-btn" style="margin-top:.6rem" onclick="closeDiceRoller();openWildMagic()" title="The table a Confused creature rolls on each turn">🌀 Wild Magic table</button>
+    </div>
+  </div>
+</div>
+<!-- Wild Magic table: what a "Confused (must roll on Wild Magic table each turn)" creature does. Opens from the
+     dice roller, from any item text that mentions the table (underlined link), and from its hover reference. -->
+<div id="wildMagicModal" class="edit-modal-overlay" onclick="if(event.target===this) closeWildMagic()">
+  <div class="edit-modal" style="width:min(620px,100%);">
+    <div class="edit-modal-header"><h3>🌀 Wild Magic Table (d100)</h3><button class="edit-modal-close" onclick="closeWildMagic()">×</button></div>
+    <div class="edit-modal-body">
+      <p class="sheet-chip-empty" style="margin-top:0">Roll once for each Confused creature at the start of its turn (or whenever something says to roll on the Wild Magic table). The DM applies the result.</p>
+      <button class="generate-btn" onclick="rollWildMagic()">🎲 Roll d100</button>
+      <div id="wildMagicResult" class="wm-result"></div>
+      <div id="wildMagicHistory" class="wm-history"></div>
+      <details class="wm-table-wrap"><summary>Show the whole table</summary><div id="wildMagicTable"></div></details>
     </div>
   </div>
 </div>
@@ -4530,6 +4564,8 @@ const APP_VERSION = 'v104';
 <script src="mechanics/canonical/items.js"></script>
 <script src="monster-art.js"></script>
 <script src="item-affixes.js"></script>
+<script src="wild-magic-data.js"></script>
+<script src="item-examine.js"></script>
 <script src="item-art-kit.js"></script>
 <script src="item-art-weapons.js"></script>
 <script src="item-art-armor.js"></script>
@@ -7335,7 +7371,7 @@ function renderInteractionsItemResults() {
     const chips = e.item.interactions.length
       ? e.item.interactions.map(k => `<span class="tt-prop-chip">${escapeHtml((INTERACTIONS[k] || {}).label || k)}</span>`).join('')
       : '<span class="interactions-none">No interactions</span>';
-    return `<div class="interactions-item-row">
+    return `<div class="interactions-item-row" ${itemHoverAttrs(e.item, e.rarity, e.key)}>
       <span class="interactions-item-name">${itemPixelIcon(e.item, 20, e.rarity)} ${escapeHtml(e.item.name)}</span>
       <div class="interactions-item-chips">${chips}</div>
     </div>`;
@@ -9403,7 +9439,7 @@ function renderItemsList() {
   const itemsCapNote = itemsCapped ? `<div class="empty-results" style="padding:1rem;">Showing first ${COMPENDIUM_RENDER_CAP.toLocaleString()} of ${entries.length.toLocaleString()} matches — narrow your search or filters to see the rest.</div>` : '';
 
   list.innerHTML = itemsShown.map(({item, rarity, i}) => `
-    <div class="item-row ${rarity}">
+    <div class="item-row ${rarity}" ${itemHoverAttrs(item, rarity)}>
       <span class="item-num">${i+1}</span>
       ${itemPixelIcon(item, 28, rarity)}
       <div class="item-info">
@@ -9415,6 +9451,7 @@ function renderItemsList() {
         ${item.unlocks && item.unlocks.length ? renderUnlocks(item, rarity) : ''}
       </div>
       <div class="item-actions">
+        <button class="edit-btn" onclick="examineCompendiumItem('${rarity}', ${i})" title="Examine: everything about this item">🔍</button>
         <button class="edit-btn" onclick="saveCompendiumItem('${rarity}', ${i}, this)" title="Save a copy to your Token Library">💾</button>
         <button class="edit-btn" onclick="lootCompendiumItem('${rarity}', ${i}, this)" title="Loot a copy to Recently Looted">🎒</button>
         <button class="edit-btn" onclick="editItem('${rarity}', ${i})" title="Edit">✎</button>
@@ -11763,7 +11800,7 @@ function renderSavedItems() {
     return;
   }
   el.innerHTML = visible.map(item => `
-    <div class="saved-item-row" onclick="loadSavedItem(${item.id})">
+    <div class="saved-item-row" ${itemHoverAttrs(item, item.rarity, 'gen:' + item.id)} onclick="loadSavedItem(${item.id})">
       <div class="saved-item-dot" style="background:var(--${item.rarity})"></div>
       <span class="saved-item-name">${item.name}</span>
       <span class="saved-item-rarity">${(GEN.scale[item.rarity] || {}).label || rarityNames[item.rarity] || item.rarity || ''}</span>
@@ -12662,7 +12699,7 @@ function renderFleshWorkshop() {
   if (slotEl) slotEl.classList.toggle('mangler-slot-focused', !!entry);
   if (content) {
     content.innerHTML = entry
-      ? `${itemPixelIcon(entry.item, 26, entry.rarity)}<span>${escapeHtml(entry.item.name)}</span>`
+      ? `<span ${itemHoverAttrs(entry.item, entry.rarity, fleshMaterialKey)} style="display:inline-flex;align-items:center;gap:.4rem">${itemPixelIcon(entry.item, 26, entry.rarity)}<span>${escapeHtml(entry.item.name)}</span></span>`
       : 'Drag a monster part here';
   }
   if (entry) {
@@ -15294,6 +15331,7 @@ function findRefSpans(text, summonContext) {
     idx.monsterRe.lastIndex = 0;
     for (const m of text.matchAll(idx.monsterRe)) { const mo = idx.monsterMap.get(refNormName(m[1])); if (mo) add(m.index, m.index + m[0].length, 'monster', mo.name); }
   }
+  for (const m of text.matchAll(/\bWild Magic(?: Surge)?(?: table)?\b/gi)) add(m.index, m.index + m[0].length, 'table', 'Wild Magic');
   spans.sort((a, b) => a.start - b.start || b.end - a.end);
   const out = [];
   spans.forEach(sp => { if (!out.length || sp.start >= out[out.length - 1].end) out.push(sp); });
@@ -15304,7 +15342,7 @@ function linkRefs(html) {
   if (!html) return html;
   const s = String(html);
   const idx = getRefIndex();
-  if (!idx.spellMap.size && !idx.monsterMap.size) return s;
+  if (!idx.spellMap.size && !idx.monsterMap.size && !/wild magic/i.test(s)) return s;
   const summonContext = REF_SUMMON_VERB.test(s.replace(/<[^>]+>/g, ' '));
   return s.replace(/(<[^>]*>)|([^<]+)/g, (m, tag, text) => {
     if (tag) return tag;
@@ -15312,7 +15350,7 @@ function linkRefs(html) {
     if (!spans.length) return text;
     let out = '', at = 0;
     spans.forEach(sp => {
-      out += text.slice(at, sp.start) + `<span class="ref-link ref-${sp.kind}" data-ref-kind="${sp.kind}" data-ref-name="${escapeHtml(sp.name)}" onmouseenter="showRefTooltip(event,this)" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${text.slice(sp.start, sp.end)}</span>`;
+      out += text.slice(at, sp.start) + `<span class="ref-link ref-${sp.kind}" data-ref-kind="${sp.kind}" data-ref-name="${escapeHtml(sp.name)}"${sp.kind === 'table' ? ' onclick="openWildMagic()"' : ''} onmouseenter="showRefTooltip(event,this)" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${text.slice(sp.start, sp.end)}</span>`;
       at = sp.end;
     });
     return out + text.slice(at);
@@ -15399,13 +15437,22 @@ function buildMonsterRefHtml(name, compact, snapshot) {
     ${(m.traits && m.traits.length) ? `<div class="tt-unlocks-title">Traits</div>${attacks(m.traits, 4, 160)}` : ''}
     ${(m.actions && m.actions.length) ? `<div class="tt-unlocks-title">Actions</div>${attacks(m.actions, 5, 200)}` : ''}`;
 }
+// Reference card for the Wild Magic table: a few rows as a taste; the full table and a roll button open on click.
+function buildTableRefHtml(compact) {
+  const W = window.WildMagic;
+  if (!W) return '<div class="tt-header"><span>Wild Magic table</span></div><div class="tt-desc">Table not loaded.</div>';
+  const sample = [W.lookup(5), W.lookup(31), W.lookup(53), W.lookup(79), W.lookup(99)];
+  const rows = (compact ? sample.slice(0, 3) : sample).map(e => `<div class="tt-ref-text"><b>${W.label(e)}.</b> ${escapeHtml(refTrim(e.text, 120))}</div>`).join('');
+  if (compact) return `<div class="tt-ref"><div class="tt-ref-head"><b>🌀 Wild Magic table</b> <span>d100 · 50 results</span></div>${rows}<div class="tt-ref-text">Click the underlined name on the item card, or open the Dice Roller, to roll on it.</div></div>`;
+  return `<div class="tt-header"><span>🌀 Wild Magic table</span></div><div class="tt-rarity">d100 · 50 results · click to open and roll</div><div class="tt-desc">What a Confused creature does each turn, or any surge of wild magic.</div>${rows}`;
+}
 function showRefTooltip(evt, el) {
   const tt = document.getElementById('itemTooltip');
   if (!tt || !el) return;
   const kind = el.getAttribute('data-ref-kind'), name = el.getAttribute('data-ref-name');
   if (kind === 'spell' && !spellDatabaseLoaded && typeof loadSpellDatabase === 'function') loadSpellDatabase(false);
   if (kind === 'monster' && !monsterDatabaseLoaded && typeof loadMonsterDatabase === 'function') loadMonsterDatabase(false);
-  tt.innerHTML = kind === 'spell' ? buildSpellRefHtml(name, false) : buildMonsterRefHtml(name, false);
+  tt.innerHTML = kind === 'spell' ? buildSpellRefHtml(name, false) : kind === 'table' ? buildTableRefHtml(false) : buildMonsterRefHtml(name, false);
   tt.style.display = 'block';
   moveTokenTooltip(evt);
 }
@@ -15418,7 +15465,7 @@ function buildItemRefSection(item) {
   const MAX = 3;
   const snaps = new Map();
   (item.mods || []).forEach(m => { if (m.summonedMonster && m.summonedMonster.name) snaps.set(m.summonedMonster.name.toLowerCase(), m.summonedMonster); });
-  const blocks = refs.slice(0, MAX).map(r => r.kind === 'spell' ? buildSpellRefHtml(r.name, true) : buildMonsterRefHtml(r.name, true, snaps.get(r.name.toLowerCase())));
+  const blocks = refs.slice(0, MAX).map(r => r.kind === 'spell' ? buildSpellRefHtml(r.name, true) : r.kind === 'table' ? buildTableRefHtml(true) : buildMonsterRefHtml(r.name, true, snaps.get(r.name.toLowerCase())));
   const more = refs.length > MAX ? `<div class="tt-ref-text">+${refs.length - MAX} more — hover the underlined names on the item card.</div>` : '';
   return `<div class="tt-refs"><div class="tt-unlocks-title">Quick reference</div>${blocks.join('')}${more}</div>`;
 }
@@ -17457,6 +17504,25 @@ function openDiceRoller() {
 function closeDiceRoller() {
   document.getElementById('diceRollerModal')?.classList.remove('open');
 }
+// ---------- Wild Magic table (wild-magic-data.js) ----------
+let wildMagicHistory = [];
+function wildMagicTableHtml(hitNum) {
+  return WildMagic.table.map(e => `<div class="wm-row${hitNum != null && hitNum >= e.lo && hitNum <= e.hi ? ' hit' : ''}"><span class="wm-num">${WildMagic.label(e)}</span><span>${escapeHtml(e.text)} <span class="wm-kind ${e.kind}">${e.kind}</span></span></div>`).join('');
+}
+function openWildMagic() {
+  if (!window.WildMagic) return;
+  document.getElementById('wildMagicTable').innerHTML = wildMagicTableHtml(wildMagicHistory[0] && wildMagicHistory[0].d100);
+  document.getElementById('wildMagicModal')?.classList.add('open');
+}
+function closeWildMagic() { document.getElementById('wildMagicModal')?.classList.remove('open'); }
+function rollWildMagic() {
+  if (!window.WildMagic) return;
+  const r = WildMagic.roll();
+  wildMagicHistory.unshift(r); if (wildMagicHistory.length > 8) wildMagicHistory.length = 8;
+  document.getElementById('wildMagicResult').innerHTML = `<b class="wm-n">${r.d100 === 100 ? '00' : String(r.d100).padStart(2, '0')}</b>${escapeHtml(r.entry.text)}<span class="wm-kind ${r.entry.kind}">${r.entry.kind}</span>`;
+  document.getElementById('wildMagicHistory').innerHTML = wildMagicHistory.length > 1 ? 'Earlier: ' + wildMagicHistory.slice(1).map(x => `${x.d100 === 100 ? '00' : x.d100}`).join(', ') : '';
+  document.getElementById('wildMagicTable').innerHTML = wildMagicTableHtml(r.d100);
+}
 // computeCharacterSheetFor — the single computation function everything else reads from
 // (ability totals/modifiers, proficiency bonus, every skill/save total, AC, max HP) — now lives
 // in game-engine.js, reached through the window.X bridge; see the note further up this file
@@ -17935,7 +18001,7 @@ function renderActiveEffectsDisplay() {
       unlocksHtml = `<div class="ae-unlocks">🔒 Hidden Power${item.unlocks.length > 1 ? 's' : ''}: ${labels.map(l => escapeHtml(l)).join(', ')}</div>`;
     }
     return `
-      <div class="ae-row ${entry.rarity}">
+      <div class="ae-row ${entry.rarity}" ${itemHoverAttrs(item, entry.rarity, key)}>
         <div class="ae-row-header">
           <span class="ae-dot" style="background:var(--${entry.rarity})"></span>
           <span class="ae-name">${escapeHtml(item.name)}</span>
@@ -18088,6 +18154,7 @@ function buildTooltipHtml(entry) {
     ${tagsHtml}
     ${interactionsHtml}
     ${unlocksHtml}
+    <div class="tt-hint">🔍 Press I (or Shift+click) to examine everything about this item</div>
   `;
 }
 
@@ -18133,11 +18200,30 @@ function showMonsterTooltip(evt, uid) {
   tt.style.display = 'block';
   moveTokenTooltip(evt);
 }
+// ---------- One hover entry point for every item surface ----------
+// Any template that shows an item adds `${itemHoverAttrs(item, rarity, key?)}` to its element and gets the SAME popup
+// (buildTooltipHtml) as the inventory — a card in the Compendium, a row in the DM's view of a player's inventory, a
+// slot in the Mangler. `key` (a TOKEN_INDEX key) is optional: with one the popup reads the saved entry, without one it
+// is built from the raw item. The item under the cursor is remembered so "Examine" can open the full view for it.
+const _itemHoverReg = new Map(); let _itemHoverSeq = 0;
+function itemHoverAttrs(item, rarity, key) {
+  if (!item) return '';
+  const id = ++_itemHoverSeq;
+  _itemHoverReg.set(id, { item, rarity: rarity || item.rarity || 'common', key: key || null });
+  if (_itemHoverReg.size > 6000) { const first = _itemHoverReg.keys().next().value; _itemHoverReg.delete(first); }
+  return `data-item-hover="${id}" onmouseenter="showItemHover(event,${id})" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()"`;
+}
+function showItemHover(evt, id) {
+  const e = _itemHoverReg.get(id); if (!e) return;
+  if (e.key && TOKEN_INDEX[e.key]) showTokenTooltip(evt, e.key); else showRawItemTooltip(evt, e.item, e.rarity);
+}
+let _hoverItem = null;   // { item, rarity, key } currently shown in the popup (for Examine)
 function showTokenTooltip(evt, key) {
   const entry = TOKEN_INDEX[key];
   if (!entry) return;
   const tt = document.getElementById('itemTooltip');
   if (!tt) return;
+  _hoverItem = { item: entry.item, rarity: entry.rarity, key };
   tt.innerHTML = buildTooltipHtml(entry);
   tt.style.display = 'block';
   moveTokenTooltip(evt);
@@ -18198,6 +18284,7 @@ function showRawItemTooltip(evt, item, rarity) {
   if (!item) return;
   const tt = document.getElementById('itemTooltip');
   if (!tt) return;
+  _hoverItem = { item, rarity, key: null };
   tt.innerHTML = buildTooltipHtml({ item, rarity });
   tt.style.display = 'block';
   moveTokenTooltip(evt);
@@ -20939,7 +21026,7 @@ function renderMonsterConditionIcon(monster, hp, maxHp) {
 function combatLootItemRowHtml(entry, it, mode) {
   const isDm = mode === 'dm';
   if (!isDm) {
-    return `<div class="combat-loot-item ${it.rarity}" data-item-id="${it.id}">
+    return `<div class="combat-loot-item ${it.rarity}" data-item-id="${it.id}" ${itemHoverAttrs(it, it.rarity)}>
       <span class="combat-loot-item-name">${escapeHtml(it.name)}</span>
       <span class="loot-item-actions"><button class="loot-save-btn" onclick="playerLootItem(${entry.uid}, '${it.id}', this)">🎒 Loot</button></span>
     </div>`;
@@ -21599,7 +21686,7 @@ function buildForeignInventoryGridHtml(grid, placements, savedGeneratedItems) {
         const body = wide
           ? (entry ? itemPixelIcon(entry.item, null, rarity, true) : '')
           : `${entry ? itemPixelIcon(entry.item, 22, rarity) : ''}<span class="inv-item-name">${escapeHtml(name)}</span>`;
-        html += `<div class="inv-item foreign-takeable ${rarity}${wide ? ' inv-item-fill' : ''}" style="width:${p.w * 44 + (p.w - 1) * 3}px" title="Click to take: ${escapeHtml(name)}" onclick="dmTakeViewedPlayerInventoryItem('${String(placementId).replace(/'/g, "\\'")}')">${body}</div>`;
+        html += `<div class="inv-item foreign-takeable ${rarity}${wide ? ' inv-item-fill' : ''}" style="width:${p.w * 44 + (p.w - 1) * 3}px" ${entry ? itemHoverAttrs(entry.item, rarity) : `title="${escapeHtml(name)}"`} onclick="dmTakeViewedPlayerInventoryItem('${String(placementId).replace(/'/g, "\\'")}')">${body}</div>`;
         col += p.w;
       } else {
         html += `<div class="inv-cell"></div>`;
@@ -22088,7 +22175,9 @@ function buildForeignDollHtml(foreignSlots, savedGeneratedItems) {
     const titleAttr = filled ? `${label}: ${escapeHtml(entry.item.name)} — click to take` : label;
     const clickAttr = filled ? ` onclick="dmTakeViewedPlayerSlotItem('${slotId}')"` : '';
     const styleAttr = `${gridStyle || ''}${filled ? 'cursor:pointer;' : ''}`;
-    return `<div class="doll-slot${extraClass ? ' ' + extraClass : ''}${filled ? ' filled' : ''}"${styleAttr ? ` style="${styleAttr}"` : ''} title="${escapeHtml(titleAttr)}"${clickAttr}>${body}</div>`;
+    // a filled slot shows the shared item popup (the click-to-take hint rides in the title only for empty slots)
+    const hoverOrTitle = filled ? itemHoverAttrs(entry.item, entry.rarity) + ` aria-label="${escapeHtml(titleAttr)}"` : `title="${escapeHtml(titleAttr)}"`;
+    return `<div class="doll-slot${extraClass ? ' ' + extraClass : ''}${filled ? ' filled' : ''}"${styleAttr ? ` style="${styleAttr}"` : ''} ${hoverOrTitle}${clickAttr}>${body}</div>`;
   }
   return `
     <div class="player-top-row" style="border-bottom:none;padding-bottom:0;margin-bottom:0;">
@@ -22368,7 +22457,7 @@ function buildPlayerUnlocksHtml(uid, s) {
         </div>
       `;
     }).join('');
-    cards.push(`<div class="unlock-item-card"><div class="unlock-item-name">${escapeHtml(item.name)}</div>${tiersHtml}</div>`);
+    cards.push(`<div class="unlock-item-card"><div class="unlock-item-name" ${itemHoverAttrs(item, item.rarity, key)}>${escapeHtml(item.name)}</div>${tiersHtml}</div>`);
   });
   return cards.length ? cards.join('') : '<p style="color:var(--text-dim);font-size:0.85rem;font-style:italic;">None of this player\'s current items have hidden powers to unlock.</p>';
 }
@@ -22384,7 +22473,7 @@ function renderPlayersSendResults() {
   resultsEl.innerHTML = entries.length ? entries.map(e => {
     if (!e.item.interactions) classifyItemFull(e.item, e.rarity);
     const canApply = canInteract(e.item, 'apply');
-    return `<div class="players-send-item-row">
+    return `<div class="players-send-item-row" ${itemHoverAttrs(e.item, e.rarity, e.key)}>
       <span>${itemPixelIcon(e.item, 20, e.rarity)} ${escapeHtml(e.item.name)}</span>
       <div class="players-send-item-actions">
         ${canApply ? `<button class="loot-save-btn" onclick="applyItemToViewedPlayer('${e.key.replace(/'/g, "\\'")}', this)" title="Administer this item's effect directly, without giving them the item">💊 Apply</button>` : ''}
@@ -24899,12 +24988,12 @@ function renderManglerSlots() {
   if (itemSlotEl) itemSlotEl.classList.toggle('mangler-slot-focused', manglerFocus === 'item');
   if (partContent) {
     partContent.innerHTML = partEntry
-      ? `${itemPixelIcon(partEntry.item, 26, partEntry.rarity)}<span>${escapeHtml(partEntry.item.name)}</span>`
+      ? `<span ${itemHoverAttrs(partEntry.item, partEntry.rarity)} style="display:inline-flex;align-items:center;gap:.4rem">${itemPixelIcon(partEntry.item, 26, partEntry.rarity)}<span>${escapeHtml(partEntry.item.name)}</span></span>`
       : 'Drag a monster part here';
   }
   if (itemContent) {
     itemContent.innerHTML = itemEntry
-      ? `${itemPixelIcon(itemEntry.item, 26, itemEntry.rarity)}<span>${escapeHtml(itemEntry.item.name)}</span>`
+      ? `<span ${itemHoverAttrs(itemEntry.item, itemEntry.rarity)} style="display:inline-flex;align-items:center;gap:.4rem">${itemPixelIcon(itemEntry.item, 26, itemEntry.rarity)}<span>${escapeHtml(itemEntry.item.name)}</span></span>`
       : 'Drag a weapon or armor piece here';
   }
   if (partEntry && itemEntry) {
@@ -25317,7 +25406,7 @@ function renderManglerFinishedWork() {
   wrap.style.display = 'block';
   wrap.innerHTML = `
     <div class="mangler-finished-label">✨ Finished Work</div>
-    <div class="mangler-finished-card">
+    <div class="mangler-finished-card" ${itemHoverAttrs(item, rarity)}>
       ${itemPixelIcon(item, 32, rarity)}
       <div>
         <div class="mangler-finished-name">${escapeHtml(item.name)}</div>
