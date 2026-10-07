@@ -7229,6 +7229,38 @@ function closePowerPicker() {
 // Only fills in the field if it's genuinely missing; never overwrites a hand-authored value.
 const FALLBACK_WEAPON_DICE_BY_RARITY = {common:'1d6',uncommon:'1d8',rare:'2d6',superrare:'2d8',legendary:'3d8',celestial:'4d10'};
 const FALLBACK_ARMOR_AC_BY_RARITY = {common:'11',uncommon:'13',rare:'15',superrare:'17',legendary:'19',celestial:'21'};
+// An armor piece's AC must do what it says when worn (docs/ITEM_AUDIT.md): body armor above the unarmoured 10, helmets/bracers/boots a small flat
+// bonus. Old numbers (a leather armor "AC 6", a helm "AC 13") are rebuilt from the item's name and rarity; sensible numbers are left alone.
+function normalizeArmorItem(item, rarity) {
+  if (!item || item.type !== 'armor' || typeof normalizedBodyArmorAc !== 'function') return item;
+  const raw = String(item.ac == null ? '' : item.ac).trim();
+  if (!/^\d+$/.test(raw)) return item;
+  if (inferSlotType(item) === 'armor' && !isShieldName(item.name)) { const n = String(normalizedBodyArmorAc(item, rarity || item.rarity)); if (n !== raw) item.ac = n; }
+  else item.ac = '+' + normalizedAccessoryAc(item, rarity || item.rarity);
+  return item;
+}
+// What wearing the item really does to AC, read from the same engine the character sheet uses (so the card can never disagree with the sheet):
+// body armor shows the AC you end up with ("AC 15"), anything else the bonus it adds ("+2"). Armor scaling (stat grades) is listed separately.
+const _acCache = new WeakMap();
+function itemAcContribution(item) {
+  const sig = [item.ac, item.effect, item.rarity, (item.mods || []).length, item.name, item.__canonical ? 1 : 0].join('|');
+  const hit = _acCache.get(item); if (hit && hit.sig === sig) return hit.val;
+  let val = { total: 0, replaces: false };
+  try {
+    const slot = inferSlotType(item), slotId = Object.keys(SLOT_CATEGORY).find(id => SLOT_CATEGORY[id] === slot) || 'armor';
+    const sheet = computeCharacterSheetFor({}, 1, [], [], { [slotId]: 'k' }, () => ({ item, rarity: item.rarity || 'common' }), 10, 30);
+    const src = sheet.ac.sources.filter(x => !/^Armor scaling/.test(x.itemName));
+    val = { total: src.reduce((n, x) => n + x.amount, 0), replaces: src.some(x => x.isBaseOverride) };
+  } catch (e) { /* engine not ready yet */ }
+  _acCache.set(item, { sig, val });
+  return val;
+}
+function acLabel(item) {
+  const raw = String((item && item.ac) || '');
+  if (!raw || typeof computeCharacterSheetFor !== 'function') return raw;
+  const c = itemAcContribution(item);
+  return c.replaces ? String(10 + c.total) : (c.total >= 0 ? '+' : '') + c.total;
+}
 function inferItemMetadata(item, rarity){
   const n=item.name.toLowerCase();
   if(!item.type){
@@ -7238,6 +7270,7 @@ function inferItemMetadata(item, rarity){
     else item.type='misc';
   }
   if(!item.subcategory) item.subcategory=classifySubcategory(item.name, item.type, rarity, item.desc);
+  normalizeArmorItem(item, rarity);
   if(!item.slotSize) item.slotSize=SUBCATEGORY_SLOT_SIZE[item.subcategory]||1;
   if(item.type==='consumable' && !item.charges) item.charges=rollConsumableCharges(item.subcategory, rarity);
   if(item.weight===undefined || item.weight===null) item.weight=computeItemWeight(item);
@@ -7270,6 +7303,10 @@ function inferItemMetadata(item, rarity){
 document.addEventListener('DOMContentLoaded', () => {
   // Arrows and bolts live in the catalog (Compendium / Token Library) but stay out of the random item pools.
   if (window.AmmoData && !lootData.common.some(i => i.subcategory === 'ammo')) AmmoData.items.forEach(it => lootData[it.rarity].push(JSON.parse(JSON.stringify(it))));
+  // The old catalogue "arrows" (weapons with a dmg of "No bonus" / "+1 bonus") are replaced by real stackable ammunition (ammo-data.js).
+  if (window.AmmoData) Object.keys(lootData).forEach(r => { lootData[r] = lootData[r].filter(it => !(it.type === 'weapon' && /\b(arrows?|bolts?|ammunition|bullets?)\b/i.test(it.name) && !/\d+d\d+/.test(String(it.dmg || '')))); });
+  // "1-3d4+1" is three darts of 1d4+1: write it as dice the attack roller can read.
+  Object.values(lootData).forEach(arr => arr.forEach(it => { if (it.type === 'weapon' && /^1[–-]3d4\+1$/.test(String(it.dmg || '').trim())) it.dmg = '3d4+3'; }));
   Object.entries(lootData).forEach(([r, arr]) => arr.forEach(item => inferItemMetadata(item, r)));
   // NPC signature weapons (see NPC_WEAPONS in npc-data.js) register after the pass above, not
   // before -- they're already fully classified by registerNpcWeapons itself, so running them
@@ -8325,9 +8362,9 @@ function buildInspectMeta(it, fieldsToHide, revealed, sourceKey) {
     if (focusMeta) tags += `<span class="meta-tag scaling">✦ Focus: ${SCALING_STAT_LABEL[focusMeta.stat]} ${focusMeta.grade}</span>`; }
   if (it.ac) {
     if (fieldsToHide.includes('ac') && !revealed.has('ac')) {
-      tags += inspectField('ac', it.ac, it.rarity, sourceKey, false);
+      tags += inspectField('ac', acLabel(it), it.rarity, sourceKey, false);
     } else {
-      tags += `<span class="meta-tag ac">AC: ${it.ac}</span>`;
+      tags += `<span class="meta-tag ac">AC: ${acLabel(it)}</span>`;
     }
   }
   if (it.hp) {
@@ -8409,7 +8446,7 @@ function copyResults() {
       if(it.desc) text+=`    ${it.desc}\n`;
       text+=`    Type: ${it.type||'unknown'} | Slot: ${it.slotSize||1} | Value: ${it.gp||'—'}`;
       if(it.dmg) text+=` | DMG: ${it.dmg}`;
-      if(it.ac) text+=` | AC: ${it.ac}`;
+      if(it.ac) text+=` | AC: ${acLabel(it)}`;
       if(it.hp) text+=` | Heals: ${it.hp}`;
       if(it.charges) text+=` | Charges: ${it.charges}`;
       text+='\n';
@@ -9157,7 +9194,7 @@ function copyChestResults() {
       if (it.desc) text += `    ${it.desc}\n`;
       text += `    Type: ${it.type||'unknown'} | Value: ${it.gp||'—'}`;
       if (it.dmg) text += ` | DMG: ${it.dmg}`;
-      if (it.ac)  text += ` | AC: ${it.ac}`;
+      if (it.ac)  text += ` | AC: ${acLabel(it)}`;
       if (it.hp)  text += ` | Heals: ${it.hp}`;
       if (it.charges) text += ` | Charges: ${it.charges}`;
       text += '\n';
@@ -9322,7 +9359,7 @@ function copyDeceasedResults() {
       if (it.desc) text += `    ${it.desc}\n`;
       text += `    Type: ${it.type || 'unknown'} | Value: ${it.gp || '—'}`;
       if (it.dmg) text += ` | DMG: ${it.dmg}`;
-      if (it.ac) text += ` | AC: ${it.ac}`;
+      if (it.ac) text += ` | AC: ${acLabel(it)}`;
       if (it.hp) text += ` | Heals: ${it.hp}`;
       if (it.charges) text += ` | Charges: ${it.charges}`;
       text += '\n';
@@ -9398,7 +9435,7 @@ function metaTagsFor(item, rarity){
   tags += `<span class="meta-tag weight">Weight: ${item.weight != null ? item.weight : computeItemWeight(item)} lbs</span>`;
   if(item.gp) tags += `<span class="meta-tag gp">Value: ${item.gp}</span>`;
   if(item.dmg) tags += `<span class="meta-tag dmg">DMG: ${item.dmg}</span>`;
-  if(item.ac) tags += `<span class="meta-tag ac">AC: ${item.ac}</span>`;
+  if(item.ac) tags += `<span class="meta-tag ac">AC: ${acLabel(item)}</span>`;
   if(item.hp) tags += `<span class="meta-tag hp">Heals: ${item.hp}</span>`;
   if(item.charges) tags += `<span class="meta-tag charges">Charges: ${item.charges}</span>`;
   if(item.requirement) tags += `<span class="meta-tag">Req: ${item.requirement}</span>`;
@@ -10788,7 +10825,8 @@ function rollItemStats(cat, rarity, baseName) {
     // all and the item would silently contribute 0 AC, same bug this phase is fixing).
     if (isBodySlot) {
       armorStyle = base ? base.weightClass : 'medium';
-      ac = String(baseAC + (RARITY_AC_BONUS[rarity] || 0));
+      // body armor REPLACES the unarmoured 10, so it is built from the real armor values (padded/leather 11 ... plate 18) plus a rarity bonus
+      ac = String(typeof normalizedBodyArmorAc === 'function' ? normalizedBodyArmorAc({ name: baseName, ac: '0' }, rarity) : baseAC + (RARITY_AC_BONUS[rarity] || 0));
       requirement = armorStyle === 'heavy' ? 'Heavy armor proficiency' : armorStyle === 'medium' ? 'Medium armor proficiency' : 'No proficiency required';
     } else {
       ac = '+' + String(baseAC + (RARITY_ACC_AC_BONUS[rarity] || 0));
@@ -10888,6 +10926,7 @@ function generateUniqueItem() {
   const subcategoryLabel = SUBCATEGORY_LABELS[subcategory] || '';
 
   const weight = computeItemWeight({ type: cat, subcategory, name: itemName });
+  const acShown = ac ? acLabel({ name: itemName, rarity, type: cat, cat, subcategory, ac, mods, armorStyle }) : '';
 
   const statsHtml = `
     <div class="ic-stats">
@@ -10896,7 +10935,7 @@ function generateUniqueItem() {
       <span class="ic-stat gp">💰 ${gp}</span>
       <span class="ic-stat weight">⚖ ${weight} lbs</span>
       ${dmg ? `<span class="ic-stat dmg">⚔ ${dmg}</span>` : ''}
-      ${ac  ? `<span class="ic-stat ac">🛡 AC ${ac}</span>` : ''}${requirement ? `<span class="ic-stat">Req: ${requirement}</span>` : ''}
+      ${ac  ? `<span class="ic-stat ac">🛡 AC ${acShown}</span>` : ''}${requirement ? `<span class="ic-stat">Req: ${requirement}</span>` : ''}
       ${hp  ? `<span class="ic-stat hp">❤ Heals ${hp}</span>` : ''}
       ${charges ? `<span class="ic-stat charges">✦ ${charges}</span>` : ''}
     </div>
@@ -10956,8 +10995,8 @@ function generateUniqueItem() {
     }
     if (ac) {
       newStats += rFields.includes('ac') && !revealed.has('ac')
-        ? inspectField('ac', `<span class="meta-tag ac">${ac}</span>`, rarity, genSourceKey, false)
-        : `<span class="meta-tag ac">AC: ${ac}</span>`;
+        ? inspectField('ac', `<span class="meta-tag ac">${acShown}</span>`, rarity, genSourceKey, false)
+        : `<span class="meta-tag ac">AC: ${acShown}</span>`;
     }
     if (hp) {
       newStats += rFields.includes('hp') && !revealed.has('hp')
@@ -11068,7 +11107,7 @@ function buildDescParagraphs(baseName, cat, rarity, tags, mods, stats) {
     if (/elixir/.test(lowerName)) return 'elixir';
     if (/\bvial\b/.test(lowerName)) return 'vial';
     if (/scroll/.test(lowerName)) return 'scroll';
-    if (/dust/.test(lowerName)) return 'dust';
+    if (/dust|powder|incense|\bash\b/.test(lowerName)) return 'dust';
     if (/ink/.test(lowerName)) return 'ink';
     if (/wand/.test(lowerName)) return 'wand';
     if (/rod\b/.test(lowerName) && cat !== 'weapon') return 'rod';
@@ -11866,7 +11905,7 @@ function loadSavedItem(id) {
     <span class="ic-stat slot">Slot ${item.slotSize}</span>
     <span class="ic-stat gp">💰 ${item.gp}</span>
     ${item.dmg ? `<span class="ic-stat dmg">⚔ ${item.dmg}</span>` : ''}
-    ${item.ac  ? `<span class="ic-stat ac">🛡 AC ${item.ac}</span>` : ''}${item.requirement ? `<span class="ic-stat">Req: ${item.requirement}</span>` : ''}
+    ${item.ac  ? `<span class="ic-stat ac">🛡 AC ${acLabel(item)}</span>` : ''}${item.requirement ? `<span class="ic-stat">Req: ${item.requirement}</span>` : ''}
     ${item.hp  ? `<span class="ic-stat hp">❤ Heals ${item.hp}</span>` : ''}
   </div>`;
   const modsHtml = item.mods.map(m => `<div class="ic-mod-group"><div class="ic-mod-label">${m.type}</div><div class="ic-mod-entry">${colorizeModifierText(m.text, m.type)}</div></div>`).join('');
@@ -14828,27 +14867,27 @@ const DESC = {
 
     // ── Consumables by sub-type ──
     potion: [
-      "A glass vial of {lc} liquid that {liquidmotion}. The smell when opened: {scent}.",
+      "A glass vial of {lc} liquid. It {liquidmotion}. The smell when opened: {scent}.",
       "The liquid {liquidcolor} and {liquidmotion}. Held to light, {transparence}.",
-      "Small enough to disappear in a closed fist. The liquid {lc} and {liquidmotion}. The stopper is {seal}.",
-      "The container is {container}. The liquid inside {liquidcolor} and carries the scent of {scent}.",
-      "A {container} of {lc} fluid. When moved, it {liquidmotion}. The scent is {scent}.",
+      "Small enough to disappear in a closed fist. The liquid is {lc} and {liquidmotion}. The stopper is {seal}.",
+      "The container is {container}. The liquid inside is {lc} and carries the scent of {scent}.",
+      "It is {container}, full of {lc} fluid. When moved, it {liquidmotion}. The scent is {scent}.",
     ],
     tonic: [
-      "A small {container} of pale {lc} liquid. It {liquidmotion} when the vessel is tilted and smells of {scent}.",
-      "Thick and {lc}, slower to pour than you'd expect. It {liquidmotion} and smells faintly of {scent}.",
+      "It is {container}, full of {lc} liquid. It {liquidmotion} when tilted and smells of {scent}.",
+      "The liquid is {lc} and thick, slower to pour than you'd expect. It {liquidmotion} and smells faintly of {scent}.",
     ],
     draught: [
-      "A stoppered {container} of dark {lc} liquid. It {liquidmotion} with a faint scent of {scent}.",
-      "Dense and {lc}, meant to be taken quickly. The container is {seal}. It smells of {scent}.",
+      "It is {container}, full of {lc} liquid. It {liquidmotion} with a faint scent of {scent}.",
+      "The liquid is {lc} and dense, meant to be taken quickly. The container is sealed with {seal}. It smells of {scent}.",
     ],
     elixir: [
-      "A fine glass {container} of {lc} liquid. Held to light: {transparence}. The scent: {scent}.",
-      "Clear {container}, {lc} contents, {seal}. It {liquidmotion} even when held still.",
+      "It is {container}, full of {lc} liquid. Held to light: {transparence}. The scent: {scent}.",
+      "It is {container}. The contents are {lc} and {liquidmotion} even when held still.",
     ],
     vial: [
-      "A finger-width {container} of {lc} fluid. It {liquidmotion} and carries the scent of {scent}.",
-      "Sealed with {seal}. The contents are {lc} and {liquidmotion} when tilted.",
+      "It is {container}, full of {lc} fluid. It {liquidmotion} and carries the scent of {scent}.",
+      "The stopper is {seal}. The contents are {lc} and {liquidmotion} when tilted.",
     ],
     scroll: [
       "Rolled tight and bound with cord. The parchment {sc_texture}, the script {sc_script}.",
@@ -14861,7 +14900,7 @@ const DESC = {
       "Fine {dc_color} dust in a cloth envelope, sealed with wax. It {dc_motion} when the packet is opened.",
     ],
     ink: [
-      "A small {container} of {dc_color} ink. It {liquidmotion} faintly even in a sealed vessel.",
+      "It is {container}, full of {dc_color} ink. It {liquidmotion} faintly even when sealed.",
     ],
 
     // ── Misc items by sub-type ──
@@ -14951,10 +14990,10 @@ const DESC = {
       "The join-work {joint}. The surface {surface} and the lining {lining}.",
     ],
     consumable: [
-      "A {container} of {lc} liquid. It {liquidmotion} and smells of {scent}.",
-      "The liquid {liquidcolor}. Sealed with {seal}.",
+      "It is {container}, full of {lc} liquid. It {liquidmotion} and smells of {scent}.",
+      "The liquid {liquidcolor}. The stopper is {seal}.",
       "Held to light: {transparence}. The scent: {scent}.",
-      "Small, {container}, {lc}. The stopper is {seal}.",
+      "It is {container}, full of {lc} liquid. The stopper is {seal}.",
     ],
     misc: [
       "The surface is {surface} and {detail}.",
@@ -15052,7 +15091,7 @@ const DESC = {
   lining: ['has been replaced with padding finer than the outer piece warrants','smells of old cedar and someone else\'s sweat','is thicker on the left side, which a previous owner added','goes cold against the skin for a moment when first donned, then settles'],
   edgedetail: ['chamfered in a regional style not common here for two generations','finished with a line of controlled oxidation that was probably once a different color','worn through in places to the base metal','will catch thread if run carelessly'],
   liquidcolor: ['is {lc} in bright light but goes {lc2} the moment you move it into shadow','shifts between {lc} and {lc2} as you turn the vessel','appears uniformly {lc} until something disturbs it','sits {lc} near the surface and {lc2} below — layers, with opinions'],
-  lc: ['a deep amber like old honey','pale silver that catches light it hasn\'t been shown','an unsettling blue-black','murky green the color of standing water','translucent grey like river ice','warm rose that is wrong for something in a bottle','nearly opaque and the color of old blood'],
+  lc: ['deep amber, like old honey','pale silver, catching light it hasn\'t been shown','unsettling blue-black','murky green, the color of standing water','translucent grey, like river ice','warm rose, which is wrong for something in a bottle','nearly opaque, the color of old blood'],
   lc2: ['faintly luminous, which is not a property liquids normally have','almost perfectly clear, as though the color burned off','very nearly black at the center','threaded through with something that isn\'t settling out','rust-red, which is either iron content or something worse','a color that doesn\'t have a name in the common tongue'],
   liquidmotion: ['moves like something thicker than water, reluctant, deliberate','won\'t fully settle after being shaken — still circulating a minute later','clings to the inside of the vessel and releases slowly, as though reconsidering','is moving on its own, slightly, in a direction that has nothing to do with how it\'s held'],
   container: ['a hand-blown vial with walls thick on one side and thin on the other','a ceramic bottle sealed with black wax over a carved cork','a stoppered iron flask covered in shallow etchings','a small stone bottle worn smooth on the underside','a glass tube bent at a sharp angle and sealed at both ends'],
@@ -15737,7 +15776,15 @@ const ACCESSORY_CLASSIFICATION_TO_SLOT = {
 };
 // Guess an equipment slot category from an item's name/type. The person can override
 // this per-token from the dropdown on its card in the Tokens tab.
+const JEWELRY_NAME = /\b(amulet|necklace|pendant|periapt|talisman|brooch|locket|medallion|torc|holy symbol|rings?)\b/i;
+const ACCESSORY_ARMOR_NAME = /\b(helm|helmet|cap|crown|circlet|coif|diadem|tiara|gauntlets?|gloves?|bracers?|vambraces?|greaves|boots?|sandals?|cloak|cape|mantle|belt|girdle|sash|mask|goggles)\b/i;
+const BODY_ARMOR_NAME = /\b(armou?r|mail|plate|breastplate|cuirass|hauberk|brigandine|splint|gambeson|jerkin|robes?|vestments?|chain shirt|studded leather|padded|hide|scale)\b/i;
 function inferSlotType(item) {
+  // Names decide first for armor: "Ring Mail" is body armor, not a ring; "Wayfaring"/"Thundering"/"Smoldering" only CONTAIN "ring";
+  // a buckler is a shield. Word boundaries everywhere so a substring never picks the slot.
+  const _nm = String(item.name || '');
+  if (/\b(shield|buckler)\b/i.test(_nm) && !/shielding|shield of expression/i.test(_nm)) return 'offhand';
+  if ((item.type === 'armor' || item.cat === 'armor') && !JEWELRY_NAME.test(_nm.replace(/ring ?mail/i, '')) && !ACCESSORY_ARMOR_NAME.test(_nm) && BODY_ARMOR_NAME.test(_nm)) return 'armor';
   if (item.classification && item.classification[0] === 'Accessory') {
     const bySlot = ACCESSORY_CLASSIFICATION_TO_SLOT[item.classification[1]];
     if (bySlot) return bySlot;
@@ -15788,7 +15835,7 @@ function inferSlotType(item) {
   // carried..." is chainmail, not a finger ring) — scanning the full description for it would
   // misclassify body armor as jewelry far more often than it would ever catch a real ring whose
   // name doesn't already say so.
-  if (name.includes('ring')) return 'ring';
+  if (/\bring\b/.test(name)) return 'ring';
   if (name.includes('amulet') || name.includes('necklace') || name.includes('pendant') ||
       name.includes('periapt') || name.includes('torc') || name.includes('gorget') ||
       name.includes('holy symbol')) return 'amulet';
@@ -25882,6 +25929,7 @@ function showUpdateNotice(html) {
   window._appUpdateNoticeTimer = setTimeout(() => el.remove(), 20000);
 }
 function runSavedItemRefresh() {
+  (savedGeneratedItems || []).forEach(i => normalizeArmorItem(i, i.rarity));
   const changes = refreshSavedItemsFromCatalog();
   window._savedItemRefresh = changes;
   if (!changes.length) return;
