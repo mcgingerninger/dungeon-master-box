@@ -5,7 +5,7 @@
 // battleParseAttack / battleRollDamage (attack + damage parsing and dice) and the connected-players
 // roster. Classic script: it shares the monolith's globals and is wired up from the tab markup.
 (function () {
-  const bt = { tokens: [], selected: new Set(), nextId: 1, customPlayers: [], drag: null, last: null };
+  const bt = { tokens: [], selected: new Set(), selectedPlayer: null, nextId: 1, customPlayers: [], drag: null, last: null, lastResult: '' };
   window.btState = bt; // exposed for tests
 
   // ---------- styles ----------
@@ -62,6 +62,9 @@
     .bt-atk .sub { margin:0.4rem 0 0 0.6rem; padding-left:0.6rem; border-left:2px solid var(--border); }
     .bt-hit { color:#4caf7d; } .bt-miss { color:#e05252; } .bt-crit { color:#f7d774; font-weight:bold; }
     .bt-note { color:var(--text-dim); font-size:0.8rem; }
+    .bt-token.player.p-selected .disc { box-shadow:0 0 0 3px #6fd07f, 0 0 16px #6fd07f; }
+    .bt-token.monster.attackable .disc svg, .bt-token.monster.attackable .disc { filter:drop-shadow(0 0 5px #e05252); cursor:crosshair; }
+    .bt-token .lv { position:absolute; top:-2px; right:10px; min-width:20px; padding:0 4px; font-size:0.62rem; background:#12301e; border:1px solid #4caf7d; border-radius:8px; color:#bfeccd; line-height:15px; }
   `;
   document.head.appendChild(style);
 
@@ -128,7 +131,35 @@
       return { id: bt.nextId++, kind, x, y, name: entry.displayName || monster.name, ac: entry.ac, hp: entry.hp, maxHp: entry.maxHp, entry, monster };
     }
     const p = playerSources().find(s => s.key === key); if (!p) return null;
-    return { id: bt.nextId++, kind, x, y, name: p.name, ac: p.ac, hp: p.hp, maxHp: p.maxHp, uid: p.uid, srcKey: p.key };
+    const tok = { id: bt.nextId++, kind, x, y, name: p.name, ac: p.ac, hp: p.hp, maxHp: p.maxHp, uid: p.uid, srcKey: p.key };
+    loadStats(tok);
+    return tok;
+  }
+  // ---------- campaign characters: their real stats ----------
+  // A campaign member's full sheet (abilities, level, gear, spells) lives in their synced state. The DM can load it one player at a
+  // time (the same subscription the Players tab uses); the token then shows the character's real AC, HP, level and class.
+  function fetchState(uid) {
+    return new Promise(resolve => {
+      if (typeof viewedPlayerUid !== 'undefined' && viewedPlayerUid === uid && viewedPlayerState) return resolve(viewedPlayerState);
+      if (typeof selectViewedPlayer !== 'function' || typeof window.startViewedPlayerListener !== 'function') return resolve(null);
+      const orig = window.applyViewedPlayerState; let done = false;
+      const finish = st => { if (done) return; done = true; clearTimeout(timer); window.applyViewedPlayerState = orig; resolve(st); };
+      const timer = setTimeout(() => finish(null), 6000);
+      window.applyViewedPlayerState = function (u, state) { orig.apply(this, arguments); if (u === uid && state) finish(state); };
+      if (viewedPlayerUid === uid) { viewedPlayerUid = null; }   // force a fresh subscription
+      selectViewedPlayer(uid);
+    });
+  }
+  function sheetOf(state) { return window.PlayerAttack ? PlayerAttack.withCharacter(state, () => computeCharacterSheet()) : null; }
+  function loadStats(tok) {
+    if (!tok.uid) { if (tok.srcKey === 'me') { try { applySheet(tok, null); } catch (e) {} } return Promise.resolve(); }
+    return fetchState(tok.uid).then(state => { if (!state) return; tok.state = state; applySheet(tok, state); btRenderField(); btRenderSide(); });
+  }
+  function applySheet(tok, state) {
+    const sh = sheetOf(state); if (!sh) return;
+    tok.sheet = { abilities: Object.fromEntries(Object.entries(sh.abilities).map(([k, v]) => [k, v.total])), level: state ? (state.characterLevel || 1) : characterLevel, cls: state ? (state.characterClass || '') : (typeof characterClass !== 'undefined' ? characterClass : ''), prof: sh.profBonus, speed: sh.speed && sh.speed.total };
+    tok.ac = sh.ac.total; tok.maxHp = sh.maxHp.total;
+    if (tok.hp > tok.maxHp) tok.hp = tok.maxHp;
   }
   window.btRenderField = function () {
     const f = document.getElementById('btField'); if (!f) return;
@@ -136,14 +167,17 @@
     f.innerHTML = (bt.tokens.length ? '' : '<div class="bt-empty">Drag monsters and players from the left onto the field.</div>') + bt.tokens.map(t => {
       const pct = Math.max(0, Math.min(100, Math.round((t.hp / Math.max(1, t.maxHp)) * 100)));
       const tier = t.entry && t.entry.variant ? t.entry.variant.tier : '';
-      const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', t.hp <= 0 ? 'dead' : ''].join(' ');
+      const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', bt.selectedPlayer === t.id ? 'p-selected' : '', bt.selectedPlayer && t.kind === 'monster' && t.hp > 0 ? 'attackable' : '', t.hp <= 0 ? 'dead' : ''].join(' ');
       const icon = t.kind === 'player' ? '🛡️' : (typeof monsterArtSvg === 'function' ? monsterArtSvg(t.monster, 64, true) : monsterIcon(t.monster));
-      return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><span class="ac" title="Armor Class">🛡${t.ac == null ? '—' : t.ac}</span><div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="bar"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></div></div>`;
+      return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><span class="ac" title="Armor Class">🛡${t.ac == null ? '—' : t.ac}</span>${t.sheet ? `<span class="lv" title="${esc((t.sheet.cls || 'Character') + ' level ' + t.sheet.level)}">L${t.sheet.level}</span>` : ''}<div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="bar"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></div></div>`;
     }).join('');
     const hint = document.getElementById('btHint');
-    if (hint) hint.innerHTML = bt.selected.size
+    const sp = bt.tokens.find(t => t.id === bt.selectedPlayer);
+    if (hint) hint.innerHTML = (bt.selected.size
       ? `<b>${bt.selected.size}</b> monster${bt.selected.size > 1 ? 's' : ''} selected — <b>left-click a player</b> to roll the attack${bt.selected.size > 1 ? 's' : ''}. Right-click monsters to add/remove.`
-      : '<b>Left-click</b> a monster to select it, <b>right-click</b> monsters to select several, then <b>left-click a player</b> to roll the attack. Hover a token for its info.';
+      : sp ? `<b>${esc(sp.name)}</b> is ready — <b>left-click a monster</b> to attack it with their main hand (a small chooser appears when they have several weapons or damage spells). Click ${esc(sp.name)} again to cancel.`
+      : '<b>Left-click</b> a monster to select it, <b>right-click</b> monsters to select several, then <b>left-click a player</b> to roll the attack. Or <b>left-click a player</b> first, then a monster, to make the player attack it. Hover a token for its info.')
+      + (bt.lastResult ? `<div class="bt-note" style="margin-top:0.25rem">${bt.lastResult}</div>` : '');
   };
 
 
@@ -198,7 +232,8 @@
             const all = [...(t.monster.actions || []).map(a => esc(a.name)), ...gear.map(esc)];
             return all.length ? `<div class="bt-sec"><b>Actions</b> ${all.join(', ')}</div>` : ''; })();
     } else {
-      tt.innerHTML = `<div class="tt-header">${esc(t.name)}</div><div class="tt-rarity">Player</div><div class="tt-stats"><span>🛡 AC ${t.ac}</span><span>❤ ${t.hp}/${t.maxHp}</span></div>`;
+      const sh = t.sheet, ab = sh ? Object.entries(sh.abilities).map(([k, v]) => `<span>${k.toUpperCase()} ${v}</span>`).join('') : '';
+      tt.innerHTML = `<div class="tt-header">${esc(t.name)}</div><div class="tt-rarity">${sh ? esc((sh.cls || 'Character') + ' · level ' + sh.level) : 'Player'}</div><div class="tt-stats"><span>🛡 AC ${t.ac}</span><span>❤ ${t.hp}/${t.maxHp}</span>${sh && sh.speed ? `<span>👟 ${sh.speed} ft</span>` : ''}</div>${ab ? `<div class="tt-stats" style="margin-top:0.2rem">${ab}</div>` : ''}${t.uid && !sh ? '<div class="bt-note">Loading their sheet…</div>' : ''}`;
     }
     tt.style.display = 'block';
     if (typeof moveTokenTooltip === 'function') moveTokenTooltip(evt);
@@ -424,7 +459,7 @@
     // left button: drag to move, click to select / attack
     f.addEventListener('mousedown', e => {
       if (e.button !== 0) return;
-      if (e.target.dataset && e.target.dataset.x) { bt.tokens = bt.tokens.filter(t => String(t.id) !== e.target.dataset.x); bt.selected.delete(+e.target.dataset.x); btRenderField(); return; }
+      if (e.target.dataset && e.target.dataset.x) { bt.tokens = bt.tokens.filter(t => String(t.id) !== e.target.dataset.x); bt.selected.delete(+e.target.dataset.x); if (bt.selectedPlayer === +e.target.dataset.x) bt.selectedPlayer = null; btRenderField(); return; }
       const t = tokenOf(e.target); if (!t) return;
       bt.drag = { t, sx: e.clientX, sy: e.clientY, moved: false }; hideTip(); e.preventDefault();
     });
@@ -440,11 +475,33 @@
       const t = d.t;
       if (t.kind === 'monster') {
         if (t.hp <= 0) return;
+        if (bt.selectedPlayer) { playerAttacks(bt.tokens.find(x => x.id === bt.selectedPlayer), t); return; }
         if (bt.selected.size === 1 && bt.selected.has(t.id)) bt.selected.clear(); else { bt.selected.clear(); bt.selected.add(t.id); }
         btRenderField();
       } else if (bt.selected.size) attackTarget(t);
+      else { bt.selectedPlayer = bt.selectedPlayer === t.id ? null : t.id; btRenderField(); }
     });
   };
+  // A campaign character attacks a monster: their own gear and spells (PlayerAttack), resolved against the monster's AC.
+  async function playerAttacks(pt, mt) {
+    if (!pt || !mt || mt.hp <= 0) return;
+    if (!window.PlayerAttack) return;
+    const anchor = document.querySelector(`.bt-token[data-id="${mt.id}"]`);
+    let state = null;
+    if (pt.uid) {
+      bt.lastResult = `Loading ${esc(pt.name)}’s sheet…`; btRenderField();
+      state = pt.state = await fetchState(pt.uid);
+      if (!state) { bt.lastResult = `Could not load ${esc(pt.name)}’s character — try again.`; btRenderField(); return; }
+      applySheet(pt, state);
+    } else if (pt.srcKey !== 'me') state = {};   // a quick test player has no gear: unarmed strikes
+    bt.lastResult = '';
+    PlayerAttack.beginFor({ currentTarget: anchor }, { state, who: pt.name, target: { name: mt.name, ac: mt.ac, apply(dmg, log) {
+      if (dmg > 0) { mt.hp = Math.max(0, mt.hp - dmg); if (mt.entry) mt.entry.hp = mt.hp; }
+      bt.lastResult = `${log.detail}${mt.hp <= 0 ? ' <b>Defeated!</b>' : ''}`;
+      if (mt.hp <= 0) bt.selectedPlayer = bt.selectedPlayer;   // keep the attacker ready for the next target
+      btRenderField();
+    } } });
+  }
   window.btRerollAll = function () {
     bt.tokens.filter(t => t.kind === 'monster').forEach(t => {
       const entry = buildBattleEntry(t.monster, sliderOpts());
@@ -452,7 +509,7 @@
     });
     btRenderField();
   };
-  window.btClear = function () { bt.tokens = []; bt.selected.clear(); btRenderField(); };
+  window.btClear = function () { bt.tokens = []; bt.selected.clear(); bt.selectedPlayer = null; bt.lastResult = ''; btRenderField(); };
   window.btHealAll = function () { bt.tokens.forEach(t => { t.hp = t.maxHp; delete t.spellState; }); btRenderField(); };
   window.btOnShow = function () {
     btInit(); btRenderSide(); btRenderField();

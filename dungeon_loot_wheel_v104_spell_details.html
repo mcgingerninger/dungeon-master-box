@@ -4590,6 +4590,7 @@ const APP_VERSION = 'v104';
 <script src="wild-magic-data.js"></script>
 <script src="ammo-data.js"></script>
 <script src="item-examine.js"></script>
+<script src="player-attack.js"></script>
 <script src="player-status.js"></script>
 <script src="item-art-kit.js"></script>
 <script src="item-art-weapons.js"></script>
@@ -5513,7 +5514,7 @@ function spellCastRollHtml(r) {
   _attackRollSources = r.sources || {};
   const S = (key, label) => (r.sources && r.sources[key]) ? `<span class="attack-src" onmouseenter="showAttackSourceTip(event,'${key}')" onmousemove="moveTokenTooltip(event)" onmouseleave="hideTokenTooltip()">${label}</span>` : label;
   const L = SCALING_STAT_LABEL;
-  const remaining = r.slotLevel ? Math.max(0, (characterSpellSlots[r.slotLevel] || 0) - (characterSpellSlotsUsed[r.slotLevel] || 0)) : null;
+  const remaining = r.slotsLeft != null ? r.slotsLeft : (r.slotLevel ? Math.max(0, (characterSpellSlots[r.slotLevel] || 0) - (characterSpellSlotsUsed[r.slotLevel] || 0)) : null);
   const rows = [];
   if (r.slotLevel) rows.push(`<div class="weapon-attack-line"><span>${S('slot', 'Spell slot used')}</span><span>Level ${r.slotLevel} (${remaining} left)</span></div>`);
   else rows.push(`<div class="weapon-attack-line"><span>Cantrip</span><span>no slot used</span></div>`);
@@ -17420,7 +17421,7 @@ function availableAmmoFor(weaponItem) {
 function pickAmmo(info) { return info.stacks.find(x => x.id === ammoPreference[info.kind]) || info.stacks[0] || null; }
 function setAmmoPreference(kind, id) { ammoPreference[kind] = id; if (_activeAttackRoll && _activeAttackRoll.ammoKind === kind) { _activeAttackRoll.ammoPref = id; renderActiveAttackRoll(); } }
 // Rolls a weapon attack, spending the ammunition it needs. Returns null (and says why) if the launcher has nothing to fire.
-function rollWeaponWithAmmo(item, sheet, rarity) {
+function rollWeaponWithAmmo(item, sheet, rarity, opts) {
   const info = availableAmmoFor(item);
   let ammo = null;
   if (info.kind) {
@@ -17429,7 +17430,7 @@ function rollWeaponWithAmmo(item, sheet, rarity) {
   }
   const roll = computeWeaponAttackRoll(item, sheet, rarity, ammo ? { ammo } : null);
   if (info.kind) { roll.ammoKind = info.kind; roll.ammoStacks = info.stacks.map(x => ({ id: x.id, name: x.item.name, qty: x.qty - (x.id === ammo.id ? 1 : 0) })); roll.ammoPref = ammo.id; }
-  if (ammo) spendInventoryStack(ammo.item, ammo.rarity, 1);
+  if (ammo && !(opts && opts.noSpend)) spendInventoryStack(ammo.item, ammo.rarity, 1);
   return roll;
 }
 function computeWeaponAttackRoll(item, sheet, rarity, opts) {
@@ -17487,7 +17488,7 @@ function showAttackRoll(roll, title, note, askAc) {
 function renderActiveAttackRoll() {
   const roll = _activeAttackRoll, bodyEl = document.getElementById('weaponAttackBody'); if (!roll || !bodyEl) return;
   if (window.AttackMarginUI) AttackMarginUI.bind(roll, renderActiveAttackRoll);
-  bodyEl.innerHTML = weaponAttackRollHtml(roll) + (roll._note || '');
+  bodyEl.innerHTML = (roll._html ? roll._html(roll) : weaponAttackRollHtml(roll)) + (roll._note || '');
 }
 function setAttackTargetAc(v) {
   const roll = _activeAttackRoll; if (!roll) return;
@@ -21355,7 +21356,7 @@ function combatCardHtml(entry, mode, shellOnly) {
     if (!entry.loot) {
       actionHtml = entry.defeated
         ? '<div class="combat-loot-hint">☠ Defeated — right-click again to roll its loot.</div>'
-        : `<button class="combat-roll-btn" onclick="rollBattleAttack(${entry.uid})">🎲 Roll Attack</button>`;
+        : `<button class="combat-roll-btn" onclick="rollBattleAttack(${entry.uid})">🎲 Roll Attack</button>${window.PlayerAttack ? ' ' + PlayerAttack.buttonsHtml(entry.uid, 'dm', '🗡 Hit it') : ''}`;
     } else {
       const lootTier = entry.loot.tier;
       const revealBtn = entry.lootRevealed
@@ -21380,7 +21381,7 @@ function combatCardHtml(entry, mode, shellOnly) {
     // simply absent from entry.loot.items here, not hidden by CSS, so there's nothing to
     // inspect via devtools to see early or to still show a live Loot button for.
     actionHtml = !entry.defeated
-      ? `<button class="combat-roll-btn" onclick="openBattlefieldAttackPicker(${entry.uid})">⚔ Attack</button>`
+      ? (window.PlayerAttack ? PlayerAttack.buttonsHtml(entry.uid, 'player') : `<button class="combat-roll-btn" onclick="openBattlefieldAttackPicker(${entry.uid})">⚔ Attack</button>`)
       : !entry.loot
         ? '<div class="combat-loot-hint">☠ Defeated — loot not revealed yet.</div>'
         : (() => {
@@ -21584,7 +21585,7 @@ function pendingMargin(req) {
   const a = req.attackData || {};
   const entry = battleRoster.find(e => e.uid === a.monsterUid);
   const targetAc = entry ? (entry.ac !== null && entry.ac !== undefined ? entry.ac : entry.monster.ac) : null;
-  if (targetAc == null || !window.AttackMargin) return { targetAc, entry, m: null };
+  if (targetAc == null || !window.AttackMargin || a.dc != null || a.toHitTotal == null) return { targetAc, entry, m: null };
   if (!req._m || req._m.ac !== targetAc) {
     const d20 = a.d20 != null ? a.d20 : (a.isCrit ? 20 : a.isFumble ? 1 : 10);
     const toHit = (a.toHitTotal || 0) - d20;
@@ -21604,7 +21605,7 @@ function renderPendingAttacksPanel() {
     ${pendingAttackRequests.map(req => {
       const a = req.attackData || {};
       const { targetAc, m } = pendingMargin(req);
-      const detail = targetAc == null
+      const detail = a.dc != null ? `${escapeHtml(a.saveStat || '')} save DC ${a.dc} — ${a.dmgTotal != null ? a.dmgTotal : '?'} damage${a.damageType ? ' ' + escapeHtml(a.damageType) : ''}${a.halfOnSave ? ' (half on a success)' : ''}` : a.toHitTotal == null ? `Automatic hit — ${a.dmgTotal != null ? a.dmgTotal : '?'} damage${a.damageType ? ' ' + escapeHtml(a.damageType) : ''}` : targetAc == null
         ? `To Hit: ${a.toHitTotal} — that monster is no longer in your roster${a.dmgTotal != null ? ` · Damage: ${a.dmgTotal}` : ''}`
         : `To Hit: ${a.toHitTotal} vs AC ${targetAc}${a.dmgTotal != null ? ` · Damage: ${a.dmgTotal}${m && m.margin.hit && m.margin.dmgPct !== 100 ? ` × ${m.margin.dmgPct}% → <b>${m.finalDamage}</b>` : m && !m.margin.hit ? ' → 0' : ''}` : ' · no damage dice recorded'}`;
       return `<div class="pending-attack-row">
@@ -21614,7 +21615,9 @@ function renderPendingAttacksPanel() {
           ${m ? AttackMarginUI.html({ ...m, ac: m.ac, _amId: m._amId }) : ''}
         </div>
         <div class="pending-attack-actions">
-          <button class="loot-save-btn" onclick="applyPendingAttackRequest(${req.id})">✓ Apply</button>
+          ${a.dc != null
+            ? `<button class="loot-save-btn" onclick="applyPendingAttackRequest(${req.id},'fail')">✗ Failed save</button><button class="loot-save-btn" onclick="applyPendingAttackRequest(${req.id},'save')">✓ Saved</button>`
+            : `<button class="loot-save-btn" onclick="applyPendingAttackRequest(${req.id})">✓ Apply</button>`}
           <button class="loot-save-btn" onclick="dismissPendingAttackRequest(${req.id})">✕ Dismiss</button>
         </div>
       </div>`;
@@ -21625,7 +21628,7 @@ function renderPendingAttacksPanel() {
 // hit/miss against the monster's OWN current AC at the moment the DM clicks Apply (not whatever
 // it was when the player rolled, in case something changed it in between) before touching HP.
 // The degree of hit (margin, docs/ATTACK_MARGIN.md) scales the damage; the effects the DM picked go in the log.
-function applyPendingAttackRequest(reqId) {
+function applyPendingAttackRequest(reqId, outcome) {
   const req = pendingAttackRequests.find(r => r.id === reqId);
   if (!req) return;
   const a = req.attackData || {};
@@ -21633,8 +21636,10 @@ function applyPendingAttackRequest(reqId) {
   if (entry) {
     const margin = m && m.margin;
     // fallback (no margin engine): the old flat rule — a natural 1 misses, a natural 20 hits, otherwise total vs AC
-    const hit = margin ? margin.hit : (!a.isFumble && (a.isCrit || a.toHitTotal >= targetAc));
-    const dmg = hit && a.dmgTotal != null ? (m ? m.finalDamage : a.dmgTotal) : null;
+    const isSave = a.dc != null, isAuto = !isSave && a.toHitTotal == null;
+    const hit = isSave ? (outcome === 'fail' || !!a.halfOnSave) : isAuto ? true : margin ? margin.hit : (!a.isFumble && (a.isCrit || a.toHitTotal >= targetAc));
+    const dmg = isSave ? (a.dmgTotal != null ? (outcome === 'fail' ? a.dmgTotal : (a.halfOnSave ? Math.floor(a.dmgTotal / 2) : 0)) : null)
+      : hit && a.dmgTotal != null ? (m ? m.finalDamage : a.dmgTotal) : null;
     if (hit && dmg != null && !entry.defeated) {
       entry.hp = Math.max(0, entry.hp - dmg);
       if (entry.hp <= 0) entry.defeated = true;
@@ -21645,7 +21650,7 @@ function applyPendingAttackRequest(reqId) {
     const effects = m && m.effects.length ? ` Effects: ${m.effects.map(e => `<strong>${escapeHtml(e.name)}</strong> (${escapeHtml(e.text)})`).join('; ')}` : '';
     battleLog.push({
       cls, title,
-      detail: `<strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)} — rolled <strong>${a.toHitTotal}</strong> vs AC ${targetAc}${margin ? ` (M ${margin.margin >= 0 ? '+' : ''}${margin.margin})` : ''}. ${hit ? `${label}${dmg != null ? ` for <strong>${dmg}</strong> damage` : ''}.` : (margin && margin.fumble ? 'Fumble.' : 'Missed.')}${effects}`,
+      detail: `<strong>${escapeHtml(req.playerUsername)}</strong> attacks <strong>${escapeHtml(a.monsterName)}</strong> with ${escapeHtml(a.weaponName)} — ${isSave ? `— ${escapeHtml(a.saveStat || '')} save DC ${a.dc}, ${outcome === 'fail' ? 'failed' : 'succeeded'}` : isAuto ? '— automatic hit' : `rolled <strong>${a.toHitTotal}</strong> vs AC ${targetAc}`}${margin ? ` (M ${margin.margin >= 0 ? '+' : ''}${margin.margin})` : ''}. ${hit ? `${label}${dmg != null ? ` for <strong>${dmg}</strong> damage` : ''}.` : (margin && margin.fumble ? 'Fumble.' : 'Missed.')}${effects}`,
     });
     if (battleLog.length > 50) battleLog = battleLog.slice(-50);
     renderCombatRoster();
