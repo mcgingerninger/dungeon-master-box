@@ -76,6 +76,7 @@ const STATIC_EXTENSIONS = {
   '.ico': 'image/x-icon',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
 };
 
 // Returns true (and has already written the response) if a static file was actually served;
