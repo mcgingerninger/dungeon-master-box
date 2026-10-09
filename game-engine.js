@@ -881,7 +881,10 @@ export function computeCharacterSheetFor(abilityScores, level, skillProfs, saveP
   const abilities = {};
   Object.keys(ABILITY_NAMES).forEach(abbr => {
     const full = ABILITY_NAMES[abbr];
-    const base = abilityScores[abbr] != null ? abilityScores[abbr] : 10;
+    let base = abilityScores[abbr] != null ? abilityScores[abbr] : 10;
+    // A rerolled-scores effect (Fragment of Pride) replaces the character's own base score outright;
+    // gear and other effects still stack on top of the rolled value.
+    (activeEffects || []).forEach(e => { if (e && e.baseOverride && e.baseOverride[abbr] != null) base = e.baseOverride[abbr]; });
     let sources = breakdown[full] || [];
     let total = base + sumBreakdown(sources);
     // A set-value item/effect ("Strength set to 29") only ever raises the score up to its
@@ -1273,7 +1276,7 @@ export function refillDailyItemCharges(item, rand = Math.random) {
 export function refillAbilityUses(item) {
   if (!item || !item.abilities || !item.abilities.length) return item;
   item.abilities.forEach(a => {
-    if (a.uses && (a.uses.recharge === 'longRest' || a.uses.recharge === 'shortRest')) {
+    if (a.uses && (a.uses.recharge === 'longRest' || a.uses.recharge === 'shortRest' || a.uses.recharge === 'day')) {
       a.usesLeft = a.uses.max;
     }
   });

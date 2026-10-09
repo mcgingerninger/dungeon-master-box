@@ -31839,15 +31839,15 @@
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard of grey-black glass, cold to the touch no matter the weather. Looking into it too long shows you a face you've lost. It was not made — it was left behind, the way a scar is left behind.",
-    "description": "+3 Wisdom while attuned. Once per long rest, when you or a creature within 30 ft. drops to 0 HP, you may cast Revivify on them with no material component and no cost, and the target regains hit points equal to half their hit point maximum instead of the usual 1. Curse: whenever you finish a long rest, make a DC 14 Wisdom save or lose all Hit Dice you would otherwise regain that rest — the shard feeds on your capacity to recover, not your memories. Requires attunement.",
+    "description": "+3 Wisdom while attuned. Once per long rest, when you or a creature within 30 ft. drops to 0 HP, you may cast True Resurrection on them with no material component and no cost. Curse: every time you use the shard, make a DC 16 Wisdom saving throw. On a failure, you will try to kill yourself, using any means available, until you are stopped or you drop to 0 HP. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Acceptance",
-          "condition": "Use the shard's Revivify to save a creature, then fail a long rest's saving throw and continue carrying it anyway for 7 more days.",
-          "reward": "The curse's saving throw DC drops to 10, and on a success you regain half your Hit Dice instead of none."
+          "condition": "Use the shard's True Resurrection to save a creature, then fail the curse's saving throw and continue carrying it anyway for 7 more days.",
+          "reward": "The curse's saving throw DC drops to 12."
         }
       ]
     },
@@ -31871,7 +31871,7 @@
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard the deep red of an old bruise, warm even in winter. It thrums faintly, like a held breath about to break. Whoever carved it out of whatever it came from did not do so gently.",
-    "description": "+3 Strength while attuned. Once per turn when you hit with a melee attack, deal an extra 3d6 damage. Curse: while below half your maximum HP, you cannot willingly end your turn without either attacking or moving toward the nearest hostile creature, and cannot choose to disengage or retreat. Requires attunement.",
+    "description": "+5 Strength while attuned. Whenever you make an attack, you may choose to add extra damage equal to (1d2)^(1d20)^(1d20), worked left to right: roll a d2 and raise it to the power of a d20, then raise that result to the power of another d20. The extra damage only lands on a 50/50 chance (heads you add it, tails you don't). Curse: while below half your maximum HP, you cannot willingly end your turn without either attacking or moving toward the nearest hostile creature, and cannot choose to disengage or retreat. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31879,7 +31879,7 @@
           "type": "locked",
           "tierLabel": "Hidden Power — Tempered",
           "condition": "End a combat encounter below half HP without the curse causing you to attack an ally or take an action you tried to avoid.",
-          "reward": "The extra damage increases to 4d6, and the curse's restriction no longer applies once you drop below one-quarter HP instead of one-half."
+          "reward": "The extra damage lands on a 2-in-3 chance instead of 1-in-2, and the curse's restriction no longer applies once you drop below one-quarter HP instead of one-half."
         }
       ]
     },
@@ -31893,7 +31893,7 @@
     "passive": [
       {
         "stat": "str",
-        "value": 3
+        "value": 5
       }
     ]
   },
@@ -31903,7 +31903,7 @@
     "rarity": "celestial",
     "weight": 1,
     "flavorText": "A shard so dark it seems to swallow candlelight near it. Holding it still, you can feel — faintly, at the edges — the specific fear of someone who is no longer around to be afraid.",
-    "description": "+3 Charisma while attuned. Once per short rest, force every creature of your choice within 30 ft. that can see you to make a DC 16 Wisdom save or become Frightened of you for 1 minute; any creature that fails by 5 or more also drops whatever it's holding and uses all of its movement fleeing directly away from you on its next turn. Curse: once per day, the GM secretly calls for a DC 14 Wisdom save from you; on a failure, you must spend your next turn fleeing the nearest threat, whether or not it is actually dangerous. Requires attunement.",
+    "description": "+3 Charisma while attuned. Once per short rest, force every creature of your choice within 30 ft. that can see you to make a DC 20 Wisdom save or become Frightened of you for 1 minute; any creature that fails by 5 or more also drops whatever it's holding and uses all of its movement fleeing directly away from you on its next turn. Curse: once per day, the GM secretly calls for a DC 14 Wisdom save from you; on a failure, you must spend your next turn fleeing the nearest threat, whether or not it is actually dangerous. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31911,7 +31911,7 @@
           "type": "locked",
           "tierLabel": "Hidden Power — Unshaken",
           "condition": "Succeed on 5 of the curse's secret saving throws.",
-          "reward": "The Frighten ability's save DC increases to 18, and you gain advantage on the curse's own secret saving throw from then on."
+          "reward": "The Frighten ability's save DC increases to 22, and you gain advantage on the curse's own secret saving throw from then on."
         }
       ]
     },
@@ -31935,15 +31935,15 @@
     "rarity": "celestial",
     "weight": 1.5,
     "flavorText": "A shard cut with too many facets, like it couldn't decide what it wanted to be. Every angle shows a different reflection — always slightly better looking, slightly more accomplished, than the one actually holding it.",
-    "description": "+3 Dexterity while attuned. Once per long rest, as a reaction to any attack roll, ability check, or saving throw made by a creature within 30 ft. (including you), you may force it to be rerolled and choose which of the two results is used — even assigning a result that wasn't originally yours to your own concurrent roll instead. Curse: you have disadvantage on Charisma (Persuasion) checks made toward any creature you believe to be wealthier, more accomplished, or more envied than you — the shard's judgment, not always yours to argue with. Requires attunement.",
+    "description": "+3 Dexterity while attuned. Three times per day, you may change any dice roll (an attack roll, ability check, saving throw, or damage roll made by you or a creature you can see) to any number you choose. Curse: the shard only works while you carry the most gold of anyone in your group on your person. If another party member carries more gp than you, its effect is switched off until you are the richest again. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Satisfied",
-          "condition": "Use the shard's reroll to hand a rival success instead of claiming it for yourself or an ally.",
-          "reward": "The ability recharges on a short rest as well as a long rest, and a single use can now affect two qualifying rolls instead of one."
+          "condition": "Use the shard to hand a rival success instead of claiming it for yourself or an ally.",
+          "reward": "The ability can be used 4 times per day instead of 3."
         }
       ]
     },
@@ -31967,7 +31967,7 @@
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard so heavy it seems to pull the hand that holds it downward. It doesn't glow, exactly — it dims everything around it a little, the way a bad memory dims a good day.",
-    "description": "+3 Constitution while attuned. While below half your maximum HP, you have resistance to all damage. Curse: whenever an ally within 30 ft. drops to 0 HP, you must succeed on a DC 16 Wisdom save or become Poisoned until the end of your next turn, overwhelmed by the shard's grief. Requires attunement.",
+    "description": "+5 Constitution while attuned. While below half your maximum HP, you have resistance to all damage. Curse: whenever an ally within 30 ft. drops to 0 HP, you must succeed on a DC 16 Wisdom save or become Poisoned until the end of your next turn, overwhelmed by the shard's grief. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -31989,7 +31989,7 @@
     "passive": [
       {
         "stat": "con",
-        "value": 3
+        "value": 5
       }
     ]
   },
@@ -31999,15 +31999,15 @@
     "rarity": "celestial",
     "weight": 2.5,
     "flavorText": "A shard the warm gold of late afternoon light, humming with something between a laugh and a held note. It is, unmistakably, the only fragment that seems happy to be held — which some who have carried it find more unsettling than any of the others.",
-    "description": "+3 Charisma while attuned. Once per long rest, cast Mass Cure Wounds without expending a spell slot or material components. Curse: you cannot willingly harm a creature that is not currently attacking you or an ally — the shard floods you with an indiscriminate, overriding love for everything around you. Requires attunement.",
+    "description": "+3 Charisma while attuned. Once per day each, cast Vision of Elapsing Eons and cast Weird, without expending a spell slot or material components. Curse: you cannot willingly harm a creature that is not currently attacking you or an ally — the shard floods you with an indiscriminate, overriding love for everything around you. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
         {
           "type": "locked",
           "tierLabel": "Hidden Power — Boundless",
-          "condition": "Use the shard's healing ability to save the life of a creature that was, at the time, hostile to you.",
-          "reward": "Mass Cure Wounds becomes available twice per long rest, and it can now also remove one condition of your choice from each target it heals."
+          "condition": "Use the shard to spare the life of a creature that was, at the time, hostile to you.",
+          "reward": "Both spells become available twice per day, and each can also remove one condition of your choice from you."
         }
       ]
     },
@@ -32031,7 +32031,7 @@
     "rarity": "celestial",
     "weight": 0.75,
     "flavorText": "A shard etched with fine lines that, from any distance, look like a face turned away. It is lighter than it looks, as though whatever weight it should have has been quietly passed along to whoever is holding it instead.",
-    "description": "+3 Wisdom while attuned. Once per day, when you fail a saving throw, you may choose to succeed instead — but the nearest ally within 30 ft. must immediately make the same saving throw in your place. Curse: whenever you knowingly cause harm to an innocent creature, you gain one level of Exhaustion that cannot be removed by any rest, only by an atonement the GM designs. Requires attunement.",
+    "description": "+3 Wisdom while attuned. Once per day, cast Dominate Monster at 9th level without expending a spell slot or material components; the saving throw DC is 20 (Wisdom). Curse: whenever you knowingly cause harm to an innocent creature, you gain one level of Exhaustion that cannot be removed by any rest, only by an atonement the GM designs. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
@@ -32039,7 +32039,7 @@
           "type": "locked",
           "tierLabel": "Hidden Power — Absolution",
           "condition": "Complete a GM-designed atonement to remove Exhaustion caused by the shard's curse.",
-          "reward": "The saving-throw transfer ability no longer requires an ally to be present — you may instead simply fail with no transfer needed, once per day, at no cost."
+          "reward": "Dominate Monster can be cast twice per day."
         }
       ]
     },
@@ -32058,27 +32058,27 @@
     ]
   },
   {
-    "id": "fragment-of-the-hollow",
-    "name": "Fragment of the Hollow",
+    "id": "fragment-of-pride",
+    "name": "Fragment of Pride",
     "rarity": "celestial",
-    "weight": 2,
-    "flavorText": "A shard that is somehow both there and not — it catches no light, casts no reflection, and feels, when held, like touching something that has already stopped feeling anything at all.",
-    "description": "+3 to all saving throws against being Charmed, Frightened, or Possessed while attuned, and you cannot be read or located by any divination effect. Once per long rest, become utterly unreadable for 1 minute: advantage on all Deception checks, and immune to any effect that would reveal your emotions, alignment, thoughts, or intentions. Curse: you no longer benefit from any effect that relies on inspiring courage or willpower (Bardic Inspiration and similar), and you have disadvantage on Charisma checks that rely on expressing genuine emotion — the shard has hollowed out the part of you such things reach. Requires attunement.",
+    "weight": 0.6,
+    "flavorText": "A shard of polished white-gold that shows every viewer a flattering reflection, a little taller and a little surer than they are. It is warm, and it hums when you stand up straighter.",
+    "description": "Once per day, click the shard to reroll your ability scores: roll 1d10, 1d12, two d20s and two d100s (one d100 each), and each die is assigned to a random ability score. The new scores replace your own for 8 hours, or until you destroy the shard (discard it). Curse: the rapid change crushes your body. Each time you reroll, make a DC 10 Strength check or take 1d100 damage. Requires attunement.",
     "requiresAttunement": true,
     "narrative": {
       "unlocks": [
         {
           "type": "locked",
-          "tierLabel": "Hidden Power — Something Remains",
-          "condition": "Willingly put the shard aside for a full week, then choose to take up its attunement again.",
-          "reward": "The curse's disadvantage on Charisma checks no longer applies, though the immunity to morale effects remains."
+          "tierLabel": "Hidden Power — Humbled",
+          "condition": "Let the reroll leave you with a lower total than your own scores, and keep the shard for 7 more days.",
+          "reward": "The curse's Strength check drops to DC 5."
         }
       ]
     },
     "legacySource": {
       "tier": "celestial",
       "index": 8,
-      "name": "Fragment of the Hollow"
+      "name": "Fragment of Pride"
     },
     "itemType": "wondrous",
     "wondrous": {}
