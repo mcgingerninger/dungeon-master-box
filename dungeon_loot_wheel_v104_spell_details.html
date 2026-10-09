@@ -5573,6 +5573,7 @@ function activateStructuredAbility(slotId, abilityId) {
   const ability = (item.abilities || []).find(a => a.id === abilityId);
   if (!ability) return;
   if (ability.usesLeft == null && ability.uses) ability.usesLeft = ability.uses.max;
+  if (ability.requires && !confirm(ability.requires)) return;
   if (ability.usesLeft != null) {
     if (ability.usesLeft <= 0) return;
     ability.usesLeft -= 1;
@@ -5611,10 +5612,37 @@ function activateStructuredAbility(slotId, abilityId) {
     });
     if (gains.length) message = `${abilityText ? abilityText + ' ' : ''}${gains.join(', ')} (permanent).`.trim();
   }
+  // Fragments of Suffering: a curse that triggers every time the ability is used (a Wisdom save or
+  // Strength check rolled here with the character's current modifier) and, for Pride, the stat reroll itself.
+  const extraNotes = [];
+  if (ability.curse) {
+    const mod = (computeCharacterSheet().abilities[ability.curse.stat] || {}).mod || 0;
+    const d20 = rn(1, 20), total = d20 + mod, ok = total >= ability.curse.dc;
+    const label = ability.curse.stat.toUpperCase() + (ability.curse.kind === 'check' ? ' check' : ' save');
+    let line = `Curse: DC ${ability.curse.dc} ${label} — rolled ${d20}${mod >= 0 ? '+' : ''}${mod} = ${total}, ${ok ? 'passed.' : 'FAILED.'}`;
+    if (!ok && ability.curse.kind === 'check') {
+      const dmg = rn(1, 100);
+      updateCharacterField('characterCurrentHp', Math.max(0, characterCurrentHp - dmg));
+      line += ` You take ${dmg} damage.`;
+    } else if (!ok) line += ' ' + ability.curse.onFail;
+    extraNotes.push(line);
+  }
+  if (ability.effect && ability.effect.kind === 'stat_reroll') {
+    const dice = [10, 12, 20, 20, 100, 100].map(s => rn(1, s));
+    const keys = ABILITY_SCORE_KEYS.slice();
+    for (let i = keys.length - 1; i > 0; i--) { const j = rn(0, i); [keys[i], keys[j]] = [keys[j], keys[i]]; }
+    const baseOverride = {};
+    keys.forEach((k, i) => { baseOverride[k] = dice[i]; });
+    const hours = ability.effect.hours || 8;
+    activeTimedEffects = activeTimedEffects.filter(e => !e.baseOverride);
+    activeTimedEffects.push({ id: 'aeff' + (++activeEffectCounter), key: entry.key, name: item.name, rarity: entry.rarity, text: 'Ability scores rerolled: ' + ABILITY_SCORE_KEYS.map(k => k.toUpperCase() + ' ' + baseOverride[k]).join(', ') + '. Ends if the fragment is discarded.', startedAt: Date.now(), durationMs: hours * 3600000, expiresAt: Date.now() + hours * 3600000, permanent: false, baseOverride });
+    message = 'Stats rerolled for ' + hours + ' hours: ' + ABILITY_SCORE_KEYS.map(k => k.toUpperCase() + ' ' + baseOverride[k]).join(', ') + '.';
+  }
+  if (extraNotes.length) message = (message + ' ' + extraNotes.join(' ')).trim();
   // Never time-tracked: a permanent_stat_increase is already fully, directly applied above, so
   // scanning its (often multi-day-referencing, e.g. "Read over 48 hours across 6 days...") prose
   // for a duration phrase would spuriously start an unrelated countdown in Active Effects.
-  const dur = isPermanentStatIncrease ? null : parseDurationMs(abilityText);
+  const dur = (isPermanentStatIncrease || (ability.effect && ability.effect.kind === 'stat_reroll')) ? null : parseDurationMs(abilityText);
   if (dur) startTimedEffect(item, entry.key + ':' + ability.id, entry.rarity, abilityText, dur);
   renderPlayerSlots();
   renderActiveEffects();
@@ -17498,7 +17526,30 @@ function rollWeaponWithAmmo(item, sheet, rarity, opts) {
   if (ammo && !(opts && opts.noSpend)) spendInventoryStack(ammo.item, ammo.rarity, 1);
   return roll;
 }
+// Fragment of Rage: while it is equipped, an attack may add (1d2)^(1d20)^(1d20) (left to right) damage
+// on a 50/50 coin flip. Huge results are shown in scientific notation.
+let fragmentRageEnabled = true;
+function equippedFragmentOfRage() { return Object.values(playerSlots || {}).some(k => { const e = k && TOKEN_INDEX[k]; return e && e.item.name === 'Fragment of Rage'; }); }
+function formatBigDamage(n) { return n >= 1e9 ? n.toExponential(3).replace('e+', ' x 10^') : String(n); }
+function addRageRider(roll) {
+  if (!fragmentRageEnabled || !equippedFragmentOfRage() || roll.dmgTotal == null) return roll;
+  const a = rn(1, 2), b = rn(1, 20), c = rn(1, 20), hit = rn(0, 1) === 1;
+  const value = Math.pow(Math.pow(a, b), c);
+  roll.rage = { a, b, c, hit, value };
+  if (hit) roll.dmgTotal += value;
+  return roll;
+}
+function rageRollHtml(roll) {
+  if (!equippedFragmentOfRage()) return '';
+  const toggle = `<label class="sheet-chip-empty"><input type="checkbox" ${fragmentRageEnabled ? 'checked' : ''} onchange="fragmentRageEnabled=this.checked"> Add Fragment of Rage damage on my next attacks</label>`;
+  if (!roll.rage) return toggle;
+  const r = roll.rage;
+  return `<div class="weapon-attack-line"><span>Fragment of Rage (${r.a}^${r.b}^${r.c}), coin flip: ${r.hit ? 'heads' : 'tails'}</span><span>${r.hit ? '+' + formatBigDamage(r.value) : 'no extra damage'}</span></div>` + toggle;
+}
 function computeWeaponAttackRoll(item, sheet, rarity, opts) {
+  return addRageRider(computeWeaponAttackRollWithAmmo(item, sheet, rarity, opts));
+}
+function computeWeaponAttackRollWithAmmo(item, sheet, rarity, opts) {
   const roll = computeWeaponAttackRollBase(item, sheet, rarity);
   const ammo = opts && opts.ammo;
   if (!ammo || !window.AmmoData) return roll;
@@ -17585,7 +17636,7 @@ function weaponAttackRollHtml(roll) {
         : `<div class="weapon-attack-line"><span>${S('strmod', roll.abilityLabel + ' modifier')}</span><span>${fmtMod(roll.abilityMod)}</span></div>`}
       ${roll.dmgBonus ? `<div class="weapon-attack-line"><span>${S('dmg', 'Weapon damage bonus')}</span><span>${fmtMod(roll.dmgBonus)}</span></div>` : ''}
       ${roll.bonusRolls.map((c, i) => `<div class="weapon-attack-line"><span>${S('bonus' + i, `Bonus ${c.type ? escapeHtml(c.type) + ' ' : ''}damage (${escapeHtml(c.dice)})`)}</span><span>${c.roll.rolls.join(' + ')}${c.roll.mod ? ' ' + fmtMod(c.roll.mod) : ''}</span></div>`).join('')}
-      ${ammoRollHtml(roll)}
+      ${ammoRollHtml(roll)}${rageRollHtml(roll)}
       <div class="weapon-attack-total">Damage: ${roll.margin && roll.finalDamage != null ? `${roll.finalDamage} <span class="sheet-chip-empty">(${roll.dmgTotal} × ${roll.margin.dmgPct}%)</span>` : roll.dmgTotal}</div>
     ` : `<p class="sheet-chip-empty">This weapon's damage dice aren't set on the item (edit it to add one, e.g. "1d8") — showing the attack roll only.</p>`}
   `;

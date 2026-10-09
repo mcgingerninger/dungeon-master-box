@@ -518,7 +518,7 @@ Differences from current live behavior were investigated before being carried in
 - **Adamantine Crown of the Venom** (superrare): no parseable armor.ac value — excluded from this migration pass
 - **Great Helm of the Brinewrought** (superrare): no parseable armor.ac value — excluded from this migration pass
 
-## Ambiguous / needs review (Section 27) — 828 item(s)
+## Ambiguous / needs review (Section 27) — 831 item(s)
 
 These items WERE migrated with their best-effort derived mechanics (nothing below blocks migration), but each needs a human look before being treated as fully authoritative:
 
@@ -629,7 +629,7 @@ These items WERE migrated with their best-effort derived mechanics (nothing belo
 - **Vane's Judgment** (rare): could not determine simple/martial proficiency category from name — left unset
 - **Thorne's Answer** (rare): could not determine simple/martial proficiency category from name — left unset
 
-### effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect (146)
+### effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect (144)
 - **Crowbar** (common): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **Wool Cloak** (common): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **Rough Map Fragment** (common): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
@@ -770,10 +770,8 @@ These items WERE migrated with their best-effort derived mechanics (nothing belo
 - **Crystalline Chronicle** (legendary): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **Far Realm Shard** (legendary): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **Grimoire Infinitus** (legendary): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
-- **Fragment of Rage** (celestial): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
-- **Fragment of Envy** (celestial): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **Fragment of Despair** (celestial): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
-- **Fragment of the Hollow** (celestial): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
+- **Fragment of Pride** (celestial): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **The First Candle** (celestial): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 - **The Cinderwright's Press** (rare): effect text contains mechanical-sounding language beyond a plain "+N stat" bonus this migration does not yet extract into a structured effect — full text preserved in flavorText, needs manual review
 
@@ -1358,8 +1356,13 @@ These items WERE migrated with their best-effort derived mechanics (nothing belo
 ### charges "1d6+1 beads" is dice notation (1)
 - **Necklace of Fireballs** (uncommon): charges "1d6+1 beads" is dice notation — legacy rolls this once with true randomness on first use; this migration rolled it once deterministically instead (result: 2) to keep the migration itself reproducible, needs manual review/reroll if the exact starting count matters
 
-### item has a structured legacy "abilities" entry (3)
+### item has a structured legacy "abilities" entry (8)
 - **Pearl of Power** (uncommon): item has a structured legacy "abilities" entry (Regain Slot) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
+- **Fragment of Grief** (celestial): item has a structured legacy "abilities" entry (True Resurrection) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
+- **Fragment of Envy** (celestial): item has a structured legacy "abilities" entry (Change a Roll) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
+- **Fragment of Ecstasy** (celestial): item has a structured legacy "abilities" entry (Vision of Elapsing Eons, Weird) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
+- **Fragment of Guilt** (celestial): item has a structured legacy "abilities" entry (Dominate Monster) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
+- **Fragment of Pride** (celestial): item has a structured legacy "abilities" entry (Reroll Stats) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
 - **The Legion Seal** (rare): item has a structured legacy "abilities" entry (Compel Truth) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
 - **The Cinderwright's Press** (rare): item has a structured legacy "abilities" entry (Print Pamphlet) this migration does not yet convert into a V2 Ability — full text preserved in flavorText/effect, needs manual review
 

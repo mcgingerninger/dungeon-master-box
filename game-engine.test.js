@@ -965,3 +965,13 @@ describe('armor AC sanity (item audit): armor must do what its card says when wo
     assert.equal(GE.isShieldName('Chain Mail'), false);
   });
 });
+
+describe('Fragment of Pride: rerolled base ability scores', () => {
+  test('a baseOverride effect replaces the base score and gear still stacks on top', () => {
+    const items = { k: { item: { name: 'Belt', effect: '+2 Strength' } } };
+    const sheet = GE.computeCharacterSheetFor({ str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, 1, [], [], { belt: 'k' }, key => items[key], 10, 30, [{ name: 'Fragment of Pride', text: 'rerolled', baseOverride: { str: 77, dex: 3 } }]);
+    assert.equal(sheet.abilities.str.total, 79);
+    assert.equal(sheet.abilities.dex.total, 3);
+    assert.equal(sheet.abilities.con.total, 10);
+  });
+});
