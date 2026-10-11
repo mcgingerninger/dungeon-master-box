@@ -2730,7 +2730,6 @@
   <button class="tab-btn" onclick="showTab('inventory',this)">🎒 Inventory</button>
   <button class="tab-btn" onclick="showTab('compendium',this)">📚 Compendium</button>
   <button class="tab-btn" onclick="showTab('combat',this)">⚔ Combat</button>
-  <button class="tab-btn" onclick="showTab('battletest',this)">🧪 Battle Field</button>
   <button class="tab-btn" onclick="showTab('players',this)">👥 Players</button>
   <button class="tab-btn" onclick="showTab('store',this)">🛒 Store</button>
   <button class="tab-btn" onclick="showTab('journey',this)">🧭 Journey</button>
@@ -3804,22 +3803,6 @@
 </div>
 
 <!-- COMBAT TAB -->
-<!-- 🧪 Battle Field (test): drag monsters/players onto a field; click a monster, then a player to roll
-     the attack. All logic lives in battlefield-tab.js and reuses the Combat tab's monster systems. -->
-<div id="tab-battletest" class="tab-content">
-  <h3 style="color:var(--gold);margin-bottom:0.3rem;">🧪 Battle Field <span style="font-size:0.75rem;color:var(--text-dim);font-weight:normal;">(test)</span></h3>
-  <div class="bt-hint" id="btHint"></div>
-  <div class="bt-bar bt-sliders">
-    <label>Variant chance: <input type="range" id="btVariantChance" min="0" max="100" value="15" oninput="document.getElementById('btVariantChanceVal').textContent=this.value+'%'"> <span id="btVariantChanceVal">15%</span></label>
-    <label>Chaos: <input type="range" id="btChaosChance" min="0" max="100" value="10" oninput="document.getElementById('btChaosChanceVal').textContent=this.value+'%'"> <span id="btChaosChanceVal">10%</span></label>
-    <span class="bt-note">Applies to monsters dropped from now on — or press Reroll.</span>
-  </div>
-  <div class="bt-bar"><button class="action-btn" onclick="btRerollAll()">🎲 Reroll modifiers on field</button><button class="action-btn" onclick="btHealAll()">❤ Heal all</button><button class="action-btn" onclick="btClear()">🗑 Clear field</button></div>
-  <div class="bt-wrap">
-    <div class="bt-side" id="btSide"></div>
-    <div class="bt-field" id="btField"></div>
-  </div>
-</div>
 <div id="btAttackModal" class="edit-modal-overlay" onclick="if(event.target===this) btClosePopup()">
   <div class="edit-modal" style="width:min(560px,100%);">
     <div class="edit-modal-header"><h3 id="btAttackTitle">⚔ Attack</h3><button class="edit-modal-close" onclick="btClosePopup()">×</button></div>
@@ -3835,6 +3818,16 @@
     </div>
 
     <div id="combat-battle" class="combat-subpanel active">
+    <!-- Battle Field board (battlefield-tab.js): drag creatures/characters onto the field. Every creature on the board IS a
+         roster entry (battleRoster), so right-clicking a token opens that creature's full control card. -->
+    <div class="bt-hint" id="btHint"></div>
+    <div class="bt-bar"><button class="action-btn" onclick="btRerollAll()">🎲 Reroll modifiers on field</button><button class="action-btn" onclick="btHealAll()">❤ Heal all</button><button class="action-btn" onclick="btClear()">🗑 Clear field</button><span class="bt-note">Variant and Chaos sliders above apply to creatures added from now on.</span></div>
+    <div class="bt-wrap">
+      <div class="bt-side" id="btSide"></div>
+      <div class="bt-field" id="btField"></div>
+    </div>
+    <div id="btControlPanel" class="bt-ctl" role="dialog" aria-label="Creature controls"></div>
+
     <div class="combat-settings">
       <label>Target AC to roll against: <input type="number" id="battleTargetAC" value="15" min="1" max="30"></label>
       <label>Variant chance: <input type="range" id="battleVariantChance" min="0" max="100" value="15" oninput="document.getElementById('battleVariantChanceVal').textContent=this.value+'%'"> <span id="battleVariantChanceVal" class="combat-variant-chance-val">15%</span></label>
@@ -3863,7 +3856,8 @@
           <button class="combat-danger-btn" onclick="clearBattleLog()">🗑 Clear Log</button>
         </div>
       </div>
-      <div class="combat-roster" id="combatRoster"><div class="combat-empty-roster">No creatures added yet. Search above and add a few to begin.</div></div>
+      <details class="combat-roster-details"><summary>📋 Roster list (every creature in the battle)</summary>
+      <div class="combat-roster" id="combatRoster"><div class="combat-empty-roster">No creatures added yet. Search above and add a few to begin.</div></div></details>
     </div>
     </div>
 
@@ -7367,8 +7361,7 @@ function showTab(tab, btn) {
   // showCompendiumSub) — re-entering the tab just re-initializes whichever sub-panel was
   // last active instead of always resetting to Items.
   if (tab === 'compendium') initCompendiumSub(activeCompendiumSub);
-  if (tab === 'battletest' && typeof btOnShow === 'function') btOnShow();
-  if (tab === 'combat') { loadMonsterDatabase(false).then(renderCombatPicker); renderCombatRoster(); renderCombatLog(); renderCombatLootSettings(); renderPendingAttacksPanel(); renderCombatBattleMap(); }
+  if (tab === 'combat') { if (typeof btOnShow === 'function') btOnShow(); loadMonsterDatabase(false).then(renderCombatPicker); renderCombatRoster(); renderCombatLog(); renderCombatLootSettings(); renderPendingAttacksPanel(); renderCombatBattleMap(); }
   if (tab === 'store') { renderStoreTab(); renderInventoryGrid(); }
   if (tab === 'players' && typeof renderPlayersTab === 'function') renderPlayersTab();
   if (tab === 'battlefield' && typeof renderBattlefieldForPlayer === 'function') renderBattlefieldForPlayer();
@@ -21041,8 +21034,7 @@ function updateBattleHp(uid, value) {
     renderCombatRoster();
     return;
   }
-  const numEl = document.getElementById('combatHpNum' + uid);
-  if (numEl) numEl.textContent = hp;
+  document.querySelectorAll(`[id="combatHpNum${uid}"],[id="combatHpNumPanel${uid}"]`).forEach(el => { el.textContent = hp; });
 }
 // The slider's own oninput (above) deliberately skips renderCombatRoster/scheduleSave while
 // mid-drag so it stays smooth — but with nothing bound to fire once the drag ENDS, a dragged
@@ -21669,6 +21661,7 @@ function reconcileRosterCards(wrap, entries, mode, skipIfInteracting) {
 // renderCombatRoster() and correctly saves/pushes.
 function renderCombatRosterDisplay(skipIfInteracting) {
   reconcileRosterCards(document.getElementById('combatRoster'), battleRoster, 'dm', skipIfInteracting);
+  if (typeof window.btAfterRosterChange === 'function') window.btAfterRosterChange();
 }
 function renderCombatRoster(skipIfInteracting) {
   if (typeof scheduleSave === 'function') scheduleSave();

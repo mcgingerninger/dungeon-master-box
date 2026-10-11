@@ -28,7 +28,7 @@
       background-color:#1c1712; background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px); background-size:48px 48px; }
     .bt-field.over { border-color:var(--gold); }
     .bt-empty { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-dim); text-align:center; padding:2rem; pointer-events:none; }
-    .bt-token { position:absolute; width:120px; transform:translate(-50%,-34px); text-align:center; cursor:pointer; user-select:none; touch-action:none; }
+    .bt-token { position:absolute; width:136px; transform:translate(-50%,-34px); text-align:center; cursor:pointer; user-select:none; touch-action:none; }
     .bt-token .disc { position:relative; width:60px; height:60px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; line-height:1;
       background:radial-gradient(circle at 35% 30%, var(--bt-hi), var(--bt-lo)); border:4px solid var(--bt-ring); box-shadow:0 3px 8px rgba(0,0,0,0.7), inset 0 0 8px rgba(0,0,0,0.5); }
     .bt-token.monster { --bt-hi:#b84444; --bt-lo:#4a1414; --bt-ring:#2b0d0d; }
@@ -43,12 +43,12 @@
     .bt-token.target-ready.player .disc { box-shadow:0 0 0 3px #e8d060, 0 0 14px #e8d060; animation:btPulse 1.2s infinite; }
     @keyframes btPulse { 50% { box-shadow:0 0 0 5px #e8d060, 0 0 20px #e8d060; } }
     .bt-token.dead { opacity:0.45; filter:grayscale(1); }
-    .bt-token .lbl { display:inline-block; max-width:116px; margin-top:4px; padding:1px 7px; background:rgba(10,8,6,0.82); border:1px solid var(--border); border-radius:9px; font-size:0.72rem; color:var(--text); line-height:1.25; }
-    .bt-token .bar { position:relative; height:14px; width:84px; margin:3px auto 0; background:#000; border:1px solid #000; border-radius:6px; overflow:hidden; }
+    .bt-token .lbl { display:inline-block; max-width:132px; white-space:normal; overflow-wrap:anywhere; margin-top:4px; padding:1px 7px; background:rgba(10,8,6,0.82); border:1px solid var(--border); border-radius:9px; font-size:0.72rem; color:var(--text); line-height:1.25; }
+    .bt-token .bar { position:relative; height:14px; flex:1 1 auto; width:auto; min-width:60px; max-width:84px; margin:0; background:#000; border:1px solid #000; border-radius:6px; overflow:hidden; }
     .bt-token .bar i { position:absolute; inset:0 auto 0 0; background:#4caf7d; }
     .bt-token .bar span { position:relative; display:block; font-size:0.62rem; line-height:14px; color:#fff; text-shadow:0 0 2px #000; }
-    .bt-token .ac { position:absolute; top:-2px; left:14px; min-width:20px; padding:0 3px; font-size:0.65rem; background:#1a1a22; border:1px solid #888; border-radius:8px; color:#dfe6ff; line-height:15px; }
-    .bt-token .x { position:absolute; top:-4px; right:14px; display:none; background:#000; color:#fff; border:1px solid #888; border-radius:50%; font-size:0.7rem; line-height:1; width:18px; height:18px; cursor:pointer; padding:0; }
+    .bt-token .ac { position:static; flex:0 0 auto; min-width:20px; padding:0 3px; font-size:0.65rem; background:#1a1a22; border:1px solid #888; border-radius:8px; color:#dfe6ff; line-height:15px; }
+    .bt-token .x { position:absolute; top:-6px; right:6px; z-index:5; display:none; background:#000; color:#fff; border:1px solid #888; border-radius:50%; font-size:0.7rem; line-height:1; width:18px; height:18px; cursor:pointer; padding:0; }
     .bt-token:hover .x { display:block; }
     .bt-sec { margin-top:0.35rem; padding-top:0.3rem; border-top:1px solid var(--border); font-size:0.8rem; }
     .bt-sec b { color:var(--gold); }
@@ -64,7 +64,20 @@
     .bt-note { color:var(--text-dim); font-size:0.8rem; }
     .bt-token.player.p-selected .disc { box-shadow:0 0 0 3px #6fd07f, 0 0 16px #6fd07f; }
     .bt-token.monster.attackable .disc svg, .bt-token.monster.attackable .disc { filter:drop-shadow(0 0 5px #e05252); cursor:crosshair; }
-    .bt-token .lv { position:absolute; top:-2px; right:10px; min-width:20px; padding:0 4px; font-size:0.62rem; background:#12301e; border:1px solid #4caf7d; border-radius:8px; color:#bfeccd; line-height:15px; }
+    .bt-token .lv { position:static; flex:0 0 auto; min-width:20px; padding:0 4px; font-size:0.62rem; background:#12301e; border:1px solid #4caf7d; border-radius:8px; color:#bfeccd; line-height:15px; }
+    /* The disc, the info row and the name never overlap: the stats (AC / level / HP) sit in their own row under the art. */
+    .bt-token .disc { z-index:1; }
+    .bt-token .stats { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:5px; position:relative; z-index:2; }
+    .bt-token .lbl { margin-top:5px; position:relative; z-index:2; }
+    .bt-ctl { display:none; position:fixed; z-index:1200; width:min(580px, 96vw); max-height:84vh; overflow:auto; background:var(--surface); border:2px solid var(--gold); box-shadow:0 10px 36px rgba(0,0,0,0.75); padding:0.5rem 0.6rem 0.6rem; }
+    .bt-ctl.open { display:block; }
+    .bt-ctl-head { display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-bottom:0.4rem; color:var(--gold); font-size:0.8rem; letter-spacing:0.06em; text-transform:uppercase; }
+    .bt-ctl-head button { background:#000; color:#fff; border:1px solid #888; width:26px; height:26px; cursor:pointer; line-height:1; }
+    .bt-ctl .combat-card { margin:0; }
+    .bt-ctl .bt-player-ctl label { display:flex; justify-content:space-between; gap:0.6rem; margin:0.3rem 0; align-items:center; }
+    .bt-ctl .bt-player-ctl input[type=number] { width:5rem; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:0.25rem; font-family:inherit; }
+    @media (max-width:800px) { .bt-ctl { left:0 !important; right:0 !important; top:auto !important; bottom:0 !important; width:100vw; max-height:78vh; border-width:2px 0 0; } }
+    .combat-roster-details { margin-top:0.4rem; } .combat-roster-details > summary { cursor:pointer; color:var(--gold); margin-bottom:0.5rem; }
   `;
   document.head.appendChild(style);
 
@@ -123,12 +136,47 @@
   };
 
   // ---------- tokens ----------
-  const sliderOpts = () => ({ variantChance: parseInt((document.getElementById('btVariantChance') || {}).value, 10) || 0, chaosChance: parseInt((document.getElementById('btChaosChance') || {}).value, 10) || 0 });
+  const sliderOpts = () => undefined;   // buildBattleEntry reads the Combat tab's own Variant / Chaos sliders when given no options
+  // A monster token is a VIEW of a roster entry (battleRoster, the same list the old Combat tab used): HP, AC, name, defeated
+  // state, loot and attacks all live on the entry, so the board, the control panel, the shared player view and saves never disagree.
+  function bindMonsterToken(tok) {
+    Object.defineProperties(tok, {
+      hp: { enumerable: true, get() { return tok.entry.hp; }, set(v) { tok.entry.hp = v; if (v <= 0) tok.entry.defeated = true; } },
+      maxHp: { enumerable: true, get() { return tok.entry.maxHp; } },
+      ac: { enumerable: true, get() { return tok.entry.ac; } },
+      name: { enumerable: true, get() { return tok.entry.displayName || tok.monster.name; } },
+    });
+    return tok;
+  }
+  const FIELD_COL_W = 156, FIELD_ROW_H = 176;
+  function autoSpot() {
+    const f = document.getElementById('btField'), w = (f && f.clientWidth) || 800;
+    const cols = Math.max(1, Math.floor((w - 40) / FIELD_COL_W));
+    const used = new Set(bt.tokens.map(t => Math.round((t.x - 80) / FIELD_COL_W) + ',' + Math.round((t.y - 70) / FIELD_ROW_H)));
+    for (let i = 0; i < 400; i++) { const c = i % cols, r = Math.floor(i / cols); if (!used.has(c + ',' + r)) return { x: 80 + c * FIELD_COL_W, y: 70 + r * FIELD_ROW_H }; }
+    return { x: 80, y: 70 };
+  }
+  function syncFromRoster() {
+    const roster = (typeof battleRoster !== 'undefined' ? battleRoster : []);
+    const byUid = new Map(roster.map(e => [e.uid, e]));
+    bt.tokens = bt.tokens.filter(t => t.kind !== 'monster' || byUid.has(t.entry.uid));
+    roster.forEach(e => {
+      const tok = bt.tokens.find(t => t.kind === 'monster' && t.entry.uid === e.uid);
+      if (tok) { tok.entry = e; return; }
+      const spot = e.bfX != null ? { x: e.bfX, y: e.bfY } : autoSpot();
+      const monster = e.monster || { name: e.displayName || 'Creature', type: '' };
+      bt.tokens.push(bindMonsterToken({ id: bt.nextId++, kind: 'monster', x: spot.x, y: spot.y, entry: e, monster }));
+    });
+  }
   function makeToken(kind, key, x, y) {
     if (kind === 'monster') {
       const monster = monsterDatabase.find(m => m.name === key); if (!monster) return null;
       const entry = buildBattleEntry(monster, sliderOpts());
-      return { id: bt.nextId++, kind, x, y, name: entry.displayName || monster.name, ac: entry.ac, hp: entry.hp, maxHp: entry.maxHp, entry, monster };
+      entry.bfX = x; entry.bfY = y;
+      battleRoster.push(entry);
+      syncFromRoster();
+      if (typeof renderCombatRoster === 'function') renderCombatRoster();
+      return null;   // the roster owns the token now (syncFromRoster created it); nothing else to push
     }
     const p = playerSources().find(s => s.key === key); if (!p) return null;
     const tok = { id: bt.nextId++, kind, x, y, name: p.name, ac: p.ac, hp: p.hp, maxHp: p.maxHp, uid: p.uid, srcKey: p.key };
@@ -163,21 +211,87 @@
   }
   window.btRenderField = function () {
     const f = document.getElementById('btField'); if (!f) return;
+    syncFromRoster();
     const ready = [...bt.selected].length > 0;
-    f.innerHTML = (bt.tokens.length ? '' : '<div class="bt-empty">Drag monsters and players from the left onto the field.</div>') + bt.tokens.map(t => {
+    f.innerHTML = (bt.tokens.length ? '' : '<div class="bt-empty">Drag monsters and players from the left onto the field, or add creatures with the search above.</div>') + bt.tokens.map(t => {
       const pct = Math.max(0, Math.min(100, Math.round((t.hp / Math.max(1, t.maxHp)) * 100)));
       const tier = t.entry && t.entry.variant ? t.entry.variant.tier : '';
-      const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', bt.selectedPlayer === t.id ? 'p-selected' : '', bt.selectedPlayer && t.kind === 'monster' && t.hp > 0 ? 'attackable' : '', t.hp <= 0 ? 'dead' : ''].join(' ');
+      const dead = t.hp <= 0 || (t.entry && t.entry.defeated);
+      const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', bt.selectedPlayer === t.id ? 'p-selected' : '', bt.selectedPlayer && t.kind === 'monster' && !dead ? 'attackable' : '', dead ? 'dead' : ''].join(' ');
       const icon = t.kind === 'player' ? '🛡️' : (typeof monsterArtSvg === 'function' ? monsterArtSvg(t.monster, 64, true) : monsterIcon(t.monster));
-      return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><span class="ac" title="Armor Class">🛡${t.ac == null ? '—' : t.ac}</span>${t.sheet ? `<span class="lv" title="${esc((t.sheet.cls || 'Character') + ' level ' + t.sheet.level)}">L${t.sheet.level}</span>` : ''}<div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="bar"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></div></div>`;
+      const stats = `<span class="ac" title="Armor Class">🛡 ${t.ac == null ? '—' : t.ac}</span>${t.sheet ? `<span class="lv" title="${esc((t.sheet.cls || 'Character') + ' level ' + t.sheet.level)}">L${t.sheet.level}</span>` : ''}<span class="bar" title="Hit points"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></span>`;
+      return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="stats">${stats}</div></div>`;
     }).join('');
     const hint = document.getElementById('btHint');
     const sp = bt.tokens.find(t => t.id === bt.selectedPlayer);
     if (hint) hint.innerHTML = (bt.selected.size
-      ? `<b>${bt.selected.size}</b> monster${bt.selected.size > 1 ? 's' : ''} selected — <b>left-click a player</b> to roll the attack${bt.selected.size > 1 ? 's' : ''}. Right-click monsters to add/remove.`
+      ? `<b>${bt.selected.size}</b> monster${bt.selected.size > 1 ? 's' : ''} selected — <b>left-click a player</b> to roll the attack${bt.selected.size > 1 ? 's' : ''}. <b>Shift/Ctrl-click</b> monsters to add or remove.`
       : sp ? `<b>${esc(sp.name)}</b> is ready — <b>left-click a monster</b> to attack it with their main hand (a small chooser appears when they have several weapons or damage spells). Click ${esc(sp.name)} again to cancel.`
-      : '<b>Left-click</b> a monster to select it, <b>right-click</b> monsters to select several, then <b>left-click a player</b> to roll the attack. Or <b>left-click a player</b> first, then a monster, to make the player attack it. Hover a token for its info.')
+      : '<b>Left-click</b> a monster to select it, <b>Shift/Ctrl-click</b> to select several, then <b>left-click a player</b> to roll the attack. Or <b>left-click a player</b> first, then a monster. <b>Right-click</b> (or press and hold) any token for its controls. Hover for info.')
       + (bt.lastResult ? `<div class="bt-note" style="margin-top:0.25rem">${bt.lastResult}</div>` : '');
+  };
+  // Called by the Combat tab whenever the roster changes (HP slider, defeat, add/remove, loot...): redraw the board and keep an open panel current.
+  window.btAfterRosterChange = function () {
+    if (bt.drag) return;
+    if (!document.getElementById('btField')) return;
+    btRenderField(); refreshPanel();
+  };
+  const alive = t => t.hp > 0 && !(t.entry && t.entry.defeated);
+  const defeatCheck = t => { if (t.entry && t.entry.hp <= 0) t.entry.defeated = true; };
+  function damageMonster(t, dmg) {
+    if (!t.entry) return;
+    if (dmg > 0) t.entry.hp = Math.max(0, t.entry.hp - dmg);
+    defeatCheck(t);
+    if (typeof renderCombatRoster === 'function') renderCombatRoster(); else btRenderField();
+  }
+
+  // ---------- right-click control panel ----------
+  // A monster's panel is exactly its roster card (HP slider and nudges, AC, traits, Roll Attack, defeat / loot / reveal, remove); a
+  // player's is a small stat editor. It re-renders whenever the roster changes so nothing in it is ever stale.
+  function panelEl() { return document.getElementById('btControlPanel'); }
+  function panelHtml(t) {
+    if (t.kind === 'monster') {
+      if (!t.entry || typeof combatCardHtml !== 'function') return '<div class="bt-note">No controls for this token.</div>';
+      const card = combatCardHtml(t.entry, 'dm').replace(new RegExp('id="combatHpNum' + t.entry.uid + '"', 'g'), 'id="combatHpNumPanel' + t.entry.uid + '"');
+      return `<div class="bt-ctl-head"><span>Creature controls</span><button onclick="btClosePanel()" title="Close">×</button></div>${card}`;
+    }
+    const sh = t.sheet;
+    return `<div class="bt-ctl-head"><span>${esc(t.name)}</span><button onclick="btClosePanel()" title="Close">×</button></div>
+      <div class="bt-player-ctl">${sh ? `<div class="bt-note">${esc((sh.cls || 'Character') + ' · level ' + sh.level)}</div>` : ''}
+      <label>Armor Class <input type="number" value="${t.ac == null ? '' : t.ac}" onchange="btSetPlayerStat(${t.id},'ac',this.value)"></label>
+      <label>Current HP <input type="number" value="${t.hp}" onchange="btSetPlayerStat(${t.id},'hp',this.value)"></label>
+      <label>Max HP <input type="number" value="${t.maxHp}" onchange="btSetPlayerStat(${t.id},'maxHp',this.value)"></label>
+      <div class="bt-bar"><button class="action-btn" onclick="btRemoveToken(${t.id})">🗑 Remove from field</button></div></div>`;
+  }
+  function refreshPanel() {
+    const el = panelEl(); if (!el || !el.classList.contains('open') || bt.panelTokenId == null) return;
+    if (el.contains(document.activeElement) && /^(SELECT|TEXTAREA)$/.test(document.activeElement.tagName)) return;   // never close a dropdown the DM has open
+    const t = bt.tokens.find(x => x.id === bt.panelTokenId);
+    if (!t) { btClosePanel(); return; }
+    const top = el.scrollTop; el.innerHTML = panelHtml(t); el.scrollTop = top;
+  }
+  function openPanel(t, evt) {
+    const el = panelEl(); if (!el) return;
+    bt.panelTokenId = t.id; hideTip();
+    el.innerHTML = panelHtml(t); el.classList.add('open');
+    const vw = window.innerWidth, vh = window.innerHeight, w = Math.min(580, vw * 0.96);
+    let x = (evt && evt.clientX != null ? evt.clientX : vw / 2) + 14, y = (evt && evt.clientY != null ? evt.clientY : vh / 2) - 20;
+    x = Math.max(8, Math.min(vw - w - 8, x)); y = Math.max(8, Math.min(vh - Math.min(el.offsetHeight, vh * 0.84) - 8, y));
+    el.style.left = x + 'px'; el.style.top = y + 'px'; el.scrollTop = 0;
+  }
+  window.btClosePanel = function () { const el = panelEl(); if (el) el.classList.remove('open'); bt.panelTokenId = null; };
+  window.btSetPlayerStat = function (id, key, v) {
+    const t = bt.tokens.find(x => x.id === id); if (!t) return;
+    const n = parseInt(v, 10); if (!Number.isFinite(n)) return;
+    t[key] = key === 'hp' ? Math.max(0, Math.min(t.maxHp, n)) : Math.max(0, n);
+    if (t.hp > t.maxHp) t.hp = t.maxHp;
+    btRenderField();
+  };
+  window.btRemoveToken = function (id) {
+    const t = bt.tokens.find(x => x.id === id); if (!t) return;
+    if (t.kind === 'monster' && t.entry && typeof removeFromBattle === 'function') { bt.tokens = bt.tokens.filter(x => x.id !== id); bt.selected.delete(id); btClosePanel(); removeFromBattle(t.entry.uid); return; }
+    bt.tokens = bt.tokens.filter(x => x.id !== id); bt.selected.delete(id); if (bt.selectedPlayer === id) bt.selectedPlayer = null;
+    btClosePanel(); btRenderField();
   };
 
 
@@ -416,7 +530,7 @@
     recalc();
   }
   function attackTarget(target) {
-    const attackers = bt.tokens.filter(t => bt.selected.has(t.id) && t.hp > 0);
+    const attackers = bt.tokens.filter(t => bt.selected.has(t.id) && alive(t));
     if (!attackers.length) return;
     open(attackers.map(t => rollMonster(t, target)), target);
   }
@@ -444,24 +558,30 @@
       e.preventDefault(); f.classList.remove('over');
       let d; try { d = JSON.parse(e.dataTransfer.getData('text/bt')); } catch (er) { return; }
       const p = fieldPoint(e), t = makeToken(d.kind, d.key, p.x, p.y);
-      if (t) { bt.tokens.push(t); btRenderField(); }
+      if (t) bt.tokens.push(t);
+      btRenderField();
     });
     // hover info
     f.addEventListener('mouseover', e => { const t = tokenOf(e.target); if (t && !bt.drag) showTip(e, t); });
     f.addEventListener('mousemove', e => { const t = tokenOf(e.target); if (t && !bt.drag) { const tt = document.getElementById('itemTooltip'); if (tt && tt.style.display === 'block' && typeof moveTokenTooltip === 'function') moveTokenTooltip(e); } else hideTip(); });
     f.addEventListener('mouseleave', hideTip);
-    // right-click = multi-select monsters
+    // right-click (or press and hold on a touch screen) = that token's control panel
     f.addEventListener('contextmenu', e => {
       e.preventDefault();
       const t = tokenOf(e.target);
-      if (t && t.kind === 'monster' && t.hp > 0) { bt.selected.has(t.id) ? bt.selected.delete(t.id) : bt.selected.add(t.id); btRenderField(); }
+      if (t) openPanel(t, e); else btClosePanel();
     });
+    let pressTimer = null;
+    f.addEventListener('touchstart', e => { const t = tokenOf(e.target); if (!t || e.touches.length !== 1) return; const tc = e.touches[0]; pressTimer = setTimeout(() => { pressTimer = null; bt.drag = null; openPanel(t, { clientX: tc.clientX, clientY: tc.clientY }); }, 550); }, { passive: true });
+    ['touchmove', 'touchend', 'touchcancel'].forEach(n => f.addEventListener(n, () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }, { passive: true }));
+    document.addEventListener('mousedown', e => { const p = panelEl(); if (p && p.classList.contains('open') && !p.contains(e.target) && e.button === 0) btClosePanel(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') btClosePanel(); });
     // left button: drag to move, click to select / attack
     f.addEventListener('mousedown', e => {
       if (e.button !== 0) return;
-      if (e.target.dataset && e.target.dataset.x) { bt.tokens = bt.tokens.filter(t => String(t.id) !== e.target.dataset.x); bt.selected.delete(+e.target.dataset.x); if (bt.selectedPlayer === +e.target.dataset.x) bt.selectedPlayer = null; btRenderField(); return; }
+      if (e.target.dataset && e.target.dataset.x) { btRemoveToken(+e.target.dataset.x); return; }
       const t = tokenOf(e.target); if (!t) return;
-      bt.drag = { t, sx: e.clientX, sy: e.clientY, moved: false }; hideTip(); e.preventDefault();
+      bt.drag = { t, sx: e.clientX, sy: e.clientY, moved: false, multi: e.shiftKey || e.ctrlKey || e.metaKey }; hideTip(); e.preventDefault();
     });
     document.addEventListener('mousemove', e => {
       const d = bt.drag; if (!d) return;
@@ -471,10 +591,11 @@
     });
     document.addEventListener('mouseup', e => {
       const d = bt.drag; if (!d) return; bt.drag = null;
-      if (d.moved) return;
+      if (d.moved) { if (d.t.kind === 'monster' && d.t.entry) { d.t.entry.bfX = d.t.x; d.t.entry.bfY = d.t.y; if (typeof scheduleSave === 'function') scheduleSave(); } return; }
       const t = d.t;
       if (t.kind === 'monster') {
-        if (t.hp <= 0) return;
+        if (!alive(t)) return;
+        if (d.multi) { bt.selected.has(t.id) ? bt.selected.delete(t.id) : bt.selected.add(t.id); btRenderField(); return; }
         if (bt.selectedPlayer) { playerAttacks(bt.tokens.find(x => x.id === bt.selectedPlayer), t); return; }
         if (bt.selected.size === 1 && bt.selected.has(t.id)) bt.selected.clear(); else { bt.selected.clear(); bt.selected.add(t.id); }
         btRenderField();
@@ -484,7 +605,7 @@
   };
   // A campaign character attacks a monster: their own gear and spells (PlayerAttack), resolved against the monster's AC.
   async function playerAttacks(pt, mt) {
-    if (!pt || !mt || mt.hp <= 0) return;
+    if (!pt || !mt || !alive(mt)) return;
     if (!window.PlayerAttack) return;
     const anchor = document.querySelector(`.bt-token[data-id="${mt.id}"]`);
     let state = null;
@@ -496,23 +617,30 @@
     } else if (pt.srcKey !== 'me') state = {};   // a quick test player has no gear: unarmed strikes
     bt.lastResult = '';
     PlayerAttack.beginFor({ currentTarget: anchor }, { state, who: pt.name, target: { name: mt.name, ac: mt.ac, apply(dmg, log) {
-      if (dmg > 0) { mt.hp = Math.max(0, mt.hp - dmg); if (mt.entry) mt.entry.hp = mt.hp; }
-      bt.lastResult = `${log.detail}${mt.hp <= 0 ? ' <b>Defeated!</b>' : ''}`;
-      if (mt.hp <= 0) bt.selectedPlayer = bt.selectedPlayer;   // keep the attacker ready for the next target
-      btRenderField();
+      bt.lastResult = `${log.detail}${mt.hp - Math.max(0, dmg) <= 0 ? ' <b>Defeated!</b>' : ''}`;
+      damageMonster(mt, dmg);   // updates the roster entry (HP, defeated), saves and re-renders; the attacker stays ready for the next target
     } } });
   }
   window.btRerollAll = function () {
     bt.tokens.filter(t => t.kind === 'monster').forEach(t => {
       const entry = buildBattleEntry(t.monster, sliderOpts());
-      Object.assign(t, { name: entry.displayName || t.monster.name, ac: entry.ac, hp: entry.hp, maxHp: entry.maxHp, entry }); delete t.spellState; delete t.spellCache;
+      entry.uid = t.entry.uid; entry.bfX = t.x; entry.bfY = t.y;   // same slot in the roster, freshly rolled
+      const i = battleRoster.findIndex(e => e.uid === t.entry.uid); if (i >= 0) battleRoster[i] = entry;
+      t.entry = entry; delete t.spellState; delete t.spellCache;
     });
-    btRenderField();
+    if (typeof renderCombatRoster === 'function') renderCombatRoster(); else btRenderField();
   };
-  window.btClear = function () { bt.tokens = []; bt.selected.clear(); bt.selectedPlayer = null; bt.lastResult = ''; btRenderField(); };
-  window.btHealAll = function () { bt.tokens.forEach(t => { t.hp = t.maxHp; delete t.spellState; }); btRenderField(); };
+  window.btClear = function () {
+    if (battleRoster.length && !confirm('Remove every creature from the battle (including their rolled loot)?')) return;
+    bt.tokens = []; bt.selected.clear(); bt.selectedPlayer = null; bt.lastResult = ''; btClosePanel();
+    if (typeof clearBattleRoster === 'function') clearBattleRoster(); else btRenderField();
+  };
+  window.btHealAll = function () {
+    bt.tokens.forEach(t => { if (t.kind === 'monster') { t.entry.hp = t.entry.maxHp; t.entry.defeated = false; delete t.spellState; } else t.hp = t.maxHp; });
+    if (typeof renderCombatRoster === 'function') renderCombatRoster(); else btRenderField();
+  };
   window.btOnShow = function () {
-    btInit(); btRenderSide(); btRenderField();
+    btInit(); btRenderSide(); btRenderField();   // btRenderField also pulls every roster creature onto the board
     if (typeof loadMonsterDatabase === 'function') loadMonsterDatabase(false).then(() => btRenderSide());
   };
   // expose the pure-ish pieces for tests
