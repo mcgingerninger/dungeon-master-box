@@ -32,7 +32,7 @@
     .bt-token .disc { position:relative; width:60px; height:60px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; line-height:1;
       background:radial-gradient(circle at 35% 30%, var(--bt-hi), var(--bt-lo)); border:4px solid var(--bt-ring); box-shadow:0 3px 8px rgba(0,0,0,0.7), inset 0 0 8px rgba(0,0,0,0.5); }
     .bt-token.monster { --bt-hi:#b84444; --bt-lo:#4a1414; --bt-ring:#2b0d0d; }
-    .bt-token.monster .disc { background:none; border:none; box-shadow:none; width:64px; height:64px; } .bt-token.monster .disc svg { display:block; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
+    .bt-token.monster .disc { background:none; border:none; box-shadow:none; width:76px; height:76px; } .bt-token.monster .disc svg { display:block; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.7)); }
     .bt-token.monster.selected .disc svg { filter:drop-shadow(0 0 4px var(--gold)) drop-shadow(0 0 8px var(--gold)) !important; }
     .bt-token.monster.t-uncommon .disc svg { filter:drop-shadow(0 0 3px #4caf7d); } .bt-token.monster.t-rare .disc svg { filter:drop-shadow(0 0 3px #5b9cf6); } .bt-token.monster.t-superrare .disc svg { filter:drop-shadow(0 0 3px #c47cf5); } .bt-token.monster.t-legendary .disc svg { filter:drop-shadow(0 0 4px #e8963a); }
     .bt-chip .art { width:22px; height:22px; flex:0 0 auto; margin-right:0.35rem; } .bt-chip .art svg { display:block; }
@@ -218,7 +218,7 @@
       const tier = t.entry && t.entry.variant ? t.entry.variant.tier : '';
       const dead = t.hp <= 0 || (t.entry && t.entry.defeated);
       const cls = ['bt-token', t.kind, tier ? 't-' + tier : '', bt.selected.has(t.id) ? 'selected' : '', ready && t.kind === 'player' ? 'target-ready' : '', bt.selectedPlayer === t.id ? 'p-selected' : '', bt.selectedPlayer && t.kind === 'monster' && !dead ? 'attackable' : '', dead ? 'dead' : ''].join(' ');
-      const icon = t.kind === 'player' ? '🛡️' : (typeof monsterArtSvg === 'function' ? monsterArtSvg(t.monster, 64, true) : monsterIcon(t.monster));
+      const icon = t.kind === 'player' ? '🛡️' : (typeof monsterArtSvg === 'function' ? monsterArtSvg(t.monster, 76, true) : monsterIcon(t.monster));
       const stats = `<span class="ac" title="Armor Class">🛡 ${t.ac == null ? '—' : t.ac}</span>${t.sheet ? `<span class="lv" title="${esc((t.sheet.cls || 'Character') + ' level ' + t.sheet.level)}">L${t.sheet.level}</span>` : ''}<span class="bar" title="Hit points"><i style="width:${pct}%"></i><span>${t.hp}/${t.maxHp}</span></span>`;
       return `<div class="${cls}" data-id="${t.id}" style="left:${t.x}px;top:${t.y}px"><button class="x" data-x="${t.id}" title="Remove">×</button><div class="disc">${icon}</div><div class="lbl">${esc(t.name)}</div><div class="stats">${stats}</div></div>`;
     }).join('');

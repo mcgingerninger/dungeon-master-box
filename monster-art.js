@@ -313,23 +313,30 @@
   window.monsterArt = function (m) { const p = pick(m || {}); return { ...p, family: FAMILY[p.kind] || 'humanoid', colors: PAL[p.pal] || PAL.grey }; };
   // Inline SVG. `framed` adds the round gold-rimmed token backing used on the Battle Field.
   window.monsterArtSvg = function (m, px, framed) {
-    const art = window.monsterArt(m), grid = rasterize(art.kind, art.colors), c = art.colors;
+    const art = window.monsterArt(m), c = art.colors;
+    // Kinds with a high-detail 64x64 drawing (monster-art-hd.js) use it; everything else keeps the original 32x32 sprite.
+    const hd = window.MonsterArtHD && window.MonsterArtHD.has(art.kind);
+    const grid = hd ? window.MonsterArtHD.render(art.kind, c, art.pal) : rasterize(art.kind, c), G = grid.length, k = G / 32;
     let rects = '';
     grid.forEach((row, y) => {
       let x = 0;
-      while (x < N) {
+      while (x < G) {
         const col = row[x]; if (!col) { x++; continue; }
-        let run = 1; while (x + run < N && row[x + run] === col) run++;
+        let run = 1; while (x + run < G && row[x + run] === col) run++;
         rects += `<rect x="${x}" y="${y}" width="${run}" height="1" fill="${col}"/>`;
         x += run;
       }
     });
-    const bg = BG[art.family] || '#1f1f1f', id = 'ma' + Math.random().toString(36).slice(2, 7);
-    const head = `<svg class="monster-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${px}" height="${px}" shape-rendering="crispEdges" role="img" aria-label="${art.label}">`;
+    const bg = BG[art.family] || '#1f1f1f', id = 'ma' + Math.random().toString(36).slice(2, 7), cx = G / 2;
+    const head = `<svg class="monster-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${G} ${G}" width="${px}" height="${px}" shape-rendering="crispEdges" role="img" aria-label="${art.label}">`;
     if (!framed) return head + rects + '</svg>';
-    return head + `<defs><radialGradient id="${id}" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="${mix(bg, c.b, 0.45)}"/><stop offset="1" stop-color="${bg}"/></radialGradient><clipPath id="${id}c"><circle cx="16" cy="16" r="14.2"/></clipPath></defs>`
-      + `<circle cx="16" cy="16" r="15.4" fill="#2b200f"/><circle cx="16" cy="16" r="14.6" fill="url(#${id})"/><g clip-path="url(#${id}c)">${rects}</g>`
-      + `<circle cx="16" cy="16" r="15.4" fill="none" stroke="#c9a84c" stroke-width="1"/><circle cx="16" cy="16" r="14.4" fill="none" stroke="#6b5420" stroke-width="0.6"/></svg>`;
+    // HD portraits sit on a darker, vignetted backdrop so the lit art stays moody; the small sprites keep the original tinted disc.
+    const inner = hd ? mix(mix(bg, c.b, 0.25), '#000000', 0.55) : mix(bg, c.b, 0.45), outer = hd ? mix(bg, '#000000', 0.8) : bg;
+    return head + `<defs><radialGradient id="${id}" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="${inner}"/><stop offset="1" stop-color="${outer}"/></radialGradient><clipPath id="${id}c"><circle cx="${cx}" cy="${cx}" r="${14.2 * k}"/></clipPath>`
+      + (hd ? `<radialGradient id="${id}v" cx="50%" cy="50%" r="50%"><stop offset="0.62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.4"/></radialGradient>` : '') + `</defs>`
+      + `<circle cx="${cx}" cy="${cx}" r="${15.4 * k}" fill="#2b200f"/><circle cx="${cx}" cy="${cx}" r="${14.6 * k}" fill="url(#${id})"/><g clip-path="url(#${id}c)">${rects}</g>`
+      + (hd ? `<circle cx="${cx}" cy="${cx}" r="${14.6 * k}" fill="url(#${id}v)"/>` : '')
+      + `<circle cx="${cx}" cy="${cx}" r="${15.4 * k}" fill="none" stroke="#c9a84c" stroke-width="${k}"/><circle cx="${cx}" cy="${cx}" r="${14.4 * k}" fill="none" stroke="#6b5420" stroke-width="${0.6 * k}"/></svg>`;
   };
   window.MONSTER_ART_KINDS = Object.keys(D);
   window.PixelKit = { Canvas, mix, hex, N }; // shared with item-art.js
